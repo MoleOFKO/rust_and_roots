@@ -21,4 +21,5 @@
 }
 .lbl{
     -fx-text-fill: #643302;
+    font-weight: bold;
 }
