@@ -1,0 +1,25 @@
+/*about new game css*/ 
+.mcimageborder{
+    -fx-border-color: #643302;
+    -fx-border-radius: 5px;
+    -fx-border-width: 5px;
+    -fx-background-color: #904e0b;
+    -fx-background-radius: 6px;
+}
+.inputbox{
+    -fx-border-color: #643302;
+    -fx-border-radius: 2px;
+    -fx-border-width: 2px;
+    -fx-background-color: #904e0b;
+    -fx-background-radius: 6px;
+    -fx-text-fill: #643302;
+    -fx-prompt-text-fill: #643302;
+}
+.dashboard{
+    -fx-background-image: url("../image/dashboard.png.png");
+    -fx-background-size: cover;
+}
+.lbl{
+    -fx-text-fill: #643302;
+    font-weight: bold;
+}
