@@ -22,27 +22,27 @@
          <font>
             <Font name="System Bold" size="12.0" />
          </font></TextField>
-      <Label layoutX="369.0" layoutY="154.0" prefHeight="19.0" prefWidth="48.0" styleClass="lbl" stylesheets="@../css/style.css" text="[STR] : " textFill="#643302">
+      <Label layoutX="359.0" layoutY="180.0" prefHeight="19.0" prefWidth="48.0" styleClass="lbl" stylesheets="@../css/style.css" text="[STR] : " textFill="#643302">
          <font>
             <Font name="System Bold" size="13.0" />
          </font></Label>
-      <Label layoutX="372.0" layoutY="214.0" prefHeight="17.0" prefWidth="38.0" text="[VIT] :" textFill="#643302">
+      <Label layoutX="361.0" layoutY="212.0" prefHeight="17.0" prefWidth="38.0" text="[VIT] :" textFill="#643302">
          <font>
             <Font name="System Bold" size="13.0" />
          </font></Label>
-      <Label layoutX="369.0" layoutY="184.0" prefHeight="19.0" prefWidth="48.0" text="[AGI] :" textFill="#643302">
+      <Label layoutX="502.0" layoutY="212.0" prefHeight="19.0" prefWidth="48.0" text="[AGI] :" textFill="#643302">
          <font>
             <Font name="System Bold" size="13.0" />
          </font></Label>
-      <Label fx:id="lblstr" layoutX="421.0" layoutY="154.0" prefHeight="17.0" prefWidth="29.0" text="0" textFill="#643302">
+      <Label fx:id="lblstr" layoutX="411.0" layoutY="180.0" prefHeight="17.0" prefWidth="29.0" text="0" textFill="#643302">
          <font>
             <Font name="System Bold" size="13.0" />
          </font></Label>
-      <Label fx:id="lblagi" layoutX="421.0" layoutY="184.0" prefHeight="17.0" prefWidth="33.0" text="0" textFill="#643302">
+      <Label fx:id="lblagi" layoutX="551.0" layoutY="212.0" prefHeight="17.0" prefWidth="33.0" text="0" textFill="#643302">
          <font>
             <Font name="System Bold" size="13.0" />
          </font></Label>
-      <Label fx:id="lblvit" layoutX="421.0" layoutY="214.0" prefHeight="17.0" prefWidth="31.0" text="0" textFill="#643302">
+      <Label fx:id="lblvit" layoutX="411.0" layoutY="212.0" prefHeight="17.0" prefWidth="31.0" text="0" textFill="#643302">
          <font>
             <Font name="System Bold" size="13.0" />
          </font></Label>
@@ -64,27 +64,27 @@
             <FontAwesomeIcon glyphName="ARROW_LEFT" />
          </graphic>
       </Button>
-      <Label layoutX="511.0" layoutY="154.0" text="[DEX] : " textFill="#643302">
+      <Label layoutX="501.0" layoutY="180.0" text="[DEX] : " textFill="#643302">
          <font>
             <Font name="System Bold" size="13.0" />
          </font></Label>
-      <Label fx:id="lbldex" layoutX="561.0" layoutY="154.0" prefHeight="17.0" prefWidth="20.0" text="0" textFill="#643302">
+      <Label fx:id="lbldex" layoutX="551.0" layoutY="180.0" prefHeight="17.0" prefWidth="20.0" text="0" textFill="#643302">
          <font>
             <Font name="System Bold" size="13.0" />
          </font></Label>
-      <Label layoutX="517.0" layoutY="184.0" text="[HP] :" textFill="#643302">
+      <Label layoutX="368.0" layoutY="150.0" text="[HP] :" textFill="#643302">
          <font>
             <Font name="System Bold" size="12.0" />
          </font></Label>
-      <Label fx:id="lblhp" layoutX="561.0" layoutY="184.0" prefHeight="17.0" prefWidth="20.0" text="0" textFill="#643302">
+      <Label fx:id="lblhp" layoutX="412.0" layoutY="150.0" prefHeight="17.0" prefWidth="20.0" text="0" textFill="#643302">
          <font>
             <Font name="System Bold" size="13.0" />
          </font></Label>
-      <Label layoutX="481.0" layoutY="214.0" text="[STAMINA] :" textFill="#643302">
+      <Label layoutX="465.0" layoutY="150.0" text="[STAMINA] :" textFill="#643302">
          <font>
             <Font name="System Bold" size="13.0" />
          </font></Label>
-      <Label fx:id="lblstamina" layoutX="561.0" layoutY="214.0" prefHeight="17.0" prefWidth="20.0" text="0" textFill="#643302">
+      <Label fx:id="lblstamina" layoutX="552.0" layoutY="150.0" prefHeight="17.0" prefWidth="20.0" text="0" textFill="#643302">
          <font>
             <Font name="System Bold" size="13.0" />
          </font></Label>
