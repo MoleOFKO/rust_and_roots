@@ -69,6 +69,8 @@ public class New_gameController implements Initializable {
     private void handlebtnStartGame(ActionEvent event) throws IOException {
         if(txtchaname.getText().isEmpty())
             JOptionPane.showMessageDialog(null, "Please Enter Character Name!");
+        else if(txtworldname.getText().isEmpty())
+            JOptionPane.showMessageDialog(null, "Please Enter World Name!");
         else{
             char_name = txtchaname.getText();
             world_name = txtworldname.getText();
