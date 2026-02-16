@@ -23,3 +23,67 @@
     -fx-text-fill: #643302;
     font-weight: bold;
 }
+.pane{
+    -fx-background-image: url("../image/homemapuse.png");
+}
+.btn_transparent{
+    -fx-background-color: transparent;
+    /*-fx-border-color: black;*/
+}
+.btn_transparent:hover{
+    -fx-border-color: #ffffff;
+}
+.btn_transparent:active{
+    -fx-border-color: white;
+}
+
+.stackpane{
+    -fx-border-color: #000;
+    -fx-border-radius: 5px;
+    -fx-border-width: 2px;
+    -fx-padding: 2px;
+    -fx-background-color: #666666;
+    -fx-background-radius: 5px;
+}
+.label{
+    -fx-alignment: bottom-right; 
+}
+.btninventory{
+    -fx-background-color:  #9da4aa;
+    -fx-border-color: black;
+}
+.hbox{
+    -fx-border-color: black;
+    -fx-padding: 2px;
+    -fx-background-color:  #9da4aa;
+    -fx-background-radius: 5px;
+    -fx-border-radius: 5px;
+}
+.inventory-overlay {
+    -fx-background-color: rgba(0,0,0,0.55);
+    -fx-alignment: center;
+}
+
+.inventory-panel {
+    -fx-background-color: #9da4aa;
+    -fx-border-color: black;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-padding: 14px;
+}
+
+.inventory-title {
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
+
+.anchorpane {
+    -fx-background-color: rgb(105,56,33);
+    -fx-border-color: rgb(77,41,24);
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+    -fx-border-width: 5px;
+}
+.tableplant {
+    -fx-alignment: center;
+}
