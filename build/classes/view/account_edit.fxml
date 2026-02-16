@@ -7,7 +7,7 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane id="AnchorPane" prefHeight="319.0" prefWidth="490.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane id="AnchorPane" prefHeight="319.0" prefWidth="490.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Account_editController">
    <children>
       <Label layoutX="14.0" layoutY="27.0" prefHeight="17.0" prefWidth="49.0" text="Admin:" />
       <Label fx:id="lblaname" layoutX="63.0" layoutY="27.0" prefHeight="17.0" prefWidth="49.0" text="Name" />
