@@ -37,15 +37,15 @@
       </Group>
             <Group fx:id="walls" layoutX="-6.0" layoutY="-3.0">
                <children>
-            <Rectangle fx:id="wall" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="5.0" layoutX="490.0" stroke="TRANSPARENT" strokeType="INSIDE" width="116.0" />
+            <Rectangle fx:id="wall" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="10.0" layoutX="354.0" stroke="TRANSPARENT" strokeType="INSIDE" width="252.0" />
             <Rectangle fx:id="wall1" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="5.0" layoutX="3.0" layoutY="403.0" stroke="TRANSPARENT" strokeType="INSIDE" width="601.0" />
             <Rectangle fx:id="wall2" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="74.0" layoutX="3.0" layoutY="169.0" stroke="TRANSPARENT" strokeType="INSIDE" width="23.0" />
-            <Rectangle fx:id="wall3" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="129.0" layoutX="600.0" layoutY="10.0" stroke="TRANSPARENT" strokeType="INSIDE" width="8.0" />
+            <Rectangle fx:id="wall3" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="199.0" layoutX="600.0" layoutY="10.0" stroke="TRANSPARENT" strokeType="INSIDE" width="8.0" />
             <Rectangle fx:id="wall4" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="157.0" layoutX="600.0" layoutY="237.0" stroke="TRANSPARENT" strokeType="INSIDE" width="8.0" />
             <Rectangle fx:id="wall5" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="5.0" stroke="TRANSPARENT" strokeType="INSIDE" width="439.0" />
-            <Rectangle fx:id="wall6" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="90.0" layoutX="3.0" layoutY="318.0" stroke="TRANSPARENT" strokeType="INSIDE" width="8.0" />
+            <Rectangle fx:id="wall6" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="168.0" layoutX="3.0" layoutY="239.0" stroke="TRANSPARENT" strokeType="INSIDE" width="10.0" />
             <Rectangle fx:id="wall7" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="5.0" layoutX="223.0" layoutY="395.0" stroke="TRANSPARENT" strokeType="INSIDE" width="379.0" />
-            <Rectangle fx:id="wall8" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="55.0" layoutX="552.0" layoutY="179.0" stroke="TRANSPARENT" strokeType="INSIDE" width="53.0" y="1.0" />
+            <Rectangle fx:id="wall8" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="55.0" layoutX="552.0" layoutY="180.0" stroke="TRANSPARENT" strokeType="INSIDE" width="53.0" y="1.0" />
             <Rectangle fx:id="wall9" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="108.0" layoutX="3.0" layoutY="56.0" stroke="TRANSPARENT" strokeType="INSIDE" width="8.0" />
             <Rectangle fx:id="wall10" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="5.0" layoutX="2.0" layoutY="48.0" stroke="TRANSPARENT" strokeType="INSIDE" width="126.0" />
             <Rectangle fx:id="wall11" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="10.0" layoutX="284.0" layoutY="152.0" stroke="TRANSPARENT" strokeType="INSIDE" width="97.0" />
@@ -127,6 +127,30 @@
             <Button fx:id="btnmerchant" disable="true" mnemonicParsing="false" onAction="#onMerchantShopClick" prefHeight="41.0" prefWidth="58.0" styleClass="btn_transparent" stylesheets="@../css/style.css" />
          </children>
       </Group>
+            <Group fx:id="home" layoutX="148.0" layoutY="81.0">
+               <children>
+                  <Rectangle fx:id="homedetect" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="45.0" stroke="TRANSPARENT" strokeType="INSIDE" width="110.0" />
+                  <Button fx:id="doorbtn" disable="true" mnemonicParsing="false" onAction="#handledoorbtnaction" prefHeight="45.0" prefWidth="109.0" styleClass="btn_transparent" stylesheets="@../css/style.css" />
+               </children>
+            </Group>
+            <Group fx:id="leftMap" layoutX="-4.0" layoutY="260.0">
+               <children>
+                  <Rectangle fx:id="leftmapdetect" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="45.0" stroke="TRANSPARENT" strokeType="INSIDE" width="16.0" />
+                  <Button fx:id="leftmsp" disable="true" mnemonicParsing="false" onAction="#updateleftmapInteraction" prefHeight="45.0" prefWidth="7.0" styleClass="btn_transparent" stylesheets="@../css/style.css" />
+               </children>
+            </Group>
+            <Group fx:id="rightMap" layoutX="586.0" layoutY="144.0">
+               <children>
+                  <Rectangle fx:id="rightmapdetect" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="45.0" stroke="TRANSPARENT" strokeType="INSIDE" width="16.0" />
+                  <Button fx:id="rightmsp" disable="true" mnemonicParsing="false" onAction="#handlerightmapaction" prefHeight="45.0" prefWidth="7.0" styleClass="btn_transparent" stylesheets="@../css/style.css" />
+               </children>
+            </Group>
+            <Group fx:id="upperMap" layoutX="435.0" layoutY="-2.0">
+               <children>
+                  <Rectangle fx:id="uppermapdetect" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="25.0" stroke="TRANSPARENT" strokeType="INSIDE" width="41.0" />
+                  <Button fx:id="uppermsp" disable="true" mnemonicParsing="false" onAction="#handleuppermapaction" prefHeight="10.0" prefWidth="42.0" styleClass="btn_transparent" stylesheets="@../css/style.css" />
+               </children>
+            </Group>
             <TableView disable="true" layoutX="132.0" layoutY="56.0" prefHeight="240.0" prefWidth="330.0" visible="false">
               <columns>
                 <TableColumn prefWidth="75.0" text="C1" />
