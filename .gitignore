@@ -1,4 +1,9 @@
+# NetBeans user-specific
 nbproject/private/
+nbproject/.DS_Store
+
+# Build outputs
 build/
 dist/
+out/
 *.class
