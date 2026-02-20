@@ -1,5 +1,6 @@
 package controller;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,8 +38,11 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import static rust_and_roots.Rust_and_roots.stage;
 
 
 
@@ -47,12 +51,12 @@ import javafx.scene.control.TableView;
  */
 public class home_mapController implements Initializable {
     
+    Parent root;
     private Player player;
     private Farm farm;
     private Merchant merChant;
-    private boolean shop=false;
+    private boolean shop=false,homeInside=false,leftmapInside=false,rightmapInside=false,uppermapInside=false;
     private AnimationTimer gameloop;
-
     private static final double BASE_WIDTH  = 600;
     private static final double BASE_HEIGHT = 400;
     
@@ -81,7 +85,6 @@ public class home_mapController implements Initializable {
     private Rectangle wall3;
     @FXML
     private Rectangle wall4;
-    
     @FXML
     private Rectangle wall5;
     @FXML
@@ -298,6 +301,30 @@ public class home_mapController implements Initializable {
     private TableColumn<InventoryRow, Number> colQty;
     @FXML
     private Label invCoinsLabel;
+    @FXML
+    private Group home;
+    @FXML
+    private Rectangle homedetect;
+    @FXML
+    private Button doorbtn;
+    @FXML
+    private Group leftMap;
+    @FXML
+    private Rectangle leftmapdetect;
+    @FXML
+    private Button leftmsp;
+    @FXML
+    private Group rightMap;
+    @FXML
+    private Rectangle rightmapdetect;
+    @FXML
+    private Button rightmsp;
+    @FXML
+    private Group upperMap;
+    @FXML
+    private Rectangle uppermapdetect;
+    @FXML
+    private Button uppermsp;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -449,6 +476,10 @@ public class home_mapController implements Initializable {
                 Bounds playerBounds = human_hitbox.localToScene(human_hitbox.getBoundsInLocal());
                 farm.updatePlayerBounds(playerBounds);
                 updateMerchantInteraction();
+                updateHomeInteraction();
+                updateuppermapInteraction();
+                updaterightmapInteraction();
+                updateleftmapInteraction();
             }
         };
         gameloop.start();
@@ -619,6 +650,94 @@ public class home_mapController implements Initializable {
                 // reattach movement input
                 player.attachInput(view.getScene());
             }
+        }
+    }
+
+    @FXML
+    private void handledoorbtnaction(ActionEvent event) throws IOException {
+        root = FXMLLoader.load(getClass().getResource("/view/home_interior.fxml"));
+        Scene scene = new Scene(root, 600, 400);
+        stage.setScene(scene);
+        stage.show();
+    }
+    private void updateHomeInteraction() {
+
+    Bounds playerBounds = human_hitbox.localToScene(human_hitbox.getBoundsInLocal());
+    Bounds homeBounds   = homedetect.localToScene(homedetect.getBoundsInLocal());
+
+    boolean nowInside = playerBounds.intersects(homeBounds);
+
+    if (nowInside != homeInside) {
+        homeInside = nowInside;
+
+        doorbtn.setDisable(!nowInside);
+        doorbtn.setVisible(nowInside);
+    }
+}
+
+    private void handleleftmapaction(ActionEvent event) throws IOException {
+        root = FXMLLoader.load(getClass().getResource("/view/left_map.fxml"));
+        Scene scene = new Scene(root, 600, 400);
+        stage.setScene(scene);
+        stage.show();
+    }
+    @FXML
+    public void updateleftmapInteraction() {
+
+    Bounds playerBounds = human_hitbox.localToScene(human_hitbox.getBoundsInLocal());
+    Bounds leftmapBounds   = leftmapdetect.localToScene(leftmapdetect.getBoundsInLocal());
+
+    boolean nowInside = playerBounds.intersects(leftmapBounds);
+
+    if (nowInside != leftmapInside) {
+        leftmapInside = nowInside;
+
+        leftmsp.setDisable(!nowInside);
+        leftmsp.setVisible(nowInside);
+    }
+    }
+
+    @FXML
+    private void handlerightmapaction(ActionEvent event) throws IOException {
+        root = FXMLLoader.load(getClass().getResource("/view/right_map.fxml"));
+        Scene scene = new Scene(root, 600, 400);
+        stage.setScene(scene);
+        stage.show();
+    }
+    private void updaterightmapInteraction() {
+
+    Bounds playerBounds = human_hitbox.localToScene(human_hitbox.getBoundsInLocal());
+    Bounds rightmapBounds   = rightmapdetect.localToScene(rightmapdetect.getBoundsInLocal());
+
+    boolean nowInside = playerBounds.intersects(rightmapBounds);
+
+    if (nowInside != rightmapInside) {
+        rightmapInside = nowInside;
+
+        rightmsp.setDisable(!nowInside);
+        rightmsp.setVisible(nowInside);
+    }
+    }
+
+    @FXML
+    private void handleuppermapaction(ActionEvent event) throws IOException {
+        root = FXMLLoader.load(getClass().getResource("/view/upper_map.fxml"));
+        Scene scene = new Scene(root, 600, 400);
+        stage.setScene(scene);
+        stage.show();
+    }
+    private void updateuppermapInteraction() {
+
+    Bounds playerBounds = human_hitbox.localToScene(human_hitbox.getBoundsInLocal());
+    Bounds uppermapBounds   = uppermapdetect.localToScene(uppermapdetect.getBoundsInLocal());
+
+    boolean nowInside = playerBounds.intersects(uppermapBounds);
+
+        if (nowInside != uppermapInside) {
+            uppermapInside = nowInside;
+
+            uppermsp.setDisable(!nowInside);
+            uppermsp.setVisible(nowInside);
         }
     }
     
