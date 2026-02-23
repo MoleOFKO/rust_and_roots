@@ -1,4 +1,21 @@
+# NetBeans user-specific
 nbproject/private/
+nbproject/.DS_Store
+
+# Build outputs
 build/
 dist/
+out/
 *.class
+.idea/libraries/fontawesomefx_8_2.xml
+.idea/libraries/lib.xml
+.idea/misc.xml
+.idea/vcs.xml
+.idea/workspace.xml
+build/built-jar.properties
+build/built-jar.properties
+nbproject/private/private.xml
+nbproject/private/private.xml
+nbproject/private/private.xml
+nbproject/private/private.xml
+nbproject/private/private.xml
