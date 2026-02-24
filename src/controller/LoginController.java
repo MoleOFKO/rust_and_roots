@@ -80,6 +80,7 @@ public class LoginController implements Initializable {
             con=db.getConnection();
         }catch(ClassNotFoundException ex){
             System.out.println("Connection not found.....");
+            ex.printStackTrace();
         }
     }    
 
