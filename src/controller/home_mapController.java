@@ -5,8 +5,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
-import javafx.animation.AnimationTimer;
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -21,8 +19,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import model.Farm;
@@ -33,13 +29,6 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import model.ItemType;
 import model.Merchant;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.MapChangeListener;
-import javafx.collections.ObservableList;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import model.CollisionRegistry;
@@ -47,7 +36,6 @@ import model.FarmPlotRegistrar;
 import game.GameLoopManager;
 import game.InteractionManager;
 import model.InteractionZone;
-import static rust_and_roots.Rust_and_roots.stage;
 import ui.InventoryRow;
 import ui.InventoryUIManager;
 import util.SceneManager;
@@ -59,8 +47,6 @@ import util.WorldScaler;
  * FXML Controller class
  */
 public class home_mapController implements Initializable {
-    
-    Parent root;
     private GameLoopManager gameLoop;
     private Player player;
     private Farm farm;
@@ -75,10 +61,6 @@ public class home_mapController implements Initializable {
     private InteractionManager interactionManager;
     private InventoryUIManager inventoryUIManager;
     
-    private AnimationTimer gameloop;
-    private static final double BASE_WIDTH  = 600;
-    private static final double BASE_HEIGHT = 400;
-    
     private final List<StackPane> slots = new ArrayList<>();
     private final List<Button> slotButtons = new ArrayList<>();
 
@@ -92,66 +74,6 @@ public class home_mapController implements Initializable {
     private ImageView human_img;
     @FXML
     private Rectangle human_hitbox;
-    @FXML
-    private Rectangle wall;
-    @FXML
-    private Rectangle wall1;
-    @FXML
-    private Rectangle wall2;
-    @FXML
-    private Rectangle wall3;
-    @FXML
-    private Rectangle wall4;
-    @FXML
-    private Rectangle wall5;
-    @FXML
-    private Rectangle wall6;
-    @FXML
-    private Rectangle wall7;
-    @FXML
-    private Rectangle wall8;
-    @FXML
-    private Rectangle wall9;
-    @FXML
-    private Rectangle wall10;
-    @FXML
-    private Rectangle wall11;
-    @FXML
-    private Rectangle wall12;
-    @FXML
-    private Rectangle wall13;
-    @FXML
-    private Rectangle wall14;
-    @FXML
-    private Rectangle wall15;
-    @FXML
-    private Rectangle wall16;
-    @FXML
-    private Rectangle wall17;
-    @FXML
-    private Rectangle wall18;
-    @FXML
-    private Rectangle wall19;
-    @FXML
-    private Rectangle wall20;
-    @FXML
-    private Rectangle wall21;
-    @FXML
-    private Rectangle wall22;
-    @FXML
-    private Rectangle wall23;
-    @FXML
-    private Rectangle wall24;
-    @FXML
-    private Rectangle wall25;
-    @FXML
-    private Rectangle wall26;
-    @FXML
-    private Rectangle wall27;
-    @FXML
-    private Rectangle wall28;
-    @FXML
-    private Rectangle wall29;
     @FXML
     private Group farm1;
     @FXML
@@ -429,15 +351,6 @@ public class home_mapController implements Initializable {
         });
         interactionManager = new InteractionManager();
 
-        interactionManager.addZone(
-            new InteractionZone(merchantdetect, inside -> {
-                shop = inside;
-                btnmerchant.setDisable(!inside);
-            })
-        );
-
-        new WorldScaler(view, world);
-
         merchantZone = new InteractionZone(merchantdetect, inside -> {
             shop = inside;
             btnmerchant.setDisable(!inside);
@@ -467,8 +380,15 @@ public class home_mapController implements Initializable {
             uppermsp.setVisible(inside);
         });
 
+        interactionManager.addZone(merchantZone);
+        interactionManager.addZone(homeZone);
+        interactionManager.addZone(leftMapZone);
+        interactionManager.addZone(rightMapZone);
+        interactionManager.addZone(upperMapZone);
+        
         startGameLoop();
         player.start();
+        new WorldScaler(view, world);
     }
     
     private void selectSlot(int idx) {
@@ -506,11 +426,6 @@ public class home_mapController implements Initializable {
             );
 
             farm.updatePlayerBounds(playerBounds);
-//            merchantZone.update(playerBounds); //works fine
-//            homeZone.update(playerBounds);    //not ok
-//            leftMapZone.update(playerBounds); //not ok
-//            rightMapZone.update(playerBounds);    //not ok
-//            upperMapZone.update(playerBounds);    //not ok
             interactionManager.updateAll(playerBounds);
         });
 
@@ -624,77 +539,20 @@ public class home_mapController implements Initializable {
     private void handledoorbtnaction(ActionEvent event) throws IOException {
         SceneManager.switchScene("/view/home_interior.fxml");
     }
-    private void updateHomeInteraction() {
-
-    Bounds playerBounds = human_hitbox.localToScene(human_hitbox.getBoundsInLocal());
-    Bounds homeBounds   = homedetect.localToScene(homedetect.getBoundsInLocal());
-
-    boolean nowInside = playerBounds.intersects(homeBounds);
-
-    if (nowInside != homeInside) {
-        homeInside = nowInside;
-
-        doorbtn.setDisable(!nowInside);
-        doorbtn.setVisible(nowInside);
-    }
-}
-
+    
     @FXML
     private void handleleftmapaction(ActionEvent event) throws IOException {
         SceneManager.switchScene("/view/left_map.fxml");
     }
     
-    public void updateleftmapInteraction() {
-
-    Bounds playerBounds = human_hitbox.localToScene(human_hitbox.getBoundsInLocal());
-    Bounds leftmapBounds   = leftmapdetect.localToScene(leftmapdetect.getBoundsInLocal());
-
-    boolean nowInside = playerBounds.intersects(leftmapBounds);
-
-    if (nowInside != leftmapInside) {
-        leftmapInside = nowInside;
-
-        leftmsp.setDisable(!nowInside);
-        leftmsp.setVisible(nowInside);
-    }
-    }
-
     @FXML
     private void handlerightmapaction(ActionEvent event) throws IOException {
         SceneManager.switchScene("/view/right_map.fxml");
     }
-    private void updaterightmapInteraction() {
-
-    Bounds playerBounds = human_hitbox.localToScene(human_hitbox.getBoundsInLocal());
-    Bounds rightmapBounds   = rightmapdetect.localToScene(rightmapdetect.getBoundsInLocal());
-
-    boolean nowInside = playerBounds.intersects(rightmapBounds);
-
-    if (nowInside != rightmapInside) {
-        rightmapInside = nowInside;
-
-        rightmsp.setDisable(!nowInside);
-        rightmsp.setVisible(nowInside);
-    }
-    }
-
+    
     @FXML
     private void handleuppermapaction(ActionEvent event) throws IOException {
         SceneManager.switchScene("/view/upper_map.fxml");
-    }
-    private void updateuppermapInteraction() {
-
-    Bounds playerBounds = human_hitbox.localToScene(human_hitbox.getBoundsInLocal());
-    Bounds uppermapBounds   = uppermapdetect.localToScene(uppermapdetect.getBoundsInLocal());
-
-    boolean nowInside = playerBounds.intersects(uppermapBounds);
-
-        if (nowInside != uppermapInside) {
-            uppermapInside = nowInside;
-
-            uppermsp.setDisable(!nowInside);
-            uppermsp.setVisible(nowInside);
-        }
     }
     
 }
