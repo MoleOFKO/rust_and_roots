@@ -21,8 +21,7 @@ public class InventoryUIManager {
     private final TableColumn<InventoryRow, String> colItem;
     private final TableColumn<InventoryRow, Number> colQty;
     private final Label coinsLabel;
-    private final ObservableList<InventoryRow> rows =
-            FXCollections.observableArrayList();
+    private final ObservableList<InventoryRow> rows = FXCollections.observableArrayList();
 
     public InventoryUIManager(
         TableView<InventoryRow> table,
