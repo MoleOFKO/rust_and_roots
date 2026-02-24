@@ -349,6 +349,7 @@ public class home_mapController implements Initializable {
                 player.attachInput(newScene);
             }
         });
+        
         interactionManager = new InteractionManager();
 
         merchantZone = new InteractionZone(merchantdetect, inside -> {
@@ -441,19 +442,6 @@ public class home_mapController implements Initializable {
         FarmPlotRegistrar.registerPlots(farm, farm1);
     }
     
-    private void updateMerchantInteraction() {
-        
-        Bounds playerBounds = human_hitbox.localToScene(human_hitbox.getBoundsInLocal());
-        Bounds merchBounds  = merchantdetect.localToScene(merchantdetect.getBoundsInLocal());
-
-        boolean nowInside = playerBounds.intersects(merchBounds);
-
-        if (nowInside != shop) {
-            shop = nowInside;
-            btnmerchant.setDisable(!nowInside);
-        }
-    }
-
     private void openShopWindow() {
         ListView<Merchant.ShopItem> listView = new ListView<>();
         listView.getItems().addAll(merChant.getItems());
