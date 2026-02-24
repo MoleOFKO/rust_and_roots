@@ -19,6 +19,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -41,7 +42,7 @@ public class LoginController implements Initializable {
     PreparedStatement pst;
     
     @FXML
-    private Pane login_pane;
+    private Group login_pane;
     @FXML
     private Button btnlogin;
     @FXML
@@ -51,7 +52,7 @@ public class LoginController implements Initializable {
     @FXML
     private Hyperlink sihl;
     @FXML
-    private Pane sign_inpane;
+    private Group sign_inpane;
     @FXML
     private Button btnsignin;
     @FXML
@@ -79,6 +80,7 @@ public class LoginController implements Initializable {
             con=db.getConnection();
         }catch(ClassNotFoundException ex){
             System.out.println("Connection not found.....");
+            ex.printStackTrace();
         }
     }    
 
