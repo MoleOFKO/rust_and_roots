@@ -1,11 +1,10 @@
 package controller;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
-import javafx.animation.AnimationTimer;
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -20,8 +19,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import model.Farm;
@@ -32,13 +29,17 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import model.ItemType;
 import model.Merchant;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.MapChangeListener;
-import javafx.collections.ObservableList;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import model.CollisionRegistry;
+import model.FarmPlotRegistrar;
+import game.GameLoopManager;
+import game.InteractionManager;
+import model.InteractionZone;
+import ui.InventoryRow;
+import ui.InventoryUIManager;
+import util.SceneManager;
+import util.WorldScaler;
 
 
 
@@ -46,23 +47,25 @@ import javafx.scene.control.TableView;
  * FXML Controller class
  */
 public class home_mapController implements Initializable {
-    
+    private GameLoopManager gameLoop;
     private Player player;
     private Farm farm;
     private Merchant merChant;
-    private boolean shop=false;
-    private AnimationTimer gameloop;
-
-    private static final double BASE_WIDTH  = 600;
-    private static final double BASE_HEIGHT = 400;
+    
+    private boolean shop=false,homeInside=false,leftmapInside=false,rightmapInside=false,uppermapInside=false;
+    private InteractionZone merchantZone;
+    private InteractionZone homeZone;
+    private InteractionZone leftMapZone;
+    private InteractionZone rightMapZone;
+    private InteractionZone upperMapZone;
+    private InteractionManager interactionManager;
+    private InventoryUIManager inventoryUIManager;
     
     private final List<StackPane> slots = new ArrayList<>();
     private final List<Button> slotButtons = new ArrayList<>();
 
     private int selectedIndex = -1;
     
-    private final ObservableList<InventoryRow> invRows = FXCollections.observableArrayList();
-
     @FXML
     private StackPane view;
     @FXML
@@ -71,67 +74,6 @@ public class home_mapController implements Initializable {
     private ImageView human_img;
     @FXML
     private Rectangle human_hitbox;
-    @FXML
-    private Rectangle wall;
-    @FXML
-    private Rectangle wall1;
-    @FXML
-    private Rectangle wall2;
-    @FXML
-    private Rectangle wall3;
-    @FXML
-    private Rectangle wall4;
-    
-    @FXML
-    private Rectangle wall5;
-    @FXML
-    private Rectangle wall6;
-    @FXML
-    private Rectangle wall7;
-    @FXML
-    private Rectangle wall8;
-    @FXML
-    private Rectangle wall9;
-    @FXML
-    private Rectangle wall10;
-    @FXML
-    private Rectangle wall11;
-    @FXML
-    private Rectangle wall12;
-    @FXML
-    private Rectangle wall13;
-    @FXML
-    private Rectangle wall14;
-    @FXML
-    private Rectangle wall15;
-    @FXML
-    private Rectangle wall16;
-    @FXML
-    private Rectangle wall17;
-    @FXML
-    private Rectangle wall18;
-    @FXML
-    private Rectangle wall19;
-    @FXML
-    private Rectangle wall20;
-    @FXML
-    private Rectangle wall21;
-    @FXML
-    private Rectangle wall22;
-    @FXML
-    private Rectangle wall23;
-    @FXML
-    private Rectangle wall24;
-    @FXML
-    private Rectangle wall25;
-    @FXML
-    private Rectangle wall26;
-    @FXML
-    private Rectangle wall27;
-    @FXML
-    private Rectangle wall28;
-    @FXML
-    private Rectangle wall29;
     @FXML
     private Group farm1;
     @FXML
@@ -298,6 +240,30 @@ public class home_mapController implements Initializable {
     private TableColumn<InventoryRow, Number> colQty;
     @FXML
     private Label invCoinsLabel;
+    @FXML
+    private Group home;
+    @FXML
+    private Rectangle homedetect;
+    @FXML
+    private Button doorbtn;
+    @FXML
+    private Group leftMap;
+    @FXML
+    private Rectangle leftmapdetect;
+    @FXML
+    private Button leftmsp;
+    @FXML
+    private Group rightMap;
+    @FXML
+    private Rectangle rightmapdetect;
+    @FXML
+    private Button rightmsp;
+    @FXML
+    private Group upperMap;
+    @FXML
+    private Rectangle uppermapdetect;
+    @FXML
+    private Button uppermsp;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -311,9 +277,14 @@ public class home_mapController implements Initializable {
                 150_000_000L
         );
         
-        setupInventoryTable();
-        setupInventoryBindings();
-
+        inventoryUIManager = new InventoryUIManager(
+                invTable,
+                colItem,
+                colQty,
+                invCoinsLabel,
+                player.getInventory()
+        );
+        
         // keep only real item slots selectable (0..4)
         slots.clear();
         slotButtons.clear();
@@ -344,7 +315,7 @@ public class home_mapController implements Initializable {
         //Start animation
         merChant.play();
         
-         registerAllWalls();
+        registerAllWalls();
 
         farm = new Farm(farm1, farm1_detection, farm1_button);
         farm.setAvailableSeeds(
@@ -378,40 +349,47 @@ public class home_mapController implements Initializable {
                 player.attachInput(newScene);
             }
         });
+        
+        interactionManager = new InteractionManager();
 
-
-        startGameLoop();
-        player.start();
-
-        // 2) Prepare world
-        world.setManaged(true);
-        world.setLayoutX(0);
-        world.setLayoutY(0);
-        world.setTranslateX(0);
-        world.setTranslateY(0);
-
-        view.setStyle("-fx-background-color: black;");
-
-        // 3) Add listeners LAST (after everything exists)
-        view.widthProperty().addListener((obs, oldVal, newVal) -> requestScale());
-        view.heightProperty().addListener((obs, oldVal, newVal) -> requestScale());
-
-        view.sceneProperty().addListener((obs, oldScene, newScene) -> {
-            if (newScene == null) return;
-
-            // ✅ Force the root AnchorPane to always match the scene size
-            view.prefWidthProperty().bind(newScene.widthProperty());
-            view.prefHeightProperty().bind(newScene.heightProperty());
-
-            // if you want, also:
-            view.minWidthProperty().bind(newScene.widthProperty());
-            view.minHeightProperty().bind(newScene.heightProperty());
-
-            player.attachInput(newScene);
-
-            Platform.runLater(this::requestScale);
+        merchantZone = new InteractionZone(merchantdetect, inside -> {
+            shop = inside;
+            btnmerchant.setDisable(!inside);
         });
 
+        homeZone = new InteractionZone(homedetect, inside -> {
+            homeInside = inside;
+            doorbtn.setDisable(!inside);
+            doorbtn.setVisible(inside);
+        });
+
+        leftMapZone = new InteractionZone(leftmapdetect, inside -> {
+            leftmapInside = inside;
+            leftmsp.setDisable(!inside);
+            leftmsp.setVisible(inside);
+        });
+
+        rightMapZone = new InteractionZone(rightmapdetect, inside -> {
+            rightmapInside = inside;
+            rightmsp.setDisable(!inside);
+            rightmsp.setVisible(inside);
+        });
+
+        upperMapZone = new InteractionZone(uppermapdetect, inside -> {
+            uppermapInside = inside;
+            uppermsp.setDisable(!inside);
+            uppermsp.setVisible(inside);
+        });
+
+        interactionManager.addZone(merchantZone);
+        interactionManager.addZone(homeZone);
+        interactionManager.addZone(leftMapZone);
+        interactionManager.addZone(rightMapZone);
+        interactionManager.addZone(upperMapZone);
+        
+        startGameLoop();
+        player.start();
+        new WorldScaler(view, world);
     }
     
     private void selectSlot(int idx) {
@@ -443,71 +421,27 @@ public class home_mapController implements Initializable {
     }
 
     private void startGameLoop(){
-        gameloop = new AnimationTimer() {
-            @Override
-            public void handle(long now) {
-                Bounds playerBounds = human_hitbox.localToScene(human_hitbox.getBoundsInLocal());
-                farm.updatePlayerBounds(playerBounds);
-                updateMerchantInteraction();
-            }
-        };
-        gameloop.start();
+        gameLoop = new GameLoopManager(() -> {
+            Bounds playerBounds = human_hitbox.localToScene(
+                human_hitbox.getBoundsInLocal()
+            );
+
+            farm.updatePlayerBounds(playerBounds);
+            interactionManager.updateAll(playerBounds);
+        });
+
+        gameLoop.start();
     }
     
     private void registerAllWalls(){
-        List<Rectangle> Wall=new ArrayList<>();
-        for(var node:walls.getChildren()){
-            if(node instanceof Rectangle rectAngle && rectAngle.getId() !=null && rectAngle.getId().startsWith("wall")){
-                Wall.add(rectAngle);
-            }
-        }
-        
-        player.setWalls(Wall);
-    
+        player.setWalls(CollisionRegistry.collectWalls(walls));
     }
 
     
     private void registerAllPlots(){
-        List<ImageView> plotList=new ArrayList<>();
-        for(var node : farm1.getChildren()){
-            if(node instanceof ImageView imageView && imageView.getId() != null && imageView.getId().startsWith("farm_img")){
-                plotList.add(imageView);
-            }
-        }
-        
-        plotList.sort((a, b)->{
-        int numA=extractNumber(a.getId());
-        int numB=extractNumber(b.getId());
-        return Integer.compare(numA, numB);
-        });
-        
-        for(ImageView imageView:plotList){
-            int number=extractNumber(imageView.getId());
-            farm.addPlot("Plot " + number, imageView);
-        }
+        FarmPlotRegistrar.registerPlots(farm, farm1);
     }
     
-    private int extractNumber(String id){
-        try{
-            return Integer.parseInt(id.replace("farm_img", ""));
-        }catch(NumberFormatException e){
-            return Integer.MAX_VALUE;
-        }
-    }
-    
-    private void updateMerchantInteraction() {
-        
-        Bounds playerBounds = human_hitbox.localToScene(human_hitbox.getBoundsInLocal());
-        Bounds merchBounds  = merchantdetect.localToScene(merchantdetect.getBoundsInLocal());
-
-        boolean nowInside = playerBounds.intersects(merchBounds);
-
-        if (nowInside != shop) {
-            shop = nowInside;
-            btnmerchant.setDisable(!nowInside);
-        }
-    }
-
     private void openShopWindow() {
         ListView<Merchant.ShopItem> listView = new ListView<>();
         listView.getItems().addAll(merChant.getItems());
@@ -562,39 +496,6 @@ public class home_mapController implements Initializable {
             default -> null;
         };
     }
-   
-    public void scaleWorld() {
-        double paneW = view.getWidth();
-        double paneH = view.getHeight();
-        if (paneW <= 0 || paneH <= 0) return;
-
-        Bounds b = world.getLayoutBounds();
-        double contentW = b.getWidth();
-        double contentH = b.getHeight();
-        if (contentW <= 0 || contentH <= 0) return;
-
-        double scale = Math.min(paneW / contentW, paneH / contentH);
-
-        world.setScaleX(scale);
-        world.setScaleY(scale);
-
-        // ✅ IMPORTANT: no translate here
-        world.setTranslateX(0);
-        world.setTranslateY(0);
-    }
-
-
-    private boolean scaleQueued = false;
-
-    private void requestScale() {
-        if (scaleQueued) return;
-        scaleQueued = true;
-
-        Platform.runLater(() -> {
-            scaleQueued = false;
-            scaleWorld();
-        });
-    }
 
     @FXML
     private void onCloseInventory(ActionEvent event) {
@@ -621,60 +522,25 @@ public class home_mapController implements Initializable {
             }
         }
     }
+
+    @FXML
+    private void handledoorbtnaction(ActionEvent event) throws IOException {
+        SceneManager.switchScene("/view/home_interior.fxml");
+    }
     
-    private static class InventoryRow {
-        private final ItemType type;
-        private final IntegerProperty qty;
-
-        InventoryRow(ItemType type, IntegerProperty qty) {
-            this.type = type;
-            this.qty = qty;
-        }
-
-        public ItemType getType() { return type; }
-        public IntegerProperty quantityProperty() { return qty; }
+    @FXML
+    private void handleleftmapaction(ActionEvent event) throws IOException {
+        SceneManager.switchScene("/view/left_map.fxml");
     }
-
-    private void setupInventoryTable() {
-        invTable.setItems(invRows);
-
-        colItem.setCellValueFactory(data ->
-            new SimpleStringProperty(data.getValue().getType().getDisplayName())
-        );
-
-        colQty.setCellValueFactory(data ->
-            data.getValue().quantityProperty()
-        );
+    
+    @FXML
+    private void handlerightmapaction(ActionEvent event) throws IOException {
+        SceneManager.switchScene("/view/right_map.fxml");
     }
-
-    private void setupInventoryBindings() {
-        var inv = player.getInventory();
-
-        // Coins auto-update
-        invCoinsLabel.textProperty().bind(inv.coinsProperty().asString("Coins: %dg"));
-
-        
-        // Initial rows
-        invRows.clear();
-        inv.itemsProperty().forEach((type, qtyProp) -> invRows.add(new InventoryRow(type, qtyProp)));
-
-        // Live updates when map changes (add/remove)
-        inv.itemsProperty().addListener((MapChangeListener<ItemType, IntegerProperty>) change -> {
-            if (change.wasRemoved() && !change.wasAdded()) {
-                ItemType removed = change.getKey();
-                invRows.removeIf(r -> r.getType() == removed);
-            }
-            if (change.wasAdded() && !change.wasRemoved()) {
-                invRows.add(new InventoryRow(change.getKey(), change.getValueAdded()));
-            }
-            if (change.wasAdded() && change.wasRemoved()) {
-                // rare case: value property replaced; rewire row
-                ItemType key = change.getKey();
-                invRows.removeIf(r -> r.getType() == key);
-                invRows.add(new InventoryRow(key, change.getValueAdded()));
-            }
-        });
+    
+    @FXML
+    private void handleuppermapaction(ActionEvent event) throws IOException {
+        SceneManager.switchScene("/view/upper_map.fxml");
     }
-
     
 }
