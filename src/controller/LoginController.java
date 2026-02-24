@@ -19,7 +19,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -42,7 +41,7 @@ public class LoginController implements Initializable {
     PreparedStatement pst;
     
     @FXML
-    private Group login_pane;
+    private Pane login_pane;
     @FXML
     private Button btnlogin;
     @FXML
@@ -52,7 +51,7 @@ public class LoginController implements Initializable {
     @FXML
     private Hyperlink sihl;
     @FXML
-    private Group sign_inpane;
+    private Pane sign_inpane;
     @FXML
     private Button btnsignin;
     @FXML
