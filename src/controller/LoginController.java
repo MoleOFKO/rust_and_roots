@@ -30,6 +30,7 @@ import javafx.scene.layout.Pane;
 import javax.swing.JOptionPane;
 import model.AccMg;
 import static rust_and_roots.Rust_and_roots.stage;
+import util.WorldScaler;
 
 /**
  * FXML Controller class
@@ -67,6 +68,10 @@ public class LoginController implements Initializable {
     private Button btnclose;
     @FXML
     private TextField txtsgmail;
+    @FXML 
+    private Pane view;
+    @FXML 
+    private Group uiRoot;
     
     ObservableList<AccMg> emailList;
     public static String txtname;
@@ -82,6 +87,8 @@ public class LoginController implements Initializable {
             System.out.println("Connection not found.....");
             ex.printStackTrace();
         }
+        WorldScaler scaler = new WorldScaler(view, uiRoot);
+        Platform.runLater(scaler::scale);
     }    
 
     @FXML
