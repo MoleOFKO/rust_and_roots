@@ -11,11 +11,11 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="593.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.LoginController">
+<AnchorPane id="AnchorPane" prefHeight="379.0" prefWidth="598.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.LoginController">
    <children>
       <Group fx:id="login_pane" layoutX="-2.0">
          <children>
-            <ImageView fitHeight="400.0" fitWidth="600.0" pickOnBounds="true" preserveRatio="true" style="-fx-background-size: cover;">
+            <ImageView fitHeight="400.0" fitWidth="607.0" layoutX="2.0" pickOnBounds="true" preserveRatio="true" style="-fx-background-size: cover;">
                <image>
                   <Image url="@../image/loginDesign.png" />
                </image>
@@ -41,7 +41,7 @@
       </Group>
       <Group fx:id="sign_inpane" visible="false">
          <children>
-            <ImageView fitHeight="400.0" fitWidth="598.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fitHeight="400.0" fitWidth="600.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../image/signInDesign.png" />
                </image>
@@ -50,7 +50,7 @@
                <children>
                   <TextField fx:id="txtsname" layoutX="50.0" layoutY="114.0" promptText="Username" styleClass="inputbox" stylesheets="@../css/style.css" />
                   <PasswordField fx:id="txtspassword" layoutX="50.0" layoutY="149.0" promptText="password" styleClass="inputbox" stylesheets="@../css/style.css" />
-                  <Hyperlink fx:id="lghl" layoutX="80.0" layoutY="220.0" onAction="#handlelghlaction" text="Have account?" textFill="#bf8000">
+                  <Hyperlink fx:id="lghl" layoutX="80.0" layoutY="220.0" onAction="#handlelghlaction" text="Have account?" textFill="#9a5000">
                      <font>
                         <Font name="System Bold" size="12.0" />
                      </font>
