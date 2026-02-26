@@ -35,6 +35,7 @@ import model.CollisionRegistry;
 import model.FarmPlotRegistrar;
 import game.GameLoopManager;
 import game.InteractionManager;
+import javafx.scene.layout.AnchorPane;
 import model.InteractionZone;
 import ui.InventoryRow;
 import ui.InventoryUIManager;
@@ -231,7 +232,7 @@ public class home_mapController implements Initializable {
     @FXML
     private Button slotBtn5;
     @FXML
-    private Pane inventoryOverlay;
+    private AnchorPane inventoryOverlay;
     @FXML
     private TableView<InventoryRow> invTable;
     @FXML
@@ -264,6 +265,84 @@ public class home_mapController implements Initializable {
     private Rectangle uppermapdetect;
     @FXML
     private Button uppermsp;
+    @FXML
+    private Rectangle wall;
+    @FXML
+    private Rectangle wall1;
+    @FXML
+    private Rectangle wall2;
+    @FXML
+    private Rectangle wall3;
+    @FXML
+    private Rectangle wall4;
+    @FXML
+    private Rectangle wall5;
+    @FXML
+    private Rectangle wall6;
+    @FXML
+    private Rectangle wall7;
+    @FXML
+    private Rectangle wall8;
+    @FXML
+    private Rectangle wall9;
+    @FXML
+    private Rectangle wall10;
+    @FXML
+    private Rectangle wall11;
+    @FXML
+    private Rectangle wall12;
+    @FXML
+    private Rectangle wall13;
+    @FXML
+    private Rectangle wall14;
+    @FXML
+    private Rectangle wall15;
+    @FXML
+    private Rectangle wall16;
+    @FXML
+    private Rectangle wall17;
+    @FXML
+    private Rectangle wall18;
+    @FXML
+    private Rectangle wall19;
+    @FXML
+    private Rectangle wall20;
+    @FXML
+    private Rectangle wall21;
+    @FXML
+    private Rectangle wall22;
+    @FXML
+    private Rectangle wall23;
+    @FXML
+    private Rectangle wall24;
+    @FXML
+    private Rectangle wall25;
+    @FXML
+    private Rectangle wall26;
+    @FXML
+    private Rectangle wall27;
+    @FXML
+    private Rectangle wall28;
+    @FXML
+    private Rectangle wall29;
+    @FXML
+    private Label lbName;
+    @FXML
+    private Label lbHP;
+    @FXML
+    private Label lbSP;
+    @FXML
+    private Label lbEXP;
+    @FXML
+    private Label lbSTR;
+    @FXML
+    private Label lbAGI;
+    @FXML
+    private Label lbDEX;
+    @FXML
+    private Label lbVIT;
+    @FXML
+    private Button btnSave;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -541,6 +620,10 @@ public class home_mapController implements Initializable {
     @FXML
     private void handleuppermapaction(ActionEvent event) throws IOException {
         SceneManager.switchScene("/view/upper_map.fxml");
+    }
+
+    @FXML
+    private void handlebtnSave(ActionEvent event) {
     }
     
 }

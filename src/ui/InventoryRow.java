@@ -28,4 +28,8 @@ public class InventoryRow {
     public IntegerProperty quantityProperty() {
         return quantity;
     }
+    public int getQuantity() {
+        return quantity.get();
+    }
+    
 }
