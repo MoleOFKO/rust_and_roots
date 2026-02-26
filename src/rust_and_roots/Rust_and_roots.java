@@ -4,6 +4,7 @@
  */
 package rust_and_roots;
 
+import game.GameTimeManager;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -24,6 +25,10 @@ public class Rust_and_roots extends Application {
 //        Parent root = FXMLLoader.load(getClass().getResource("/view/home_map.fxml"));
         Rust_and_roots.stage=stage;
         Scene scene = new Scene(root);
+<<<<<<< HEAD
+=======
+        GameTimeManager.get().start();
+>>>>>>> origin/jimi
         stage.setScene(scene);
         stage.show();
         
