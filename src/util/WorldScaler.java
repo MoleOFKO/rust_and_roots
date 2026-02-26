@@ -18,6 +18,9 @@ public class WorldScaler {
     private final Group world;
 
     public WorldScaler(Pane view, Group world) {
+        this(view, world, false);
+    }   
+    public WorldScaler(Pane view, Group world, boolean center) {
         this.view = view;
         this.world = world;
 
@@ -38,6 +41,11 @@ public class WorldScaler {
         double scale = Math.min(paneW / contentW, paneH / contentH);
         world.setScaleX(scale);
         world.setScaleY(scale);
+
+        double scaledW = contentW * scale;
+        double scaledH = contentH * scale;
+        world.setLayoutX((paneW - scaledW) / 2.0);
+        world.setLayoutY((paneH - scaledH) / 2.0);
     }
 
     private boolean queued = false;

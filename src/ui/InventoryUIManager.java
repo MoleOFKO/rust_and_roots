@@ -6,11 +6,13 @@ package ui;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import model.Inventory;
+import model.ItemType;
 
 /**
  *
@@ -54,7 +56,31 @@ public class InventoryUIManager {
     }
 
     private void bindInventory(Inventory inv) {
-        coinsLabel.textProperty()
-                .bind(inv.coinsProperty().asString("Coins: %dg"));
+        coinsLabel.textProperty().bind(inv.coinsProperty().asString("Coins: %dg"));
+        
+        // Initial population
+        inv.itemsProperty().forEach((type, property) -> {
+            rows.add(new InventoryRow(type, property));
+        });
+
+        // React to changes
+        inv.itemsProperty().addListener(
+                (MapChangeListener<ItemType, javafx.beans.property.IntegerProperty>) change -> {
+
+                    if (change.wasAdded()) {
+                        rows.add(new InventoryRow(
+                                change.getKey(),
+                                change.getValueAdded()
+                        ));
+                    }
+
+                    if (change.wasRemoved()) {
+                        rows.removeIf(row ->
+                                row.getType() == change.getKey()
+                        );
+                    }
+                }
+        );
+        
     }
 }
