@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
@@ -14,21 +15,27 @@
    <children>
       <Pane prefHeight="531.0" prefWidth="746.0" styleClass="image-table" stylesheets="@../css/style.css">
          <children>
-            <StackPane layoutX="59.0" layoutY="32.0" prefHeight="411.0" prefWidth="631.0">
+            <StackPane layoutX="12.0" layoutY="8.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="469.0" prefWidth="706.0">
                <children>
-                  <ImageView fitHeight="421.0" fitWidth="667.0" pickOnBounds="true" preserveRatio="true">
+                  <ImageView fitHeight="469.0" fitWidth="728.0" pickOnBounds="true" preserveRatio="true">
                      <image>
                         <Image url="@../image/Farm_Table.png" />
                      </image>
                   </ImageView>
-                  <TableView prefHeight="309.0" prefWidth="505.0" styleClass="theme-table" stylesheets="@../css/style.css">
+                  <TableView maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="421.0" prefWidth="631.0" styleClass="theme-table" stylesheets="@../css/style.css" StackPane.alignment="CENTER">
                     <columns>
-                      <TableColumn prefWidth="75.0" text="C1" />
-                      <TableColumn prefWidth="75.0" text="C2" />
+                      <TableColumn prefWidth="100.66662343343069" />
+                      <TableColumn prefWidth="156.66661834716797" />
+                        <TableColumn prefWidth="132.0" />
+                        <TableColumn prefWidth="118.66671752929688" />
+                        <TableColumn prefWidth="120.000010172526" />
                     </columns>
+                     <StackPane.margin>
+                        <Insets bottom="40.0" left="39.0" right="38.0" top="98.0" />
+                     </StackPane.margin>
                   </TableView>
                </children></StackPane>
-            <Button layoutX="46.0" layoutY="476.0" mnemonicParsing="false" prefHeight="41.0" prefWidth="66.0" text="Back">
+            <Button layoutX="46.0" layoutY="483.0" mnemonicParsing="false" prefHeight="41.0" prefWidth="66.0" text="Back">
                <graphic>
                   <FontAwesomeIcon glyphName="ARROW_LEFT" />
                </graphic>
