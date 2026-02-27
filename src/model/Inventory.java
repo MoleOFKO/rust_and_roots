@@ -48,7 +48,7 @@ public class Inventory {
     }
 
     public IntegerProperty countProperty(ItemType type) {
-        if (type == null) return new SimpleIntegerProperty(0);
+        if (type == null) throw new IllegalArgumentException("ItemType cannot be null");
         return items.computeIfAbsent(type, t -> new SimpleIntegerProperty(0));
     }
 

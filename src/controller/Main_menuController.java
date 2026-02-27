@@ -12,10 +12,13 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.layout.StackPane;
 import static rust_and_roots.Rust_and_roots.stage;
+import util.WorldScaler;
 
 /**
  * FXML Controller class
@@ -30,11 +33,17 @@ public class Main_menuController implements Initializable {
     private Button btnexit;
     @FXML
     private Button btnnewg;
+    @FXML 
+    private StackPane view;
+    @FXML 
+    private Group uiRoot;
 
     Parent root;
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
+        WorldScaler scaler = new WorldScaler(view, uiRoot);
+        Platform.runLater(scaler::scale);
     }    
 
     @FXML

@@ -20,7 +20,6 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import model.Farm;
 import model.Player;
 import javafx.scene.layout.StackPane;
@@ -31,15 +30,20 @@ import model.ItemType;
 import model.Merchant;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.beans.value.ChangeListener;
 import model.CollisionRegistry;
 import model.FarmPlotRegistrar;
 import game.GameLoopManager;
 import game.InteractionManager;
+import javafx.scene.image.Image;
+import javafx.scene.layout.AnchorPane;
 import model.InteractionZone;
 import ui.InventoryRow;
 import ui.InventoryUIManager;
 import util.SceneManager;
 import util.WorldScaler;
+import game.GameTimeManager;
+import javafx.scene.control.Slider;
 
 
 
@@ -60,6 +64,13 @@ public class home_mapController implements Initializable {
     private InteractionZone upperMapZone;
     private InteractionManager interactionManager;
     private InventoryUIManager inventoryUIManager;
+    
+    private Image dayBg;
+    private Image nightBg;
+    private ChangeListener<Boolean> nightListener;
+
+    private static final String DAY_BG_PATH = "/image/homemapuse.png";
+    private static final String NIGHT_BG_PATH = "/image/homemapuse_night.png";
     
     private final List<StackPane> slots = new ArrayList<>();
     private final List<Button> slotButtons = new ArrayList<>();
@@ -231,7 +242,7 @@ public class home_mapController implements Initializable {
     @FXML
     private Button slotBtn5;
     @FXML
-    private Pane inventoryOverlay;
+    private AnchorPane inventoryOverlay;
     @FXML
     private TableView<InventoryRow> invTable;
     @FXML
@@ -264,6 +275,98 @@ public class home_mapController implements Initializable {
     private Rectangle uppermapdetect;
     @FXML
     private Button uppermsp;
+    @FXML
+    private Rectangle wall;
+    @FXML
+    private Rectangle wall1;
+    @FXML
+    private Rectangle wall2;
+    @FXML
+    private Rectangle wall3;
+    @FXML
+    private Rectangle wall4;
+    @FXML
+    private Rectangle wall5;
+    @FXML
+    private Rectangle wall6;
+    @FXML
+    private Rectangle wall7;
+    @FXML
+    private Rectangle wall8;
+    @FXML
+    private Rectangle wall9;
+    @FXML
+    private Rectangle wall10;
+    @FXML
+    private Rectangle wall11;
+    @FXML
+    private Rectangle wall12;
+    @FXML
+    private Rectangle wall13;
+    @FXML
+    private Rectangle wall14;
+    @FXML
+    private Rectangle wall15;
+    @FXML
+    private Rectangle wall16;
+    @FXML
+    private Rectangle wall17;
+    @FXML
+    private Rectangle wall18;
+    @FXML
+    private Rectangle wall19;
+    @FXML
+    private Rectangle wall20;
+    @FXML
+    private Rectangle wall21;
+    @FXML
+    private Rectangle wall22;
+    @FXML
+    private Rectangle wall23;
+    @FXML
+    private Rectangle wall24;
+    @FXML
+    private Rectangle wall25;
+    @FXML
+    private Rectangle wall26;
+    @FXML
+    private Rectangle wall27;
+    @FXML
+    private Rectangle wall28;
+    @FXML
+    private Rectangle wall29;
+    @FXML
+    private Label lbName;
+    @FXML
+    private Label lbHP;
+    @FXML
+    private Label lbSP;
+    @FXML
+    private Label lbEXP;
+    @FXML
+    private Label lbSTR;
+    @FXML
+    private Label lbAGI;
+    @FXML
+    private Label lbDEX;
+    @FXML
+    private Label lbVIT;
+    @FXML
+    private Button btnSave;
+    @FXML
+    private Label timeLabel;
+    @FXML
+    private Button pauseTimeBtn;
+    @FXML
+    private Slider timeSpeedSlider;
+    @FXML
+    private Label timeSpeedValueLabel;
+    @FXML
+    private Button btnMorning;
+    @FXML
+    private Button btnNight;
+    @FXML
+    private Button btnAddHour;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -387,8 +490,11 @@ public class home_mapController implements Initializable {
         interactionManager.addZone(rightMapZone);
         interactionManager.addZone(upperMapZone);
         
-        startGameLoop();
         player.start();
+        setupDayNightBinding();
+        GameTimeManager.get().start();
+        setupSettingsTab();
+        startGameLoop();
         new WorldScaler(view, world);
     }
     
@@ -428,6 +534,7 @@ public class home_mapController implements Initializable {
 
             farm.updatePlayerBounds(playerBounds);
             interactionManager.updateAll(playerBounds);
+            
         });
 
         gameLoop.start();
@@ -541,6 +648,87 @@ public class home_mapController implements Initializable {
     @FXML
     private void handleuppermapaction(ActionEvent event) throws IOException {
         SceneManager.switchScene("/view/upper_map.fxml");
+    }
+
+    private void setupDayNightBinding() {
+        dayBg = loadImageOrNull(DAY_BG_PATH);
+        nightBg = loadImageOrNull(NIGHT_BG_PATH);
+
+        // If you only have day image, just keep it
+        if (dayBg != null && bg.getImage() == null) bg.setImage(dayBg);
+
+        GameTimeManager time = GameTimeManager.get();
+
+        nightListener = (obs, wasNight, isNight) -> {
+            if (bg == null) return;
+            if (isNight) {
+                if (nightBg != null) bg.setImage(nightBg);
+            } else {
+                if (dayBg != null) bg.setImage(dayBg);
+            }
+        };
+
+        time.nightProperty().addListener(nightListener);
+
+        // Set initial correct image immediately
+        nightListener.changed(time.nightProperty(), !time.isNight(), time.isNight());
+
+        // Avoid leaks: if this controller is detached, remove listener
+        bg.sceneProperty().addListener((o, oldScene, newScene) -> {
+            if (newScene == null && nightListener != null) {
+                time.nightProperty().removeListener(nightListener);
+                nightListener = null;
+            }
+        });
+    }
+    private Image loadImageOrNull(String path) {
+        var url = getClass().getResource(path);
+        if (url == null) {
+            System.err.println("[DayNight] Missing resource: " + path);
+            return null;
+        }
+        return new Image(url.toExternalForm());
+    }
+
+    private void setupSettingsTab() {
+        GameTimeManager time = GameTimeManager.get();
+
+        // Show formatted time in the label (auto-updates)
+        if (timeLabel != null) {
+            timeLabel.textProperty().bind(time.formattedProperty());
+        }
+
+        // Slider controls time speed (debug)
+        if (timeSpeedSlider != null) {
+            timeSpeedSlider.valueProperty().bindBidirectional(time.timeScaleProperty());
+        }
+
+        // Show current speed as text
+        if (timeSpeedValueLabel != null && timeSpeedSlider != null) {
+            timeSpeedValueLabel.textProperty().bind(
+                time.timeScaleProperty().asString("x%.1f")
+            );
+        }
+
+        // Pause / resume
+        if (pauseTimeBtn != null) {
+            pauseTimeBtn.setOnAction(e -> time.togglePause());
+        }
+
+        // Quick time jumps
+        if (btnMorning != null) {
+            btnMorning.setOnAction(e -> time.setTimeOfDay(8, 0));
+        }
+        if (btnNight != null) {
+            btnNight.setOnAction(e -> time.setTimeOfDay(20, 0));
+        }
+        if (btnAddHour != null) {
+            btnAddHour.setOnAction(e -> time.addMinutes(60));
+        }
+    }
+    
+    @FXML
+    private void handlebtnSave(ActionEvent event) {
     }
     
 }

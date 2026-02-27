@@ -7,18 +7,22 @@ package controller;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.StackPane;
 import javax.swing.JOptionPane;
 import static rust_and_roots.Rust_and_roots.stage;
+import util.WorldScaler;
 
 /**
  * FXML Controller class
@@ -49,6 +53,10 @@ public class New_gameController implements Initializable {
     private Label lblstamina;
     @FXML
     private TextField txtworldname;
+    @FXML 
+    private StackPane view;
+    @FXML 
+    private Group uiRoot;
 
     Parent root;
     public static String char_name;
@@ -62,7 +70,8 @@ public class New_gameController implements Initializable {
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        
+        WorldScaler scaler = new WorldScaler(view, uiRoot);
+        Platform.runLater(scaler::scale);
     }    
 
     @FXML
