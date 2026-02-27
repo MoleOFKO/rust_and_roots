@@ -20,9 +20,9 @@ public class Rust_and_roots extends Application {
     public static Stage stage;
     @Override
     public void start(Stage stage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("/view/login.fxml"));
+//        Parent root = FXMLLoader.load(getClass().getResource("/view/login.fxml"));
 //        Parent root = FXMLLoader.load(getClass().getResource("/view/new_game.fxml"));
-//        Parent root = FXMLLoader.load(getClass().getResource("/view/home_map.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("/view/home_map.fxml"));
         Rust_and_roots.stage=stage;
         Scene scene = new Scene(root);
 
