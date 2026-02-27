@@ -273,7 +273,7 @@
             </HBox>
          </children>
       </Group>
-      <AnchorPane fx:id="inventoryOverlay" prefHeight="200.0" prefWidth="200.0">
+      <AnchorPane fx:id="inventoryOverlay" prefHeight="200.0" prefWidth="200.0" visible="false">
          <children>
             <TabPane layoutX="96.0" layoutY="65.0" prefHeight="240.0" prefWidth="402.0" styleClass="inventory-overlay" stylesheets="@../css/style.css" tabClosingPolicy="UNAVAILABLE">
                <tabs>
