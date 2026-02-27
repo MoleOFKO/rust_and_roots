@@ -7,16 +7,20 @@ package controller;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.layout.StackPane;
 import static rust_and_roots.Rust_and_roots.stage;
+import util.WorldScaler;
 
 /**
  * FXML Controller class
@@ -37,11 +41,17 @@ public class SaveloadsController implements Initializable {
     private Button btnLoad;
     @FXML
     private Button btnback;
+    @FXML 
+    private StackPane view;
+    @FXML 
+    private Group uiRoot;
 
     Parent root;
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
+        WorldScaler scaler = new WorldScaler(view, uiRoot);
+        Platform.runLater(scaler::scale);
     }    
 
     @FXML

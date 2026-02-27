@@ -15,12 +15,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ResourceBundle;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -31,6 +33,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javax.swing.JOptionPane;
 import model.Account;
@@ -38,6 +41,7 @@ import model.item;
 import model.mobs;
 import rust_and_roots.Rust_and_roots;
 import static rust_and_roots.Rust_and_roots.stage;
+import util.WorldScaler;
 
 /**
  * FXML Controller class
@@ -58,6 +62,10 @@ public class Edit_itemController implements Initializable {
     private Button btnvplayer;
     @FXML
     private Button btnlogout;
+    @FXML 
+    private StackPane view;
+    @FXML 
+    private Group uiRoot;
     
     @FXML
     private TableColumn<?, ?> colaccid;
@@ -122,6 +130,8 @@ public class Edit_itemController implements Initializable {
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
+        WorldScaler scaler = new WorldScaler(view, uiRoot);
+        Platform.runLater(scaler::scale);
     }    
 
     @FXML
