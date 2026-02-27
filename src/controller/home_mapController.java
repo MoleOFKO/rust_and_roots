@@ -492,6 +492,7 @@ public class home_mapController implements Initializable {
         
         player.start();
         setupDayNightBinding();
+        GameTimeManager.get().start();
         setupSettingsTab();
         startGameLoop();
         new WorldScaler(view, world);
