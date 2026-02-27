@@ -14,17 +14,21 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ResourceBundle;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.StackPane;
 import static rust_and_roots.Rust_and_roots.stage;
+import util.WorldScaler;
 
 /**
  * FXML Controller class
@@ -45,6 +49,10 @@ public class Account_editController implements Initializable {
     private Button btnsave;
     @FXML
     private Button btnback;
+    @FXML 
+    private StackPane view;
+    @FXML 
+    private Group uiRoot;
     @FXML
     private ComboBox<String> user_type;
 
@@ -71,6 +79,8 @@ public class Account_editController implements Initializable {
         } catch (SQLException ex) {
             System.getLogger(Account_editController.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         }
+        WorldScaler scaler = new WorldScaler(view, uiRoot);
+        Platform.runLater(scaler::scale);
     }    
 
     @FXML

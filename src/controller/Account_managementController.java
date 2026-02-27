@@ -14,12 +14,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ResourceBundle;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -28,6 +30,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javax.swing.JOptionPane;
 import model.AccMg;
@@ -35,6 +38,7 @@ import model.Account;
 import model.item;
 import rust_and_roots.Rust_and_roots;
 import static rust_and_roots.Rust_and_roots.stage;
+import util.WorldScaler;
 
 /**
  * FXML Controller class
@@ -85,10 +89,16 @@ public class Account_managementController implements Initializable {
     private Button btnvplayer;
     @FXML
     private Button btnlogout;
+    @FXML 
+    private StackPane view;
+    @FXML 
+    private Group uiRoot;
     @FXML
     private TableColumn<?, ?> user_type;
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        WorldScaler scaler = new WorldScaler(view, uiRoot);
+        Platform.runLater(scaler::scale);
         dbcon db = new dbcon();
         try {
         con = db.getConnection();

@@ -72,7 +72,6 @@ public class LoginController implements Initializable {
     private TextField txtsgmail;
     @FXML 
     private StackPane view;
-    
     @FXML 
     private Group uiRoot;
     
