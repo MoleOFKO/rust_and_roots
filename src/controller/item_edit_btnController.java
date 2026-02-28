@@ -17,10 +17,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ResourceBundle;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -31,11 +33,13 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javax.swing.JOptionPane;
 import rust_and_roots.Rust_and_roots;
 import static rust_and_roots.Rust_and_roots.stage;
+import util.WorldScaler;
 
 /**
  * FXML Controller class
@@ -72,6 +76,10 @@ public class item_edit_btnController implements Initializable {
     private BorderPane image;
     @FXML
     private ImageView itemimage;
+    @FXML 
+    private StackPane view;
+    @FXML 
+    private Group uiRoot;
 
     /**
      * Initializes the controller class.
@@ -96,7 +104,10 @@ public class item_edit_btnController implements Initializable {
         } catch (SQLException ex) {
             System.getLogger(item_edit_btnController.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         } 
-        }      
+        WorldScaler scaler = new WorldScaler(view, uiRoot);
+        Platform.runLater(scaler::scale);
+        
+    }      
 
     @FXML
     private void handlebtnuploadaction(ActionEvent event) throws IOException {

@@ -5,12 +5,15 @@
 <?import javafx.scene.Group?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Rectangle?>
@@ -37,15 +40,15 @@
       </Group>
             <Group fx:id="walls" layoutX="-6.0" layoutY="-3.0">
                <children>
-            <Rectangle fx:id="wall" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="5.0" layoutX="490.0" stroke="TRANSPARENT" strokeType="INSIDE" width="116.0" />
+            <Rectangle fx:id="wall" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="10.0" layoutX="354.0" stroke="TRANSPARENT" strokeType="INSIDE" width="252.0" />
             <Rectangle fx:id="wall1" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="5.0" layoutX="3.0" layoutY="403.0" stroke="TRANSPARENT" strokeType="INSIDE" width="601.0" />
             <Rectangle fx:id="wall2" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="74.0" layoutX="3.0" layoutY="169.0" stroke="TRANSPARENT" strokeType="INSIDE" width="23.0" />
-            <Rectangle fx:id="wall3" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="129.0" layoutX="600.0" layoutY="10.0" stroke="TRANSPARENT" strokeType="INSIDE" width="8.0" />
+            <Rectangle fx:id="wall3" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="199.0" layoutX="600.0" layoutY="10.0" stroke="TRANSPARENT" strokeType="INSIDE" width="8.0" />
             <Rectangle fx:id="wall4" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="157.0" layoutX="600.0" layoutY="237.0" stroke="TRANSPARENT" strokeType="INSIDE" width="8.0" />
             <Rectangle fx:id="wall5" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="5.0" stroke="TRANSPARENT" strokeType="INSIDE" width="439.0" />
-            <Rectangle fx:id="wall6" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="90.0" layoutX="3.0" layoutY="318.0" stroke="TRANSPARENT" strokeType="INSIDE" width="8.0" />
+            <Rectangle fx:id="wall6" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="168.0" layoutX="3.0" layoutY="239.0" stroke="TRANSPARENT" strokeType="INSIDE" width="10.0" />
             <Rectangle fx:id="wall7" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="5.0" layoutX="223.0" layoutY="395.0" stroke="TRANSPARENT" strokeType="INSIDE" width="379.0" />
-            <Rectangle fx:id="wall8" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="55.0" layoutX="552.0" layoutY="179.0" stroke="TRANSPARENT" strokeType="INSIDE" width="53.0" y="1.0" />
+            <Rectangle fx:id="wall8" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="55.0" layoutX="552.0" layoutY="180.0" stroke="TRANSPARENT" strokeType="INSIDE" width="53.0" y="1.0" />
             <Rectangle fx:id="wall9" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="108.0" layoutX="3.0" layoutY="56.0" stroke="TRANSPARENT" strokeType="INSIDE" width="8.0" />
             <Rectangle fx:id="wall10" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="5.0" layoutX="2.0" layoutY="48.0" stroke="TRANSPARENT" strokeType="INSIDE" width="126.0" />
             <Rectangle fx:id="wall11" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="10.0" layoutX="284.0" layoutY="152.0" stroke="TRANSPARENT" strokeType="INSIDE" width="97.0" />
@@ -127,6 +130,30 @@
             <Button fx:id="btnmerchant" disable="true" mnemonicParsing="false" onAction="#onMerchantShopClick" prefHeight="41.0" prefWidth="58.0" styleClass="btn_transparent" stylesheets="@../css/style.css" />
          </children>
       </Group>
+            <Group fx:id="home" layoutX="148.0" layoutY="81.0">
+               <children>
+                  <Rectangle fx:id="homedetect" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="45.0" stroke="TRANSPARENT" strokeType="INSIDE" width="110.0" />
+                  <Button fx:id="doorbtn" disable="true" mnemonicParsing="false" onAction="#handledoorbtnaction" prefHeight="45.0" prefWidth="109.0" styleClass="btn_transparent" stylesheets="@../css/style.css" />
+               </children>
+            </Group>
+            <Group fx:id="leftMap" layoutX="-4.0" layoutY="260.0">
+               <children>
+                  <Rectangle fx:id="leftmapdetect" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="45.0" stroke="TRANSPARENT" strokeType="INSIDE" width="16.0" />
+                  <Button fx:id="leftmsp" disable="true" mnemonicParsing="false" onAction="#handleleftmapaction" prefHeight="45.0" prefWidth="7.0" styleClass="btn_transparent" stylesheets="@../css/style.css" />
+               </children>
+            </Group>
+            <Group fx:id="rightMap" layoutX="586.0" layoutY="144.0">
+               <children>
+                  <Rectangle fx:id="rightmapdetect" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="45.0" stroke="TRANSPARENT" strokeType="INSIDE" width="16.0" />
+                  <Button fx:id="rightmsp" disable="true" mnemonicParsing="false" onAction="#handlerightmapaction" prefHeight="45.0" prefWidth="7.0" styleClass="btn_transparent" stylesheets="@../css/style.css" />
+               </children>
+            </Group>
+            <Group fx:id="upperMap" layoutX="435.0" layoutY="-2.0">
+               <children>
+                  <Rectangle fx:id="uppermapdetect" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="25.0" stroke="TRANSPARENT" strokeType="INSIDE" width="41.0" />
+                  <Button fx:id="uppermsp" disable="true" mnemonicParsing="false" onAction="#handleuppermapaction" prefHeight="10.0" prefWidth="42.0" styleClass="btn_transparent" stylesheets="@../css/style.css" />
+               </children>
+            </Group>
             <TableView disable="true" layoutX="132.0" layoutY="56.0" prefHeight="240.0" prefWidth="330.0" visible="false">
               <columns>
                 <TableColumn prefWidth="75.0" text="C1" />
@@ -246,23 +273,114 @@
             </HBox>
          </children>
       </Group>
-      <Pane fx:id="inventoryOverlay" managed="false" prefHeight="130.0" prefWidth="320.0" styleClass="inventory-overlay" visible="false">
+      <AnchorPane fx:id="inventoryOverlay" prefHeight="200.0" prefWidth="200.0" visible="false">
          <children>
-
-        <HBox alignment="CENTER_RIGHT" layoutX="391.0" layoutY="360.0" spacing="10">
-            <Button onAction="#onCloseInventory" text="Close" />
-        </HBox>
-       <VBox layoutX="73.0" layoutY="41.0" maxHeight="360" maxWidth="419.0" prefHeight="296.0" prefWidth="419.0" spacing="10" styleClass="inventory-panel">
-           <Label fx:id="invCoinsLabel" prefHeight="17.0" prefWidth="113.0" styleClass="inventory-title" text="Coins: 0g" />
-               <TableView fx:id="invTable" prefHeight="231.0" prefWidth="419.0">
-                 <columns>
-                   <TableColumn fx:id="colItem" prefWidth="300.0" text="Item" />
-                   <TableColumn fx:id="colQty" prefWidth="100.0" text="Qty" />
-                 </columns>
-               </TableView>
-       </VBox>
+            <TabPane layoutX="96.0" layoutY="65.0" prefHeight="240.0" prefWidth="402.0" styleClass="inventory-overlay" stylesheets="@../css/style.css" tabClosingPolicy="UNAVAILABLE">
+               <tabs>
+                  <Tab text="Inventory">
+                     <content>
+                        <VBox prefHeight="200.0" prefWidth="100.0">
+                           <children>
+                              <Label fx:id="invCoinsLabel" prefHeight="17.0" prefWidth="113.0" styleClass="inventory-title" text="Coins: 0g" textFill="WHITE" />
+                              <TableView fx:id="invTable" prefHeight="194.0" prefWidth="485.0">
+                                 <columns>
+                                    <TableColumn fx:id="colItem" prefWidth="300.0" text="Item" />
+                                    <TableColumn fx:id="colQty" prefWidth="100.0" text="Qty" />
+                                 </columns>
+                              </TableView>
+                           </children>
+                        </VBox>
+                     </content>
+                  </Tab>
+                  <Tab text="Status">
+                     <content>
+                        <VBox prefHeight="211.0" prefWidth="148.0">
+                           <children>
+                              <Label fx:id="lbName" text="Name : TOM" textFill="WHITE">
+                                 <font>
+                                    <Font size="15.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="lbHP" text="HP : 100%" textFill="WHITE">
+                                 <font>
+                                    <Font size="15.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="lbSP" text="SP : 100%" textFill="WHITE">
+                                 <font>
+                                    <Font size="15.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="lbEXP" text="EXP : 0" textFill="WHITE">
+                                 <font>
+                                    <Font size="15.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="lbSTR" text="STR : 5" textFill="WHITE">
+                                 <font>
+                                    <Font size="15.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="lbAGI" text="AGI : 5" textFill="WHITE">
+                                 <font>
+                                    <Font size="15.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="lbDEX" text="DEX : 5" textFill="WHITE">
+                                 <font>
+                                    <Font size="15.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="lbVIT" text="VIT : 5" textFill="WHITE">
+                                 <font>
+                                    <Font size="15.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </VBox>
+                     </content></Tab>
+                  <Tab text="Settings">
+                     <content>
+                        <VBox>
+                           <children>
+                              <Label text="Game Time" textFill="WHITE">
+                                 <font>
+                                    <Font size="18.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="timeLabel" text="Day 1  00:00" textFill="WHITE">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                              </Label>
+                              <Button fx:id="pauseTimeBtn" mnemonicParsing="false" text="Pause / Resume" />
+                              <Label text="Time Speed" textFill="WHITE">
+                                 <font>
+                                    <Font size="18.0" />
+                                 </font>
+                              </Label>
+                              <Slider fx:id="timeSpeedSlider" majorTickUnit="1.0" max="10.0" minorTickCount="1" showTickLabels="true" showTickMarks="true" value="1.0" />
+                              <Label fx:id="timeSpeedValueLabel" text="x1.0" textFill="WHITE" />
+                              <HBox prefHeight="25.0" prefWidth="402.0" spacing="10.0">
+                                 <children>
+                                    <Button fx:id="btnMorning" mnemonicParsing="false" text="Set 08:00" />
+                                    <Button fx:id="btnNight" mnemonicParsing="false" text="Set 20:00" />
+                                    <Button fx:id="btnAddHour" mnemonicParsing="false" text="+1 hour" />
+                                 </children>
+                              </HBox>
+                              <Button fx:id="btnSave" mnemonicParsing="false" onAction="#handlebtnSave" text="Save &amp; Exit" />
+                           </children>
+                        </VBox>
+                     </content></Tab>
+               </tabs>
+            </TabPane>
+            <HBox alignment="CENTER_RIGHT" layoutX="392.0" layoutY="356.0" spacing="10">
+               <children>
+                  <Button onAction="#onCloseInventory" text="Close" />
+               </children>
+            </HBox>
          </children>
-      </Pane>
+      </AnchorPane>
 
    </children>
 </StackPane>

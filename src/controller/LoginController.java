@@ -19,16 +19,20 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javax.swing.JOptionPane;
 import model.AccMg;
 import static rust_and_roots.Rust_and_roots.stage;
+import util.WorldScaler;
 
 /**
  * FXML Controller class
@@ -41,7 +45,7 @@ public class LoginController implements Initializable {
     PreparedStatement pst;
     
     @FXML
-    private Pane login_pane;
+    private Group login_pane;
     @FXML
     private Button btnlogin;
     @FXML
@@ -51,7 +55,7 @@ public class LoginController implements Initializable {
     @FXML
     private Hyperlink sihl;
     @FXML
-    private Pane sign_inpane;
+    private Group sign_inpane;
     @FXML
     private Button btnsignin;
     @FXML
@@ -66,6 +70,10 @@ public class LoginController implements Initializable {
     private Button btnclose;
     @FXML
     private TextField txtsgmail;
+    @FXML 
+    private StackPane view;
+    @FXML 
+    private Group uiRoot;
     
     ObservableList<AccMg> emailList;
     public static String txtname;
@@ -79,9 +87,12 @@ public class LoginController implements Initializable {
             con=db.getConnection();
         }catch(ClassNotFoundException ex){
             System.out.println("Connection not found.....");
+            ex.printStackTrace();
         }
-    }    
-
+        WorldScaler scaler = new WorldScaler(view, uiRoot);
+        Platform.runLater(scaler::scale);
+    }   
+ 
     @FXML
     private void handlebtnloginaction(ActionEvent event) throws SQLException, IOException {
        emailList = FXCollections.observableArrayList();

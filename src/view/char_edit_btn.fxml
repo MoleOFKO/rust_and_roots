@@ -7,36 +7,42 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.Group?>
+<?import javafx.scene.layout.StackPane?>
 
-<AnchorPane id="AnchorPane" prefHeight="539.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Char_edit_btnController">
-   <children>
-      <Label layoutX="14.0" layoutY="27.0" prefHeight="17.0" prefWidth="49.0" text="Admin:" />
-      <Label fx:id="lblaname" layoutX="63.0" layoutY="27.0" prefHeight="17.0" prefWidth="49.0" text="Name" />
-      <TextField fx:id="txtmname" layoutX="242.0" layoutY="36.0" prefHeight="25.0" prefWidth="242.0" />
-      <TextField fx:id="txtstr" layoutX="242.0" layoutY="104.0" prefHeight="25.0" prefWidth="242.0" />
-      <TextField fx:id="txtagi" layoutX="242.0" layoutY="138.0" prefHeight="25.0" prefWidth="242.0" />
-      <TextField fx:id="txtdex" layoutX="242.0" layoutY="175.0" prefHeight="25.0" prefWidth="242.0" />
-      <TextField fx:id="txtvid" layoutX="242.0" layoutY="212.0" prefHeight="25.0" prefWidth="242.0" />
-      <TextField fx:id="txthp" layoutX="242.0" layoutY="248.0" prefHeight="25.0" prefWidth="242.0" />
-      <TextField fx:id="txtstamina" layoutX="242.0" layoutY="285.0" prefHeight="25.0" prefWidth="242.0" />
-      <ImageView fx:id="mobimg" fitHeight="150.0" fitWidth="200.0" layoutX="270.0" layoutY="324.0" pickOnBounds="true" preserveRatio="true" />
-      <Button fx:id="btnupload" layoutX="503.0" layoutY="386.0" mnemonicParsing="false" onAction="#handlebtnuploadaction" text="Upload" />
-      <Button fx:id="btnsave" layoutX="336.0" layoutY="488.0" mnemonicParsing="false" onAction="#handlebtnsaveaction" prefHeight="25.0" prefWidth="49.0" text="Save" />
-      <Label layoutX="165.0" layoutY="40.0" prefHeight="17.0" prefWidth="67.0" text="Mob Name" />
-      <Label layoutX="165.0" layoutY="73.0" prefHeight="17.0" prefWidth="67.0" text="Mob Type" />
-      <Label layoutX="165.0" layoutY="108.0" prefHeight="17.0" prefWidth="67.0" text="STR" />
-      <Label layoutX="165.0" layoutY="142.0" prefHeight="17.0" prefWidth="67.0" text="AGI" />
-      <Label layoutX="165.0" layoutY="179.0" prefHeight="17.0" prefWidth="67.0" text="DEX" />
-      <Label layoutX="165.0" layoutY="216.0" prefHeight="17.0" prefWidth="67.0" text="VIT" />
-      <Label layoutX="165.0" layoutY="252.0" prefHeight="17.0" prefWidth="67.0" text="HP" />
-      <Label layoutX="165.0" layoutY="289.0" prefHeight="17.0" prefWidth="67.0" text="Stamina" />
-      <Label layoutX="336.0" layoutY="390.0" prefHeight="17.0" prefWidth="67.0" text="Inset Image" />
-      <BorderPane layoutX="270.0" layoutY="324.0" prefHeight="150.0" prefWidth="200.0" style="-fx-border-color: black;" />
-      <Button fx:id="btnback" layoutX="526.0" layoutY="15.0" mnemonicParsing="false" onAction="#handlebtnbackaction" prefHeight="25.0" prefWidth="67.0" text="Back">
-         <graphic>
-            <FontAwesomeIcon glyphName="ARROW_LEFT" />
-         </graphic>
-      </Button>
-      <TextField fx:id="txtmobstype" layoutX="242.0" layoutY="69.0" prefHeight="25.0" prefWidth="242.0" />
-   </children>
-</AnchorPane>
+<StackPane fx:id="view" prefHeight="539.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Char_edit_btnController">
+    <children>
+        <Group fx:id="uiRoot">
+            <children>
+               <Label layoutX="14.0" layoutY="27.0" prefHeight="17.0" prefWidth="49.0" text="Admin:" />
+               <Label fx:id="lblaname" layoutX="63.0" layoutY="27.0" prefHeight="17.0" prefWidth="49.0" text="Name" />
+               <TextField fx:id="txtmname" layoutX="242.0" layoutY="36.0" prefHeight="25.0" prefWidth="242.0" />
+               <TextField fx:id="txtstr" layoutX="242.0" layoutY="104.0" prefHeight="25.0" prefWidth="242.0" />
+               <TextField fx:id="txtagi" layoutX="242.0" layoutY="138.0" prefHeight="25.0" prefWidth="242.0" />
+               <TextField fx:id="txtdex" layoutX="242.0" layoutY="175.0" prefHeight="25.0" prefWidth="242.0" />
+               <TextField fx:id="txtvid" layoutX="242.0" layoutY="212.0" prefHeight="25.0" prefWidth="242.0" />
+               <TextField fx:id="txthp" layoutX="242.0" layoutY="248.0" prefHeight="25.0" prefWidth="242.0" />
+               <TextField fx:id="txtstamina" layoutX="242.0" layoutY="285.0" prefHeight="25.0" prefWidth="242.0" />
+               <ImageView fx:id="mobimg" fitHeight="150.0" fitWidth="200.0" layoutX="270.0" layoutY="324.0" pickOnBounds="true" preserveRatio="true" />
+               <Button fx:id="btnupload" layoutX="503.0" layoutY="386.0" mnemonicParsing="false" onAction="#handlebtnuploadaction" text="Upload" />
+               <Button fx:id="btnsave" layoutX="336.0" layoutY="488.0" mnemonicParsing="false" onAction="#handlebtnsaveaction" prefHeight="25.0" prefWidth="49.0" text="Save" />
+               <Label layoutX="165.0" layoutY="40.0" prefHeight="17.0" prefWidth="67.0" text="Mob Name" />
+               <Label layoutX="165.0" layoutY="73.0" prefHeight="17.0" prefWidth="67.0" text="Mob Type" />
+               <Label layoutX="165.0" layoutY="108.0" prefHeight="17.0" prefWidth="67.0" text="STR" />
+               <Label layoutX="165.0" layoutY="142.0" prefHeight="17.0" prefWidth="67.0" text="AGI" />
+               <Label layoutX="165.0" layoutY="179.0" prefHeight="17.0" prefWidth="67.0" text="DEX" />
+               <Label layoutX="165.0" layoutY="216.0" prefHeight="17.0" prefWidth="67.0" text="VIT" />
+               <Label layoutX="165.0" layoutY="252.0" prefHeight="17.0" prefWidth="67.0" text="HP" />
+               <Label layoutX="165.0" layoutY="289.0" prefHeight="17.0" prefWidth="67.0" text="Stamina" />
+               <Label layoutX="336.0" layoutY="390.0" prefHeight="17.0" prefWidth="67.0" text="Inset Image" />
+               <BorderPane layoutX="270.0" layoutY="324.0" prefHeight="150.0" prefWidth="200.0" style="-fx-border-color: black;" />
+               <Button fx:id="btnback" layoutX="526.0" layoutY="15.0" mnemonicParsing="false" onAction="#handlebtnbackaction" prefHeight="25.0" prefWidth="67.0" text="Back">
+                  <graphic>
+                     <FontAwesomeIcon glyphName="ARROW_LEFT" />
+                  </graphic>
+               </Button>
+               <TextField fx:id="txtmobstype" layoutX="242.0" layoutY="69.0" prefHeight="25.0" prefWidth="242.0" />
+            </children>
+        </Group>
+    </children>
+</StackPane>
