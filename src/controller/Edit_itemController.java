@@ -179,7 +179,7 @@ public class Edit_itemController implements Initializable {
         else{
             itemList.clear();
             String sname=txtsearch.getText();
-            String sql = "select i.item_id,i.item_name,i.price,s.str,s.agi,s.vid,s.dex,s.hp,s.stimana,i.image from items i JOIN stats s ON i.stats_id = s.stats_id where item_name like ?;";
+            String sql = "select i.item_id,i.item_name,i.price,s.str,s.agi,s.vit,s.dex,s.hp,s.stamina,i.image from items i JOIN stats s ON i.stats_id = s.stats_id where item_name like ?;";
             pst=con.prepareStatement(sql);
             pst.setString(1, txtsearch.getText()+"%");
             rs=pst.executeQuery();
@@ -194,14 +194,14 @@ public class Edit_itemController implements Initializable {
             imgView.setPreserveRatio(true);
             
             
-            itemList.add(new item(rs.getInt("item_id"), rs.getString("item_name"), rs.getInt("price"), rs.getInt("str"), rs.getInt("agi"),rs.getInt("vid"),rs.getInt("dex"),rs.getInt("hp"),rs.getInt("stimana"),imgView));
+            itemList.add(new item(rs.getInt("item_id"), rs.getString("item_name"), rs.getInt("price"), rs.getInt("str"), rs.getInt("agi"),rs.getInt("vit"),rs.getInt("dex"),rs.getInt("hp"),rs.getInt("stamina"),imgView));
          }
         }
     }
     
     private void initaccountList(   ) throws SQLException{
         itemList = FXCollections.observableArrayList();
-        String sql="SELECT i.item_id,i.item_name,i.price,s.str,s.agi,s.vid,s.dex,s.hp,s.stimana,i.image FROM items i JOIN stats s ON i.stats_id = s.stats_id;";
+        String sql="SELECT i.item_id,i.item_name,i.price,s.str,s.agi,s.vit,s.dex,s.hp,s.stamina,i.image FROM items i JOIN stats s ON i.stats_id = s.stats_id;";
         st = con.createStatement();
         rs = st.executeQuery(sql);
         while(rs.next()){
@@ -215,7 +215,7 @@ public class Edit_itemController implements Initializable {
             imgView.setPreserveRatio(true);
             
             
-            itemList.add(new item(rs.getInt("item_id"), rs.getString("item_name"), rs.getInt("price"), rs.getInt("str"), rs.getInt("agi"),rs.getInt("vid"),rs.getInt("dex"),rs.getInt("hp"),rs.getInt("stimana") ,imgView));
+            itemList.add(new item(rs.getInt("item_id"), rs.getString("item_name"), rs.getInt("price"), rs.getInt("str"), rs.getInt("agi"),rs.getInt("vit"),rs.getInt("dex"),rs.getInt("hp"),rs.getInt("stamina") ,imgView));
          }
         item_view.setItems(itemList);
     }
