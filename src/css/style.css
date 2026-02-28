@@ -77,13 +77,41 @@
     -fx-font-size: 14px;
 }
 
-.anchorpane {
-    -fx-background-color: rgb(105,56,33);
-    -fx-border-color: rgb(77,41,24);
-    -fx-background-radius: 10px;
-    -fx-border-radius: 10px;
-    -fx-border-width: 5px;
+.theme-table {
+    -fx-background-color: transparent;
+    -fx-control-inner-background: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
 }
-.tableplant {
-    -fx-alignment: center;
+
+/* Remove white header background */
+.theme-table .column-header-background {
+    -fx-background-color: transparent;
+}
+
+.theme-table .column-header {
+    -fx-background-color: transparent;
+}
+
+.theme-table .filler {
+    -fx-background-color: transparent;
+}
+
+/* Remove row background */
+.theme-table .table-row-cell {
+    -fx-background-color: transparent;
+}
+
+/* Remove cell background */
+.theme-table .table-cell {
+    -fx-background-color: transparent;
+}
+
+/* Remove empty area */
+.theme-table .virtual-flow {
+    -fx-background-color: transparent;
+}
+
+.theme-table .viewport {
+    -fx-background-color: transparent;
 }
