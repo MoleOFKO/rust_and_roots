@@ -155,7 +155,7 @@ public class item_edit_btnController implements Initializable {
         } 
         else{
            
-        String sql = "UPDATE items i JOIN stats s ON i.stats_id = s.stats_id SET i.item_name = ?, i.price = ?, s.str = ?, s.agi = ?, s.dex = ?,  s.vid = ?, s.hp = ?, s.stimana = ?,i.image = ? WHERE i.item_name = ?;";
+        String sql = "UPDATE items i JOIN stats s ON i.stats_id = s.stats_id SET i.item_name = ?, i.price = ?, s.str = ?, s.agi = ?, s.dex = ?,  s.vit = ?, s.hp = ?, s.stamina = ?,i.image = ? WHERE i.item_name = ?;";
         pst = con.prepareStatement(sql);
         pst.setString(1, txtmname.getText());
         pst.setInt(2, Integer.parseInt((txtmobstype.getText())));
@@ -207,7 +207,7 @@ public class item_edit_btnController implements Initializable {
 
     private void inititem() throws SQLException {
 
-    String sql = "SELECT i.item_name,i.price,s.str,s.agi,s.vid,s.dex,s.hp,s.stimana,i.image " +
+    String sql = "SELECT i.item_name,i.price,s.str,s.agi,s.vit,s.dex,s.hp,s.stamina,i.image " +
              "FROM items i JOIN stats s ON i.stats_id = s.stats_id " +
              "WHERE i.item_id = ?";
     pst = con.prepareStatement(sql);
@@ -228,9 +228,9 @@ public class item_edit_btnController implements Initializable {
             txtstr.setText(rs.getString("str"));
             txtagi.setText(rs.getString("agi"));
             txtvid.setText(rs.getString("dex"));
-            txtdex.setText(rs.getString("vid"));
+            txtdex.setText(rs.getString("vit"));
             txthp.setText(rs.getString("hp"));
-            txtstamina.setText(rs.getString("stimana"));
+            txtstamina.setText(rs.getString("stamina"));
            img_name = rs.getString("image");
             File afile= new File("E:\\PJ\\rust_and_roots\\src\\image\\items\\"+img_name );
            Image iimage = new Image(afile.toURI().toString());

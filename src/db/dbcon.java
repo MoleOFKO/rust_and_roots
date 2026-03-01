@@ -15,7 +15,7 @@ import java.sql.SQLException;
 public class dbcon {
     
     private String username="root";
-    private String password="";
+    private String password="123123";
     
     public Connection getConnection() throws ClassNotFoundException{
         Connection con=null;
