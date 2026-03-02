@@ -9,6 +9,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import util.SceneManager;
 
 /**
  *
@@ -18,18 +19,25 @@ public class Rust_and_roots extends Application {
     public static Stage stage;
     @Override
     public void start(Stage stage) throws Exception {
+        
+        Rust_and_roots.stage = stage;  // <-- IMPORTANT
+
         Parent root = FXMLLoader.load(getClass().getResource("/view/login.fxml"));
 //        Parent root = FXMLLoader.load(getClass().getResource("/view/new_game.fxml"));
 //        Parent root = FXMLLoader.load(getClass().getResource("/view/home_map.fxml"));
-        Rust_and_roots.stage=stage;
         Scene scene = new Scene(root);
-        
+
         stage.setScene(scene);
         stage.show();
+
+        
+//        Rust_and_roots.stage=stage;
+//        SceneManager.switchScene("/view/home_map.fxml");
+//        stage.show();
     }
 
     /**
-     * @param args the command line arguments p
+     * @param args the command line arguments
      */
     public static void main(String[] args) {
         launch(args);

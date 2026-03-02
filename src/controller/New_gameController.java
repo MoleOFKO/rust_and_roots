@@ -21,7 +21,9 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javax.swing.JOptionPane;
+import rust_and_roots.Rust_and_roots;
 import static rust_and_roots.Rust_and_roots.stage;
+import util.SceneManager;
 import util.WorldScaler;
 
 /**
@@ -92,10 +94,9 @@ public class New_gameController implements Initializable {
             stamina = Integer.parseInt(lblstamina.getText());
 
             
-            root = FXMLLoader.load(getClass().getResource("/view/home_map.fxml"));
-            Scene scene = new Scene(root);
-            stage.setScene(scene);
-            stage.show();
+        Rust_and_roots.stage=stage;
+        SceneManager.switchScene("/view/home_map.fxml");
+        stage.show();
         }
     }
 

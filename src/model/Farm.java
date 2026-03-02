@@ -1,13 +1,7 @@
 package model;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-
+import java.util.*;
 import javafx.geometry.Bounds;
 import javafx.scene.Group;
 import javafx.scene.control.Button;
@@ -16,60 +10,45 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.shape.Rectangle;
 
-/**
- * Farm:
- * - Has a detection area (Rectangle)
- * - Enables button when player hitbox intersects detection area
- * - Button flow: Plant -> Water -> Water -> Reap (default 3 stages)
- *
- * Usage:
- *   Farm farm = new Farm(farmGroup, farmImg, farmDetectionRect, farmButton);
- *   farm.setAvailableSeeds(SeedType.CARROT, SeedType.CORN, SeedType.TOMATO);
- *   // in animation loop:
- *   farm.updatePlayerBounds(playerHitbox.localToScene(playerHitbox.getBoundsInLocal()));
- */
 public class Farm {
 
-    // --- Required UI nodes (from FXML) ---
     private final Group root;
     private final Rectangle detectionArea;
     private final Button actionButton;
 
-    //All plots (each plot uses its own ImageView)
-    private final Map<String, Plot> plots=new LinkedHashMap<>();
-    
-    // --- Config ---
+    // UI views only
+    private final Map<String, ImageView> plotViews = new LinkedHashMap<>();
+
+    // persistent data
+    private final FarmState state;
+
     private List<SeedType> availableSeeds = new ArrayList<>();
-    
     private java.util.function.BiConsumer<SeedType, Integer> onHarvest;
 
-   
-    private int totalStages = 3; //Default = 3 (plant shows stage1, then 2 waters to reach stage3, then reap)
+    private int totalStages = 3;
     private String resourcePattern = "/image/crops/%s_plant%d.png";
 
-    public Farm(Group root, Rectangle detectionArea, Button actionButton) {
+    public Farm(Group root, Rectangle detectionArea, Button actionButton, FarmState state) {
         this.root = Objects.requireNonNull(root);
         this.detectionArea = Objects.requireNonNull(detectionArea);
         this.actionButton = Objects.requireNonNull(actionButton);
+        this.state = Objects.requireNonNull(state);
 
         actionButton.setDisable(true);
-
         actionButton.setOnAction(e -> openHud());
     }
 
-    // Public API
-
-    public void addPlot(String plotName, ImageView plotImageView){
-        plots.put(plotName,new Plot(plotName, plotImageView));
-        //Start empty
+    public void addPlot(String plotId, ImageView plotImageView) {
+        plotViews.put(plotId, plotImageView);
         plotImageView.setImage(null);
         plotImageView.setVisible(false);
+        state.getPlot(plotId); // ensure exists
     }
 
     public void setOnHarvest(java.util.function.BiConsumer<SeedType, Integer> onHarvest) {
         this.onHarvest = onHarvest;
     }
-    
+
     public void setAvailableSeeds(SeedType... seeds) {
         availableSeeds = new ArrayList<>(Arrays.asList(seeds));
     }
@@ -83,141 +62,125 @@ public class Farm {
         this.resourcePattern = Objects.requireNonNull(resourcePattern);
     }
 
-    /**
-     * Call this repeatedly (e.g. in AnimationTimer) to enable/disable the button
-     * based on player bounds intersecting the detection area.
-     */
     public void updatePlayerBounds(Bounds playerBoundsScene) {
         Bounds detectBoundsScene = detectionArea.localToScene(detectionArea.getBoundsInLocal());
         boolean inside = playerBoundsScene.intersects(detectBoundsScene);
         actionButton.setDisable(!inside);
     }
 
-    // HUD flow (simple dialogs for now)
-    
-    private void openHud(){
-        if(plots.isEmpty()) return;
-        
-        //1)choose plot
-        Plot chosenPlot=choosePlotDialog();
-        if(chosenPlot==null) return;
-        
-        //2) decide action based on plot state
-        switch(chosenPlot.state){
-            case EMPTY -> plantOnPlot(chosenPlot);
-            case NEED_WATER -> waterPlot(chosenPlot);
-            case READY_TO_REAP -> reapPlot(chosenPlot);
+    /** Call every frame (or often) to refresh crop visuals based on GameTimeManager seconds */
+    public void update(double nowSeconds) {
+        for (Map.Entry<String, ImageView> e : plotViews.entrySet()) {
+            String plotId = e.getKey();
+            ImageView view = e.getValue();
+            FarmState.PlotData pd = state.getPlot(plotId);
+
+            if (pd.seed == null) {
+                view.setImage(null);
+                view.setVisible(false);
+                continue;
+            }
+
+            int stage = pd.getStage(nowSeconds, totalStages);
+            showStage(view, pd.seed.id, stage);
         }
-        
     }
-    
-    private Plot choosePlotDialog(){
-        List<Plot> plotList=new ArrayList<>(plots.values());
-        ChoiceDialog<Plot> dialog=new ChoiceDialog<>(plotList.get(0), plotList);
+
+    // ---------------- HUD logic ----------------
+
+    private void openHud() {
+        if (plotViews.isEmpty()) return;
+
+        String plotId = choosePlotDialog();
+        if (plotId == null) return;
+
+        FarmState.PlotData pd = state.getPlot(plotId);
+
+        double now = game.GameTimeManager.get().totalSecondsProperty().get();
+
+        if (pd.seed == null) {
+            plantOnPlot(plotId, pd, now);
+        } else if (pd.isReady(now)) {
+            reapPlot(plotId, pd);
+        } else {
+            waterPlot(plotId, pd, now);
+        }
+    }
+
+    private String choosePlotDialog() {
+        List<String> ids = new ArrayList<>(plotViews.keySet());
+        ChoiceDialog<String> dialog = new ChoiceDialog<>(ids.get(0), ids);
         dialog.setTitle("Farm");
         dialog.setHeaderText("Select farmland");
         dialog.setContentText("Plot:");
-        
         return dialog.showAndWait().orElse(null);
     }
-    
-    private void plantOnPlot(Plot plot){
-        if(availableSeeds.isEmpty())return;
-        
-        //Choose seed
-        ChoiceDialog<SeedType> dialog=new ChoiceDialog<>(availableSeeds.get(0), availableSeeds);
+
+    private void plantOnPlot(String plotId, FarmState.PlotData pd, double nowSeconds) {
+        if (availableSeeds.isEmpty()) return;
+
+        ChoiceDialog<SeedType> dialog = new ChoiceDialog<>(availableSeeds.get(0), availableSeeds);
         dialog.setTitle("Plant");
-        dialog.setHeaderText("Choose seed to plant on "+plot.name);
+        dialog.setHeaderText("Choose seed to plant on " + plotId);
         dialog.setContentText("Seed:");
+
         dialog.showAndWait().ifPresent(seed -> {
-            plot.plantedSeed = seed;
-            plot.stageIndex=0;
-            plot.state=(totalStages <=1)? PlotState.READY_TO_REAP : PlotState.NEED_WATER;
-            showStage(plot, plot.stageIndex +1);
+            pd.seed = seed;
+            pd.plantedAt = nowSeconds;
+            pd.lastWateredAt = -1;
+            pd.accumulatedWaterReduction = 0;
+
+            // show stage 1 immediately
+            ImageView view = plotViews.get(plotId);
+            if (view != null) {
+                showStage(view, seed.id, 1);
+            }
         });
     }
-    
-    private void waterPlot(Plot plot){
-        if(plot.plantedSeed == null) return;
-        
-        if(plot.stageIndex < totalStages -1){
-            plot.stageIndex++;
-            showStage(plot, plot.stageIndex +1);
-        }
-        if(plot.stageIndex>= totalStages-1){
-            plot.state= PlotState.READY_TO_REAP;
-        }else{
-            plot.state=PlotState.NEED_WATER;
+
+    private void waterPlot(String plotId, FarmState.PlotData pd, double nowSeconds) {
+        if (!pd.canWater(nowSeconds)) return;
+        pd.water(nowSeconds);
+
+        // update immediate stage after watering
+        ImageView view = plotViews.get(plotId);
+        if (view != null) {
+            int stage = pd.getStage(nowSeconds, totalStages);
+            showStage(view, pd.seed.id, stage);
         }
     }
-    
-    private void reapPlot(Plot plot){
-        // Reward: 1 crop (adjust amount as you like)
-        if (plot.plantedSeed != null && onHarvest != null) {
-            onHarvest.accept(plot.plantedSeed, 1);
+
+    private void reapPlot(String plotId, FarmState.PlotData pd) {
+        if (pd.seed != null && onHarvest != null) {
+            onHarvest.accept(pd.seed, 1);
         }
+        pd.seed = null;
+        pd.plantedAt = -1;
+        pd.lastWateredAt = -1;
+        pd.accumulatedWaterReduction = 0;
 
-        plot.plantedSeed = null;
-        plot.stageIndex=-1;
-        plot.state=PlotState.EMPTY;
-        
-        plot.view.setImage(null);
-        plot.view.setVisible(false);
+        ImageView view = plotViews.get(plotId);
+        if (view != null) {
+            view.setImage(null);
+            view.setVisible(false);
+        }
     }
-    
-    // ------------------------
-    // Image helpers
-    // ------------------------
 
-    private void showStage(Plot plot,int stageNumber1Based) {
-        String seedId = plot.plantedSeed.id;
+    // ---------------- Image helper ----------------
 
+    private void showStage(ImageView view, String seedId, int stageNumber1Based) {
         String path = String.format(resourcePattern, seedId, stageNumber1Based);
-        
-        URL url=getClass().getResource(path);
-        if(url==null){
-            System.out.println("Image not found: "+path);
+        URL url = getClass().getResource(path);
+        if (url == null) {
+            System.out.println("Image not found: " + path);
             return;
         }
-        
-        Image img = new Image(getClass().getResource(path).toExternalForm());
-        plot.view.setImage(img);
-        plot.view.setVisible(true);
+        Image img = new Image(url.toExternalForm());
+        view.setImage(img);
+        view.setVisible(true);
     }
 
-    // ------------------------
-    // Types
-    // ------------------------
-
-    private enum PlotState {
-        EMPTY,
-        NEED_WATER,
-        READY_TO_REAP
-    }
-
-    private static class Plot{
-        final String name;
-        final ImageView view;
-        
-        PlotState state = PlotState.EMPTY;
-        SeedType plantedSeed=null;
-        int stageIndex=-1;
-        Plot(String name, ImageView view){
-            this.name=name;
-            this.view=view;
-        }
-
-        @Override
-        public String toString() {
-        //This text appears in the plot ChoiceDialog list
-            return name+" ("+state+")";
-        }
-    }
-    
-    /**
-     * Add your seeds here. "id" should match your image naming.
-     * Example: CARROT uses carrot_stage1.png, carrot_stage2.png, carrot_stage3.png
-     */
+    // ---------------- Seeds ----------------
     public enum SeedType {
         GRAPE("grape", "Grape"),
         CARROT("carrot", "Carrot"),
