@@ -34,6 +34,7 @@ import javafx.beans.value.ChangeListener;
 import model.CollisionRegistry;
 import model.FarmPlotRegistrar;
 import game.GameLoopManager;
+import game.GameState;
 import game.InteractionManager;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
@@ -44,6 +45,8 @@ import util.SceneManager;
 import util.WorldScaler;
 import game.GameTimeManager;
 import javafx.scene.control.Slider;
+import model.PlayerState;
+import util.SpawnTag;
 
 
 
@@ -51,6 +54,9 @@ import javafx.scene.control.Slider;
  * FXML Controller class
  */
 public class home_mapController implements Initializable {
+    private GameState gameState;
+    private PlayerState playerState;
+    
     private GameLoopManager gameLoop;
     private Player player;
     private Farm farm;
@@ -371,7 +377,10 @@ public class home_mapController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
 
+        playerState = GameState.get().getPlayerState();
+        
         player = new Player(
+                playerState,
                 human,
                 human_img,
                 human_hitbox,
@@ -420,7 +429,8 @@ public class home_mapController implements Initializable {
         
         registerAllWalls();
 
-        farm = new Farm(farm1, farm1_detection, farm1_button);
+        farm = new Farm(farm1, farm1_detection, farm1_button,game.GameState.get().getFarmState("home_map"));
+
         farm.setAvailableSeeds(
                 Farm.SeedType.CARROT,
                 Farm.SeedType.GRAPE,
@@ -460,28 +470,20 @@ public class home_mapController implements Initializable {
             btnmerchant.setDisable(!inside);
         });
 
-        homeZone = new InteractionZone(homedetect, inside -> {
-            homeInside = inside;
-            doorbtn.setDisable(!inside);
-            doorbtn.setVisible(inside);
-        });
-
         leftMapZone = new InteractionZone(leftmapdetect, inside -> {
-            leftmapInside = inside;
-            leftmsp.setDisable(!inside);
-            leftmsp.setVisible(inside);
+            if (inside) SceneManager.switchScene("/view/left_map.fxml", SpawnTag.FROM_RIGHT);
         });
 
         rightMapZone = new InteractionZone(rightmapdetect, inside -> {
-            rightmapInside = inside;
-            rightmsp.setDisable(!inside);
-            rightmsp.setVisible(inside);
+            if (inside) SceneManager.switchScene("/view/right_map.fxml", SpawnTag.FROM_LEFT);
         });
 
         upperMapZone = new InteractionZone(uppermapdetect, inside -> {
-            uppermapInside = inside;
-            uppermsp.setDisable(!inside);
-            uppermsp.setVisible(inside);
+            if (inside) SceneManager.switchScene("/view/upper_map.fxml", SpawnTag.FROM_DOWN);
+        });
+
+        homeZone = new InteractionZone(homedetect, inside -> {
+            if (inside) SceneManager.switchScene("/view/home_interior.fxml", SpawnTag.FROM_DOOR);
         });
 
         interactionManager.addZone(merchantZone);
@@ -535,6 +537,8 @@ public class home_mapController implements Initializable {
             farm.updatePlayerBounds(playerBounds);
             interactionManager.updateAll(playerBounds);
             
+            double nowSeconds = GameTimeManager.get().totalSecondsProperty().get();
+            farm.update(nowSeconds);
         });
 
         gameLoop.start();
@@ -630,6 +634,26 @@ public class home_mapController implements Initializable {
         }
     }
 
+//    @Override
+    public void init(GameState gameState) {
+        this.gameState = gameState;
+        this.playerState = gameState.getPlayerState();
+
+        // Safety: if some controller ever gets loaded before initialize runs,
+        // ensure player exists.
+        if (player == null) {
+            player = new Player(
+                    playerState,
+                    human,
+                    human_img,
+                    human_hitbox,
+                    64, 64,
+                    5,
+                    150_000_000L
+            );
+        }
+    }
+    
     @FXML
     private void handledoorbtnaction(ActionEvent event) throws IOException {
         SceneManager.switchScene("/view/home_interior.fxml");

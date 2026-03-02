@@ -31,8 +31,9 @@ public class Player {
 
     private boolean moving = false;
     private final double speed;
+    private final PlayerState state;
 
-    private final Inventory inventory = new Inventory(100);//starting coins (change as needs)
+//    private final Inventory inventory = new Inventory(100);//starting coins (change as needs)
     
     private List<Rectangle> walls = List.of(); // set later
 
@@ -46,7 +47,8 @@ public class Player {
     
     private Image walk_spriteSheet = new Image(getClass().getResource("/image/human/human_Walk.png").toExternalForm());
     
-    public Player(Group node,
+    public Player(PlayerState state,
+                  Group node,
                   ImageView sprite,
                   Rectangle hitbox,
                   int frameWidth,
@@ -54,6 +56,7 @@ public class Player {
                   double speed,
                   long frameDelayNanos) {
 
+        this.state = state;
         this.node = node;
         this.sprite = sprite;
         this.hitbox = hitbox;
@@ -69,7 +72,7 @@ public class Player {
     }
 
     public Inventory getInventory(){
-        return inventory;
+        return state.getInventory();
     }
     
     public void setWalls(List<Rectangle> walls) {
