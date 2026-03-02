@@ -30,8 +30,6 @@ public class Rust_and_roots extends Application {
         stage.setScene(scene);
         stage.show();
 
-        
-//        Rust_and_roots.stage=stage;
 //        SceneManager.switchScene("/view/home_map.fxml");
 //        stage.show();
     }
