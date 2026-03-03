@@ -19,6 +19,14 @@ public final class GameState {
     // ---- Scene transition spawn ----
     private SpawnTag pendingSpawn = SpawnTag.DEFAULT;
 
+    // ---------- Shop navigation ----------
+    private String returnFxml = null;
+    private util.SpawnTag returnSpawn = util.SpawnTag.DEFAULT;
+
+    // ---------- Shop merchant catalog ----------
+    private java.util.List<model.Merchant.ShopItem> currentMerchantItems = java.util.List.of();
+
+    
     // ---- Per-map farm persistence ----
     private final Map<String, FarmState> farmByMap = new HashMap<>();
     
@@ -40,6 +48,27 @@ public final class GameState {
 
     public FarmState getFarmState(String mapKey) {
         return farmByMap.computeIfAbsent(mapKey, k -> new FarmState());
+    }
+    
+    public void setReturnScene(String fxml, util.SpawnTag spawn) {
+        this.returnFxml = fxml;
+        this.returnSpawn = (spawn == null) ? util.SpawnTag.DEFAULT : spawn;
+    }
+
+    public String getReturnFxml() {
+        return returnFxml;
+    }
+
+    public util.SpawnTag getReturnSpawn() {
+        return returnSpawn;
+    }
+
+    public void setCurrentMerchantItems(java.util.List<model.Merchant.ShopItem> items) {
+        this.currentMerchantItems = (items == null) ? java.util.List.of() : java.util.List.copyOf(items);
+    }
+
+    public java.util.List<model.Merchant.ShopItem> getCurrentMerchantItems() {
+        return currentMerchantItems;
     }
     
 }
