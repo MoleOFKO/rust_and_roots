@@ -53,7 +53,7 @@ import util.SpawnTag;
 /**
  * FXML Controller class
  */
-public class home_mapController implements Initializable {
+public class home_mapController implements Initializable , game.SceneController {
     private GameState gameState;
     private PlayerState playerState;
     
@@ -642,7 +642,7 @@ public class home_mapController implements Initializable {
         }
     }
 
-//    @Override
+    @Override
     public void init(GameState gameState) {
         this.gameState = gameState;
         this.playerState = gameState.getPlayerState();

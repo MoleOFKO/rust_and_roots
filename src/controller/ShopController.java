@@ -26,6 +26,9 @@ import model.ItemType;
 import model.Merchant;
 
 import java.util.*;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.layout.StackPane;
 
 /**
  * FXML Controller class
@@ -36,6 +39,14 @@ public class ShopController implements Initializable, SceneController {
 
     private GameState gameState;
     private Inventory inv;
+    @FXML
+    private StackPane root;
+    @FXML
+    private ImageView inyimg11;
+    @FXML
+    private Button buybtn;
+    @FXML
+    private Button sellbtn;
 
     @Override
     public void init(GameState gs) {
@@ -347,10 +358,6 @@ public class ShopController implements Initializable, SceneController {
     @FXML
     private Label lblsell12;
     @FXML
-    private Button btnbuy;
-    @FXML
-    private Button btnsell;
-    @FXML
     private Button btnback;
     @FXML
     private Label lbltotal;
@@ -413,7 +420,7 @@ public class ShopController implements Initializable, SceneController {
         tablequantity.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
         tablequantity.setOnEditCommit(e -> {
             DetailRow row = e.getRowValue();
-            int newQty = (e.getNewValue() == null) ? row.getQty() : e.getNewValue().intValue();
+            int newQty = (e.getNewValue() == null) ? row.getQty() : e.getNewValue();
 
             // allow "0 means remove" exactly as you requested
             if (newQty <= 0) {
@@ -552,8 +559,8 @@ public class ShopController implements Initializable, SceneController {
         buypane.setDisable(!buyMode);
         sellpane.setDisable(buyMode);
 
-        btnbuy.setDisable(!buyMode);
-        btnsell.setDisable(buyMode);
+        buybtn.setDisable(!buyMode);
+        sellbtn.setDisable(buyMode);
 
         refreshTableFromActiveCart();
         refreshAllPanels();
@@ -587,19 +594,31 @@ public class ShopController implements Initializable, SceneController {
     private void collectButtonsOnce() {
         if (!invBtns.isEmpty()) return;
 
-        // inventory
-        invBtns.addAll(List.of(invbtn1, invbtn2, invbtn3, invbtn4, invbtn5,
-                invbtn6, invbtn7, invbtn8, invbtn9, invbtn10,
-                invbtn11, invbtn12, invbtn13, invbtn14, invbtn15,
-                invbtn16, invbtn17, invbtn18, invbtn19, invbtn20));
+        invBtns.addAll(collectByPrefix(root, Button.class, "invbtn"));
+        buyBtns.addAll(collectByPrefix(buypane, Button.class, "btnbuy"));
+        sellBtns.addAll(collectByPrefix(sellpane, Button.class, "btnsell"));
 
-        // buy
-        buyBtns.addAll(List.of(btnbuy1, btnbuy2, btnbuy3, btnbuy4, btnbuy5, btnbuy6,
-                btnbuy7, btnbuy8, btnbuy9, btnbuy10, btnbuy11, btnbuy12));
+        invBtns.sort(Comparator.comparing(Node::getId));
+        buyBtns.sort(Comparator.comparing(Node::getId));
+        sellBtns.sort(Comparator.comparing(Node::getId));
+    }
 
-        // sell
-        sellBtns.addAll(List.of(btnsell1, btnsell2, btnsell3, btnsell4, btnsell5, btnsell6,
-                btnsell7, btnsell8, btnsell9, btnsell10, btnsell11, btnsell12));
+    private <T extends Node> List<T> collectByPrefix(Parent start, Class<T> type, String prefix) {
+        List<T> out = new ArrayList<>();
+        walk(start, n -> {
+            if (type.isInstance(n)) {
+                String id = n.getId();
+                if (id != null && id.startsWith(prefix)) out.add(type.cast(n));
+            }
+        });
+        return out;
+    }
+
+    private void walk(Parent p, java.util.function.Consumer<Node> visitor) {
+        for (Node n : p.getChildrenUnmodifiable()) {
+            visitor.accept(n);
+            if (n instanceof Parent child) walk(child, visitor);
+        }
     }
 
     private void refreshAllPanels() {
