@@ -373,6 +373,9 @@ public class ShopController implements Initializable, SceneController {
     private Button colbuy;
     @FXML
     private Button colsell;
+    
+
+    
 
     /**
      * Initializes the controller class.
@@ -388,6 +391,7 @@ public class ShopController implements Initializable, SceneController {
         setMode(Mode.BUY);     // default
         refreshTableFromActiveCart();
         refreshAllPanels();
+        
     }    
 
     private void setupMerchantCatalog() {
@@ -597,11 +601,16 @@ public class ShopController implements Initializable, SceneController {
         invBtns.addAll(collectByPrefix(root, Button.class, "invbtn"));
         buyBtns.addAll(collectByPrefix(buypane, Button.class, "btnbuy"));
         sellBtns.addAll(collectByPrefix(sellpane, Button.class, "btnsell"));
+        
+        
 
         invBtns.sort(Comparator.comparing(Node::getId));
         buyBtns.sort(Comparator.comparing(Node::getId));
         sellBtns.sort(Comparator.comparing(Node::getId));
-    }
+        
+        
+}
+    
 
     private <T extends Node> List<T> collectByPrefix(Parent start, Class<T> type, String prefix) {
         List<T> out = new ArrayList<>();
