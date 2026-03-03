@@ -26,6 +26,8 @@ public class WorldScaler {
 
         view.widthProperty().addListener((obs, o, n) -> requestScale());
         view.heightProperty().addListener((obs, o, n) -> requestScale());
+        
+        requestScale();
     }
 
     public void scale() {
