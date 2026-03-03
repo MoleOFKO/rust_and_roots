@@ -1,0 +1,198 @@
+/* tableview-rich.css */
+
+/* ---------- Root TableView container ---------- */
+.table-view {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 14;
+    -fx-border-radius: 14;
+    -fx-border-color: #e6e8ee;
+    -fx-border-width: 1;
+
+    /* subtle depth */
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.10), 18, 0.25, 0, 6);
+
+    -fx-padding: 10;
+}
+
+/* keep corners clean */
+.table-view .corner {
+    -fx-background-color: transparent;
+}
+
+/* ---------- Header ---------- */
+.table-view .column-header-background {
+    -fx-background-color: linear-gradient(to bottom, #fbfcff, #f3f6fb);
+    -fx-background-radius: 14 14 0 0;
+    -fx-padding: 8 8 8 8;
+    -fx-border-color: transparent transparent #e6e8ee transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.table-view .column-header {
+    -fx-background-color: transparent;
+    -fx-size: 44px;
+    -fx-padding: 0 10 0 10;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: #2b2f3a;
+    -fx-font-size: 13px;
+    -fx-font-weight: 700;
+}
+
+/* optional: style sort arrows */
+.table-view .arrow {
+    -fx-background-color: #6b7280;
+}
+
+/* ---------- Rows & Cells ---------- */
+.table-view .table-row-cell {
+    -fx-background-color: transparent;
+    -fx-cell-size: 42px;
+    -fx-border-color: transparent;
+}
+
+/* zebra striping */
+.table-view .table-row-cell:odd {
+    -fx-background-color: #fbfcff;
+}
+.table-view .table-row-cell:even {
+    -fx-background-color: #ffffff;
+}
+
+/* hover */
+.table-view .table-row-cell:hover {
+    -fx-background-color: #f2f7ff;
+}
+
+/* selected */
+.table-view .table-row-cell:selected {
+    -fx-background-color: #e7f0ff;
+}
+
+/* cell text + padding */
+.table-view .table-cell {
+    -fx-padding: 0 12 0 12;
+    -fx-border-color: transparent;
+    -fx-text-fill: #323847;
+    -fx-font-size: 12.5px;
+}
+
+/* subtle vertical separators (very light) */
+.table-view .table-cell {
+    -fx-border-color: transparent #eef1f6 transparent transparent;
+    -fx-border-width: 0 1 0 0;
+}
+.table-view .table-cell:last-visible {
+    -fx-border-width: 0;
+}
+
+/* keep text readable on selection */
+.table-view .table-row-cell:selected .table-cell {
+    -fx-text-fill: #1f2a44;
+}
+
+/* ---------- Scrollbars (cleaner) ---------- */
+.table-view .scroll-bar:vertical,
+.table-view .scroll-bar:horizontal {
+    -fx-background-color: transparent;
+}
+
+.table-view .scroll-bar .track {
+    -fx-background-color: transparent;
+}
+
+.table-view .scroll-bar .thumb {
+    -fx-background-color: rgba(120, 130, 150, 0.35);
+    -fx-background-radius: 10;
+}
+
+.table-view .scroll-bar .thumb:hover {
+    -fx-background-color: rgba(120, 130, 150, 0.55);
+}
+
+.table-view .increment-button,
+.table-view .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 2;
+}
+.table-view .increment-arrow,
+.table-view .decrement-arrow {
+    -fx-background-color: rgba(120, 130, 150, 0.6);
+}
+
+/* ---------- Placeholder (when no rows) ---------- */
+.table-view .placeholder .label {
+    -fx-text-fill: #8b93a6;
+    -fx-font-size: 13px;
+}
+
+/* ============================= */
+/*         SCROLLBAR DESIGN      */
+/* ============================= */
+
+/* make scrollbar slim */
+.table-view .scroll-bar:vertical {
+    -fx-pref-width: 12;
+    -fx-padding: 2;
+}
+
+.table-view .scroll-bar:horizontal {
+    -fx-pref-height: 12;
+    -fx-padding: 2;
+}
+
+/* transparent track */
+.table-view .scroll-bar .track {
+    -fx-background-color: transparent;
+}
+
+/* remove track background */
+.table-view .scroll-bar {
+    -fx-background-color: transparent;
+}
+
+/* thumb (the draggable part) */
+.table-view .scroll-bar .thumb {
+    -fx-background-color: linear-gradient(to bottom, #cfd6e6, #b8c1d9);
+    -fx-background-radius: 10;
+    -fx-background-insets: 2;
+}
+
+/* thumb hover effect */
+.table-view .scroll-bar .thumb:hover {
+    -fx-background-color: linear-gradient(to bottom, #9db4ff, #7c97ff);
+}
+
+/* thumb when pressed */
+.table-view .scroll-bar .thumb:pressed {
+    -fx-background-color: linear-gradient(to bottom, #6a8cff, #4f73ff);
+}
+
+/* remove increment/decrement button background */
+.table-view .scroll-bar .increment-button,
+.table-view .scroll-bar .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 4;
+}
+
+/* arrow style */
+.table-view .scroll-bar .increment-arrow,
+.table-view .scroll-bar .decrement-arrow {
+    -fx-background-color: #9aa4bf;
+}
+
+/* arrow hover */
+.table-view .scroll-bar .increment-button:hover .increment-arrow,
+.table-view .scroll-bar .decrement-button:hover .decrement-arrow {
+    -fx-background-color: #6a8cff;
+}
+
+/* completely remove arrows (OPTIONAL – cleaner modern look) */
+/*
+.table-view .scroll-bar .increment-arrow,
+.table-view .scroll-bar .decrement-arrow {
+    -fx-padding: 0;
+    -fx-shape: "";
+}
+*/
