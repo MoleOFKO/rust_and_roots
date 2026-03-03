@@ -25,8 +25,7 @@ public class Rust_and_roots extends Application {
 //        Parent root = FXMLLoader.load(getClass().getResource("/view/login.fxml"));
 //        Parent root = FXMLLoader.load(getClass().getResource("/view/new_game.fxml"));
 //        Parent root = FXMLLoader.load(getClass().getResource("/view/home_map.fxml"));
-//        Scene scene = new Scene(root);
-
+//       Scene scene = new Scene(root);
 //        stage.setScene(scene);
 //        stage.show();
 
