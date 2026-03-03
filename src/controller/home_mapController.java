@@ -525,15 +525,7 @@ public class home_mapController implements Initializable {
     @FXML
     private void onMerchantShopClick(ActionEvent event) {
         if (!shop) return; // safety check
-        
-        // 1) remember where to return
-        GameState.get().setReturnScene("/view/home_map.fxml", util.SpawnTag.DEFAULT);
-
-        // 2) pass this merchant's catalog into GameState
-        GameState.get().setCurrentMerchantItems(merChant.getItems());
-
-        // 3) go to shop scene
-        util.SceneManager.switchScene("/view/shop.fxml");
+        openShopWindow();
     }
 
     private void startGameLoop(){
