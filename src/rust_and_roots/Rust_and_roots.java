@@ -22,16 +22,16 @@ public class Rust_and_roots extends Application {
         
         Rust_and_roots.stage = stage;  // <-- IMPORTANT
 
-//        Parent root = FXMLLoader.load(getClass().getResource("/view/main_menu.fxml"));
+//        Parent root = FXMLLoader.load(getClass().getResource("/view/login.fxml"));
 //        Parent root = FXMLLoader.load(getClass().getResource("/view/new_game.fxml"));
-        Parent root = FXMLLoader.load(getClass().getResource("/view/home_map.fxml"));
-        Scene scene = new Scene(root);
+//        Parent root = FXMLLoader.load(getClass().getResource("/view/home_map.fxml"));
+//        Scene scene = new Scene(root);
 
-        stage.setScene(scene);
-        stage.show();
-
-//        SceneManager.switchScene("/view/home_map.fxml");
+//        stage.setScene(scene);
 //        stage.show();
+
+        SceneManager.switchScene("/view/home_map.fxml");
+        stage.show();
     }
 
     /**
