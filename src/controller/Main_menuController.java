@@ -48,10 +48,7 @@ public class Main_menuController implements Initializable {
 
     @FXML
     private void handlebtnloadgaction(ActionEvent event) throws IOException {
-        root = FXMLLoader.load(getClass().getResource("/view/saveloads.fxml"));
-        Scene scene = new Scene(root);
-        stage.setScene(scene);
-        stage.show();
+        util.SceneManager.switchScene("/view/saveloads.fxml");
     }
 
     @FXML
@@ -61,11 +58,7 @@ public class Main_menuController implements Initializable {
 
     @FXML
     private void handlebtnnewgaction(ActionEvent event) throws IOException {
-        root = FXMLLoader.load(getClass().getResource("/view/new_game.fxml"));
-        Scene scene = new Scene(root);
-        stage.setScene(scene);
-        stage.show();
-
+            util.SceneManager.switchScene("/view/new_game.fxml");
     }
     
 }

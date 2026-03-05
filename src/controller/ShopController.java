@@ -40,13 +40,15 @@ public class ShopController implements Initializable, SceneController {
     private GameState gameState;
     private Inventory inv;
     @FXML
-    private StackPane root;
-    @FXML
     private ImageView inyimg11;
     @FXML
     private Button buybtn;
     @FXML
     private Button sellbtn;
+    @FXML
+    private StackPane view;
+    @FXML
+    private Pane world;
 
     @Override
     public void init(GameState gs) {
@@ -598,7 +600,7 @@ public class ShopController implements Initializable, SceneController {
     private void collectButtonsOnce() {
         if (!invBtns.isEmpty()) return;
 
-        invBtns.addAll(collectByPrefix(root, Button.class, "invbtn"));
+        invBtns.addAll(collectByPrefix(view, Button.class, "invbtn"));
         buyBtns.addAll(collectByPrefix(buypane, Button.class, "btnbuy"));
         sellBtns.addAll(collectByPrefix(sellpane, Button.class, "btnsell"));
         

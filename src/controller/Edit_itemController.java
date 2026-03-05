@@ -136,10 +136,7 @@ public class Edit_itemController implements Initializable {
 
     @FXML
     private void handlebtnecharacteraction(ActionEvent event) throws IOException {
-        root = FXMLLoader.load(getClass().getResource("/view/edit_character.fxml"));
-        Scene scene = new Scene(root);
-        stage.setScene(scene);
-        stage.show();
+        util.SceneManager.switchScene("/view/edit_character.fxml");
     }
 
     @FXML
@@ -150,26 +147,17 @@ public class Edit_itemController implements Initializable {
 
     @FXML
     private void handlebtnaccmanagementaction(ActionEvent event) throws IOException {
-        root = FXMLLoader.load(getClass().getResource("/view/account_management.fxml"));
-        Scene scene = new Scene(root);
-        stage.setScene(scene);
-        stage.show();
+        util.SceneManager.switchScene("/view/account_management.fxml");
     }
 
     @FXML
     private void handlebtnvplayeraction(ActionEvent event) throws IOException {
-        root = FXMLLoader.load(getClass().getResource("/view/account_view.fxml"));
-        Scene scene = new Scene(root);
-        stage.setScene(scene);
-        stage.show();
+        util.SceneManager.switchScene("/view/account_view.fxml");
     }
 
     @FXML
     private void handlebtnlogoutaction(ActionEvent event) throws IOException {
-        root = FXMLLoader.load(getClass().getResource("/view/login.fxml"));
-        Scene scene = new Scene(root);
-        stage.setScene(scene);
-        stage.show();
+        util.SceneManager.switchScene("/view/login.fxml");
     }
 
     @FXML
@@ -239,11 +227,7 @@ public class Edit_itemController implements Initializable {
     }
     @FXML
     void handlebtnaddaction(ActionEvent event) throws IOException {
-        root = FXMLLoader.load(getClass().getResource("/view/item_add_btn.fxml"));
-        Scene scene = new Scene(root);
-        stage.setScene(scene);
-        stage.show();
-        
+        util.SceneManager.switchScene("/view/item_add_btn.fxml");
     }
 
     @FXML
@@ -261,10 +245,7 @@ public class Edit_itemController implements Initializable {
             pst.setInt(1, i.getItem_id());   // use selected object
             pst.executeUpdate();
             JOptionPane.showMessageDialog(null, "Deleted Successfully!");
-            root = FXMLLoader.load(getClass().getResource("/view/edit_item.fxml"));
-            Scene scene = new Scene(root);
-            stage.setScene(scene);
-            stage.show();
+            util.SceneManager.switchScene("/view/edit_item.fxml");
         }   
     }
     @FXML
@@ -275,10 +256,7 @@ public class Edit_itemController implements Initializable {
         else{
             itemname = i.getItem_name();
             Stage stage = Rust_and_roots.stage;
-            root = FXMLLoader.load(getClass().getResource("/view/item_edit_btn.fxml"));
-            Scene scene = new Scene(root);
-            stage.setScene(scene);
-            stage.show();
+            util.SceneManager.switchScene("/view/item_edit_btn.fxml");
         }    
     }
     

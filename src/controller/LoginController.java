@@ -125,23 +125,13 @@ public class LoginController implements Initializable {
                         String temp = rs.getString("user_type");
                         if(null==temp)JOptionPane.showMessageDialog(null, "Invalid!");else switch (temp) {
                             case "admin" ->                         {
-                                    Parent root = FXMLLoader.load(getClass().getResource("/view/account_view.fxml"));
-                                    Scene scene = new Scene(root);
-                                    stage.setScene(scene);
-                                    stage.show();
+                                    util.SceneManager.switchScene("/view/account_view.fxml");
                                 }
                             case "user" ->                         {
-                                    Parent root = FXMLLoader.load(getClass().getResource("/view/main_menu.fxml"));
-                                    Scene scene = new Scene(root);
-                                    stage.setScene(scene);
-                                    stage.show();
-                                    
+                                    util.SceneManager.switchScene("/view/main_menu.fxml");
                                 }
                             case "owner" -> {
-                                Parent root = FXMLLoader.load(getClass().getResource("/view/account_view.fxml"));
-                                    Scene scene = new Scene(root);
-                                    stage.setScene(scene);
-                                    stage.show();
+                                util.SceneManager.switchScene("/view/account_view.fxml");
                             }
                             default -> JOptionPane.showMessageDialog(null, "Invalid!");
                         }
@@ -229,10 +219,7 @@ public class LoginController implements Initializable {
             txtspassword.setText("");
             txtscpassword.setText("");
             
-            Parent root = FXMLLoader.load(getClass().getResource("/view/main_menu.fxml"));
-            Scene scene = new Scene(root);
-            stage.setScene(scene);
-            stage.show();
+            util.SceneManager.switchScene("/view/main_menu.fxml");
             }
                 
         
