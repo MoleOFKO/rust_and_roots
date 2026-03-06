@@ -19,17 +19,9 @@ public class Rust_and_roots extends Application {
     public static Stage stage;
     @Override
     public void start(Stage stage) throws Exception {
-        
-        Rust_and_roots.stage = stage;  // <-- IMPORTANT
+        Rust_and_roots.stage = stage;
 
-//        Parent root = FXMLLoader.load(getClass().getResource("/view/login.fxml"));
-//        Parent root = FXMLLoader.load(getClass().getResource("/view/new_game.fxml"));
-//        Parent root = FXMLLoader.load(getClass().getResource("/view/home_map.fxml"));
-//       Scene scene = new Scene(root);
-//        stage.setScene(scene);
-//        stage.show();
-
-        stage.setFullScreen(true); // or stage.setMaximized(true);
+        stage.setFullScreen(true);
 
         util.SceneManager.switchScene("/view/main_menu.fxml");
         stage.show();

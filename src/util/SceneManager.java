@@ -48,20 +48,20 @@ public class SceneManager {
             stage.setScene(scene);
             
 //            // ---- Re-apply window state AFTER changing scene ----
-//            if (wasFullScreen) {
-//                stage.setFullScreen(true);
-//            } else {
-//                stage.setFullScreen(false);
-//
-//                // Restore size/position first
-//                stage.setWidth(prevW);
-//                stage.setHeight(prevH);
-//                stage.setX(prevX);
-//                stage.setY(prevY);
-//
-//                // Then restore maximize if needed
-//                stage.setMaximized(wasMaximized);
-//            }
+            if (wasFullScreen) {
+                stage.setFullScreen(true);
+            } else {
+                stage.setFullScreen(false);
+
+                // Restore size/position first
+                stage.setWidth(prevW);
+                stage.setHeight(prevH);
+                stage.setX(prevX);
+                stage.setY(prevY);
+
+                // Then restore maximize if needed
+                stage.setMaximized(wasMaximized);
+            }
 
         } catch (IOException e) {
             e.printStackTrace();

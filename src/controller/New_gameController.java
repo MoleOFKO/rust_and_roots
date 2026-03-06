@@ -69,40 +69,48 @@ public class New_gameController implements Initializable {
     public static int dex;
     public static int hp;
     public static int stamina;
+    @FXML
+    private ImageView bgImage;
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         WorldScaler scaler = new WorldScaler(view, uiRoot);
         Platform.runLater(scaler::scale);
-    }    
+
+//        bgImage.fitWidthProperty().bind(view.widthProperty());
+//        bgImage.fitHeightProperty().bind(view.heightProperty());
+        
+        scaler.scale();
+    }   
 
     @FXML
-    private void handlebtnStartGame(ActionEvent event) throws IOException {
-        if(txtchaname.getText().isEmpty())
+    private void handlebtnStartGame(ActionEvent event) {
+        if (txtchaname.getText().isEmpty()) {
             JOptionPane.showMessageDialog(null, "Please Enter Character Name!");
-        else if(txtworldname.getText().isEmpty())
-            JOptionPane.showMessageDialog(null, "Please Enter World Name!");
-        else{
-            char_name = txtchaname.getText();
-            world_name = txtworldname.getText();
-            
-            str = Integer.parseInt(lblstr.getText());
-            agi = Integer.parseInt(lblagi.getText());
-            vit = Integer.parseInt(lblvit.getText());
-            dex = Integer.parseInt(lbldex.getText());
-            hp = Integer.parseInt(lblhp.getText());
-            stamina = Integer.parseInt(lblstamina.getText());
-
-            
-        Rust_and_roots.stage=stage;
-        SceneManager.switchScene("/view/home_map.fxml");
-        stage.show();
+            return;
         }
+
+        if (txtworldname.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Please Enter World Name!");
+            return;
+        }
+
+        char_name = txtchaname.getText();
+        world_name = txtworldname.getText();
+
+        str = Integer.parseInt(lblstr.getText());
+        agi = Integer.parseInt(lblagi.getText());
+        vit = Integer.parseInt(lblvit.getText());
+        dex = Integer.parseInt(lbldex.getText());
+        hp = Integer.parseInt(lblhp.getText());
+        stamina = Integer.parseInt(lblstamina.getText());
+
+        SceneManager.switchScene("/view/home_map.fxml");
     }
 
     @FXML
-    private void handlebackaction(ActionEvent event) throws IOException {
-        util.SceneManager.switchScene("/view/main_menu.fxml");
+    private void handlebackaction(ActionEvent event) {
+        SceneManager.switchScene("/view/main_menu.fxml");
     }
     
 }
