@@ -509,7 +509,8 @@ public class ShopController implements Initializable, SceneController {
         buyItemButtons.add(btnbuy11);
         buyItemButtons.add(btnbuy12);
 
-        System.out.println("root = " + root);
+        System.out.println("view = " + view);
+        System.out.println("world = " + world);
         System.out.println("buypane = " + buypane);
         System.out.println("sellpane = " + sellpane);
 
@@ -730,16 +731,16 @@ public class ShopController implements Initializable, SceneController {
     }
     
 
-    private <T extends Node> List<T> collectByPrefix(Parent start, Class<T> type, String prefix) {
-        List<T> out = new ArrayList<>();
-        walk(start, n -> {
-            if (type.isInstance(n)) {
-                String id = n.getId();
-                if (id != null && id.startsWith(prefix)) out.add(type.cast(n));
-            }
-        });
-        return out;
-    }
+//    private <T extends Node> List<T> collectByPrefix(Parent start, Class<T> type, String prefix) {
+//        List<T> out = new ArrayList<>();
+//        walk(start, n -> {
+//            if (type.isInstance(n)) {
+//                String id = n.getId();
+//                if (id != null && id.startsWith(prefix)) out.add(type.cast(n));
+//            }
+//        });
+//        return out;
+//    }
 
     private void walk(Parent p, java.util.function.Consumer<Node> visitor) {
         for (Node n : p.getChildrenUnmodifiable()) {
