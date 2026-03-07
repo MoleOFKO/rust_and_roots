@@ -21,10 +21,15 @@ public class Rust_and_roots extends Application {
     public void start(Stage stage) throws Exception {
         Rust_and_roots.stage = stage;
 
-        stage.setFullScreen(true);
-
-        util.SceneManager.switchScene("/view/main_menu.fxml");
+        Parent root = FXMLLoader.load(getClass().getResource("/view/login.fxml"));
+//        Parent root = FXMLLoader.load(getClass().getResource("/view/new_game.fxml"));
+//        Parent root = FXMLLoader.load(getClass().getResource("/view/home_map.fxml"));
+       Scene scene = new Scene(root);
+        stage.setScene(scene);
         stage.show();
+
+//        SceneManager.switchScene("/view/home_map.fxml");
+//        stage.show();
     }
 
     /**
