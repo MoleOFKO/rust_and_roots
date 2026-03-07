@@ -21,7 +21,7 @@ public class Rust_and_roots extends Application {
     public void start(Stage stage) throws Exception {
         Rust_and_roots.stage = stage;
 
-        stage.setFullScreen(true);
+//        stage.setFullScreen(true);
 
         util.SceneManager.switchScene("/view/main_menu.fxml");
         stage.show();

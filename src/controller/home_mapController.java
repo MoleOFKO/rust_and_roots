@@ -632,7 +632,8 @@ public class home_mapController implements Initializable , game.SceneController 
         // Pause input while open (simple approach)
         if (view.getScene() != null) {
             if (open) {
-                // disable movement input
+                // disable movement input and clear held keys
+                player.clearInputState();
                 view.getScene().setOnKeyPressed(null);
                 view.getScene().setOnKeyReleased(null);
             } else {
