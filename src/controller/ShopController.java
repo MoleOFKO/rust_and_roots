@@ -4,9 +4,19 @@
  */
 package controller;
 
+import static controller.Edit_itemController.itemList;
+import static controller.Edit_itemController.item_id;
+import db.dbcon;
 import game.GameState;
 import game.SceneController;
+import java.io.File;
+import java.io.InputStream;
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -22,13 +32,16 @@ import javafx.collections.*;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.util.converter.IntegerStringConverter;
 import model.Inventory;
-import model.ItemType;
-import model.Merchant;
-
+import model.Inventory;
+import model.ItemDatabase;
+import model.item;
 import java.util.*;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.image.Image;
 import javafx.scene.layout.StackPane;
+import model.ItemDatabase;
+import java.util.Objects;
 
 /**
  * FXML Controller class
@@ -47,6 +60,7 @@ public class ShopController implements Initializable, SceneController {
     private Button buybtn;
     @FXML
     private Button sellbtn;
+    
 
     @Override
     public void init(GameState gs) {
@@ -54,35 +68,59 @@ public class ShopController implements Initializable, SceneController {
         this.inv = gs.getPlayerState().getInventory();
     }
 
+    
+
     private enum Mode { BUY, SELL }
     private Mode mode = Mode.BUY;
+    
 
-    private final Map<ItemType, IntegerProperty> buyCart = new LinkedHashMap<>();
-    private final Map<ItemType, IntegerProperty> sellCart = new LinkedHashMap<>();
+    private final Map<Integer, IntegerProperty> buyCart = new LinkedHashMap<>();
+    private final Map<Integer, IntegerProperty> sellCart = new LinkedHashMap<>();
 
-    // Merchant price lookup for BUY mode
-    private final Map<ItemType, Integer> buyPriceByType = new EnumMap<>(ItemType.class);
+    private final List<item> shopItems = new ArrayList<>();
+    private final Map<Integer, item> dbItemsById = new LinkedHashMap<>();
 
     // rows shown in tableitemdetail
     public static class DetailRow {
-        private final ItemType type;
-        private final IntegerProperty qty;
-        private final IntegerProperty unitPrice;
+    private final item itemData;
+    private final IntegerProperty qty;
+    private final IntegerProperty unitPrice;
 
-        public DetailRow(ItemType type, IntegerProperty qty, int unitPrice) {
-            this.type = type;
+    public DetailRow(item itemData, IntegerProperty qty, int unitPrice) {
+            this.itemData = itemData;
             this.qty = qty;
             this.unitPrice = new SimpleIntegerProperty(unitPrice);
         }
-        public ItemType getType() { return type; }
-        public IntegerProperty qtyProperty() { return qty; }
-        public int getQty() { return qty.get(); }
-        public void setQty(int v) { qty.set(v); }
-        public IntegerProperty unitPriceProperty() { return unitPrice; }
-        public int getUnitPrice() { return unitPrice.get(); }
-        public int getLineTotal() { return getQty() * getUnitPrice(); }
-    }
 
+        public item getItemData() {
+            return itemData;
+        }
+
+        public IntegerProperty qtyProperty() {
+            return qty;
+        }
+
+        public int getQty() {
+            return qty.get();
+        }
+
+        public void setQty(int v) {
+            qty.set(v);
+        }
+
+        public IntegerProperty unitPriceProperty() {
+            return unitPrice;
+        }
+
+        public int getUnitPrice() {
+            return unitPrice.get();
+        }
+
+        public int getLineTotal() {
+            return getQty() * getUnitPrice();
+        }
+    }
+    
     private final ObservableList<DetailRow> detailRows = FXCollections.observableArrayList();
     
     private final List<Button> invBtns = new ArrayList<>();
@@ -284,6 +322,30 @@ public class ShopController implements Initializable, SceneController {
     @FXML
     private Label lblbuy12;
     @FXML
+    private Label buyname1;
+    @FXML
+    private Label buyname2;
+    @FXML
+    private Label buyname3;
+    @FXML
+    private Label buyname4;
+    @FXML
+    private Label buyname5;
+    @FXML
+    private Label buyname6;
+    @FXML
+    private Label buyname7;
+    @FXML
+    private Label buyname8;
+    @FXML
+    private Label buyname9;
+    @FXML
+    private Label buyname10;
+    @FXML
+    private Label buyname11;
+    @FXML
+    private Label buyname12;
+    @FXML
     private Pane sellpane;
     @FXML
     private ImageView imgsell1;
@@ -374,14 +436,98 @@ public class ShopController implements Initializable, SceneController {
     @FXML
     private Button colsell;
     
+    
+    
 
     
 
-    /**
-     * Initializes the controller class.
-     */
+    Connection con;
+    ResultSet rs;
+    PreparedStatement pst;
+    Statement st;
+    private List<ImageView> buyImages = new ArrayList<>();
+    private List<Label> buyLabels = new ArrayList<>();
+    private List<Integer> buyStock = new ArrayList<>();
+    private List<Label> buyNameLabels = new ArrayList<>();
+    private final List<Button> buyItemButtons = new ArrayList<>();
+    
+    
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        ItemDatabase.loadItems();
+        
+        buyImages.add(imgbuy1);
+        buyImages.add(imgbuy2);
+        buyImages.add(imgbuy3);
+        buyImages.add(imgbuy4);
+        buyImages.add(imgbuy5);
+        buyImages.add(imgbuy6);
+        buyImages.add(imgbuy7);
+        buyImages.add(imgbuy8);
+        buyImages.add(imgbuy9);
+        buyImages.add(imgbuy10);
+        buyImages.add(imgbuy11);
+        buyImages.add(imgbuy12);
+        
+        buyLabels.add(lblbuy1);
+        buyLabels.add(lblbuy2);
+        buyLabels.add(lblbuy3);
+        buyLabels.add(lblbuy4);
+        buyLabels.add(lblbuy5);
+        buyLabels.add(lblbuy6);
+        buyLabels.add(lblbuy7);
+        buyLabels.add(lblbuy8);
+        buyLabels.add(lblbuy9);
+        buyLabels.add(lblbuy10);
+        buyLabels.add(lblbuy11);
+        buyLabels.add(lblbuy12);
+        
+        buyNameLabels.add(buyname1);
+        buyNameLabels.add(buyname2);
+        buyNameLabels.add(buyname3);
+        buyNameLabels.add(buyname4);
+        buyNameLabels.add(buyname5);
+        buyNameLabels.add(buyname6);
+        buyNameLabels.add(buyname7);
+        buyNameLabels.add(buyname8);
+        buyNameLabels.add(buyname9);
+        buyNameLabels.add(buyname10);
+        buyNameLabels.add(buyname11);
+        buyNameLabels.add(buyname12);
+        
+        buyItemButtons.add(btnbuy1);
+        buyItemButtons.add(btnbuy2);
+        buyItemButtons.add(btnbuy3);
+        buyItemButtons.add(btnbuy4);
+        buyItemButtons.add(btnbuy5);
+        buyItemButtons.add(btnbuy6);
+        buyItemButtons.add(btnbuy7);
+        buyItemButtons.add(btnbuy8);
+        buyItemButtons.add(btnbuy9);
+        buyItemButtons.add(btnbuy10);
+        buyItemButtons.add(btnbuy11);
+        buyItemButtons.add(btnbuy12);
+
+        System.out.println("root = " + root);
+        System.out.println("buypane = " + buypane);
+        System.out.println("sellpane = " + sellpane);
+
+        for (int i = 0; i < buyNameLabels.size(); i++) {
+            System.out.println("buyNameLabels[" + i + "] = " + buyNameLabels.get(i));
+        }
+        loadItemImages();
+        
+        for(int i = 0; i < 12; i++){
+            buyStock.add(10); // default quantity
+        }
+        refreshBuyStock();
+        
+        for (int i = 0; i < buyItemButtons.size(); i++) {
+            final int index = i;
+            buyItemButtons.get(i).setOnAction(e -> handleBuyClick(index));
+        }
+        
+        
         if (gameState == null) gameState = GameState.get();
         if (inv == null) inv = gameState.getPlayerState().getInventory();
 
@@ -389,27 +535,15 @@ public class ShopController implements Initializable, SceneController {
         setupTable();
         bindCoins();
         setMode(Mode.BUY);     // default
-        refreshTableFromActiveCart();
+        refreshTableFromBuyCart();
         refreshAllPanels();
         
     }    
 
     private void setupMerchantCatalog() {
-        buyPriceByType.clear();
-
-        for (Merchant.ShopItem si : gameState.getCurrentMerchantItems()) {
-            ItemType t = mapShopNameToItemType(si.getName());
-            if (t != null) buyPriceByType.put(t, si.getPrice());
-        }
-    }
-    
-    private ItemType mapShopNameToItemType(String shopName) {
-        return switch (shopName) {
-            case "Parsnip Seeds" -> ItemType.PARSNIP_SEEDS;
-            case "Potato Seeds" -> ItemType.POTATO_SEEDS;
-            case "Watering Can Upgrade" -> ItemType.WATERING_CAN_UPGRADE;
-            default -> null;
-        };
+//        buyPriceByType.clear();
+        // no-op now
+    // items come directly from database / ItemDatabase
     }
     
     private void setupTable() {
@@ -417,86 +551,62 @@ public class ShopController implements Initializable, SceneController {
         tableitemdetail.setItems(detailRows);
 
         tableimg.setCellValueFactory(cd ->
-            new SimpleStringProperty(cd.getValue().getType().getDisplayName())
+            new SimpleStringProperty(cd.getValue().getItemData().getItem_name())
         );
 
-        tablequantity.setCellValueFactory(cd -> cd.getValue().qtyProperty().asObject());
+        tablequantity.setCellValueFactory(cd ->
+            cd.getValue().qtyProperty().asObject()
+        );
+
         tablequantity.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
+
         tablequantity.setOnEditCommit(e -> {
             DetailRow row = e.getRowValue();
+            int itemId = row.getItemData().getItem_id();
             int newQty = (e.getNewValue() == null) ? row.getQty() : e.getNewValue();
 
-            // allow "0 means remove" exactly as you requested
-            if (newQty <= 0) {
-                removeFromActiveCart(row.getType());
+            if (mode == Mode.BUY) {
+                if (newQty <= 0) {
+                    buyCart.remove(itemId);
+                } else {
+                    buyCart.computeIfAbsent(itemId, k -> new SimpleIntegerProperty(0)).set(newQty);
+                }
+                refreshTableFromBuyCart();
             } else {
-                row.setQty(newQty);
+                int have = inv.getCount(itemId);
+                int clamped = Math.max(0, Math.min(newQty, have));
+
+                if (clamped <= 0) {
+                    sellCart.remove(itemId);
+                } else {
+                    sellCart.computeIfAbsent(itemId, k -> new SimpleIntegerProperty(0)).set(clamped);
+                }
+                refreshTableFromSellCart();
             }
-            refreshTableFromActiveCart();
         });
-        tableitemdetail.setEditable(true);
 
         tablecost.setCellValueFactory(cd ->
             new SimpleIntegerProperty(cd.getValue().getLineTotal()).asObject()
         );
     }
     
-    private Map<ItemType, IntegerProperty> activeCart() {
-        return (mode == Mode.BUY) ? buyCart : sellCart;
-    }
 
-    private void removeFromActiveCart(ItemType t) {
-        activeCart().remove(t);
-    }
 
-    private int unitPrice(ItemType t) {
-        if (mode == Mode.BUY) {
-            return buyPriceByType.getOrDefault(t, 0);
-        } else {
-            return sellPrice(t);
-        }
-    }
 
-    // You didn’t specify sell pricing. Pick a rule:
-    // here: 50% of buy price if it exists, otherwise 5g default for crops.
-    private int sellPrice(ItemType t) {
-        int base = buyPriceByType.getOrDefault(t, 0);
-        if (base > 0) return Math.max(1, base / 2);
-
-        return switch (t) {
-            case GRAPE, CARROT, CORN, TOMATO -> 5;
-            default -> 1;
-        };
-    }
-
-    private void refreshTableFromActiveCart() {
-        detailRows.clear();
-        for (var e : activeCart().entrySet()) {
-            ItemType t = e.getKey();
-            IntegerProperty qtyProp = e.getValue();
-            int price = unitPrice(t);
-            detailRows.add(new DetailRow(t, qtyProp, price));
-        }
-        refreshTotalLabel();
-    }
-    
     @FXML
     private void handlebuyaction(ActionEvent event) {
         if (mode != Mode.BUY) return;
 
-        int total = computeActiveTotal();
+        int total = computeBuyTotal();
         if (!inv.canAfford(total)) return;
-
-        // spend
         if (!inv.spendCoins(total)) return;
 
-        // add items
         for (var e : buyCart.entrySet()) {
             inv.addItem(e.getKey(), e.getValue().get());
         }
 
         buyCart.clear();
-        refreshTableFromActiveCart();
+        refreshTableFromBuyCart();
         refreshAllPanels();
     }
 
@@ -504,36 +614,32 @@ public class ShopController implements Initializable, SceneController {
     private void handlesellaction(ActionEvent event) {
         if (mode != Mode.SELL) return;
 
-        // validate availability
         for (var e : sellCart.entrySet()) {
-            ItemType t = e.getKey();
+            int itemId = e.getKey();
             int qty = e.getValue().get();
-            if (inv.getCount(t) < qty) return;
+            if (inv.getCount(itemId) < qty) return;
         }
 
-        int totalGain = computeActiveTotal(); // uses sellPrice()
+        int totalGain = computeSellTotal();
 
-        // remove then pay
         for (var e : sellCart.entrySet()) {
             inv.removeItem(e.getKey(), e.getValue().get());
         }
-        inv.addCoins(totalGain);
 
+        inv.addCoins(totalGain);
         sellCart.clear();
-        refreshTableFromActiveCart();
+        refreshTableFromSellCart();
         refreshAllPanels();
     }
 
-    private int computeActiveTotal() {
-        int sum = 0;
-        for (var e : activeCart().entrySet()) {
-            sum += unitPrice(e.getKey()) * e.getValue().get();
-        }
-        return sum;
+    private int sellPrice(int itemId) {
+        item itm = ItemDatabase.getItemById(itemId);
+        if (itm == null) return 1;
+        return Math.max(1, itm.getPrice() / 2);
     }
 
     private void refreshTotalLabel() {
-        int total = computeActiveTotal();
+        int total = (mode == Mode.BUY) ? computeBuyTotal() : computeSellTotal();
         lbltotal.setText("Total: " + total + "g");
     }
     
@@ -566,27 +672,29 @@ public class ShopController implements Initializable, SceneController {
         buybtn.setDisable(!buyMode);
         sellbtn.setDisable(buyMode);
 
-        refreshTableFromActiveCart();
+        if (buyMode) {
+            refreshTableFromBuyCart();
+        } else {
+            refreshTableFromSellCart();
+        }
+
         refreshAllPanels();
     }
     
-    private void addToCart(ItemType t, int delta) {
-        Map<ItemType, IntegerProperty> cart = activeCart();
+    private void addToCart(int itemId, int delta) {
+        if (mode != Mode.SELL) return;
 
-        if (mode == Mode.SELL) {
-            int have = inv.getCount(t); // available
-            int current = cart.containsKey(t) ? cart.get(t).get() : 0;
-            int next = Math.min(have, current + delta);
-            if (next <= 0) cart.remove(t);
-            else cart.computeIfAbsent(t, k -> new SimpleIntegerProperty(0)).set(next);
+        int have = inv.getCount(itemId);
+        int current = sellCart.containsKey(itemId) ? sellCart.get(itemId).get() : 0;
+        int next = Math.min(have, current + delta);
+
+        if (next <= 0) {
+            sellCart.remove(itemId);
         } else {
-            int current = cart.containsKey(t) ? cart.get(t).get() : 0;
-            int next = current + delta;
-            if (next <= 0) cart.remove(t);
-            else cart.computeIfAbsent(t, k -> new SimpleIntegerProperty(0)).set(next);
+            sellCart.computeIfAbsent(itemId, k -> new SimpleIntegerProperty(0)).set(next);
         }
 
-        refreshTableFromActiveCart();
+        refreshTableFromSellCart();
         refreshAllPanels();
     }
     
@@ -598,18 +706,27 @@ public class ShopController implements Initializable, SceneController {
     private void collectButtonsOnce() {
         if (!invBtns.isEmpty()) return;
 
-        invBtns.addAll(collectByPrefix(root, Button.class, "invbtn"));
-        buyBtns.addAll(collectByPrefix(buypane, Button.class, "btnbuy"));
-        sellBtns.addAll(collectByPrefix(sellpane, Button.class, "btnsell"));
-        
-        
+        invBtns.addAll(Arrays.asList(
+            invbtn1, invbtn2, invbtn3, invbtn4, invbtn5,
+            invbtn6, invbtn7, invbtn8, invbtn9, invbtn10,
+            invbtn11, invbtn12, invbtn13, invbtn14, invbtn15,
+            invbtn16, invbtn17, invbtn18, invbtn19, invbtn20
+        ));
 
-        invBtns.sort(Comparator.comparing(Node::getId));
-        buyBtns.sort(Comparator.comparing(Node::getId));
-        sellBtns.sort(Comparator.comparing(Node::getId));
-        
-        
-}
+        buyBtns.addAll(Arrays.asList(
+            btnbuy1, btnbuy2, btnbuy3, btnbuy4, btnbuy5, btnbuy6,
+            btnbuy7, btnbuy8, btnbuy9, btnbuy10, btnbuy11, btnbuy12
+        ));
+
+        sellBtns.addAll(Arrays.asList(
+            btnsell1, btnsell2, btnsell3, btnsell4, btnsell5, btnsell6,
+            btnsell7, btnsell8, btnsell9, btnsell10, btnsell11, btnsell12
+        ));
+
+        invBtns.removeIf(Objects::isNull);
+        buyBtns.removeIf(Objects::isNull);
+        sellBtns.removeIf(Objects::isNull);
+    }
     
 
     private <T extends Node> List<T> collectByPrefix(Parent start, Class<T> type, String prefix) {
@@ -639,9 +756,11 @@ public class ShopController implements Initializable, SceneController {
     }
     
     private void refreshInventoryButtons() {
-        // Create a stable list of what player owns right now
-        List<ItemType> owned = new ArrayList<>(inv.itemsProperty().keySet());
-        owned.sort(Comparator.comparing(Enum::name));
+        List<Integer> owned = new ArrayList<>(inv.itemsProperty().keySet());
+        owned.sort(Comparator.comparing(id -> {
+            item itm = ItemDatabase.getItemById(id);
+            return itm == null ? "" : itm.getItem_name();
+        }));
 
         for (int i = 0; i < invBtns.size(); i++) {
             Button b = invBtns.get(i);
@@ -653,51 +772,54 @@ public class ShopController implements Initializable, SceneController {
                 continue;
             }
 
-            ItemType t = owned.get(i);
-            int count = inv.getCount(t);
+            int itemId = owned.get(i);
+            int count = inv.getCount(itemId);
+            item itm = ItemDatabase.getItemById(itemId);
+            String name = (itm == null) ? ("Item " + itemId) : itm.getItem_name();
 
             b.setDisable(false);
-            b.setText(t.getDisplayName() + " x" + count);
+            b.setText(name + " x" + count);
 
             b.setOnAction(e -> {
                 if (mode == Mode.SELL) {
-                    addToCart(t, +1);     // adds to sell cart, capped by inv count
+                    addToCart(itemId, +1);
                 }
             });
         }
     }
     
     private void refreshBuyButtons() {
-        List<ItemType> merchantTypes = new ArrayList<>(buyPriceByType.keySet());
-        merchantTypes.sort(Comparator.comparing(Enum::name));
-
         for (int i = 0; i < buyBtns.size(); i++) {
             Button b = buyBtns.get(i);
 
-            if (i >= merchantTypes.size()) {
+            if (i >= shopItems.size()) {
                 b.setText("");
                 b.setDisable(true);
                 b.setOnAction(null);
                 continue;
             }
 
-            ItemType t = merchantTypes.get(i);
-            int price = buyPriceByType.getOrDefault(t, 0);
+            item itm = shopItems.get(i);
+            int price = itm.getPrice();
 
             b.setDisable(false);
-            b.setText(t.getDisplayName() + " (" + price + "g)");
+            b.setText(itm.getItem_name() + " (" + price + "g)");
 
+            final int index = i;
             b.setOnAction(e -> {
                 if (mode == Mode.BUY) {
-                    addToCart(t, +1);
+                    handleBuyClick(index);
                 }
             });
         }
     }
     
     private void refreshSellButtons() {
-        List<ItemType> selected = new ArrayList<>(sellCart.keySet());
-        selected.sort(Comparator.comparing(Enum::name));
+        List<Integer> selected = new ArrayList<>(sellCart.keySet());
+        selected.sort(Comparator.comparing(id -> {
+            item itm = ItemDatabase.getItemById(id);
+            return itm == null ? "" : itm.getItem_name();
+        }));
 
         for (int i = 0; i < sellBtns.size(); i++) {
             Button b = sellBtns.get(i);
@@ -709,23 +831,176 @@ public class ShopController implements Initializable, SceneController {
                 continue;
             }
 
-            ItemType t = selected.get(i);
-            int qty = sellCart.get(t).get();
+            int itemId = selected.get(i);
+            int qty = sellCart.get(itemId).get();
+            item itm = ItemDatabase.getItemById(itemId);
+            String name = (itm == null) ? ("Item " + itemId) : itm.getItem_name();
 
             b.setDisable(false);
-            b.setText(t.getDisplayName() + " x" + qty);
-
-            // clicking a sell-pane item should show it in tableitemdetail:
-            // (your table already reflects the active cart; so just select it)
-            b.setOnAction(e -> {
-                for (DetailRow r : detailRows) {
-                    if (r.getType() == t) {
-                        tableitemdetail.getSelectionModel().select(r);
-                        break;
-                    }
-                }
-            });
+            b.setText(name + " x" + qty);
+            b.setOnAction(null);
         }
     }
     
+    
+
+    
+    
+    private void loadItemImages() {
+        String sql = "SELECT item_id, item_name, price, image FROM items LIMIT 12";
+        dbcon db = new dbcon();
+
+        try (
+            Connection con = db.getConnection();
+            PreparedStatement ps = con.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery()
+        ) {
+            int i = 0;
+            shopItems.clear();
+            dbItemsById.clear();
+
+            while (rs.next() && i < 12) {
+                int itemId = rs.getInt("item_id");
+                String itemName = rs.getString("item_name");
+                int price = rs.getInt("price");
+                String imageName = rs.getString("image");
+
+                item itm = new item(itemId, itemName, price);
+                shopItems.add(itm);
+                dbItemsById.put(itemId, itm);
+
+                if (i < buyImages.size() && buyImages.get(i) != null) {
+                    InputStream is = getClass().getResourceAsStream("/image/items/" + imageName);
+                    if (is != null) {
+                        buyImages.get(i).setImage(new Image(is));
+                    } else {
+                        System.out.println("Missing image file: " + imageName);
+                    }
+                }
+
+                if (i < buyNameLabels.size() && buyNameLabels.get(i) != null) {
+                    buyNameLabels.get(i).setText(itemName);
+                } else {
+                    System.out.println("Missing buyname label at index: " + i);
+                }
+
+                i++;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    private void refreshBuyStock() {
+
+        for(int i = 0; i < buyLabels.size(); i++){
+            buyLabels.get(i).setText("x" + buyStock.get(i));
+        }
+
+    }
+    
+    private void handleBuyClick(int index) {
+        if (index < 0 || index >= shopItems.size()) return;
+
+        item selectedItem = shopItems.get(index);
+
+        System.out.println("Clicked: " + selectedItem.getItem_name());
+
+        addDbItemToCart(selectedItem, 1);
+    }
+    
+    private void removeFromBuyCart(int itemId) {
+        buyCart.remove(itemId);
+    }
+
+    private void addDbItemToCart(item selectedItem, int delta) {
+        int itemId = selectedItem.getItem_id();
+        int current = buyCart.containsKey(itemId) ? buyCart.get(itemId).get() : 0;
+        int next = current + delta;
+
+        if (next <= 0) {
+            buyCart.remove(itemId);
+        } else {
+            buyCart.computeIfAbsent(itemId, k -> new SimpleIntegerProperty(0)).set(next);
+        }
+
+        refreshTableFromBuyCart();
+    }
+
+    private void refreshTableFromBuyCart() {
+        detailRows.clear();
+
+        for (var e : buyCart.entrySet()) {
+            int itemId = e.getKey();
+            IntegerProperty qtyProp = e.getValue();
+            item itm = dbItemsById.get(itemId);
+
+            if (itm != null) {
+                detailRows.add(new DetailRow(itm, qtyProp, itm.getPrice()));
+            }
+        }
+
+        refreshTotalLabel();
+    }
+    
+    private void refreshTableFromSellCart() {
+        detailRows.clear();
+
+        for (var e : sellCart.entrySet()) {
+            int itemId = e.getKey();
+            IntegerProperty qtyProp = e.getValue();
+            item itm = ItemDatabase.getItemById(itemId);
+
+            if (itm != null) {
+                detailRows.add(new DetailRow(itm, qtyProp, sellPrice(itemId)));
+            }
+        }
+
+        refreshTotalLabel();
+    }
+
+    private int computeBuyTotal() {
+        int sum = 0;
+
+        for (var e : buyCart.entrySet()) {
+            int itemId = e.getKey();
+            int qty = e.getValue().get();
+            item itm = dbItemsById.get(itemId);
+
+            if (itm != null) {
+                sum += itm.getPrice() * qty;
+            }
+        }
+
+        return sum;
+    }
+    
+    private int computeSellTotal() {
+        int sum = 0;
+
+        for (var e : sellCart.entrySet()) {
+            int itemId = e.getKey();
+            int qty = e.getValue().get();
+            sum += sellPrice(itemId) * qty;
+        }
+
+        return sum;
+    }
+    
+
+//    private void loadShopItems() {
+//        shopItems.clear();
+//        shopItems.addAll(ItemDatabase.getFirstItems(12));
+//
+//        for (int i = 0; i < shopItems.size() && i < buyNameLabels.size(); i++) {
+//            item itm = shopItems.get(i);
+//
+//            buyNameLabels.get(i).setText(itm.getItem_name());
+//
+//            if (i < buyImages.size()) {
+//                buyImages.get(i).setImage(ItemDatabase.getImage(itm.getItem_id()));
+//            }
+//        }
+//    }
 }

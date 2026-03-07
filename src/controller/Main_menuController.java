@@ -17,6 +17,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
+import model.ItemDatabase;
 import static rust_and_roots.Rust_and_roots.stage;
 import util.WorldScaler;
 
@@ -42,6 +43,7 @@ public class Main_menuController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
+        ItemDatabase.loadItems();
         WorldScaler scaler = new WorldScaler(view, uiRoot);
         Platform.runLater(scaler::scale);
     }    

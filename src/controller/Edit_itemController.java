@@ -122,7 +122,7 @@ public class Edit_itemController implements Initializable {
             System.out.println("Ready...");
             txtaname.setText(LoginController.txtname);
             initColumn();
-            initaccountList();
+            inititemList();
             
             
         }catch (ClassNotFoundException e){
@@ -199,7 +199,7 @@ public class Edit_itemController implements Initializable {
         }
     }
     
-    private void initaccountList(   ) throws SQLException{
+    private void inititemList(   ) throws SQLException{
         itemList = FXCollections.observableArrayList();
         String sql="SELECT i.item_id,i.item_name,i.price,s.str,s.agi,s.vit,s.dex,s.hp,s.stamina,i.image FROM items i JOIN stats s ON i.stats_id = s.stats_id;";
         st = con.createStatement();
