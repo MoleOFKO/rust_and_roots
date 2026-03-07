@@ -171,19 +171,13 @@ public class item_edit_btnController implements Initializable {
         JOptionPane.showMessageDialog(null, "Updated Successfully!");
         Stage stage = Rust_and_roots.stage;
 
-        root = FXMLLoader.load(getClass().getResource("/view/edit_item.fxml"));
-            Scene scene = new Scene(root);
-            stage.setScene(scene);
-            stage.show();
+        util.SceneManager.switchScene("/view/edit_item.fxml");
         } 
     }
 
     @FXML
     private void handlebtnbackaction(ActionEvent event) throws IOException {
-        root = FXMLLoader.load(getClass().getResource("/view/edit_item.fxml"));      
-        Scene scene = new Scene(root);
-        stage.setScene(scene);
-        stage.show();
+        util.SceneManager.switchScene("/view/edit_item.fxml");
     }
     
     private void handleactionupload(ActionEvent event) throws IOException {

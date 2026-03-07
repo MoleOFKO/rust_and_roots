@@ -16,6 +16,7 @@ import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import static rust_and_roots.Rust_and_roots.stage;
 import util.WorldScaler;
@@ -39,19 +40,16 @@ public class Main_menuController implements Initializable {
     private Group uiRoot;
 
     Parent root;
+    @FXML
+    private ImageView bgImage;
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // TODO
-        WorldScaler scaler = new WorldScaler(view, uiRoot);
-        Platform.runLater(scaler::scale);
+        new WorldScaler(view, uiRoot);
     }    
 
     @FXML
-    private void handlebtnloadgaction(ActionEvent event) throws IOException {
-        root = FXMLLoader.load(getClass().getResource("/view/saveloads.fxml"));
-        Scene scene = new Scene(root);
-        stage.setScene(scene);
-        stage.show();
+    private void handlebtnloadgaction(ActionEvent event) {
+        util.SceneManager.switchScene("/view/saveloads.fxml");
     }
 
     @FXML
@@ -60,12 +58,8 @@ public class Main_menuController implements Initializable {
     }
 
     @FXML
-    private void handlebtnnewgaction(ActionEvent event) throws IOException {
-        root = FXMLLoader.load(getClass().getResource("/view/new_game.fxml"));
-        Scene scene = new Scene(root);
-        stage.setScene(scene);
-        stage.show();
-
+    private void handlebtnnewgaction(ActionEvent event) {
+        util.SceneManager.switchScene("/view/new_game.fxml");
     }
     
 }

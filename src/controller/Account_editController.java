@@ -89,10 +89,7 @@ public class Account_editController implements Initializable {
 
     @FXML
     private void handlebtnbackaction(ActionEvent event) throws IOException {
-        root = FXMLLoader.load(getClass().getResource("/view/account_edit_main.fxml"));      
-        Scene scene = new Scene(root);
-        stage.setScene(scene);
-        stage.show();
+        util.SceneManager.switchScene("/view/account_edit_main.fxml");
     }
 
     @FXML

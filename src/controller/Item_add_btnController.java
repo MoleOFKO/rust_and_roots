@@ -172,12 +172,7 @@ public class Item_add_btnController implements Initializable {
 
                 con.commit();
                 JOptionPane.showMessageDialog(null, "Inserted Successfully!");
-
-                root = FXMLLoader.load(getClass().getResource("/view/edit_item.fxml"));
-                Scene scene = new Scene(root);
-                stage.setScene(scene);
-                stage.show();
-
+                util.SceneManager.switchScene("/view/edit_item.fxml");
             } catch (Exception e) {
                 con.rollback();
                 e.printStackTrace();
@@ -190,10 +185,7 @@ public class Item_add_btnController implements Initializable {
 
     @FXML
     private void handlebtnbackaction(ActionEvent event) throws IOException {
-        root = FXMLLoader.load(getClass().getResource("/view/edit_item.fxml"));      
-        Scene scene = new Scene(root);
-        stage.setScene(scene);
-        stage.show();
+        util.SceneManager.switchScene("/view/edit_item.fxml");
     }
     
 }
