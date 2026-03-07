@@ -74,13 +74,7 @@ public class New_gameController implements Initializable {
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        WorldScaler scaler = new WorldScaler(view, uiRoot);
-        Platform.runLater(scaler::scale);
-
-//        bgImage.fitWidthProperty().bind(view.widthProperty());
-//        bgImage.fitHeightProperty().bind(view.heightProperty());
-        
-        scaler.scale();
+        new WorldScaler(view, uiRoot);
     }   
 
     @FXML
