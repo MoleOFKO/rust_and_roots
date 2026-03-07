@@ -9,9 +9,9 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.StackPane?>
 
-<StackPane fx:id="root" style="-fx-background-color: white;" styleClass="inventory-overlay" stylesheets="@../css/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ShopController">
+<StackPane fx:id="view" style="-fx-background-color: white;" styleClass="inventory-overlay" stylesheets="@../css/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ShopController">
    <children>
-      <Pane prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: black;">
+      <Pane fx:id="world" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: black;">
          <children>
             <ImageView fitHeight="400.0" fitWidth="600.0" pickOnBounds="true" preserveRatio="true">
                <image>

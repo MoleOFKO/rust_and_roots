@@ -140,42 +140,27 @@ public class Account_managementController implements Initializable {
 
     @FXML
     private void handlebtnecharacteraction(ActionEvent event) throws IOException {
-        root = FXMLLoader.load(getClass().getResource("/view/edit_character.fxml"));
-            Scene scene = new Scene(root);
-            stage.setScene(scene);
-            stage.show();
+        util.SceneManager.switchScene("/view/edit_character.fxml");
     }
 
     @FXML
     private void handlebtneitemaction(ActionEvent event) throws IOException {
-        root = FXMLLoader.load(getClass().getResource("/view/edit_item.fxml"));
-            Scene scene = new Scene(root);
-            stage.setScene(scene);
-            stage.show();
+        util.SceneManager.switchScene("/view/edit_item.fxml");
     }
 
     @FXML
     private void handlebtnaccmanagementaction(ActionEvent event) throws IOException {
-        root = FXMLLoader.load(getClass().getResource("/view/account_management.fxml"));
-            Scene scene = new Scene(root);
-            stage.setScene(scene);
-            stage.show();
+        util.SceneManager.switchScene("/view/account_management.fxml");
     }
 
     @FXML
     private void handlebtnvplayeraction(ActionEvent event) throws IOException {
-        root = FXMLLoader.load(getClass().getResource("/view/account_view.fxml"));
-            Scene scene = new Scene(root);
-            stage.setScene(scene);
-            stage.show();
+        util.SceneManager.switchScene("/view/account_view.fxml");
     }
 
     @FXML
     private void handlebtnlogoutaction(ActionEvent event) throws IOException {
-            root = FXMLLoader.load(getClass().getResource("/view/Login.fxml"));
-            Scene scene = new Scene(root);
-            stage.setScene(scene);
-            stage.show();
+        util.SceneManager.switchScene("/view/Login.fxml");
     }
     
     
@@ -258,11 +243,8 @@ public class Account_managementController implements Initializable {
             JOptionPane.showMessageDialog(null, "Please Select one Product You Want to Edit!");
         else{
             accname = a.getAccount_name();
-            Stage stage = Rust_and_roots.stage;
-            root = FXMLLoader.load(getClass().getResource("/view/account_edit.fxml"));
-            Scene scene = new Scene(root);
-            stage.setScene(scene);
-            stage.show();
+//            Stage stage = Rust_and_roots.stage;
+            util.SceneManager.switchScene("/view/account_edit.fxml");
         }    
     }
    
@@ -301,10 +283,7 @@ public class Account_managementController implements Initializable {
                 pst.setString(1, a.getAccount_name());  
                 pst.executeUpdate();
                 JOptionPane.showMessageDialog(null, "Baned Successfully!");
-                root = FXMLLoader.load(getClass().getResource("/view/account_management.fxml"));
-                Scene scene = new Scene(root);
-                stage.setScene(scene);
-                stage.show();
+                util.SceneManager.switchScene("/view/account_management.fxml");
             }
     }
 
@@ -318,10 +297,7 @@ public class Account_managementController implements Initializable {
                 pst.setString(1, a.getAccount_name());  
                 pst.executeUpdate();
                 JOptionPane.showMessageDialog(null, "Actived Successfully!");
-                root = FXMLLoader.load(getClass().getResource("/view/account_management.fxml"));
-                Scene scene = new Scene(root);
-                stage.setScene(scene);
-                stage.show();
+                util.SceneManager.switchScene("/view/account_management.fxml");
             }
     }
 
