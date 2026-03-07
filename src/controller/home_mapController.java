@@ -26,7 +26,8 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import model.ItemType;
+import model.ItemDatabase;
+import model.item;
 import model.Merchant;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -441,21 +442,25 @@ public class home_mapController implements Initializable , game.SceneController 
         registerAllPlots();
         
         farm.setOnHarvest((seedType, amount) -> {
-            ItemType crop = switch (seedType) {
-                case GRAPE -> ItemType.GRAPE;
-                case CARROT -> ItemType.CARROT;
-                case CORN -> ItemType.CORN;
-                case TOMATO -> ItemType.TOMATO;
-            };
-                
-                player.getInventory().addItem(crop, amount);
+        String cropName = switch (seedType) {
+            case GRAPE -> "Grape";
+            case CARROT -> "Carrot";
+            case CORN -> "Corn";
+            case TOMATO -> "Tomato";
+        };
 
-            // optional: also add coins on harvest
-            // player.getInventory().addCoins(5);
+        item crop = ItemDatabase.getItemByName(cropName);
 
-            System.out.println("Harvested: " + crop.getDisplayName() + " x" + amount +
-                               " | Coins: " + player.getInventory().getCoins());
-        });
+        if (crop == null) {
+            System.out.println("Unknown crop item in database: " + cropName);
+            return;
+        }
+
+        player.getInventory().addItem(crop.getItem_id(), amount);
+
+        System.out.println("Harvested: " + crop.getItem_name() + " x" + amount +
+                           " | Coins: " + player.getInventory().getCoins());
+    });
         
         view.sceneProperty().addListener((obs, oldScene, newScene) -> {
             if (newScene != null) {
@@ -561,60 +566,51 @@ public class home_mapController implements Initializable , game.SceneController 
         FarmPlotRegistrar.registerPlots(farm, farm1);
     }
     
-    private void openShopWindow() {
-        ListView<Merchant.ShopItem> listView = new ListView<>();
-        listView.getItems().addAll(merChant.getItems());
-
-        Button buyBtn = new Button("Buy Selected");
-        buyBtn.setOnAction(e -> {
-            Merchant.ShopItem selected = listView.getSelectionModel().getSelectedItem();
-            if (selected == null) return;
-
-            int price = selected.getPrice();
-            var inv = player.getInventory();
-            
-            //Map shop item -> actual ItemType
-            ItemType itemType = mapShopNameToItemType(selected.getName());
-            if (itemType == null) {
-                new Alert(Alert.AlertType.ERROR, "Unknown shop item: " + selected.getName(), ButtonType.OK).showAndWait();
-                return;
-            }
-
-            if (!inv.spendCoins(price)) {
-                new Alert(Alert.AlertType.WARNING,
-                        "Not enough coins! You have " + inv.getCoins() + "g, need " + price + "g.",
-                        ButtonType.OK).showAndWait();
-                return;
-            }
-
-            inv.addItem(itemType, 1);
-
-            new Alert(Alert.AlertType.INFORMATION,
-                    "Purchased " + itemType.getDisplayName() + " for " + price + "g.\n" +
-                    "Coins left: " + inv.getCoins() + "g\n" +
-                    "You now have: " + inv.getCount(itemType),
-                    ButtonType.OK).showAndWait();
-        });
-        
-        VBox root = new VBox(10, listView, buyBtn);
-        root.setPadding(new Insets(12));
-
-        Stage shopStage = new Stage();
-        shopStage.setTitle("Merchant Shop");
-        shopStage.initModality(Modality.APPLICATION_MODAL);
-        shopStage.setScene(new Scene(root, 320, 420));
-        shopStage.showAndWait();
-    }
-
-    
-    private ItemType mapShopNameToItemType(String shopName) {
-        return switch (shopName) {
-            case "Parsnip Seeds" -> ItemType.PARSNIP_SEEDS;
-            case "Potato Seeds" -> ItemType.POTATO_SEEDS;
-            case "Watering Can Upgrade" -> ItemType.WATERING_CAN_UPGRADE;
-            default -> null;
-        };
-    }
+//    private void openShopWindow() {
+//        ListView<Merchant.ShopItem> listView = new ListView<>();
+//        listView.getItems().addAll(merChant.getItems());
+//
+//        Button buyBtn = new Button("Buy Selected");
+//        buyBtn.setOnAction(e -> {
+//            Merchant.ShopItem selected = listView.getSelectionModel().getSelectedItem();
+//            if (selected == null) return;
+//
+//            int price = selected.getPrice();
+//            var inv = player.getInventory();
+//
+//            item dbItem = ItemDatabase.getItemByName(selected.getName());
+//            if (dbItem == null) {
+//                new Alert(Alert.AlertType.ERROR,
+//                        "Unknown shop item in database: " + selected.getName(),
+//                        ButtonType.OK).showAndWait();
+//                return;
+//            }
+//
+//            if (!inv.spendCoins(price)) {
+//                new Alert(Alert.AlertType.WARNING,
+//                        "Not enough coins! You have " + inv.getCoins() + "g, need " + price + "g.",
+//                        ButtonType.OK).showAndWait();
+//                return;
+//            }
+//
+//            inv.addItem(dbItem.getItem_id(), 1);
+//
+//            new Alert(Alert.AlertType.INFORMATION,
+//                    "Purchased " + dbItem.getItem_name() + " for " + price + "g.\n" +
+//                    "Coins left: " + inv.getCoins() + "g\n" +
+//                    "You now have: " + inv.getCount(dbItem.getItem_id()),
+//                    ButtonType.OK).showAndWait();
+//        });
+//
+//        VBox root = new VBox(10, listView, buyBtn);
+//        root.setPadding(new Insets(12));
+//
+//        Stage shopStage = new Stage();
+//        shopStage.setTitle("Merchant Shop");
+//        shopStage.initModality(Modality.APPLICATION_MODAL);
+//        shopStage.setScene(new Scene(root, 320, 420));
+//        shopStage.showAndWait();
+//    }
 
     @FXML
     private void onCloseInventory(ActionEvent event) {
