@@ -9,7 +9,7 @@
 <?import javafx.scene.Group?>
 <?import javafx.scene.layout.StackPane?>
 
-<StackPane fx:id="view" prefHeight="549.0" prefWidth="833.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.AccountViewController">
+<StackPane fx:id="view" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.AccountViewController">
     <children>
         <Group fx:id="uiRoot">
             <children>

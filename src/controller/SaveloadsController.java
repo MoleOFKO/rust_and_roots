@@ -68,10 +68,7 @@ public class SaveloadsController implements Initializable {
 
     @FXML
     private void handlebackaction(ActionEvent event) throws IOException {
-        root = FXMLLoader.load(getClass().getResource("/view/main_menu.fxml"));
-        Scene scene = new Scene(root);
-        stage.setScene(scene);
-        stage.show();
+        util.SceneManager.switchScene("/view/main_menu.fxml");
     }
 
     @FXML

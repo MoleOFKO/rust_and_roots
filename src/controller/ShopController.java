@@ -53,14 +53,15 @@ public class ShopController implements Initializable, SceneController {
     private GameState gameState;
     private Inventory inv;
     @FXML
-    private StackPane root;
-    @FXML
     private ImageView inyimg11;
     @FXML
     private Button buybtn;
     @FXML
     private Button sellbtn;
-    
+    @FXML
+    private StackPane view;
+    @FXML
+    private Pane world;
 
     @Override
     public void init(GameState gs) {
