@@ -98,52 +98,27 @@ public class AccountViewController implements Initializable {
 
     @FXML
     private void handlebtnecharacteraction(ActionEvent event) throws IOException {
-        root = FXMLLoader.load(getClass().getResource("/view/edit_character.fxml"));
-        
-        Scene scene = new Scene(root);
-
-        stage.setScene(scene);
-        stage.show();
+        util.SceneManager.switchScene("/view/edit_character.fxml");
     }
 
     @FXML
     private void handlebtneitemaction(ActionEvent event) throws IOException {
-        root = FXMLLoader.load(getClass().getResource("/view/edit_item.fxml"));
-        
-        Scene scene = new Scene(root);
-
-        stage.setScene(scene);
-        stage.show();
+        util.SceneManager.switchScene("/view/edit_item.fxml");
     }
 
     @FXML
     private void handlebtnaccmanagementaction(ActionEvent event) throws IOException {
-        root = FXMLLoader.load(getClass().getResource("/view/account_management.fxml"));
-        
-        Scene scene = new Scene(root);
-
-        stage.setScene(scene);
-        stage.show();
+        util.SceneManager.switchScene("/view/account_management.fxml");
     }
 
     @FXML
     private void handlebtnvplayeraction(ActionEvent event) throws IOException {
-        root = FXMLLoader.load(getClass().getResource("/view/account_view.fxml"));
-        
-        Scene scene = new Scene(root);
-
-        stage.setScene(scene);
-        stage.show();
+        util.SceneManager.switchScene("/view/account_view.fxml");
     }
 
     @FXML
     private void handlebtnlogoutaction(ActionEvent event) throws IOException {
-        root = FXMLLoader.load(getClass().getResource("/view/login.fxml"));
-        
-        Scene scene = new Scene(root);
-
-        stage.setScene(scene);
-        stage.show();
+        util.SceneManager.switchScene("/view/login.fxml");
     }
     
     

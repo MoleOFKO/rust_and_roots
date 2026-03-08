@@ -11,11 +11,11 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.text.Font?>
 
-<StackPane fx:id="view" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: black;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.New_gameController">
+<StackPane fx:id="view" style="-fx-background-color: black;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.New_gameController">
     <children>
         <Group fx:id="uiRoot">
             <children>
-               <ImageView fitHeight="400.0" fitWidth="600.0" pickOnBounds="true" preserveRatio="true">
+               <ImageView fx:id="bgImage" fitHeight="400.0" fitWidth="600.0" pickOnBounds="true" preserveRatio="true">
                   <image>
                      <Image url="@../image/dashboard2.png" />
                   </image>
