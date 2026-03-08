@@ -70,10 +70,4 @@ public class RightMapController extends BaseMapController {
         registerExit(exit_up, "/view/upper_map.fxml", SpawnTag.FROM_DOWN);
     }
 
-    @Override
-    protected void configureFarm(Farm farm) {
-        // If right_map has a farm, configure it here (optional)
-        // farm.setAvailableSeeds(...);
-        // farm.setOnHarvest(...);
-    }
 }
