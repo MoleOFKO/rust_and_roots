@@ -18,7 +18,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
-import model.ItemDatabase;
 import static rust_and_roots.Rust_and_roots.stage;
 import util.WorldScaler;
 

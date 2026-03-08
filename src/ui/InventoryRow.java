@@ -5,29 +5,29 @@
 package ui;
 
 import javafx.beans.property.IntegerProperty;
+import model.ItemType;
 
 /**
  *
  * @author ASUS
  */
 public class InventoryRow {
-
-    private final int itemId;
+    
+    private final ItemType type;
     private final IntegerProperty quantity;
 
-    public InventoryRow(int itemId, IntegerProperty quantity) {
-        this.itemId = itemId;
+    public InventoryRow(ItemType type, IntegerProperty quantity) {
+        this.type = type;
         this.quantity = quantity;
     }
 
-    public int getItemId() {
-        return itemId;
+    public ItemType getType() {
+        return type;
     }
 
     public IntegerProperty quantityProperty() {
         return quantity;
     }
-
     public int getQuantity() {
         return quantity.get();
     }

@@ -1,7 +1,7 @@
 package model;
 
 public enum ItemType {
-    
+
     // Crops
     GRAPE("Grape"),
     CARROT("Carrot"),
