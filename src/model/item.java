@@ -22,6 +22,12 @@ public class item {
     private int stimana;
     private ImageView image;
 
+    public item(int item_id, String item_name, int price) {
+        this.item_id = item_id;
+        this.item_name = item_name;
+        this.price = price;
+    }
+
     public item(int item_id, String item_name, int price, int str, int agi, int vid, int dex, int hp, int stimana, ImageView image) {
         this.item_id = item_id;
         this.item_name = item_name;
@@ -35,6 +41,8 @@ public class item {
         this.image = image;
     }
 
+    
+    
     public int getPrice() {
         return price;
     }
