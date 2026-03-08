@@ -204,7 +204,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
             player.setWalls(CollisionRegistry.collectWalls(walls));
         }
 
-        applySpawn(gameState.consumePendingSpawn());
+//        applySpawn(gameState.consumePendingSpawn());
 
         interactionManager = new InteractionManager();
         configureExits();
