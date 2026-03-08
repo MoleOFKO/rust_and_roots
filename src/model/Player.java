@@ -222,7 +222,7 @@ public class Player {
             currentRow = 0; // Down
         }
 
-        double frameScale = Math.min(3.0, dtNanos / NANOS_PER_60FPS_FRAME);
+        double frameScale = Math.min(0.069, dtNanos / NANOS_PER_60FPS_FRAME);
         double dx = inputX * speed * frameScale;
         double dy = inputY * speed * frameScale;
 
