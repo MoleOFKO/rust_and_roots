@@ -271,129 +271,116 @@
                   </StackPane>
                </children>
             </HBox>
-            <AnchorPane fx:id="inventoryOverlay" prefHeight="200.0" prefWidth="200.0" visible="false">
-               <children>
-                  <TabPane layoutX="96.0" layoutY="65.0" prefHeight="240.0" prefWidth="402.0" styleClass="inventory-overlay" stylesheets="@../css/style.css" tabClosingPolicy="UNAVAILABLE">
-                     <tabs>
-                        <Tab text="Inventory">
-                           <content>
-                              <VBox prefHeight="200.0" prefWidth="100.0">
-                                 <children>
-                                    <Label fx:id="invCoinsLabel" prefHeight="17.0" prefWidth="113.0" styleClass="inventory-title" text="Coins: 0g" textFill="WHITE" />
-                                    <TableView fx:id="invTable" prefHeight="194.0" prefWidth="485.0">
-                                       <columns>
-                                          <TableColumn fx:id="colItem" prefWidth="300.0" text="Item" />
-                                          <TableColumn fx:id="colQty" prefWidth="100.0" text="Qty" />
-                                       </columns>
-                                    </TableView>
-                                 </children>
-                              </VBox>
-                           </content>
-                        </Tab>
-                        <Tab text="Status">
-                           <content>
-                              <VBox prefHeight="211.0" prefWidth="148.0">
-                                 <children>
-                                    <Label fx:id="lbName" text="Name : TOM" textFill="WHITE">
-                                       <font>
-                                          <Font size="15.0" />
-                                       </font>
-                                    </Label>
-                                    <Label fx:id="lbHP" text="HP : 100%" textFill="WHITE">
-                                       <font>
-                                          <Font size="15.0" />
-                                       </font>
-                                    </Label>
-                                    <Label fx:id="lbSP" text="SP : 100%" textFill="WHITE">
-                                       <font>
-                                          <Font size="15.0" />
-                                       </font>
-                                    </Label>
-                                    <Label fx:id="lbEXP" text="EXP : 0" textFill="WHITE">
-                                       <font>
-                                          <Font size="15.0" />
-                                       </font>
-                                    </Label>
-                                    <Label fx:id="lbSTR" text="STR : 5" textFill="WHITE">
-                                       <font>
-                                          <Font size="15.0" />
-                                       </font>
-                                    </Label>
-                                    <Label fx:id="lbAGI" text="AGI : 5" textFill="WHITE">
-                                       <font>
-                                          <Font size="15.0" />
-                                       </font>
-                                    </Label>
-                                    <Label fx:id="lbDEX" text="DEX : 5" textFill="WHITE">
-                                       <font>
-                                          <Font size="15.0" />
-                                       </font>
-                                    </Label>
-                                    <Label fx:id="lbVIT" text="VIT : 5" textFill="WHITE">
-                                       <font>
-                                          <Font size="15.0" />
-                                       </font>
-                                    </Label>
-                                 </children>
-                              </VBox>
-                           </content>
-                        </Tab>
-                        <Tab text="Settings">
-                           <content>
-                              <VBox>
-                                 <children>
-                                    <Label text="Game Time" textFill="WHITE">
-                                       <font>
-                                          <Font size="18.0" />
-                                       </font>
-                                    </Label>
-                                    <Label fx:id="timeLabel" text="Day 1  00:00" textFill="WHITE">
-                                       <font>
-                                          <Font size="14.0" />
-                                       </font>
-                                    </Label>
-                                    <Button fx:id="pauseTimeBtn" mnemonicParsing="false" text="Pause / Resume" />
-                                    <Label text="Time Speed" textFill="WHITE">
-                                       <font>
-                                          <Font size="18.0" />
-                                       </font>
-                                    </Label>
-                                    <Slider fx:id="timeSpeedSlider" majorTickUnit="1.0" max="10.0" minorTickCount="1" showTickLabels="true" showTickMarks="true" value="1.0" />
-                                    <Label fx:id="timeSpeedValueLabel" text="x1.0" textFill="WHITE" />
-                                    <HBox prefHeight="25.0" prefWidth="402.0" spacing="10.0">
-                                       <children>
-                                          <Button fx:id="btnMorning" mnemonicParsing="false" text="Set 08:00" />
-                                          <Button fx:id="btnNight" mnemonicParsing="false" text="Set 20:00" />
-                                          <Button fx:id="btnAddHour" mnemonicParsing="false" text="+1 hour" />
-                                       </children>
-                                    </HBox>
-                                    <Button fx:id="btnSave" mnemonicParsing="false" onAction="#handlebtnSave" text="Save &amp; Exit" />
-                                 </children>
-                              </VBox>
-                           </content>
-                        </Tab>
-                     </tabs>
-                  </TabPane>
-                  <HBox alignment="CENTER_RIGHT" layoutX="392.0" layoutY="356.0" spacing="10">
-                     <children>
-                        <Button onAction="#onCloseInventory" text="Close" />
-                     </children>
-                  </HBox>
-               </children>
-            </AnchorPane>
-            <Group>
-               <children>
-                  <Rectangle fx:id="spawn_default" height="10" layoutX="43.0" layoutY="69.0" opacity="0" width="10" />
-                  <Rectangle fx:id="spawn_from_left" height="10" layoutX="20.0" layoutY="278.0" opacity="0" width="10" />
-                  <Rectangle fx:id="spawn_from_right" height="10" layoutX="558.0" layoutY="153.0" opacity="0" width="10" />
-                  <Rectangle fx:id="spawn_from_up" height="10" layoutX="451.0" layoutY="20.0" opacity="0" width="10" />
-                  <Rectangle fx:id="spawn_from_farm" height="10" layoutX="340.0" layoutY="172.0" opacity="0" width="10" />
-                  <Rectangle fx:id="spawn_from_door" height="10" layoutX="186.0" layoutY="142.0" opacity="0" width="10" />
-                  <Rectangle fx:id="spawn_from_shop" height="10" layoutX="456.0" layoutY="210.0" opacity="0" stroke="BLACK" width="10" />
-               </children>
-            </Group>
          </children>
       </Group>
+      <AnchorPane fx:id="inventoryOverlay" prefHeight="200.0" prefWidth="200.0" visible="false">
+         <children>
+            <TabPane layoutX="96.0" layoutY="65.0" prefHeight="240.0" prefWidth="402.0" styleClass="inventory-overlay" stylesheets="@../css/style.css" tabClosingPolicy="UNAVAILABLE">
+               <tabs>
+                  <Tab text="Inventory">
+                     <content>
+                        <VBox prefHeight="200.0" prefWidth="100.0">
+                           <children>
+                              <Label fx:id="invCoinsLabel" prefHeight="17.0" prefWidth="113.0" styleClass="inventory-title" text="Coins: 0g" textFill="WHITE" />
+                              <TableView fx:id="invTable" prefHeight="194.0" prefWidth="485.0">
+                                 <columns>
+                                    <TableColumn fx:id="colItem" prefWidth="300.0" text="Item" />
+                                    <TableColumn fx:id="colQty" prefWidth="100.0" text="Qty" />
+                                 </columns>
+                              </TableView>
+                           </children>
+                        </VBox>
+                     </content>
+                  </Tab>
+                  <Tab text="Status">
+                     <content>
+                        <VBox prefHeight="211.0" prefWidth="148.0">
+                           <children>
+                              <Label fx:id="lbName" text="Name : TOM" textFill="WHITE">
+                                 <font>
+                                    <Font size="15.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="lbHP" text="HP : 100%" textFill="WHITE">
+                                 <font>
+                                    <Font size="15.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="lbSP" text="SP : 100%" textFill="WHITE">
+                                 <font>
+                                    <Font size="15.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="lbEXP" text="EXP : 0" textFill="WHITE">
+                                 <font>
+                                    <Font size="15.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="lbSTR" text="STR : 5" textFill="WHITE">
+                                 <font>
+                                    <Font size="15.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="lbAGI" text="AGI : 5" textFill="WHITE">
+                                 <font>
+                                    <Font size="15.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="lbDEX" text="DEX : 5" textFill="WHITE">
+                                 <font>
+                                    <Font size="15.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="lbVIT" text="VIT : 5" textFill="WHITE">
+                                 <font>
+                                    <Font size="15.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </VBox>
+                     </content></Tab>
+                  <Tab text="Settings">
+                     <content>
+                        <VBox>
+                           <children>
+                              <Label text="Game Time" textFill="WHITE">
+                                 <font>
+                                    <Font size="18.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="timeLabel" text="Day 1  00:00" textFill="WHITE">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                              </Label>
+                              <Button fx:id="pauseTimeBtn" mnemonicParsing="false" text="Pause / Resume" />
+                              <Label text="Time Speed" textFill="WHITE">
+                                 <font>
+                                    <Font size="18.0" />
+                                 </font>
+                              </Label>
+                              <Slider fx:id="timeSpeedSlider" majorTickUnit="1.0" max="10.0" minorTickCount="1" showTickLabels="true" showTickMarks="true" value="1.0" />
+                              <Label fx:id="timeSpeedValueLabel" text="x1.0" textFill="WHITE" />
+                              <HBox prefHeight="25.0" prefWidth="402.0" spacing="10.0">
+                                 <children>
+                                    <Button fx:id="btnMorning" mnemonicParsing="false" text="Set 08:00" />
+                                    <Button fx:id="btnNight" mnemonicParsing="false" text="Set 20:00" />
+                                    <Button fx:id="btnAddHour" mnemonicParsing="false" text="+1 hour" />
+                                 </children>
+                              </HBox>
+                              <Button fx:id="btnSave" mnemonicParsing="false" onAction="#handlebtnSave" text="Save &amp; Exit" />
+                           </children>
+                        </VBox>
+                     </content></Tab>
+               </tabs>
+            </TabPane>
+            <HBox alignment="CENTER_RIGHT" layoutX="392.0" layoutY="356.0" spacing="10">
+               <children>
+                  <Button onAction="#onCloseInventory" text="Close" />
+               </children>
+            </HBox>
+         </children>
+      </AnchorPane>
 
    </children>
 </StackPane>
