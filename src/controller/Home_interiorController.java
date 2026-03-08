@@ -9,14 +9,17 @@ import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Group;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
+import util.SpawnTag;
 
 /**
  * FXML Controller class
  *
  * @author larry
  */
-public class Home_interiorController implements Initializable {
+public class Home_interiorController extends BaseMapController {
 
     @FXML
     private Group walls;
@@ -77,18 +80,42 @@ public class Home_interiorController implements Initializable {
     @FXML
     private Rectangle spawn_default;
     @FXML
-    private Rectangle spawn_bed;
+    private Group spawn;
     @FXML
-    private Rectangle spawn_cook;
+    private Rectangle spawn_from_bed;
     @FXML
-    private Rectangle spawn_craft;
+    private Rectangle spawn_from_cook;
+    @FXML
+    private Rectangle spawn_from_craft;
+    @FXML
+    private Rectangle spawn_from_inv;
+    @FXML
+    private Rectangle spawn_from_melt;
+    @FXML
+    private Rectangle spawn_from_door;
+    @FXML
+    private Rectangle exit_door;
+    @FXML
+    private Group human;
+    @FXML
+    private Rectangle human_hitbox;
+    @FXML
+    private ImageView human_img;
+    @FXML
+    private StackPane view;
+    @FXML
+    private StackPane sleepStackPane;
 
-    /**
-     * Initializes the controller class.
-     */
+    
+
     @Override
-    public void initialize(URL url, ResourceBundle rb) {
-        // TODO
-    }    
+    protected String mapKey() {
+        return "Home_interior";
+    }
+
+    @Override
+    protected void configureExits() {
+        registerExit(exit_door, "/view/home_map.fxml", SpawnTag.FROM_DOOR);
+    }
     
 }
