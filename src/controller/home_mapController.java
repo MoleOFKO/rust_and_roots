@@ -21,7 +21,6 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import model.Farm;
-import model.ItemType;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -331,15 +330,15 @@ public class home_mapController extends BaseMapController {
         return "home_map";
     }
 
-    @Override
-    protected String dayBackgroundPath() {
-        return DAY_BG_PATH;
-    }
-
-    @Override
-    protected String nightBackgroundPath() {
-        return NIGHT_BG_PATH;
-    }
+//    @Override
+//    protected String dayBackgroundPath() {
+//        return DAY_BG_PATH;
+//    }
+//
+//    @Override
+//    protected String nightBackgroundPath() {
+//        return NIGHT_BG_PATH;
+//    }
 
     @Override
     protected void configureExits() {
@@ -375,21 +374,36 @@ public class home_mapController extends BaseMapController {
         }
 
         farm.setOnHarvest((seedType, amount) -> {
-            ItemType crop = switch (seedType) {
-                case GRAPE -> ItemType.GRAPE;
-                case CARROT -> ItemType.CARROT;
-                case CORN -> ItemType.CORN;
-                case TOMATO -> ItemType.TOMATO;
+            String cropName = switch (seedType) {
+                case GRAPE -> "Grape";
+                case CARROT -> "Carrot";
+                case CORN -> "Corn";
+                case TOMATO -> "Tomato";
             };
 
-            player.getInventory().addItem(crop, amount);
+            item crop = ItemDatabase.getItemByName(cropName);
+
+            if (crop == null) {
+                System.out.println("Unknown crop item in database: " + cropName);
+                return;
+            }
+
+            player.getInventory().addItem(crop.getItem_id(), amount);
 
             System.out.println("Harvested: " + crop.getDisplayName() + " x" + amount);
         });
     }
 
+//    @Override
+//    protected void afterBaseInitialize() {
+//        setupMerchant();
+//        setupMerchantZone();
+//    }
+    
     @Override
-    protected void afterBaseInitialize() {
+    public void initialize(URL url, ResourceBundle rb) {
+        super.initialize(url, rb);
+
         setupMerchant();
         setupMerchantZone();
     }

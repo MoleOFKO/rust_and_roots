@@ -249,6 +249,7 @@
                            </image>
                         </ImageView>
                         <Button fx:id="btnbuy1" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
+                        <Label fx:id="buyname1" layoutX="2.0" layoutY="1.0" text="buyname" visible="false" />
                         <Label fx:id="lblbuy1" layoutX="38.0" layoutY="38.0" text="x0" />
                      </children>
                   </Pane>
@@ -261,6 +262,7 @@
                         </ImageView>
                         <Button fx:id="btnbuy2" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                         <Label fx:id="lblbuy2" layoutX="38.0" layoutY="38.0" text="x0" />
+                        <Label fx:id="buyname2" layoutX="12.0" layoutY="11.0" text="buyname" visible="false" />
                      </children>
                   </Pane>
                   <Pane layoutX="135.0" layoutY="3.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
@@ -272,6 +274,7 @@
                         </ImageView>
                         <Button fx:id="btnbuy3" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                         <Label fx:id="lblbuy3" layoutX="38.0" layoutY="38.0" text="x0" />
+                        <Label fx:id="buyname3" layoutX="12.0" layoutY="11.0" text="buyname" visible="false" />
                      </children>
                   </Pane>
                   <Pane layoutX="193.0" layoutY="3.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
@@ -283,6 +286,7 @@
                         </ImageView>
                         <Button fx:id="btnbuy4" layoutY="-1.0" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                         <Label fx:id="lblbuy4" layoutX="38.0" layoutY="38.0" text="x0" />
+                        <Label fx:id="buyname4" layoutX="12.0" layoutY="11.0" text="buyname" visible="false" />
                      </children>
                   </Pane>
                   <Pane layoutX="19.0" layoutY="63.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
@@ -294,6 +298,7 @@
                         </ImageView>
                         <Button fx:id="btnbuy5" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                         <Label fx:id="lblbuy5" layoutX="38.0" layoutY="38.0" text="x0" />
+                        <Label fx:id="buyname5" layoutX="12.0" layoutY="11.0" text="buyname" visible="false" />
                      </children>
                   </Pane>
                   <Pane layoutX="77.0" layoutY="62.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
@@ -305,6 +310,7 @@
                         </ImageView>
                         <Button fx:id="btnbuy6" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                         <Label fx:id="lblbuy6" layoutX="38.0" layoutY="38.0" text="x0" />
+                        <Label fx:id="buyname6" layoutX="12.0" layoutY="11.0" text="buyname" visible="false" />
                      </children>
                   </Pane>
                   <Pane layoutX="135.0" layoutY="62.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
@@ -316,6 +322,7 @@
                         </ImageView>
                         <Button fx:id="btnbuy7" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                         <Label fx:id="lblbuy7" layoutX="38.0" layoutY="38.0" text="x0" />
+                        <Label fx:id="buyname7" layoutX="12.0" layoutY="11.0" text="buyname" visible="false" />
                      </children>
                   </Pane>
                   <Pane layoutX="194.0" layoutY="62.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
@@ -327,6 +334,7 @@
                         </ImageView>
                         <Button fx:id="btnbuy8" layoutY="-1.0" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                         <Label fx:id="lblbuy8" layoutX="38.0" layoutY="38.0" text="x0" />
+                        <Label fx:id="buyname8" layoutX="12.0" layoutY="11.0" text="buyname" visible="false" />
                      </children>
                   </Pane>
                   <Pane layoutX="19.0" layoutY="124.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
@@ -338,6 +346,7 @@
                         </ImageView>
                         <Button fx:id="btnbuy9" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                         <Label fx:id="lblbuy9" layoutX="38.0" layoutY="38.0" text="x0" />
+                        <Label fx:id="buyname9" layoutX="12.0" layoutY="11.0" text="buyname" visible="false" />
                      </children>
                   </Pane>
                   <Pane layoutX="77.0" layoutY="124.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
@@ -349,6 +358,7 @@
                         </ImageView>
                         <Button fx:id="btnbuy10" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                         <Label fx:id="lblbuy10" layoutX="38.0" layoutY="38.0" text="x0" />
+                        <Label fx:id="buyname10" layoutX="12.0" layoutY="11.0" text="buyname" visible="false" />
                      </children>
                   </Pane>
                   <Pane layoutX="135.0" layoutY="124.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
@@ -360,6 +370,7 @@
                         </ImageView>
                         <Button fx:id="btnbuy11" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                         <Label fx:id="lblbuy11" layoutX="38.0" layoutY="38.0" text="x0" />
+                        <Label fx:id="buyname11" layoutX="12.0" layoutY="11.0" text="buyname" visible="false" />
                      </children>
                   </Pane>
                   <Pane layoutX="194.0" layoutY="124.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
@@ -371,6 +382,7 @@
                         </ImageView>
                         <Button fx:id="btnbuy12" layoutY="-1.0" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="56.0" text="Button" />
                         <Label fx:id="lblbuy12" layoutX="38.0" layoutY="38.0" text="x0" />
+                        <Label fx:id="buyname12" layoutX="12.0" layoutY="11.0" text="buyname" visible="false" />
                      </children>
                   </Pane>
                </children>
