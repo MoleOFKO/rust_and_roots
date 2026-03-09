@@ -6,5 +6,7 @@ public enum SpawnTag {
     FROM_RIGHT,
     FROM_UP,
     FROM_DOWN,
-    FROM_DOOR
+    FROM_DOOR,
+    FROM_FARM,
+    FROM_SHOP
 }

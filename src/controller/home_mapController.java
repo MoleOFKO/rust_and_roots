@@ -24,6 +24,10 @@ import model.Farm;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import static model.Farm.SeedType.CARROT;
+import static model.Farm.SeedType.CORN;
+import static model.Farm.SeedType.GRAPE;
+import static model.Farm.SeedType.TOMATO;
 import model.ItemDatabase;
 import model.item;
 import model.Merchant;
@@ -310,6 +314,20 @@ public class home_mapController extends BaseMapController {
     private Button btnNight;
     @FXML
     private Button btnAddHour;
+    @FXML
+    private Rectangle spawn_default;
+    @FXML
+    private Rectangle spawn_from_left;
+    @FXML
+    private Rectangle spawn_from_right;
+    @FXML
+    private Rectangle spawn_from_up;
+    @FXML
+    private Rectangle spawn_from_door;
+    @FXML
+    private Rectangle spawn_from_farm;
+    @FXML
+    private Rectangle spawn_from_shop;
 
     @Override
     protected String mapKey() {
@@ -332,6 +350,17 @@ public class home_mapController extends BaseMapController {
         registerExit(rightmapdetect, "/view/right_map.fxml", SpawnTag.FROM_LEFT);
         registerExit(uppermapdetect, "/view/upper_map.fxml", SpawnTag.FROM_DOWN);
         registerExit(homedetect, "/view/home_interior.fxml", SpawnTag.FROM_DOOR);
+        registerExit(merchantdetect, "/view/shop.fxml", SpawnTag.FROM_SHOP);
+        if (farm1_detection != null) {
+            interactionManager.addZone(new model.InteractionZone(farm1_detection, inside -> {
+                if (inside) {
+                    GameState.get().setReturnScene("/view/home_map.fxml", SpawnTag.FROM_FARM);
+                    if (gameLoop != null) gameLoop.stop();
+                    if (player != null) player.stop();
+                    SceneManager.switchScene("/view/farm_table.fxml", SpawnTag.FROM_FARM);
+                }
+            }));
+        }
     }
 
     @Override
@@ -382,13 +411,7 @@ public class home_mapController extends BaseMapController {
     }
 
     private void setupMerchant() {
-        merChant = new Merchant(
-            merchantImage,
-            32, 32,
-            4, 4,
-            1,
-            "/image/human/merchant_new2.png"
-        );
+        merChant = new Merchant(merchantImage, 32, 32, 4, 4, 1, "/image/human/merchant_new2.png");
 
         merchantImage.toFront();
         merChant.play();
@@ -407,7 +430,7 @@ public class home_mapController extends BaseMapController {
     private void onMerchantShopClick(ActionEvent event) {
         if (!shop) return;
 
-        GameState.get().setReturnScene("/view/home_map.fxml", SpawnTag.DEFAULT);
+        GameState.get().setReturnScene("/view/home_map.fxml", SpawnTag.FROM_SHOP);
         GameState.get().setCurrentMerchantItems(merChant.getItems());
         SceneManager.switchScene("/view/shop.fxml");
     }
@@ -424,21 +447,25 @@ public class home_mapController extends BaseMapController {
 
     @FXML
     private void handledoorbtnaction(ActionEvent event) throws IOException {
+        GameState.get().setReturnScene("/view/home_map.fxml", SpawnTag.FROM_DOOR);
         SceneManager.switchScene("/view/home_interior.fxml");
     }
 
     @FXML
     private void handleleftmapaction(ActionEvent event) throws IOException {
+        GameState.get().setReturnScene("/view/home_map.fxml", SpawnTag.FROM_LEFT);
         SceneManager.switchScene("/view/left_map.fxml");
     }
 
     @FXML
     private void handlerightmapaction(ActionEvent event) throws IOException {
+        GameState.get().setReturnScene("/view/home_map.fxml", SpawnTag.FROM_RIGHT);
         SceneManager.switchScene("/view/right_map.fxml");
     }
 
     @FXML
     private void handleuppermapaction(ActionEvent event) throws IOException {
+        GameState.get().setReturnScene("/view/home_map.fxml", SpawnTag.FROM_UP);
         SceneManager.switchScene("/view/upper_map.fxml");
     }
 
