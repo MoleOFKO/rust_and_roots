@@ -350,7 +350,8 @@ public class home_mapController extends BaseMapController {
         registerExit(rightmapdetect, "/view/right_map.fxml", SpawnTag.FROM_LEFT);
         registerExit(uppermapdetect, "/view/upper_map.fxml", SpawnTag.FROM_DOWN);
         registerExit(homedetect, "/view/home_interior.fxml", SpawnTag.FROM_DOOR);
-        registerExit(merchantdetect, "/view/shop.fxml", SpawnTag.FROM_SHOP);if (farm1_detection != null) {
+        registerExit(merchantdetect, "/view/shop.fxml", SpawnTag.FROM_SHOP);
+        if (farm1_detection != null) {
             interactionManager.addZone(new model.InteractionZone(farm1_detection, inside -> {
                 if (inside) {
                     GameState.get().setReturnScene("/view/home_map.fxml", SpawnTag.FROM_FARM);
