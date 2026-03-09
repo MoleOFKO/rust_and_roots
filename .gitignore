@@ -27,3 +27,8 @@ build/built-jar.properties
 # =========================
 .DS_Store
 Thumbs.db
+nbproject/project.xml
+nbproject/private/private.xml
+nbproject/private/private.properties
+nbproject/genfiles.properties
+nbproject/build-impl.xml
