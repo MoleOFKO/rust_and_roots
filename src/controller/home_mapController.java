@@ -24,6 +24,10 @@ import model.Farm;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import static model.Farm.SeedType.CARROT;
+import static model.Farm.SeedType.CORN;
+import static model.Farm.SeedType.GRAPE;
+import static model.Farm.SeedType.TOMATO;
 import model.ItemDatabase;
 import model.item;
 import model.Merchant;
@@ -367,12 +371,6 @@ public class home_mapController extends BaseMapController {
             Farm.SeedType.TOMATO
         );
 
-        if (farm1_button != null) {
-            farm1_button.setDisable(true);
-            farm1_button.setVisible(false);
-            farm1_button.setManaged(false);
-        }
-
         farm.setOnHarvest((seedType, amount) -> {
             String cropName = switch (seedType) {
                 case GRAPE -> "Grape";
@@ -390,7 +388,10 @@ public class home_mapController extends BaseMapController {
 
             player.getInventory().addItem(crop.getItem_id(), amount);
 
-            System.out.println("Harvested: " + crop.getDisplayName() + " x" + amount);
+            System.out.println(
+                "Harvested: " + crop.getItem_name() + " x" + amount +
+                " | Coins: " + player.getInventory().getCoins()
+            );
         });
     }
 
