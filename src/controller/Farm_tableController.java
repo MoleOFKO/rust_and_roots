@@ -27,10 +27,11 @@ import javafx.scene.layout.StackPane;
 import model.Farm;
 import model.FarmState;
 import model.Inventory;
-import model.ItemType;
 import model.NodeCollectors;
 import util.SceneManager;
 import util.SpawnTag;
+import model.ItemDatabase;
+import model.item;
 
 /**
  * FXML Controller class
@@ -46,7 +47,7 @@ public class Farm_tableController implements Initializable, SceneController {
 
     private final Map<String, ImageView> plotViews = new LinkedHashMap<>();
     private final Map<String, TempPlotData> tempPlots = new LinkedHashMap<>();
-    private final Map<ItemType, Integer> pendingHarvests = new EnumMap<>(ItemType.class);
+    private final Map<Integer, Integer> pendingHarvests = new LinkedHashMap<>();
 
     @FXML
     private StackPane view;
@@ -142,16 +143,18 @@ public class Farm_tableController implements Initializable, SceneController {
     public void initialize(URL url, ResourceBundle rb) {
         if (gameState == null) gameState = GameState.get();
 
-        collectPlots();
-        loadTempFarmState();
-        bindPlotClicks();
-        populateSeedList();
-        seedList.setVisible(false);
-        seedList.setManaged(false);
-        seedList.setDisable(true);
-        refreshPlots();
-        refreshToolHighlight();
-        refreshPlotHighlights();
+            ItemDatabase.loadItems();
+
+            collectPlots();
+            loadTempFarmState();
+            bindPlotClicks();
+            populateSeedList();
+            seedList.setVisible(false);
+            seedList.setManaged(false);
+            seedList.setDisable(true);
+            refreshPlots();
+            refreshToolHighlight();
+            refreshPlotHighlights();
     }
     
     private void collectPlots() {
@@ -164,13 +167,16 @@ public class Farm_tableController implements Initializable, SceneController {
         }
     }
     
-    private ItemType toSeedItem(Farm.SeedType seedType) {
-        return switch (seedType) {
-            case CARROT -> ItemType.CARROT_SEEDS;
-            case GRAPE -> ItemType.GRAPE_SEEDS;
-            case CORN -> ItemType.CORN_SEEDS;
-            case TOMATO -> ItemType.TOMATO_SEEDS;
+    private int toSeedItemId(Farm.SeedType seedType) {
+        String itemName = switch (seedType) {
+            case CARROT -> "Carrot Seeds";
+            case GRAPE -> "Grape Seeds";
+            case CORN -> "Corn Seeds";
+            case TOMATO -> "Tomato Seeds";
         };
+
+        item itm = ItemDatabase.getItemByName(itemName);
+        return (itm == null) ? -1 : itm.getItem_id();
     }
     
     private List<Farm.SeedType> availableSeedsFromInventory() {
@@ -178,7 +184,8 @@ public class Farm_tableController implements Initializable, SceneController {
         List<Farm.SeedType> result = new ArrayList<>();
 
         for (Farm.SeedType seed : Farm.SeedType.values()) {
-            if (inv.getCount(toSeedItem(seed)) > 0) {
+            int itemId = toSeedItemId(seed);
+            if (itemId > 0 && inv.getCount(itemId) > 0) {
                 result.add(seed);
             }
         }
@@ -303,8 +310,10 @@ public class Farm_tableController implements Initializable, SceneController {
                 if (selectedSeedType == null) return;
                 if (!pd.isEmpty()) return;
 
-                ItemType seedItem = toSeedItem(selectedSeedType);
-                if (reservedSeedUsage(seedItem) >= gameState.getPlayerState().getInventory().getCount(seedItem)) {
+                int seedItemId = toSeedItemId(selectedSeedType);
+                if (seedItemId <= 0) return;
+
+                if (reservedSeedUsage(seedItemId) >= gameState.getPlayerState().getInventory().getCount(seedItemId)) {
                     return;
                 }
 
@@ -320,7 +329,10 @@ public class Farm_tableController implements Initializable, SceneController {
             }
             case SICKLE -> {
                 if (pd.seed != null && pd.isReady(now)) {
-                    pendingHarvests.merge(toCropItem(pd.seed), 1, Integer::sum);
+                    int cropItemId = toCropItemId(pd.seed);
+                    if (cropItemId > 0) {
+                        pendingHarvests.merge(cropItemId, 1, Integer::sum);
+                    }
                     pd.seed = null;
                     pd.plantedAt = -1;
                     pd.lastWateredAt = -1;
@@ -341,14 +353,14 @@ public class Farm_tableController implements Initializable, SceneController {
         Inventory inv = gameState.getPlayerState().getInventory();
         FarmState realFarm = gameState.getFarmState("home_map");
 
-        Map<ItemType, Integer> seedsToRemove = computeSeedConsumption();
-        for (Map.Entry<ItemType, Integer> entry : seedsToRemove.entrySet()) {
+        Map<Integer, Integer> seedsToRemove = computeSeedConsumption();
+        for (Map.Entry<Integer, Integer> entry : seedsToRemove.entrySet()) {
             if (!inv.removeItem(entry.getKey(), entry.getValue())) {
                 return;
             }
         }
 
-        for (Map.Entry<ItemType, Integer> entry : pendingHarvests.entrySet()) {
+        for (Map.Entry<Integer, Integer> entry : pendingHarvests.entrySet()) {
             inv.addItem(entry.getKey(), entry.getValue());
         }
 
@@ -381,23 +393,26 @@ public class Farm_tableController implements Initializable, SceneController {
         SceneManager.switchScene(returnFxml, returnSpawn);
     }
     
-    private ItemType toCropItem(Farm.SeedType seedType) {
-        return switch (seedType) {
-            case GRAPE -> ItemType.GRAPE;
-            case CARROT -> ItemType.CARROT;
-            case CORN -> ItemType.CORN;
-            case TOMATO -> ItemType.TOMATO;
+    private int toCropItemId(Farm.SeedType seedType) {
+        String itemName = switch (seedType) {
+            case GRAPE -> "Grape";
+            case CARROT -> "Carrot";
+            case CORN -> "Corn";
+            case TOMATO -> "Tomato";
         };
+
+        item itm = ItemDatabase.getItemByName(itemName);
+        return (itm == null) ? -1 : itm.getItem_id();
     }
     
-    private int reservedSeedUsage(ItemType seedItem) {
+    private int reservedSeedUsage(int seedItemId) {
         int count = 0;
 
         for (TempPlotData pd : tempPlots.values()) {
             if (pd.seed == null) continue;
 
-            ItemType mapped = toSeedItem(pd.seed);
-            if (mapped == seedItem) {
+            int mappedId = toSeedItemId(pd.seed);
+            if (mappedId == seedItemId) {
                 count++;
             }
         }
@@ -405,8 +420,8 @@ public class Farm_tableController implements Initializable, SceneController {
         return count;
     }
     
-    private Map<ItemType, Integer> computeSeedConsumption() {
-        Map<ItemType, Integer> used = new EnumMap<>(ItemType.class);
+    private Map<Integer, Integer> computeSeedConsumption() {
+        Map<Integer, Integer> used = new LinkedHashMap<>();
         FarmState realFarm = gameState.getFarmState("home_map");
 
         for (Map.Entry<String, TempPlotData> e : tempPlots.entrySet()) {
@@ -417,8 +432,10 @@ public class Farm_tableController implements Initializable, SceneController {
             boolean newlyPlanted = real.seed == null && temp.seed != null;
             if (!newlyPlanted) continue;
 
-            ItemType seedItem = toSeedItem(temp.seed);
-            used.merge(seedItem, 1, Integer::sum);
+            int seedItemId = toSeedItemId(temp.seed);
+            if (seedItemId > 0) {
+                used.merge(seedItemId, 1, Integer::sum);
+            }
         }
 
         return used;
@@ -549,7 +566,8 @@ public class Farm_tableController implements Initializable, SceneController {
                 refreshPlotHighlights();
             });
 
-            Label qty = new Label("x" + inv.getCount(toSeedItem(seed)));
+            int seedItemId = toSeedItemId(seed);
+            Label qty = new Label("x" + inv.getCount(seedItemId));
             qty.setLayoutX(x);
             qty.setLayoutY(y + 58);
 

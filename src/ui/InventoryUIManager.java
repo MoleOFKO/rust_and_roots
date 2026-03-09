@@ -14,7 +14,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import model.Inventory;
 import model.ItemDatabase;
-import model.ItemType;
 import model.item;
 
 /**
