@@ -72,6 +72,8 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     @FXML protected Rectangle spawn_from_up;
     @FXML protected Rectangle spawn_from_down;
     @FXML protected Rectangle spawn_from_door;
+    @FXML protected Rectangle spawn_from_farm;
+    @FXML protected Rectangle spawn_from_shop;
 
     // ---------- Exit trigger zones ----------
     @FXML protected Rectangle exit_left;
@@ -202,7 +204,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
             player.setWalls(CollisionRegistry.collectWalls(walls));
         }
 
-        applySpawn(gameState.consumePendingSpawn());
+//        applySpawn(gameState.consumePendingSpawn());
 
         interactionManager = new InteractionManager();
         configureExits();
@@ -243,6 +245,8 @@ public abstract class BaseMapController implements Initializable, SceneControlle
             case FROM_UP -> spawn_from_up;
             case FROM_DOWN -> spawn_from_down;
             case FROM_DOOR -> spawn_from_door;
+            case FROM_FARM -> spawn_from_farm;
+            case FROM_SHOP -> spawn_from_shop;
             default -> spawn_default;
         };
 

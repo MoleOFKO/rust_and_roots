@@ -7,7 +7,11 @@ public enum ItemType {
     CARROT("Carrot"),
     CORN("Corn"),
     TOMATO("Tomato"),
-
+    
+    CARROT_SEEDS("Carrot Seeds"),
+    GRAPE_SEEDS("Grape Seeds"),
+    CORN_SEEDS("Corn Seeds"),
+    TOMATO_SEEDS("Tomato Seeds"),
     
     // Seeds (example)
     PARSNIP_SEEDS("Parsnip Seeds"),
