@@ -6,6 +6,7 @@ package rust_and_roots;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
+import util.SceneManager;
 
 /**
  *

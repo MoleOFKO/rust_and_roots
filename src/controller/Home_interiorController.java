@@ -368,6 +368,22 @@ public class Home_interiorController extends BaseMapController {
     private Group world;
     @FXML
     private StackPane chestStackPane;
+    private Rectangle craft_detect;
+    @FXML
+    private Rectangle bed_detect;
+    @FXML
+    private Rectangle chest_detect;
+    @FXML
+    private Rectangle melt_detect;
+    @FXML
+    private Rectangle cook_detect;
+    @FXML
+    private Button btnmelt;
+    @FXML
+    private Button btncraft;
+    @FXML
+    private Button btncook;
+
     
     @Override
     protected String mapKey() {
@@ -392,6 +408,14 @@ public class Home_interiorController extends BaseMapController {
     private void HandleInventoryAction(ActionEvent event) {
         chestStackPane.setDisable(false);
         chestStackPane.setVisible(true);
+    }
+
+    @FXML
+    private void handlecraftaction(ActionEvent event) {
+    }
+
+    @FXML
+    private void handlecookaction(ActionEvent event) {
     }
     
 }
