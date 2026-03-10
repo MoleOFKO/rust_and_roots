@@ -8,5 +8,10 @@ public enum SpawnTag {
     FROM_DOWN,
     FROM_DOOR,
     FROM_FARM,
-    FROM_SHOP
+    FROM_SHOP,
+    FROM_MELT,
+    FROM_COOK,
+    FROM_INV,
+    FROM_CRAFT,
+    FROM_BED
 }
