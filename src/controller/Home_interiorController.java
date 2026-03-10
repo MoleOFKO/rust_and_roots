@@ -364,6 +364,24 @@ public class Home_interiorController extends BaseMapController {
     private Label invlbl41;
     @FXML
     private Button invbtn41;
+    @FXML
+    private Group world;
+    @FXML
+    private Rectangle craft_detect;
+    @FXML
+    private Rectangle bed_detect;
+    @FXML
+    private Rectangle chest_detect;
+    @FXML
+    private Rectangle melt_detect;
+    @FXML
+    private Rectangle cook_detect;
+    @FXML
+    private Button btnmelt;
+    @FXML
+    private Button btncraft;
+    @FXML
+    private Button btncook;
 
     
 
@@ -383,6 +401,14 @@ public class Home_interiorController extends BaseMapController {
 
     @FXML
     private void HandleInventoryAction(ActionEvent event) {
+    }
+
+    @FXML
+    private void handlecraftaction(ActionEvent event) {
+    }
+
+    @FXML
+    private void handlecookaction(ActionEvent event) {
     }
     
 }
