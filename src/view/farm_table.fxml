@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.StackPane?>
 
-<StackPane fx:id="view" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: black;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Farm_tableController">
+<StackPane fx:id="view" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: black;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Farm_tableController">
    <children>
       <Pane fx:id="world" prefHeight="286.0" prefWidth="600.0">
          <children>
@@ -16,58 +16,172 @@
                   <Image url="@../image/farm.png" />
                </image>
             </ImageView>
+            <ImageView fitHeight="71.0" fitWidth="355.0" layoutX="5.0" layoutY="329.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../image/farm_bar.png" />
+               </image>
+            </ImageView>
          </children>
       </Pane>
-      <Pane prefHeight="400.0" prefWidth="600.0">
+      <Pane prefHeight="400.0" prefWidth="600.0" visible="false">
          <children>
             <Pane fx:id="farm" layoutX="7.0" layoutY="26.0" prefHeight="288.0" prefWidth="592.0">
                <children>
-                  <ImageView fx:id="farm_img1" fitHeight="49.0" fitWidth="55.0" layoutX="79.0" layoutY="27.0" pickOnBounds="true" preserveRatio="true" />
-                  <ImageView fx:id="farm_img2" fitHeight="49.0" fitWidth="55.0" layoutX="142.0" layoutY="27.0" pickOnBounds="true" preserveRatio="true" />
-                  <ImageView fx:id="farm_img3" fitHeight="49.0" fitWidth="55.0" layoutX="204.0" layoutY="27.0" pickOnBounds="true" preserveRatio="true" />
-                  <ImageView fx:id="farm_img4" fitHeight="49.0" fitWidth="55.0" layoutX="266.0" layoutY="27.0" pickOnBounds="true" preserveRatio="true" />
-                  <ImageView fx:id="farm_img5" fitHeight="49.0" fitWidth="55.0" layoutX="328.0" layoutY="25.0" pickOnBounds="true" preserveRatio="true" />
-                  <ImageView fx:id="farm_img6" fitHeight="49.0" fitWidth="55.0" layoutX="390.0" layoutY="25.0" pickOnBounds="true" preserveRatio="true" />
-                  <ImageView fx:id="farm_img7" fitHeight="49.0" fitWidth="55.0" layoutX="454.0" layoutY="25.0" pickOnBounds="true" preserveRatio="true" />
-                  <ImageView fx:id="farm_img8" fitHeight="49.0" fitWidth="58.0" layoutX="71.0" layoutY="73.0" pickOnBounds="true" preserveRatio="true" />
-                  <ImageView fx:id="farm_img9" fitHeight="49.0" fitWidth="58.0" layoutX="135.0" layoutY="73.0" pickOnBounds="true" preserveRatio="true" />
-                  <ImageView fx:id="farm_img10" fitHeight="49.0" fitWidth="58.0" layoutX="200.0" layoutY="73.0" pickOnBounds="true" preserveRatio="true" />
-                  <ImageView fx:id="farm_img11" fitHeight="49.0" fitWidth="58.0" layoutX="264.0" layoutY="73.0" pickOnBounds="true" preserveRatio="true" />
-                  <ImageView fx:id="farm_img12" fitHeight="49.0" fitWidth="58.0" layoutX="329.0" layoutY="71.0" pickOnBounds="true" preserveRatio="true" />
-                  <ImageView fx:id="farm_img13" fitHeight="49.0" fitWidth="58.0" layoutX="393.0" layoutY="71.0" pickOnBounds="true" preserveRatio="true" />
-                  <ImageView fx:id="farm_img14" fitHeight="49.0" fitWidth="58.0" layoutX="458.0" layoutY="71.0" pickOnBounds="true" preserveRatio="true" />
-                  <ImageView fx:id="farm_img15" fitHeight="49.0" fitWidth="66.0" layoutX="61.0" layoutY="121.0" pickOnBounds="true" preserveRatio="true" />
-                  <ImageView fx:id="farm_img16" fitHeight="49.0" fitWidth="58.0" layoutX="130.0" layoutY="121.0" pickOnBounds="true" preserveRatio="true" />
-                  <ImageView fx:id="farm_img17" fitHeight="49.0" fitWidth="58.0" layoutX="197.0" layoutY="121.0" pickOnBounds="true" preserveRatio="true" />
-                  <ImageView fx:id="farm_img18" fitHeight="49.0" fitWidth="58.0" layoutX="264.0" layoutY="121.0" pickOnBounds="true" preserveRatio="true" />
-                  <ImageView fx:id="farm_img19" fitHeight="49.0" fitWidth="58.0" layoutX="330.0" layoutY="119.0" pickOnBounds="true" preserveRatio="true" />
-                  <ImageView fx:id="farm_img20" fitHeight="49.0" fitWidth="58.0" layoutX="397.0" layoutY="119.0" pickOnBounds="true" preserveRatio="true" />
-                  <ImageView fx:id="farm_img21" fitHeight="49.0" fitWidth="55.0" layoutX="464.0" layoutY="119.0" pickOnBounds="true" preserveRatio="true" />
-                  <ImageView fx:id="farm_img22" fitHeight="49.0" fitWidth="58.0" layoutX="55.0" layoutY="175.0" pickOnBounds="true" preserveRatio="true" />
-                  <ImageView fx:id="farm_img23" fitHeight="49.0" fitWidth="66.0" layoutX="122.0" layoutY="175.0" pickOnBounds="true" preserveRatio="true" />
-                  <ImageView fx:id="farm_img24" fitHeight="49.0" fitWidth="58.0" layoutX="194.0" layoutY="175.0" pickOnBounds="true" preserveRatio="true" />
-                  <ImageView fx:id="farm_img25" fitHeight="49.0" fitWidth="58.0" layoutX="262.0" layoutY="175.0" pickOnBounds="true" preserveRatio="true" />
-                  <ImageView fx:id="farm_img26" fitHeight="49.0" fitWidth="58.0" layoutX="332.0" layoutY="173.0" pickOnBounds="true" preserveRatio="true" />
-                  <ImageView fx:id="farm_img27" fitHeight="49.0" fitWidth="58.0" layoutX="401.0" layoutY="173.0" pickOnBounds="true" preserveRatio="true" />
-                  <ImageView fx:id="farm_img28" fitHeight="49.0" fitWidth="58.0" layoutX="471.0" layoutY="173.0" pickOnBounds="true" preserveRatio="true" />
+                  <Pane layoutX="94.0" layoutY="33.0" prefHeight="49.0" prefWidth="27.0" scaleZ="-1.0">
+                     <children>
+                        <ImageView fx:id="farm_img1" fitHeight="49.0" fitWidth="27.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </Pane>
+                  <Pane layoutX="154.0" layoutY="35.0" prefHeight="49.0" prefWidth="27.0">
+                     <children>
+                        <ImageView fx:id="farm_img2" fitHeight="49.0" fitWidth="27.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </Pane>
+                  <Pane layoutX="215.0" layoutY="27.0">
+                     <children>
+                        <ImageView fx:id="farm_img3" fitHeight="49.0" fitWidth="27.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </Pane>
+                  <Pane layoutX="277.0" layoutY="27.0">
+                     <children>
+                        <ImageView fx:id="farm_img4" fitHeight="49.0" fitWidth="27.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </Pane>
+                  <Pane layoutX="340.0" layoutY="25.0">
+                     <children>
+                        <ImageView fx:id="farm_img5" fitHeight="49.0" fitWidth="27.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </Pane>
+                  <Pane layoutX="402.0" layoutY="25.0">
+                     <children>
+                        <ImageView fx:id="farm_img6" fitHeight="49.0" fitWidth="27.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </Pane>
+                  <Pane layoutX="464.0" layoutY="25.0">
+                     <children>
+                        <ImageView fx:id="farm_img7" fitHeight="49.0" fitWidth="27.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </Pane>
+                  <Pane layoutX="85.0" layoutY="73.0">
+                     <children>
+                        <ImageView fx:id="farm_img8" fitHeight="49.0" fitWidth="27.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </Pane>
+                  <Pane layoutX="149.0" layoutY="73.0">
+                     <children>
+                        <ImageView fx:id="farm_img9" fitHeight="49.0" fitWidth="27.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </Pane>
+                  <Pane layoutX="212.0" layoutY="73.0">
+                     <children>
+                        <ImageView fx:id="farm_img10" fitHeight="49.0" fitWidth="27.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </Pane>
+                  <Pane layoutX="278.0" layoutY="73.0">
+                     <children>
+                        <ImageView fx:id="farm_img11" fitHeight="49.0" fitWidth="27.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </Pane>
+                  <Pane layoutX="344.0" layoutY="71.0">
+                     <children>
+                        <ImageView fx:id="farm_img12" fitHeight="49.0" fitWidth="27.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </Pane>
+                  <Pane layoutX="409.0" layoutY="71.0">
+                     <children>
+                        <ImageView fx:id="farm_img13" fitHeight="49.0" fitWidth="27.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </Pane>
+                  <Pane layoutX="472.0" layoutY="71.0">
+                     <children>
+                        <ImageView fx:id="farm_img14" fitHeight="49.0" fitWidth="27.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </Pane>
+                  <Pane layoutX="78.0" layoutY="121.0">
+                     <children>
+                        <ImageView fx:id="farm_img15" fitHeight="49.0" fitWidth="28.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </Pane>
+                  <Pane layoutX="145.0" layoutY="121.0">
+                     <children>
+                        <ImageView fx:id="farm_img16" fitHeight="49.0" fitWidth="28.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </Pane>
+                  <Pane layoutX="213.0" layoutY="121.0">
+                     <children>
+                        <ImageView fx:id="farm_img17" fitHeight="49.0" fitWidth="28.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </Pane>
+                  <Pane layoutX="278.0" layoutY="121.0">
+                     <children>
+                        <ImageView fx:id="farm_img18" fitHeight="49.0" fitWidth="28.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </Pane>
+                  <Pane layoutX="344.0" layoutY="119.0">
+                     <children>
+                        <ImageView fx:id="farm_img19" fitHeight="49.0" fitWidth="28.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </Pane>
+                  <Pane layoutX="410.0" layoutY="119.0">
+                     <children>
+                        <ImageView fx:id="farm_img20" fitHeight="49.0" fitWidth="28.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </Pane>
+                  <Pane layoutX="477.0" layoutY="119.0">
+                     <children>
+                        <ImageView fx:id="farm_img21" fitHeight="49.0" fitWidth="28.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </Pane>
+                  <Pane layoutX="69.0" layoutY="175.0">
+                     <children>
+                        <ImageView fx:id="farm_img22" fitHeight="49.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </Pane>
+                  <Pane layoutX="138.0" layoutY="175.0">
+                     <children>
+                        <ImageView fx:id="farm_img23" fitHeight="49.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </Pane>
+                  <Pane layoutX="207.0" layoutY="175.0">
+                     <children>
+                        <ImageView fx:id="farm_img24" fitHeight="49.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </Pane>
+                  <Pane layoutX="276.0" layoutY="175.0">
+                     <children>
+                        <ImageView fx:id="farm_img25" fitHeight="49.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </Pane>
+                  <Pane layoutX="346.0" layoutY="173.0">
+                     <children>
+                        <ImageView fx:id="farm_img26" fitHeight="49.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </Pane>
+                  <Pane layoutX="415.0" layoutY="173.0">
+                     <children>
+                        <ImageView fx:id="farm_img27" fitHeight="49.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </Pane>
+                  <Pane layoutX="484.0" layoutY="173.0">
+                     <children>
+                        <ImageView fx:id="farm_img28" fitHeight="49.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </Pane>
                </children>
             </Pane>
             <Button fx:id="btnConfirm" layoutX="513.0" layoutY="335.0" mnemonicParsing="false" onAction="#handleConfirm" text="Confirm" />
             <Button fx:id="btnBack" layoutX="14.0" layoutY="335.0" mnemonicParsing="false" onAction="#handleBack" text="Back" />
-            <Button fx:id="btnSeedsList" layoutX="73.0" layoutY="332.0" mnemonicParsing="false" onAction="#handleBtnSeedsList" prefHeight="57.0" prefWidth="84.0" styleClass="btn_transparent" stylesheets="@../css/style.css" />
-            <ImageView fx:id="SeedsImg" fitHeight="57.0" fitWidth="84.0" layoutX="74.0" layoutY="332.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="SeedsImg" fitHeight="57.0" fitWidth="84.0" layoutX="74.0" layoutY="332.0" onMouseClicked="#handleBtnSeedsList" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../image/items/Tintoberry.png" />
                </image>
             </ImageView>
-            <Button fx:id="btnWaterCan" layoutX="215.0" layoutY="332.0" mnemonicParsing="false" onAction="#handlebtnWater" prefHeight="57.0" prefWidth="84.0" styleClass="btn_transparent" stylesheets="@../css/style.css" />
-            <ImageView fx:id="WaterCanImg" fitHeight="57.0" fitWidth="84.0" layoutX="216.0" layoutY="332.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="WaterCanImg" fitHeight="57.0" fitWidth="84.0" layoutX="216.0" layoutY="332.0" onMouseClicked="#handlebtnWater" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../image/items/Tintoberry.png" />
                </image>
             </ImageView>
-            <Button fx:id="btnReap" layoutX="374.0" layoutY="332.0" mnemonicParsing="false" onAction="#handleBtnReap" prefHeight="57.0" prefWidth="84.0" styleClass="btn_transparent" stylesheets="@../css/style.css" />
-            <ImageView fx:id="SickleImg" fitHeight="57.0" fitWidth="84.0" layoutX="375.0" layoutY="332.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="SickleImg" fitHeight="57.0" fitWidth="84.0" layoutX="375.0" layoutY="332.0" onMouseClicked="#handleBtnReap" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../image/items/Tintoberry.png" />
                </image>
