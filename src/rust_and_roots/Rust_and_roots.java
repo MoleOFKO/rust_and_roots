@@ -19,11 +19,8 @@ public class Rust_and_roots extends Application {
 
 //        stage.setFullScreen(true);
 
-        util.SceneManager.switchScene("/view/login.fxml");
+        util.SceneManager.switchScene("/view/home_map.fxml");
         stage.show();
-
-//        SceneManager.switchScene("/view/home_map.fxml");
-//        stage.show();
     }
 
     /**

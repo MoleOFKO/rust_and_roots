@@ -118,7 +118,7 @@
             </ImageView>
          </children>
       </StackPane>
-      <StackPane prefHeight="150.0" prefWidth="200.0" style="-fx-background-color: black;" visible="false">
+      <StackPane fx:id="chestStackPane" prefHeight="150.0" prefWidth="200.0" style="-fx-background-color: black;" visible="false">
          <children>
             <Pane prefHeight="200.0" prefWidth="200.0">
                <children>
