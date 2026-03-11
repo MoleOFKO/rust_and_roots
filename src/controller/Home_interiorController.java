@@ -4,6 +4,7 @@
  */
 package controller;
 
+import game.GameTimeManager;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
@@ -15,6 +16,7 @@ import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
+import model.InteractionZone;
 import util.SpawnTag;
 
 /**
@@ -368,6 +370,7 @@ public class Home_interiorController extends BaseMapController {
     private Group world;
     @FXML
     private StackPane chestStackPane;
+    @FXML
     private Rectangle craft_detect;
     @FXML
     private Rectangle bed_detect;
@@ -384,7 +387,6 @@ public class Home_interiorController extends BaseMapController {
     @FXML
     private Button btncook;
 
-    
     @Override
     protected String mapKey() {
         return "Home_interior";
@@ -393,15 +395,98 @@ public class Home_interiorController extends BaseMapController {
     @Override
     protected void configureExits() {
         registerExit(exit_door, "/view/home_map.fxml", SpawnTag.FROM_DOOR);
-//        registerExit(cook_detect, "view/cook.fxml", SpawnTag.FROM_COOK);
-//        registerExit(melt_detect, "view/melt.fxml", SpawnTag.FROM_MELT);
-//        registerExit(craft_detect, "view/craft.fxml", SpawnTag.FROM_CRAFT);
+        registerExit(cook_detect, "view/cook.fxml", SpawnTag.FROM_COOK);
+        registerExit(melt_detect, "view/melt.fxml", SpawnTag.FROM_MELT);
+        registerExit(craft_detect, "view/craft.fxml", SpawnTag.FROM_CRAFT);
     }
 
+    
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {
+        super.initialize(url, rb);
+
+        setupInteriorZones();
+
+        // start with all action buttons disabled
+        if (btntoSleep != null) btntoSleep.setDisable(true);
+        if (btnOpenInv != null) btnOpenInv.setDisable(true);
+        if (btncook != null) btncook.setDisable(true);
+        if (btnmelt != null) btnmelt.setDisable(true);
+        if (btncraft != null) btncraft.setDisable(true);
+
+        if (sleepStackPane != null) {
+            sleepStackPane.setVisible(false);
+            sleepStackPane.setDisable(true);
+            sleepStackPane.setManaged(false);
+        }
+
+        if (chestStackPane != null) {
+            chestStackPane.setVisible(false);
+            chestStackPane.setDisable(true);
+            chestStackPane.setManaged(false);
+        }
+    }
+
+    private void setupInteriorZones() {
+        if (bed_detect != null && btntoSleep != null) {
+            interactionManager.addZone(new InteractionZone(bed_detect, inside -> {
+                btntoSleep.setDisable(!inside);
+            }));
+        }
+
+        if (chest_detect != null && btnOpenInv != null) {
+            interactionManager.addZone(new InteractionZone(chest_detect, inside -> {
+                btnOpenInv.setDisable(!inside);
+            }));
+        }
+
+        if (cook_detect != null && btncook != null) {
+            interactionManager.addZone(new InteractionZone(cook_detect, inside -> {
+                btncook.setDisable(!inside);
+            }));
+        }
+
+        if (melt_detect != null && btnmelt != null) {
+            interactionManager.addZone(new InteractionZone(melt_detect, inside -> {
+                btnmelt.setDisable(!inside);
+            }));
+        }
+
+        if (craft_detect != null && btncraft != null) {
+            interactionManager.addZone(new InteractionZone(craft_detect, inside -> {
+                btncraft.setDisable(!inside);
+            }));
+        }
+    }
+    
     @FXML
     private void handleSleepAction(ActionEvent event) {
+        if (btntoSleep.isDisable()) return;
+
+        sleepStackPane.setManaged(true);
         sleepStackPane.setDisable(false);
         sleepStackPane.setVisible(true);
+        
+        if (player != null) {
+        player.clearInputState();
+        }
+
+        javafx.animation.PauseTransition pause =
+            new javafx.animation.PauseTransition(javafx.util.Duration.seconds(2));
+
+        pause.setOnFinished(e -> {
+            GameTimeManager time = GameTimeManager.get();
+
+            // move to next morning
+            time.setDay(time.dayNumberProperty().get() + 1);
+            time.setTimeOfDay(6, 0);
+
+            sleepStackPane.setVisible(false);
+            sleepStackPane.setDisable(true);
+            sleepStackPane.setManaged(false);
+        });
+
+        pause.play();
     }
 
     @FXML
