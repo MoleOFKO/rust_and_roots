@@ -350,17 +350,17 @@ public class home_mapController extends BaseMapController {
         registerExit(rightmapdetect, "/view/right_map.fxml", SpawnTag.FROM_LEFT);
         registerExit(uppermapdetect, "/view/upper_map.fxml", SpawnTag.FROM_DOWN);
         registerExit(homedetect, "/view/home_interior.fxml", SpawnTag.FROM_DOOR);
-        registerExit(merchantdetect, "/view/shop.fxml", SpawnTag.FROM_SHOP);
-        if (farm1_detection != null) {
-            interactionManager.addZone(new model.InteractionZone(farm1_detection, inside -> {
-                if (inside) {
-                    GameState.get().setReturnScene("/view/home_map.fxml", SpawnTag.FROM_FARM);
-                    if (gameLoop != null) gameLoop.stop();
-                    if (player != null) player.stop();
-                    SceneManager.switchScene("/view/farm_table.fxml", SpawnTag.FROM_FARM);
-                }
-            }));
-        }
+//        registerExit(merchantdetect, "/view/shop.fxml", SpawnTag.FROM_SHOP);
+//        if (farm1_detection != null) {
+//            interactionManager.addZone(new model.InteractionZone(farm1_detection, inside -> {
+//                if (inside) {
+//                    GameState.get().setReturnScene("/view/home_map.fxml", SpawnTag.FROM_FARM);
+//                    if (gameLoop != null) gameLoop.stop();
+//                    if (player != null) player.stop();
+//                    SceneManager.switchScene("/view/farm_table.fxml", SpawnTag.FROM_FARM);
+//                }
+//            }));
+//        }
     }
 
     @Override
@@ -405,8 +405,19 @@ public class home_mapController extends BaseMapController {
 
         setupMerchant();
         setupMerchantZone();
+        
+        if (farm1_button != null) {
+            farm1_button.setOnAction(e -> openFarmTable());
+        }
     }
 
+    private void openFarmTable(){
+        if(farm1_button ==null || farm1_button.isDisable()) return;
+        
+        gameState.setReturnScene("/view/home_map.fxml", SpawnTag.FROM_FARM);
+        stopAndSwitchScene("/view/farm_table.fxml", SpawnTag.FROM_FARM);
+    }
+    
     private void setupMerchant() {
         merChant = new Merchant(merchantImage, 32, 32, 4, 4, 1, "/image/human/merchant_new2.png");
 
@@ -427,9 +438,9 @@ public class home_mapController extends BaseMapController {
     private void onMerchantShopClick(ActionEvent event) {
         if (!shop) return;
 
-        GameState.get().setReturnScene("/view/home_map.fxml", SpawnTag.FROM_SHOP);
-        GameState.get().setCurrentMerchantItems(merChant.getItems());
-        SceneManager.switchScene("/view/shop.fxml", SpawnTag.FROM_SHOP);
+        gameState.setReturnScene("/view/home_map.fxml", SpawnTag.FROM_SHOP);
+        gameState.setCurrentMerchantItems(merChant.getItems());
+        stopAndSwitchScene("/view/shop.fxml", SpawnTag.FROM_SHOP);
     }
 
     @FXML

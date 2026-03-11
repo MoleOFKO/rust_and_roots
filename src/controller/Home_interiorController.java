@@ -9,7 +9,6 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.Group;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -395,9 +394,9 @@ public class Home_interiorController extends BaseMapController {
     @Override
     protected void configureExits() {
         registerExit(exit_door, "/view/home_map.fxml", SpawnTag.FROM_DOOR);
-        registerExit(cook_detect, "view/cook.fxml", SpawnTag.FROM_COOK);
-        registerExit(melt_detect, "view/melt.fxml", SpawnTag.FROM_MELT);
-        registerExit(craft_detect, "view/craft.fxml", SpawnTag.FROM_CRAFT);
+//        registerExit(cook_detect, "view/cook.fxml", SpawnTag.FROM_COOK);
+//        registerExit(melt_detect, "view/melt.fxml", SpawnTag.FROM_MELT);
+//        registerExit(craft_detect, "view/craft.fxml", SpawnTag.FROM_CRAFT);
     }
 
     
@@ -407,13 +406,22 @@ public class Home_interiorController extends BaseMapController {
 
         setupInteriorZones();
 
-        // start with all action buttons disabled
         if (btntoSleep != null) btntoSleep.setDisable(true);
         if (btnOpenInv != null) btnOpenInv.setDisable(true);
         if (btncook != null) btncook.setDisable(true);
         if (btnmelt != null) btnmelt.setDisable(true);
         if (btncraft != null) btncraft.setDisable(true);
 
+        if(btncook != null){
+            btncook.setOnAction(e -> openCook());
+        }
+        if (btnmelt != null) {
+            btnmelt.setOnAction(e -> openMelt());
+        }
+        if (btncraft != null) {
+            btncraft.setOnAction(e -> openCraft());
+        }
+        
         if (sleepStackPane != null) {
             sleepStackPane.setVisible(false);
             sleepStackPane.setDisable(true);
@@ -427,6 +435,24 @@ public class Home_interiorController extends BaseMapController {
         }
     }
 
+    private void openCook() {
+        if (btncook.isDisable()) return;
+        gameState.setReturnScene("/view/home_interior.fxml", SpawnTag.FROM_COOK);
+        stopAndSwitchScene("/view/cook.fxml", SpawnTag.FROM_COOK);
+    }
+
+    private void openMelt() {
+        if (btnmelt.isDisable()) return;
+        gameState.setReturnScene("/view/home_interior.fxml", SpawnTag.FROM_MELT);
+        stopAndSwitchScene("/view/melt.fxml", SpawnTag.FROM_MELT);
+    }
+
+    private void openCraft() {
+        if (btncraft.isDisable()) return;
+        gameState.setReturnScene("/view/home_interior.fxml", SpawnTag.FROM_CRAFT);
+        stopAndSwitchScene("/view/craft.fxml", SpawnTag.FROM_CRAFT);
+    }
+    
     private void setupInteriorZones() {
         if (bed_detect != null && btntoSleep != null) {
             interactionManager.addZone(new InteractionZone(bed_detect, inside -> {
