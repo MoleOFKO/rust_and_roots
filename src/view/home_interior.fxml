@@ -31,9 +31,9 @@
                   <Rectangle fx:id="wall5" arcHeight="5.0" arcWidth="5.0" fill="#ffffff00" height="95.0" layoutX="6.0" layoutY="133.0" stroke="BLACK" strokeType="INSIDE" width="39.0" />
                   <Rectangle fx:id="wall6" arcHeight="5.0" arcWidth="5.0" fill="#ffffff00" height="24.0" layoutX="46.0" layoutY="189.0" stroke="BLACK" strokeType="INSIDE" width="103.0" />
                   <Rectangle fx:id="wall7" arcHeight="5.0" arcWidth="5.0" fill="#ffffff00" height="32.0" layoutX="48.0" layoutY="152.0" stroke="BLACK" strokeType="INSIDE" width="29.0" />
-                  <Rectangle fx:id="wall8" arcHeight="5.0" arcWidth="5.0" fill="#ffffff00" height="91.0" layoutX="29.0" layoutY="-6.0" stroke="BLACK" strokeType="INSIDE" width="59.0" />
+                  <Rectangle fx:id="wall8" arcHeight="5.0" arcWidth="5.0" fill="#ffffff00" height="91.0" layoutX="67.0" layoutY="14.0" stroke="BLACK" strokeType="INSIDE" width="59.0" />
                   <Rectangle fx:id="wall9" arcHeight="5.0" arcWidth="5.0" fill="#ffffff00" height="97.0" layoutX="16.0" layoutY="32.0" stroke="BLACK" strokeType="INSIDE" width="47.0" />
-                  <Rectangle fx:id="wall10" arcHeight="5.0" arcWidth="5.0" fill="#ffffff00" height="79.0" layoutX="126.0" stroke="BLACK" strokeType="INSIDE" width="79.0" />
+                  <Rectangle fx:id="wall10" arcHeight="5.0" arcWidth="5.0" fill="#ffffff00" height="79.0" layoutX="10.0" stroke="BLACK" strokeType="INSIDE" width="199.0" />
                   <Rectangle fx:id="wall11" arcHeight="5.0" arcWidth="5.0" fill="#ffffff00" height="87.0" layoutX="206.0" layoutY="4.0" stroke="BLACK" strokeType="INSIDE" width="84.0" />
                   <Rectangle fx:id="wall12" arcHeight="5.0" arcWidth="5.0" fill="#ffffff00" height="78.0" layoutX="297.0" layoutY="1.0" stroke="BLACK" strokeType="INSIDE" width="220.0" />
                   <Rectangle fx:id="wall13" arcHeight="5.0" arcWidth="5.0" fill="#ffffff00" height="31.0" layoutX="428.0" layoutY="75.0" stroke="BLACK" strokeType="INSIDE" width="89.0" />
@@ -131,7 +131,7 @@
             </ImageView>
          </children>
       </StackPane>
-      <StackPane disable="true" prefHeight="150.0" prefWidth="200.0" style="-fx-background-color: black;" visible="false">
+      <StackPane fx:id="chestStackPane" prefHeight="150.0" prefWidth="200.0" style="-fx-background-color: black;" visible="false">
          <children>
             <Pane prefHeight="200.0" prefWidth="200.0">
                <children>

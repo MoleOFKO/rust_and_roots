@@ -10,6 +10,7 @@ import game.GameState;
 import game.GameTimeManager;
 import game.InteractionManager;
 import game.SceneController;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -74,6 +75,11 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     @FXML protected Rectangle spawn_from_door;
     @FXML protected Rectangle spawn_from_farm;
     @FXML protected Rectangle spawn_from_shop;
+    @FXML protected Rectangle spawn_from_bed;
+    @FXML protected Rectangle spawn_from_cook;
+    @FXML protected Rectangle spawn_from_craft;
+    @FXML protected Rectangle spawn_from_inv;
+    @FXML protected Rectangle spawn_from_melt;
 
     // ---------- Exit trigger zones ----------
     @FXML protected Rectangle exit_left;
@@ -173,9 +179,9 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     @Override
     public void init(GameState gs) {
         this.gameState = gs;
-        if (human != null) {
-            applySpawn(gs.consumePendingSpawn());
-        }
+        SpawnTag spawn = gs.consumePendingSpawn();
+
+        Platform.runLater(() -> applySpawn(spawn));
     }
 
     @Override
@@ -247,13 +253,32 @@ public abstract class BaseMapController implements Initializable, SceneControlle
             case FROM_DOOR -> spawn_from_door;
             case FROM_FARM -> spawn_from_farm;
             case FROM_SHOP -> spawn_from_shop;
+            case FROM_BED -> spawn_from_bed;
+            case FROM_COOK -> spawn_from_cook;
+            case FROM_CRAFT -> spawn_from_craft;
+            case FROM_INV -> spawn_from_inv;
+            case FROM_MELT -> spawn_from_melt;
             default -> spawn_default;
         };
 
-        if (target != null && human != null) {
-            human.setLayoutX(target.getLayoutX());
-            human.setLayoutY(target.getLayoutY());
+        if (target == null || human == null || human_hitbox == null || human.getParent() == null) {
+            return;
         }
+
+        // Convert both into scene space
+        Bounds targetScene = target.localToScene(target.getBoundsInLocal());
+        Bounds hitboxScene = human_hitbox.localToScene(human_hitbox.getBoundsInLocal());
+
+        // Convert both into the player's parent space
+        Bounds targetInParent = human.getParent().sceneToLocal(targetScene);
+        Bounds hitboxInParent = human.getParent().sceneToLocal(hitboxScene);
+
+        // Align hitbox top-left to spawn marker top-left
+        double dx = targetInParent.getMinX() - hitboxInParent.getMinX();
+        double dy = targetInParent.getMinY() - hitboxInParent.getMinY();
+
+        human.setLayoutX(human.getLayoutX() + dx);
+        human.setLayoutY(human.getLayoutY() + dy);
     }
 
     protected void selectHotbarSlot(int idx) {

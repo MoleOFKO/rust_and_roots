@@ -42,6 +42,7 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.StackPane;
 import model.ItemDatabase;
 import java.util.Objects;
+import util.SpawnTag;
 
 /**
  * FXML Controller class
@@ -68,8 +69,6 @@ public class ShopController implements Initializable, SceneController {
         this.gameState = gs;
         this.inv = gs.getPlayerState().getInventory();
     }
-
-    
 
     private enum Mode { BUY, SELL }
     private Mode mode = Mode.BUY;
@@ -436,11 +435,6 @@ public class ShopController implements Initializable, SceneController {
     private Button colbuy;
     @FXML
     private Button colsell;
-    
-    
-    
-
-    
 
     Connection con;
     ResultSet rs;
@@ -648,9 +642,9 @@ public class ShopController implements Initializable, SceneController {
     @FXML
     private void handlebackaction(ActionEvent event) {
         String back = gameState.getReturnFxml();
-        util.SpawnTag spawn = gameState.getReturnSpawn();
+//        util.SpawnTag spawn = gameState.getReturnSpawn();
         if (back == null) back = "/view/home_map.fxml"; // fallback
-        util.SceneManager.switchScene(back, spawn);
+        util.SceneManager.switchScene(back, SpawnTag.FROM_SHOP);
     }
 
     @FXML

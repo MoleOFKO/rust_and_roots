@@ -389,10 +389,7 @@ public class home_mapController extends BaseMapController {
 
             player.getInventory().addItem(crop.getItem_id(), amount);
 
-            System.out.println(
-                "Harvested: " + crop.getItem_name() + " x" + amount +
-                " | Coins: " + player.getInventory().getCoins()
-            );
+            System.out.println("Harvested: " + crop.getItem_name() + " x" + amount);
         });
     }
 
@@ -432,7 +429,7 @@ public class home_mapController extends BaseMapController {
 
         GameState.get().setReturnScene("/view/home_map.fxml", SpawnTag.FROM_SHOP);
         GameState.get().setCurrentMerchantItems(merChant.getItems());
-        SceneManager.switchScene("/view/shop.fxml");
+        SceneManager.switchScene("/view/shop.fxml", SpawnTag.FROM_SHOP);
     }
 
     @FXML
@@ -448,25 +445,25 @@ public class home_mapController extends BaseMapController {
     @FXML
     private void handledoorbtnaction(ActionEvent event) throws IOException {
         GameState.get().setReturnScene("/view/home_map.fxml", SpawnTag.FROM_DOOR);
-        SceneManager.switchScene("/view/home_interior.fxml");
+        SceneManager.switchScene("/view/home_interior.fxml", SpawnTag.FROM_DOOR);
     }
 
     @FXML
     private void handleleftmapaction(ActionEvent event) throws IOException {
         GameState.get().setReturnScene("/view/home_map.fxml", SpawnTag.FROM_LEFT);
-        SceneManager.switchScene("/view/left_map.fxml");
+        SceneManager.switchScene("/view/left_map.fxml", SpawnTag.FROM_RIGHT);
     }
 
     @FXML
     private void handlerightmapaction(ActionEvent event) throws IOException {
         GameState.get().setReturnScene("/view/home_map.fxml", SpawnTag.FROM_RIGHT);
-        SceneManager.switchScene("/view/right_map.fxml");
+        SceneManager.switchScene("/view/right_map.fxml", SpawnTag.FROM_LEFT);
     }
 
     @FXML
     private void handleuppermapaction(ActionEvent event) throws IOException {
         GameState.get().setReturnScene("/view/home_map.fxml", SpawnTag.FROM_UP);
-        SceneManager.switchScene("/view/upper_map.fxml");
+        SceneManager.switchScene("/view/upper_map.fxml", SpawnTag.FROM_DOWN);
     }
 
     @FXML

@@ -17,7 +17,7 @@ import javafx.scene.shape.Rectangle;
 public class Player {
 
     private static final double INV_SQRT_2 = 1.0 / Math.sqrt(2.0);
-    private static final double NANOS_PER_60FPS_FRAME = 16_666_667.0;
+    private static final double NANOS_PER_60FPS_FRAME = 16_666_666.0;
 
     private final Group node;               // the player group in FXML (human)
     private final ImageView sprite;         // human_img
@@ -222,7 +222,7 @@ public class Player {
             currentRow = 0; // Down
         }
 
-        double frameScale = Math.min(0.069, dtNanos / NANOS_PER_60FPS_FRAME);
+        double frameScale = Math.min(0.15, dtNanos / NANOS_PER_60FPS_FRAME); //character's speed
         double dx = inputX * speed * frameScale;
         double dy = inputY * speed * frameScale;
 
