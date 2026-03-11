@@ -395,9 +395,9 @@ public class Home_interiorController extends BaseMapController {
     @Override
     protected void configureExits() {
         registerExit(exit_door, "/view/home_map.fxml", SpawnTag.FROM_DOOR);
-        registerExit(cook_detect, "view/cook.fxml", SpawnTag.FROM_COOK);
-        registerExit(melt_detect, "view/melt.fxml", SpawnTag.FROM_MELT);
-        registerExit(craft_detect, "view/craft.fxml", SpawnTag.FROM_CRAFT);
+        registerExit(cook_detect, "/view/cook.fxml", SpawnTag.FROM_COOK);
+        registerExit(melt_detect, "/view/melt.fxml", SpawnTag.FROM_MELT);
+        registerExit(craft_detect, "/view/craft.fxml", SpawnTag.FROM_CRAFT);
     }
 
     
