@@ -23,7 +23,7 @@ public class Rust_and_roots extends Application {
 //        util.SceneManager.switchScene("/view/login.fxml");
 //        stage.show();
 
-        SceneManager.switchScene("/view/home_map.fxml");
+        SceneManager.switchScene("/view/home_interior.fxml");
         stage.show();
     }
 
