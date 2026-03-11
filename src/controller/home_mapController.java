@@ -451,19 +451,19 @@ public class home_mapController extends BaseMapController {
     @FXML
     private void handleleftmapaction(ActionEvent event) throws IOException {
         GameState.get().setReturnScene("/view/home_map.fxml", SpawnTag.FROM_LEFT);
-        SceneManager.switchScene("/view/left_map.fxml", SpawnTag.FROM_LEFT);
+        SceneManager.switchScene("/view/left_map.fxml", SpawnTag.FROM_RIGHT);
     }
 
     @FXML
     private void handlerightmapaction(ActionEvent event) throws IOException {
         GameState.get().setReturnScene("/view/home_map.fxml", SpawnTag.FROM_RIGHT);
-        SceneManager.switchScene("/view/right_map.fxml", SpawnTag.FROM_RIGHT);
+        SceneManager.switchScene("/view/right_map.fxml", SpawnTag.FROM_LEFT);
     }
 
     @FXML
     private void handleuppermapaction(ActionEvent event) throws IOException {
         GameState.get().setReturnScene("/view/home_map.fxml", SpawnTag.FROM_UP);
-        SceneManager.switchScene("/view/upper_map.fxml", SpawnTag.FROM_UP);
+        SceneManager.switchScene("/view/upper_map.fxml", SpawnTag.FROM_DOWN);
     }
 
     @FXML
