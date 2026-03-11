@@ -14,6 +14,7 @@ import javafx.scene.Group;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 import model.InteractionZone;
@@ -386,6 +387,136 @@ public class Home_interiorController extends BaseMapController {
     private Button btncraft;
     @FXML
     private Button btncook;
+    @FXML
+    private Group chest_inv_group;
+    @FXML
+    private Group player_inv_group;
+    @FXML
+    private ImageView Playerinvimg;
+    @FXML
+    private Button Playerinvbtn;
+    @FXML
+    private Label Playerinvlbl;
+    @FXML
+    private ImageView Playerinvimg1;
+    @FXML
+    private Button Playerinvbtn1;
+    @FXML
+    private Label Playerinvlbl1;
+    @FXML
+    private ImageView Playerinvimg2;
+    @FXML
+    private Button Playerinvbtn2;
+    @FXML
+    private Label Playerinvlbl2;
+    @FXML
+    private ImageView Playerinvimg3;
+    @FXML
+    private Button Playerinvbtn3;
+    @FXML
+    private Label Playerinvlbl3;
+    @FXML
+    private ImageView Playerinvimg4;
+    @FXML
+    private Button Playerinvbtn4;
+    @FXML
+    private Label Playerinvlbl4;
+    @FXML
+    private ImageView Playerinvimg5;
+    @FXML
+    private Button Playerinvbtn5;
+    @FXML
+    private Label Playerinvlbl5;
+    @FXML
+    private ImageView Playerinvimg6;
+    @FXML
+    private Button Playerinvbtn6;
+    @FXML
+    private Label Playerinvlbl6;
+    @FXML
+    private ImageView Playerinvimg7;
+    @FXML
+    private Button Playerinvbtn7;
+    @FXML
+    private Label Playerinvlbl7;
+    @FXML
+    private ImageView Playerinvimg8;
+    @FXML
+    private Button Playerinvbtn8;
+    @FXML
+    private Label Playerinvlbl8;
+    @FXML
+    private ImageView Playerinvimg9;
+    @FXML
+    private Button Playerinvbtn9;
+    @FXML
+    private Label Playerinvlbl9;
+    @FXML
+    private ImageView Playerinvimg10;
+    @FXML
+    private Button Playerinvbtn10;
+    @FXML
+    private Label Playerinvlbl10;
+    @FXML
+    private ImageView Playerinvimg11;
+    @FXML
+    private Button Playerinvbtn11;
+    @FXML
+    private Label Playerinvlbl11;
+    @FXML
+    private ImageView Playerinvimg12;
+    @FXML
+    private Button Playerinvbtn12;
+    @FXML
+    private Label Playerinvlbl12;
+    @FXML
+    private ImageView Playerinvimg13;
+    @FXML
+    private Button Playerinvbtn13;
+    @FXML
+    private Label Playerinvlbl13;
+    @FXML
+    private ImageView Playerinvimg14;
+    @FXML
+    private Button Playerinvbtn14;
+    @FXML
+    private Label Playerinvlbl14;
+    @FXML
+    private ImageView Playerinvimg15;
+    @FXML
+    private Button Playerinvbtn15;
+    @FXML
+    private Label Playerinvlbl15;
+    @FXML
+    private ImageView Playerinvimg16;
+    @FXML
+    private Button Playerinvbtn16;
+    @FXML
+    private Label Playerinvlbl16;
+    @FXML
+    private ImageView Playerinvimg17;
+    @FXML
+    private Button Playerinvbtn17;
+    @FXML
+    private Label Playerinvlbl17;
+    @FXML
+    private ImageView Playerinvimg18;
+    @FXML
+    private Button Playerinvbtn18;
+    @FXML
+    private Label Playerinvlbl18;
+    @FXML
+    private ImageView Playerinvimg19;
+    @FXML
+    private Button Playerinvbtn19;
+    @FXML
+    private Label Playerinvlbl19;
+    @FXML
+    private ImageView send_to_chest;
+    @FXML
+    private ImageView send_to_inventory;
+    @FXML
+    private ImageView Back;
 
     @Override
     protected String mapKey() {
@@ -501,6 +632,18 @@ public class Home_interiorController extends BaseMapController {
 
     @FXML
     private void handlecookaction(ActionEvent event) {
+    }
+
+    @FXML
+    private void sendToChestClick(MouseEvent event) {
+    }
+
+    @FXML
+    private void sendToInventoryClick(MouseEvent event) {
+    }
+
+    @FXML
+    private void backClick(MouseEvent event) {
     }
     
 }
