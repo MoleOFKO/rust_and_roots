@@ -156,6 +156,8 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
     protected abstract String mapKey();
     protected abstract void configureExits();
+    
+    protected static final double MAP_EXIT_DELAY_GAME_SECONDS =3.0;
 
     protected void configureFarm(Farm farm) {
         // default: do nothing
@@ -230,19 +232,38 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         afterBaseInitialize();
     }
 
+    protected final void stopAndSwitchScene(String targetFxml, SpawnTag targetSpawn) {
+        if (gameLoop != null) gameLoop.stop();
+        if (player != null) player.stop();
+        SceneManager.switchScene(targetFxml, targetSpawn);
+    }
+
     protected final void registerExit(Rectangle zone, String targetFxml, SpawnTag targetSpawn) {
         if (zone == null) return;
 
-        InteractionZone iz = new InteractionZone(zone, inside -> {
-            if (inside) {
-                if (gameLoop != null) gameLoop.stop();
-                if (player != null) player.stop();
-                SceneManager.switchScene(targetFxml, targetSpawn);
-            }
-        });
+        InteractionZone iz = new InteractionZone(
+            zone,
+            null,
+            () -> stopAndSwitchScene(targetFxml, targetSpawn),
+            MAP_EXIT_DELAY_GAME_SECONDS
+        );
 
         interactionManager.addZone(iz);
     }
+    
+//    protected final void registerExit(Rectangle zone, String targetFxml, SpawnTag targetSpawn) {
+//        if (zone == null) return;
+//
+//        InteractionZone iz = new InteractionZone(zone, inside -> {
+//            if (inside) {
+//                if (gameLoop != null) gameLoop.stop();
+//                if (player != null) player.stop();
+//                SceneManager.switchScene(targetFxml, targetSpawn);
+//            }
+//        });
+//
+//        interactionManager.addZone(iz);
+//    }
 
     protected final void applySpawn(SpawnTag tag) {
         Rectangle target = switch (tag) {

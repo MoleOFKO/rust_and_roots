@@ -21,6 +21,7 @@ public class InteractionManager {
     }
 
     public void updateAll(Bounds playerBounds) {
-        zones.forEach(zone -> zone.update(playerBounds));
+        double nowGameSeconds = GameTimeManager.get().totalSecondsProperty().get();
+        zones.forEach(zone -> zone.update(playerBounds, nowGameSeconds));
     }
 }
