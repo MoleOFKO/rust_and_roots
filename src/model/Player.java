@@ -46,6 +46,7 @@ public class Player {
     private Rectangle detectionTarget;
     private Runnable onDetection;
     private Runnable onNoDetection;
+    private Runnable onToggleHotbarRequest;
 
     private final Image walkSpriteSheet = new Image(
             getClass().getResource("/image/human/human_Walk.png").toExternalForm()
@@ -90,24 +91,54 @@ public class Player {
         this.onNoDetection = onNoDetection;
     }
 
+    public void setOnToggleHotbarRequest(Runnable onToggleHotbarRequest){
+        this.onToggleHotbarRequest = onToggleHotbarRequest;
+    }
+    
     public void attachInput(Scene scene) {
         clearInputState();
 
         scene.setOnKeyPressed(e -> {
-            if (isMovementKey(e.getCode())) {
-                pressedKeys.add(e.getCode());
+            KeyCode code = e.getCode();
+            
+            if (code == KeyCode.E) {
+                if (!pressedKeys.contains(code)) {
+                    pressedKeys.add(code);
+                    if (onToggleHotbarRequest != null) {
+                        onToggleHotbarRequest.run();
+                    }
+                }
+                return;
+            }
+
+            if (isMovementKey(code)) {
+                pressedKeys.add(code);
             }
         });
 
         scene.setOnKeyReleased(e -> {
-            if (!isMovementKey(e.getCode())) {
+            KeyCode code = e.getCode();
+
+            if (code == KeyCode.E) {
+                pressedKeys.remove(code);
                 return;
             }
 
-            pressedKeys.remove(e.getCode());
-            if (pressedKeys.isEmpty()) {
+            if (!isMovementKey(code)) {
+                return;
+            }
+
+            pressedKeys.remove(code);
+
+            boolean anyMovementHeld =
+                    pressedKeys.contains(KeyCode.W) ||
+                    pressedKeys.contains(KeyCode.A) ||
+                    pressedKeys.contains(KeyCode.S) ||
+                    pressedKeys.contains(KeyCode.D);
+
+            if (!anyMovementHeld) {
                 moving = false;
-                currentFrame = 2; // idle frame
+                currentFrame = 2;
                 updateViewport();
             }
         });
@@ -283,4 +314,6 @@ public class Player {
         Bounds targetBounds = target.localToScene(target.getBoundsInLocal());
         return playerBounds.intersects(targetBounds);
     }
+    
+    
 }
