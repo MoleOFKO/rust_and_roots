@@ -4,18 +4,14 @@
  */
 package controller;
 
-import static controller.Edit_itemController.itemList;
-import static controller.Edit_itemController.item_id;
 import db.dbcon;
 import game.GameState;
 import game.SceneController;
-import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
@@ -31,7 +27,6 @@ import javafx.beans.property.*;
 import javafx.collections.*;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.util.converter.IntegerStringConverter;
-import model.Inventory;
 import model.Inventory;
 import model.ItemDatabase;
 import model.item;
