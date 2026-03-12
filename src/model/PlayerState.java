@@ -8,6 +8,9 @@ public final class PlayerState {
 
     private final Inventory inventory;
 
+    private boolean hotbarVisible = true;
+    private int selectedHotbarIndex = 0;
+    
     public PlayerState(int startingCoins) {
         this.inventory = new Inventory(startingCoins);
     }
@@ -16,5 +19,20 @@ public final class PlayerState {
         return inventory;
     }
 
-    // Add more persistent player data here later (health, stamina, hotbar selection, etc.)
+    public boolean isHotbarVisible(){
+        return hotbarVisible;
+    }
+    
+    public void setHotbarVisible(boolean hotbarVisible){
+        this.hotbarVisible = hotbarVisible;
+    }
+    
+    public int  getselectedHotbarIndex(){
+        return selectedHotbarIndex;
+    }
+    
+    public void setSelectedHotbarIndex(int selectedHotbarIndex){
+        this.selectedHotbarIndex = selectedHotbarIndex;
+    }
+    
 }

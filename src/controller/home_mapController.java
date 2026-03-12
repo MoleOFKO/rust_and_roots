@@ -334,15 +334,15 @@ public class home_mapController extends BaseMapController {
         return "home_map";
     }
 
-//    @Override
-//    protected String dayBackgroundPath() {
-//        return DAY_BG_PATH;
-//    }
-//
-//    @Override
-//    protected String nightBackgroundPath() {
-//        return NIGHT_BG_PATH;
-//    }
+    @Override
+    protected String dayBackgroundPath() {
+        return DAY_BG_PATH;
+    }
+
+    @Override
+    protected String nightBackgroundPath() {
+        return NIGHT_BG_PATH;
+    }
 
     @Override
     protected void configureExits() {
@@ -436,17 +436,17 @@ public class home_mapController extends BaseMapController {
 
     @FXML
     private void onMerchantShopClick(ActionEvent event) {
-        if (!shop) return;
+        if (btnmerchant == null || btnmerchant.isDisable()) return;
 
         gameState.setReturnScene("/view/home_map.fxml", SpawnTag.FROM_SHOP);
         gameState.setCurrentMerchantItems(merChant.getItems());
         stopAndSwitchScene("/view/shop.fxml", SpawnTag.FROM_SHOP);
     }
 
-    @FXML
-    private void onCloseInventory(ActionEvent event) {
-        setInventoryOpen(false);
-    }
+//    @FXML
+//    private void onCloseInventory(ActionEvent event) {
+//        setInventoryOpen(false);
+//    }
 
     @Override
     public void init(GameState gameState) {
