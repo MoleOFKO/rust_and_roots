@@ -157,7 +157,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     protected abstract String mapKey();
     protected abstract void configureExits();
     
-    protected static final double MAP_EXIT_DELAY_GAME_SECONDS =3.0;
+    protected static final double MAP_EXIT_DELAY_GAME_SECONDS =0.5;
 
     protected void configureFarm(Farm farm) {
         // default: do nothing
