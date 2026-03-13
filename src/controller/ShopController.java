@@ -38,6 +38,7 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.StackPane;
 import model.ItemDatabase;
 import java.util.Objects;
+import javafx.scene.Group;
 import util.SpawnTag;
 
 /**
@@ -58,7 +59,7 @@ public class ShopController implements Initializable, SceneController {
     @FXML
     private StackPane view;
     @FXML
-    private Pane world;
+    private Group world;
 
     @Override
     public void init(GameState gs) {

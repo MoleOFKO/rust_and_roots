@@ -22,6 +22,7 @@ public final class GameState {
     public static GameState get() { return INSTANCE; }
 
     private final PlayerState playerState = new PlayerState(100); // starting coins
+    private final Inventory chestInventory = new Inventory(0);
 
     // ---- Scene transition spawn ----
     private SpawnTag pendingSpawn = SpawnTag.DEFAULT;
@@ -41,6 +42,10 @@ public final class GameState {
 
     public PlayerState getPlayerState() {
         return playerState;
+    }
+
+    public Inventory getChestInventory() {
+        return chestInventory;
     }
 
     public void setPendingSpawn(SpawnTag tag) {

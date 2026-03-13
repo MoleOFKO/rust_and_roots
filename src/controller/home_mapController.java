@@ -434,7 +434,7 @@ public class home_mapController extends BaseMapController {
         if (btnmerchant == null || btnmerchant.isDisable()) return;
 
         gameState.setReturnScene("/view/home_map.fxml", SpawnTag.FROM_SHOP);
-        gameState.setCurrentMerchantItems(merChant.getItems());
+//        gameState.setCurrentMerchantItems(merChant.getItems());
         stopAndSwitchScene("/view/shop.fxml", SpawnTag.FROM_SHOP);
     }
 
