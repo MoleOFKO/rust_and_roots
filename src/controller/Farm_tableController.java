@@ -60,7 +60,7 @@ public class Farm_tableController implements Initializable, SceneController {
     @FXML
     private ImageView SickleImg;
     @FXML
-    private Pane farm;
+    private Group farm;
     @FXML
     private ImageView farm_img1;
     @FXML

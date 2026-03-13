@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.Group?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.image.Image?>
@@ -8,7 +9,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.text.Font?>
 
-<StackPane fx:id="view" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: black;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Farm_tableController">
+<StackPane fx:id="view" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: black;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Farm_tableController">
    <children>
       <Pane fx:id="world" prefHeight="286.0" prefWidth="600.0">
          <children>
@@ -26,150 +27,38 @@
       </Pane>
       <Pane prefHeight="400.0" prefWidth="600.0">
          <children>
-            <Pane fx:id="farm" layoutX="7.0" layoutY="26.0" prefHeight="288.0" prefWidth="592.0">
+            <Group fx:id="farm" layoutX="7.0" layoutY="26.0">
                <children>
-                  <Pane layoutX="94.0" layoutY="33.0" prefHeight="49.0" prefWidth="27.0" scaleZ="-1.0">
-                     <children>
-                        <ImageView fx:id="farm_img1" fitHeight="49.0" fitWidth="27.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
-                     </children>
-                  </Pane>
-                  <Pane layoutX="154.0" layoutY="35.0" prefHeight="49.0" prefWidth="27.0">
-                     <children>
-                        <ImageView fx:id="farm_img2" fitHeight="49.0" fitWidth="27.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
-                     </children>
-                  </Pane>
-                  <Pane layoutX="277.0" layoutY="27.0">
-                     <children>
-                        <ImageView fx:id="farm_img4" fitHeight="49.0" fitWidth="27.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
-                        <Pane>
-                           <children>
-                              <ImageView fx:id="farm_img3" fitHeight="49.0" fitWidth="27.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
-                           </children>
-                        </Pane>
-                     </children>
-                  </Pane>
-                  <Pane layoutX="340.0" layoutY="25.0">
-                     <children>
-                        <ImageView fx:id="farm_img5" fitHeight="49.0" fitWidth="27.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
-                     </children>
-                  </Pane>
-                  <Pane layoutX="402.0" layoutY="25.0">
-                     <children>
-                        <ImageView fx:id="farm_img6" fitHeight="49.0" fitWidth="27.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
-                     </children>
-                  </Pane>
-                  <Pane layoutX="464.0" layoutY="25.0">
-                     <children>
-                        <ImageView fx:id="farm_img7" fitHeight="49.0" fitWidth="27.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
-                     </children>
-                  </Pane>
-                  <Pane layoutX="85.0" layoutY="73.0">
-                     <children>
-                        <ImageView fx:id="farm_img8" fitHeight="49.0" fitWidth="27.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
-                     </children>
-                  </Pane>
-                  <Pane layoutX="149.0" layoutY="73.0">
-                     <children>
-                        <ImageView fx:id="farm_img9" fitHeight="49.0" fitWidth="27.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
-                     </children>
-                  </Pane>
-                  <Pane layoutX="212.0" layoutY="73.0">
-                     <children>
-                        <ImageView fx:id="farm_img10" fitHeight="49.0" fitWidth="27.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
-                     </children>
-                  </Pane>
-                  <Pane layoutX="278.0" layoutY="73.0">
-                     <children>
-                        <ImageView fx:id="farm_img11" fitHeight="49.0" fitWidth="27.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
-                     </children>
-                  </Pane>
-                  <Pane layoutX="344.0" layoutY="71.0">
-                     <children>
-                        <ImageView fx:id="farm_img12" fitHeight="49.0" fitWidth="27.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
-                     </children>
-                  </Pane>
-                  <Pane layoutX="409.0" layoutY="71.0">
-                     <children>
-                        <ImageView fx:id="farm_img13" fitHeight="49.0" fitWidth="27.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
-                     </children>
-                  </Pane>
-                  <Pane layoutX="472.0" layoutY="71.0">
-                     <children>
-                        <ImageView fx:id="farm_img14" fitHeight="49.0" fitWidth="27.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
-                     </children>
-                  </Pane>
-                  <Pane layoutX="78.0" layoutY="121.0">
-                     <children>
-                        <ImageView fx:id="farm_img15" fitHeight="49.0" fitWidth="28.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
-                     </children>
-                  </Pane>
-                  <Pane layoutX="145.0" layoutY="121.0">
-                     <children>
-                        <ImageView fx:id="farm_img16" fitHeight="49.0" fitWidth="28.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
-                     </children>
-                  </Pane>
-                  <Pane layoutX="213.0" layoutY="121.0">
-                     <children>
-                        <ImageView fx:id="farm_img17" fitHeight="49.0" fitWidth="28.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
-                     </children>
-                  </Pane>
-                  <Pane layoutX="278.0" layoutY="121.0">
-                     <children>
-                        <ImageView fx:id="farm_img18" fitHeight="49.0" fitWidth="28.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
-                     </children>
-                  </Pane>
-                  <Pane layoutX="344.0" layoutY="119.0">
-                     <children>
-                        <ImageView fx:id="farm_img19" fitHeight="49.0" fitWidth="28.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
-                     </children>
-                  </Pane>
-                  <Pane layoutX="410.0" layoutY="119.0">
-                     <children>
-                        <ImageView fx:id="farm_img20" fitHeight="49.0" fitWidth="28.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
-                     </children>
-                  </Pane>
-                  <Pane layoutX="477.0" layoutY="119.0">
-                     <children>
-                        <ImageView fx:id="farm_img21" fitHeight="49.0" fitWidth="28.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
-                     </children>
-                  </Pane>
-                  <Pane layoutX="69.0" layoutY="175.0">
-                     <children>
-                        <ImageView fx:id="farm_img22" fitHeight="49.0" fitWidth="30.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
-                     </children>
-                  </Pane>
-                  <Pane layoutX="138.0" layoutY="175.0">
-                     <children>
-                        <ImageView fx:id="farm_img23" fitHeight="49.0" fitWidth="30.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
-                     </children>
-                  </Pane>
-                  <Pane layoutX="207.0" layoutY="175.0">
-                     <children>
-                        <ImageView fx:id="farm_img24" fitHeight="49.0" fitWidth="30.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
-                     </children>
-                  </Pane>
-                  <Pane layoutX="276.0" layoutY="175.0">
-                     <children>
-                        <ImageView fx:id="farm_img25" fitHeight="49.0" fitWidth="30.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
-                     </children>
-                  </Pane>
-                  <Pane layoutX="346.0" layoutY="173.0">
-                     <children>
-                        <ImageView fx:id="farm_img26" fitHeight="49.0" fitWidth="30.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
-                     </children>
-                  </Pane>
-                  <Pane layoutX="415.0" layoutY="173.0">
-                     <children>
-                        <ImageView fx:id="farm_img27" fitHeight="49.0" fitWidth="30.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
-                     </children>
-                  </Pane>
-                  <Pane layoutX="484.0" layoutY="173.0">
-                     <children>
-                        <ImageView fx:id="farm_img28" fitHeight="49.0" fitWidth="30.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
-                     </children>
-                  </Pane>
+                  <ImageView fx:id="farm_img1" fitHeight="49.0" fitWidth="27.0" layoutX="94.0" layoutY="33.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
+                  <ImageView fx:id="farm_img2" fitHeight="49.0" fitWidth="27.0" layoutX="154.0" layoutY="35.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
+                  <ImageView fx:id="farm_img4" fitHeight="49.0" fitWidth="27.0" layoutX="277.0" layoutY="27.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
+                  <ImageView fx:id="farm_img3" fitHeight="49.0" fitWidth="27.0" layoutX="277.0" layoutY="27.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
+                  <ImageView fx:id="farm_img5" fitHeight="49.0" fitWidth="27.0" layoutX="340.0" layoutY="25.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
+                  <ImageView fx:id="farm_img6" fitHeight="49.0" fitWidth="27.0" layoutX="402.0" layoutY="25.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
+                  <ImageView fx:id="farm_img7" fitHeight="49.0" fitWidth="27.0" layoutX="464.0" layoutY="25.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
+                  <ImageView fx:id="farm_img8" fitHeight="49.0" fitWidth="27.0" layoutX="85.0" layoutY="73.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
+                  <ImageView fx:id="farm_img9" fitHeight="49.0" fitWidth="27.0" layoutX="149.0" layoutY="73.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
+                  <ImageView fx:id="farm_img10" fitHeight="49.0" fitWidth="27.0" layoutX="212.0" layoutY="73.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
+                  <ImageView fx:id="farm_img11" fitHeight="49.0" fitWidth="27.0" layoutX="278.0" layoutY="73.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
+                  <ImageView fx:id="farm_img12" fitHeight="49.0" fitWidth="27.0" layoutX="344.0" layoutY="71.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
+                  <ImageView fx:id="farm_img13" fitHeight="49.0" fitWidth="27.0" layoutX="409.0" layoutY="71.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
+                  <ImageView fx:id="farm_img14" fitHeight="49.0" fitWidth="27.0" layoutX="472.0" layoutY="71.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
+                  <ImageView fx:id="farm_img15" fitHeight="49.0" fitWidth="28.0" layoutX="78.0" layoutY="121.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
+                  <ImageView fx:id="farm_img16" fitHeight="49.0" fitWidth="28.0" layoutX="145.0" layoutY="121.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
+                  <ImageView fx:id="farm_img17" fitHeight="49.0" fitWidth="28.0" layoutX="213.0" layoutY="121.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
+                  <ImageView fx:id="farm_img18" fitHeight="49.0" fitWidth="28.0" layoutX="278.0" layoutY="121.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
+                  <ImageView fx:id="farm_img19" fitHeight="49.0" fitWidth="28.0" layoutX="344.0" layoutY="119.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
+                  <ImageView fx:id="farm_img20" fitHeight="49.0" fitWidth="28.0" layoutX="410.0" layoutY="119.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
+                  <ImageView fx:id="farm_img21" fitHeight="49.0" fitWidth="28.0" layoutX="477.0" layoutY="119.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
+                  <ImageView fx:id="farm_img22" fitHeight="49.0" fitWidth="30.0" layoutX="69.0" layoutY="175.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
+                  <ImageView fx:id="farm_img23" fitHeight="49.0" fitWidth="30.0" layoutX="138.0" layoutY="175.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
+                  <ImageView fx:id="farm_img24" fitHeight="49.0" fitWidth="30.0" layoutX="207.0" layoutY="175.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
+                  <ImageView fx:id="farm_img25" fitHeight="49.0" fitWidth="30.0" layoutX="276.0" layoutY="175.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
+                  <ImageView fx:id="farm_img26" fitHeight="49.0" fitWidth="30.0" layoutX="346.0" layoutY="173.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
+                  <ImageView fx:id="farm_img27" fitHeight="49.0" fitWidth="30.0" layoutX="415.0" layoutY="173.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
+                  <ImageView fx:id="farm_img28" fitHeight="49.0" fitWidth="30.0" layoutX="484.0" layoutY="173.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
                </children>
-            </Pane>
+            </Group>
             <Pane layoutX="471.0" layoutY="313.0" prefHeight="92.0" prefWidth="111.0">
                <children>
                   <ImageView fitHeight="92.0" fitWidth="111.0" layoutX="1.0" pickOnBounds="true">
