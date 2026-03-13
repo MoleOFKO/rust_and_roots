@@ -21,6 +21,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import model.Farm;
@@ -51,17 +52,11 @@ public class Farm_tableController implements Initializable, SceneController {
     @FXML
     private StackPane view;
     @FXML
-    private Group world;
-    @FXML
-    private Button btnSeedsList;
+    private Pane world;
     @FXML
     private ImageView SeedsImg;
     @FXML
-    private Button btnWaterCan;
-    @FXML
     private ImageView WaterCanImg;
-    @FXML
-    private Button btnReap;
     @FXML
     private ImageView SickleImg;
     @FXML
@@ -132,6 +127,82 @@ public class Farm_tableController implements Initializable, SceneController {
     private Button btnConfirm;
     @FXML
     private Button btnBack;
+    @FXML
+    private ImageView inyimg2;
+    @FXML
+    private Label invlbl2;
+    @FXML
+    private ImageView inyimg3;
+    @FXML
+    private Label invlbl3;
+    @FXML
+    private ImageView inyimg4;
+    @FXML
+    private Label invlbl4;
+    @FXML
+    private ImageView inyimg5;
+    @FXML
+    private Label invlbl5;
+    @FXML
+    private ImageView inyimg6;
+    @FXML
+    private Label invlbl6;
+    @FXML
+    private ImageView inyimg7;
+    @FXML
+    private Label invlbl7;
+    @FXML
+    private ImageView inyimg8;
+    @FXML
+    private Label invlbl8;
+    @FXML
+    private ImageView inyimg9;
+    @FXML
+    private Label invlbl9;
+    @FXML
+    private ImageView inyimg10;
+    @FXML
+    private Label invlbl10;
+    @FXML
+    private ImageView inyimg11;
+    @FXML
+    private Label invlbl11;
+    @FXML
+    private ImageView inyimg12;
+    @FXML
+    private Label invlbl12;
+    @FXML
+    private ImageView inyimg13;
+    @FXML
+    private Label invlbl13;
+    @FXML
+    private ImageView inyimg14;
+    @FXML
+    private Label invlbl14;
+    @FXML
+    private ImageView inyimg15;
+    @FXML
+    private Label invlbl15;
+    @FXML
+    private ImageView inyimg16;
+    @FXML
+    private Label invlbl16;
+    @FXML
+    private ImageView inyimg17;
+    @FXML
+    private Label invlbl17;
+    @FXML
+    private ImageView inyimg18;
+    @FXML
+    private Label invlbl18;
+    @FXML
+    private ImageView inyimg19;
+    @FXML
+    private Label invlbl19;
+    @FXML
+    private ImageView inyimg20;
+    @FXML
+    private Label invlbl20;
 
     @Override
     public void init(GameState gameState) {
@@ -189,6 +260,26 @@ public class Farm_tableController implements Initializable, SceneController {
             }
         }
         return result;
+    }
+
+    @FXML
+    private void handleFarmPlot(MouseEvent event) {
+    }
+
+    @FXML
+    private void handleBtnSeedsList(MouseEvent event) {
+    }
+
+    @FXML
+    private void handlebtnWater(MouseEvent event) {
+    }
+
+    @FXML
+    private void handleBtnReap(MouseEvent event) {
+    }
+
+    @FXML
+    private void handleinybox(MouseEvent event) {
     }
     
     private enum ToolMode {
@@ -265,7 +356,6 @@ public class Farm_tableController implements Initializable, SceneController {
         
     }
     
-    @FXML
     private void handleBtnSeedsList(ActionEvent event) {
         activeMode = ToolMode.SEED;
         populateSeedList();
@@ -276,7 +366,6 @@ public class Farm_tableController implements Initializable, SceneController {
         refreshPlotHighlights();
     }
 
-    @FXML
     private void handlebtnWater(ActionEvent event) {
         activeMode = ToolMode.WATER;
         seedList.setVisible(false);
@@ -286,7 +375,6 @@ public class Farm_tableController implements Initializable, SceneController {
         refreshPlotHighlights();
     }
 
-    @FXML
     private void handleBtnReap(ActionEvent event) {
         activeMode = ToolMode.SICKLE;
         seedList.setVisible(false);
