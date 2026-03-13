@@ -21,11 +21,7 @@
             <Label fx:id="lblcoin" layoutX="220.0" layoutY="37.0" prefHeight="17.0" prefWidth="55.0" text="Label" />
             <Pane layoutX="38.0" layoutY="62.0">
                <children>
-                  <ImageView fx:id="inyimg1" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../image/items/tomato.png" />
-                     </image>
-                  </ImageView>
+                  <ImageView fx:id="invimg1" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true" />
                   <Button fx:id="invbtn1" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                   <Label fx:id="invlbl1" layoutX="38.0" layoutY="38.0" text="x0" />
                </children>
@@ -33,9 +29,6 @@
             <Pane layoutX="97.0" layoutY="62.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
                <children>
                   <ImageView fx:id="inyimg2" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../image/items/tomato.png" />
-                     </image>
                   </ImageView>
                   <Button fx:id="invbtn2" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                   <Label fx:id="invlbl2" layoutX="38.0" layoutY="38.0" text="x0" />
@@ -44,9 +37,6 @@
             <Pane layoutX="156.0" layoutY="62.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
                <children>
                   <ImageView fx:id="inyimg3" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../image/items/tomato.png" />
-                     </image>
                   </ImageView>
                   <Button fx:id="invbtn3" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                   <Label fx:id="invlbl3" layoutX="38.0" layoutY="38.0" text="x0" />
@@ -55,9 +45,6 @@
             <Pane layoutX="213.0" layoutY="62.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
                <children>
                   <ImageView fx:id="inyimg4" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../image/items/tomato.png" />
-                     </image>
                   </ImageView>
                   <Button fx:id="invbtn4" layoutY="-1.0" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                   <Label fx:id="invlbl4" layoutX="38.0" layoutY="38.0" text="x0" />
@@ -66,9 +53,6 @@
             <Pane layoutX="36.0" layoutY="124.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
                <children>
                   <ImageView fx:id="inyimg5" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../image/items/tomato.png" />
-                     </image>
                   </ImageView>
                   <Button fx:id="invbtn5" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                   <Label fx:id="invlbl5" layoutX="38.0" layoutY="38.0" text="x0" />
@@ -77,9 +61,6 @@
             <Pane layoutX="96.0" layoutY="124.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
                <children>
                   <ImageView fx:id="inyimg6" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../image/items/tomato.png" />
-                     </image>
                   </ImageView>
                   <Button fx:id="invbtn6" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                   <Label fx:id="invlbl6" layoutX="38.0" layoutY="38.0" text="x0" />
@@ -88,9 +69,6 @@
             <Pane layoutX="156.0" layoutY="125.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
                <children>
                   <ImageView fx:id="inyimg7" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../image/items/tomato.png" />
-                     </image>
                   </ImageView>
                   <Button fx:id="invbtn7" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                   <Label fx:id="invlbl7" layoutX="38.0" layoutY="38.0" text="x0" />
@@ -99,9 +77,6 @@
             <Pane layoutX="213.0" layoutY="124.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
                <children>
                   <ImageView fx:id="inyimg8" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../image/items/tomato.png" />
-                     </image>
                   </ImageView>
                   <Button fx:id="invbtn8" layoutY="-1.0" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                   <Label fx:id="invlbl8" layoutX="38.0" layoutY="38.0" text="x0" />
@@ -110,9 +85,6 @@
             <Pane layoutX="38.0" layoutY="185.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
                <children>
                   <ImageView fx:id="inyimg9" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../image/items/tomato.png" />
-                     </image>
                   </ImageView>
                   <Button fx:id="invbtn9" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                   <Label fx:id="invlbl9" layoutX="38.0" layoutY="38.0" text="x0" />
@@ -121,9 +93,6 @@
             <Pane layoutX="96.0" layoutY="186.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
                <children>
                   <ImageView fx:id="inyimg10" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../image/items/tomato.png" />
-                     </image>
                   </ImageView>
                   <Button fx:id="invbtn10" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                   <Label fx:id="invlbl10" layoutX="38.0" layoutY="38.0" text="x0" />
@@ -132,9 +101,6 @@
             <Pane layoutX="157.0" layoutY="186.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
                <children>
                   <ImageView fx:id="inyimg11" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../image/items/tomato.png" />
-                     </image>
                   </ImageView>
                   <Button fx:id="invbtn11" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                   <Label fx:id="invlbl11" layoutX="38.0" layoutY="38.0" text="x0" />
@@ -143,9 +109,6 @@
             <Pane layoutX="213.0" layoutY="187.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
                <children>
                   <ImageView fx:id="inyimg12" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../image/items/tomato.png" />
-                     </image>
                   </ImageView>
                   <Button fx:id="invbtn12" layoutY="-1.0" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                   <Label fx:id="invlbl12" layoutX="38.0" layoutY="38.0" text="x0" />
@@ -154,9 +117,6 @@
             <Pane layoutX="38.0" layoutY="245.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
                <children>
                   <ImageView fx:id="inyimg13" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../image/items/tomato.png" />
-                     </image>
                   </ImageView>
                   <Button fx:id="invbtn13" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                   <Label fx:id="invlbl13" layoutX="38.0" layoutY="38.0" text="x0" />
@@ -165,9 +125,6 @@
             <Pane layoutX="97.0" layoutY="245.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
                <children>
                   <ImageView fx:id="inyimg14" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../image/items/tomato.png" />
-                     </image>
                   </ImageView>
                   <Button fx:id="invbtn14" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                   <Label fx:id="invlbl14" layoutX="38.0" layoutY="38.0" text="x0" />
@@ -176,9 +133,6 @@
             <Pane layoutX="156.0" layoutY="245.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
                <children>
                   <ImageView fx:id="inyimg15" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../image/items/tomato.png" />
-                     </image>
                   </ImageView>
                   <Button fx:id="invbtn15" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                   <Label fx:id="invlbl15" layoutX="38.0" layoutY="38.0" text="x0" />
@@ -187,9 +141,6 @@
             <Pane layoutX="215.0" layoutY="246.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
                <children>
                   <ImageView fx:id="inyimg16" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../image/items/tomato.png" />
-                     </image>
                   </ImageView>
                   <Button fx:id="invbtn16" layoutY="-1.0" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                   <Label fx:id="invlbl16" layoutX="38.0" layoutY="38.0" text="x0" />
@@ -198,9 +149,6 @@
             <Pane layoutX="38.0" layoutY="307.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
                <children>
                   <ImageView fx:id="inyimg17" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../image/items/tomato.png" />
-                     </image>
                   </ImageView>
                   <Button fx:id="invbtn17" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                   <Label fx:id="invlbl17" layoutX="38.0" layoutY="38.0" text="x0" />
@@ -209,9 +157,6 @@
             <Pane layoutX="98.0" layoutY="306.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
                <children>
                   <ImageView fx:id="inyimg18" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../image/items/tomato.png" />
-                     </image>
                   </ImageView>
                   <Button fx:id="invbtn18" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                   <Label fx:id="invlbl18" layoutX="38.0" layoutY="38.0" text="x0" />
@@ -220,9 +165,6 @@
             <Pane layoutX="156.0" layoutY="307.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
                <children>
                   <ImageView fx:id="inyimg19" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../image/items/tomato.png" />
-                     </image>
                   </ImageView>
                   <Button fx:id="invbtn19" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                   <Label fx:id="invlbl19" layoutX="38.0" layoutY="38.0" text="x0" />
@@ -231,9 +173,6 @@
             <Pane layoutX="214.0" layoutY="307.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
                <children>
                   <ImageView fx:id="inyimg20" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../image/items/tomato.png" />
-                     </image>
                   </ImageView>
                   <Button fx:id="invbtn20" layoutY="-1.0" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                   <Label fx:id="invlbl20" layoutX="38.0" layoutY="38.0" text="x0" />
@@ -392,9 +331,6 @@
                   <Pane layoutX="19.0" layoutY="3.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
                      <children>
                         <ImageView fx:id="imgsell1" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../image/items/tomato.png" />
-                           </image>
                         </ImageView>
                         <Button fx:id="btnsell1" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                         <Label fx:id="lblsell1" layoutX="38.0" layoutY="38.0" text="x0" />
@@ -403,9 +339,6 @@
                   <Pane layoutX="77.0" layoutY="3.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
                      <children>
                         <ImageView fx:id="imgsell2" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../image/items/tomato.png" />
-                           </image>
                         </ImageView>
                         <Button fx:id="btnsell2" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                         <Label fx:id="lblsell2" layoutX="38.0" layoutY="38.0" text="x0" />
@@ -414,9 +347,6 @@
                   <Pane layoutX="135.0" layoutY="3.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
                      <children>
                         <ImageView fx:id="imgsell3" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../image/items/tomato.png" />
-                           </image>
                         </ImageView>
                         <Button fx:id="btnsell3" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                         <Label fx:id="lblsell3" layoutX="38.0" layoutY="38.0" text="x0" />
@@ -425,9 +355,6 @@
                   <Pane layoutX="193.0" layoutY="3.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
                      <children>
                         <ImageView fx:id="imgsell4" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../image/items/tomato.png" />
-                           </image>
                         </ImageView>
                         <Button fx:id="btnsell4" layoutY="-1.0" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                         <Label fx:id="lblsell4" layoutX="38.0" layoutY="38.0" text="x0" />
@@ -436,9 +363,6 @@
                   <Pane layoutX="19.0" layoutY="63.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
                      <children>
                         <ImageView fx:id="imgsell5" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../image/items/tomato.png" />
-                           </image>
                         </ImageView>
                         <Button fx:id="btnsell5" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                         <Label fx:id="lblsell5" layoutX="38.0" layoutY="38.0" text="x0" />
@@ -447,9 +371,6 @@
                   <Pane layoutX="77.0" layoutY="62.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
                      <children>
                         <ImageView fx:id="imgsell6" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../image/items/tomato.png" />
-                           </image>
                         </ImageView>
                         <Button fx:id="btnsell6" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                         <Label fx:id="lblsell6" layoutX="38.0" layoutY="38.0" text="x0" />
@@ -458,9 +379,6 @@
                   <Pane layoutX="135.0" layoutY="62.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
                      <children>
                         <ImageView fx:id="imgsell7" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../image/items/tomato.png" />
-                           </image>
                         </ImageView>
                         <Button fx:id="btnsell7" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                         <Label fx:id="lblsell7" layoutX="38.0" layoutY="38.0" text="x0" />
@@ -469,9 +387,6 @@
                   <Pane layoutX="194.0" layoutY="62.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
                      <children>
                         <ImageView fx:id="imgsell8" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../image/items/tomato.png" />
-                           </image>
                         </ImageView>
                         <Button fx:id="btnsell8" layoutY="-1.0" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                         <Label fx:id="lblsell8" layoutX="38.0" layoutY="38.0" text="x0" />
@@ -480,9 +395,6 @@
                   <Pane layoutX="19.0" layoutY="124.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
                      <children>
                         <ImageView fx:id="imgsell9" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../image/items/tomato.png" />
-                           </image>
                         </ImageView>
                         <Button fx:id="btnsell9" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                         <Label fx:id="lblsell9" layoutX="38.0" layoutY="38.0" text="x0" />
@@ -491,9 +403,6 @@
                   <Pane layoutX="77.0" layoutY="124.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
                      <children>
                         <ImageView fx:id="imgsell10" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../image/items/tomato.png" />
-                           </image>
                         </ImageView>
                         <Button fx:id="btnsell10" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                         <Label fx:id="lblsell10" layoutX="38.0" layoutY="38.0" text="x0" />
@@ -502,9 +411,6 @@
                   <Pane layoutX="135.0" layoutY="124.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
                      <children>
                         <ImageView fx:id="imgsell11" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../image/items/tomato.png" />
-                           </image>
                         </ImageView>
                         <Button fx:id="btnsell11" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                         <Label fx:id="lblsell11" layoutX="38.0" layoutY="38.0" text="x0" />
@@ -513,9 +419,6 @@
                   <Pane layoutX="194.0" layoutY="124.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
                      <children>
                         <ImageView fx:id="imgsell12" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../image/items/tomato.png" />
-                           </image>
                         </ImageView>
                         <Button fx:id="btnsell12" layoutY="-1.0" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="56.0" text="Button" />
                         <Label fx:id="lblsell12" layoutX="38.0" layoutY="38.0" text="x0" />
