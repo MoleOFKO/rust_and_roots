@@ -5,6 +5,11 @@
 package controller;
 
 import game.GameTimeManager;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
@@ -13,10 +18,14 @@ import javafx.scene.Group;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 import model.InteractionZone;
+import model.Inventory;
+import model.ItemDatabase;
+import model.item;
 import util.SpawnTag;
 
 /**
@@ -517,6 +526,25 @@ public class Home_interiorController extends BaseMapController {
     @FXML
     private ImageView Back;
 
+    private static final int CHEST_SLOT_CAPACITY = 42;
+    private static final int PLAYER_SLOT_CAPACITY = 20;
+
+    private enum SelectionSource { NONE, PLAYER, CHEST }
+
+    private record SlotData(int itemId, int quantity) {}
+
+    private final List<ImageView> chestImages = new ArrayList<>();
+    private final List<Label> chestLabels = new ArrayList<>();
+    private final List<Button> chestButtons = new ArrayList<>();
+
+    private final List<ImageView> playerImages = new ArrayList<>();
+    private final List<Label> playerLabels = new ArrayList<>();
+    private final List<Button> playerButtons = new ArrayList<>();
+
+    private Inventory chestInventory;
+    private SelectionSource selectedSource = SelectionSource.NONE;
+    private Integer selectedItemId = null;
+
     @Override
     protected String mapKey() {
         return "Home_interior";
@@ -535,6 +563,9 @@ public class Home_interiorController extends BaseMapController {
     public void initialize(URL url, ResourceBundle rb) {
         super.initialize(url, rb);
 
+        ItemDatabase.loadItems();
+        chestInventory = gameState.getChestInventory();
+        setupChestUi();
         setupInteriorZones();
 
         if (btntoSleep != null) btntoSleep.setDisable(true);
@@ -648,8 +679,21 @@ public class Home_interiorController extends BaseMapController {
 
     @FXML
     private void HandleInventoryAction(ActionEvent event) {
+        if (btnOpenInv != null && btnOpenInv.isDisable()) return;
+
+        chestStackPane.setManaged(true);
         chestStackPane.setDisable(false);
         chestStackPane.setVisible(true);
+        clearSelection();
+        refreshChestAndInventoryViews();
+
+        if (player != null) {
+            player.clearInputState();
+        }
+        if (view != null && view.getScene() != null) {
+            view.getScene().setOnKeyPressed(null);
+            view.getScene().setOnKeyReleased(null);
+        }
     }
 
     @FXML
@@ -662,14 +706,268 @@ public class Home_interiorController extends BaseMapController {
 
     @FXML
     private void sendToChestClick(MouseEvent event) {
+        moveSelectedItem(SelectionSource.PLAYER);
     }
 
     @FXML
     private void sendToInventoryClick(MouseEvent event) {
+        moveSelectedItem(SelectionSource.CHEST);
     }
 
     @FXML
     private void backClick(MouseEvent event) {
+        chestStackPane.setVisible(false);
+        chestStackPane.setDisable(true);
+        chestStackPane.setManaged(false);
+        clearSelection();
+
+        if (view != null && view.getScene() != null && player != null) {
+            player.attachInput(view.getScene());
+        }
+    }
+
+    private void setupChestUi() {
+        collectChestNodes();
+        collectPlayerNodes();
+        wireChestButtons();
+        wirePlayerButtons();
+        refreshChestAndInventoryViews();
+    }
+
+    private void collectChestNodes() {
+        if (!chestImages.isEmpty()) return;
+        chestImages.addAll(List.of(
+            inyimg, inyimg1, inyimg2, inyimg3, inyimg4, inyimg5, inyimg6, inyimg7, inyimg8, inyimg9,
+            inyimg10, inyimg11, inyimg12, inyimg13, inyimg14, inyimg15, inyimg16, inyimg17, inyimg18, inyimg19,
+            inyimg20, inyimg21, inyimg22, inyimg23, inyimg24, inyimg25, inyimg26, inyimg27, inyimg28, inyimg29,
+            inyimg30, inyimg31, inyimg32, inyimg33, inyimg34, inyimg35, inyimg36, inyimg37, inyimg38, inyimg39,
+            inyimg40, inyimg41
+        ));
+        chestLabels.addAll(List.of(
+            invlbl, invlbl1, invlbl2, invlbl3, invlbl4, invlbl5, invlbl6, invlbl7, invlbl8, invlbl9,
+            invlbl10, invlbl11, invlbl12, invlbl13, invlbl14, invlbl15, invlbl16, invlbl17, invlbl18, invlbl19,
+            invlbl20, invlbl21, invlbl22, invlbl23, invlbl24, invlbl25, invlbl26, invlbl27, invlbl28, invlbl29,
+            invlbl30, invlbl31, invlbl32, invlbl33, invlbl34, invlbl35, invlbl36, invlbl37, invlbl38, invlbl39,
+            invlbl40, invlbl41
+        ));
+        chestButtons.addAll(List.of(
+            invbtn, invbtn1, invbtn2, invbtn3, invbtn4, invbtn5, invbtn6, invbtn7, invbtn8, invbtn9,
+            invbtn10, invbtn11, invbtn12, invbtn13, invbtn14, invbtn15, invbtn16, invbtn17, invbtn18, invbtn19,
+            invbtn20, invbtn21, invbtn22, invbtn23, invbtn24, invbtn25, invbtn26, invbtn27, invbtn28, invbtn29,
+            invbtn30, invbtn31, invbtn32, invbtn33, invbtn34, invbtn35, invbtn36, invbtn37, invbtn38, invbtn39,
+            invbtn40, invbtn41
+        ));
+    }
+
+    private void collectPlayerNodes() {
+        if (!playerImages.isEmpty()) return;
+        playerImages.addAll(List.of(
+            Playerinvimg, Playerinvimg1, Playerinvimg2, Playerinvimg3, Playerinvimg4,
+            Playerinvimg5, Playerinvimg6, Playerinvimg7, Playerinvimg8, Playerinvimg9,
+            Playerinvimg10, Playerinvimg11, Playerinvimg12, Playerinvimg13, Playerinvimg14,
+            Playerinvimg15, Playerinvimg16, Playerinvimg17, Playerinvimg18, Playerinvimg19
+        ));
+        playerLabels.addAll(List.of(
+            Playerinvlbl, Playerinvlbl1, Playerinvlbl2, Playerinvlbl3, Playerinvlbl4,
+            Playerinvlbl5, Playerinvlbl6, Playerinvlbl7, Playerinvlbl8, Playerinvlbl9,
+            Playerinvlbl10, Playerinvlbl11, Playerinvlbl12, Playerinvlbl13, Playerinvlbl14,
+            Playerinvlbl15, Playerinvlbl16, Playerinvlbl17, Playerinvlbl18, Playerinvlbl19
+        ));
+        playerButtons.addAll(List.of(
+            Playerinvbtn, Playerinvbtn1, Playerinvbtn2, Playerinvbtn3, Playerinvbtn4,
+            Playerinvbtn5, Playerinvbtn6, Playerinvbtn7, Playerinvbtn8, Playerinvbtn9,
+            Playerinvbtn10, Playerinvbtn11, Playerinvbtn12, Playerinvbtn13, Playerinvbtn14,
+            Playerinvbtn15, Playerinvbtn16, Playerinvbtn17, Playerinvbtn18, Playerinvbtn19
+        ));
+    }
+
+    private void wireChestButtons() {
+        for (int i = 0; i < chestButtons.size(); i++) {
+            final int index = i;
+            Button button = chestButtons.get(i);
+            if (button != null) {
+                button.setOnAction(e -> selectChestSlot(index));
+            }
+        }
+    }
+
+    private void wirePlayerButtons() {
+        for (int i = 0; i < playerButtons.size(); i++) {
+            final int index = i;
+            Button button = playerButtons.get(i);
+            if (button != null) {
+                button.setOnAction(e -> selectPlayerSlot(index));
+            }
+        }
+    }
+
+    private void selectPlayerSlot(int index) {
+        List<SlotData> slots = snapshotSlots(player.getInventory(), PLAYER_SLOT_CAPACITY);
+        if (index < 0 || index >= slots.size()) return;
+        SlotData slot = slots.get(index);
+        if (slot == null) return;
+        selectedSource = SelectionSource.PLAYER;
+        selectedItemId = slot.itemId();
+        refreshSelectionHighlight();
+    }
+
+    private void selectChestSlot(int index) {
+        List<SlotData> slots = snapshotSlots(chestInventory, CHEST_SLOT_CAPACITY);
+        if (index < 0 || index >= slots.size()) return;
+        SlotData slot = slots.get(index);
+        if (slot == null) return;
+        selectedSource = SelectionSource.CHEST;
+        selectedItemId = slot.itemId();
+        refreshSelectionHighlight();
+    }
+
+    private void moveSelectedItem(SelectionSource expectedSource) {
+        if (selectedSource != expectedSource || selectedItemId == null) return;
+
+        Inventory from = (expectedSource == SelectionSource.PLAYER) ? player.getInventory() : chestInventory;
+        Inventory to = (expectedSource == SelectionSource.PLAYER) ? chestInventory : player.getInventory();
+        int targetCapacity = (expectedSource == SelectionSource.PLAYER) ? CHEST_SLOT_CAPACITY : PLAYER_SLOT_CAPACITY;
+
+        int qty = from.getCount(selectedItemId);
+        if (qty <= 0) {
+            clearSelection();
+            refreshChestAndInventoryViews();
+            return;
+        }
+
+        if (!canAcceptItemType(to, selectedItemId, targetCapacity)) {
+            return;
+        }
+
+        if (!from.removeItem(selectedItemId, qty)) {
+            return;
+        }
+
+        to.addItem(selectedItemId, qty);
+        clearSelection();
+        refreshChestAndInventoryViews();
+    }
+
+    private boolean canAcceptItemType(Inventory inventory, int itemId, int capacity) {
+        if (inventory.getCount(itemId) > 0) return true;
+        return inventory.itemsProperty().size() < capacity;
+    }
+
+    private void clearSelection() {
+        selectedSource = SelectionSource.NONE;
+        selectedItemId = null;
+        refreshSelectionHighlight();
+    }
+
+    private void refreshChestAndInventoryViews() {
+        refreshSlots(snapshotSlots(chestInventory, CHEST_SLOT_CAPACITY), chestImages, chestLabels, chestButtons, SelectionSource.CHEST);
+        refreshSlots(snapshotSlots(player.getInventory(), PLAYER_SLOT_CAPACITY), playerImages, playerLabels, playerButtons, SelectionSource.PLAYER);
+    }
+
+    private List<SlotData> snapshotSlots(Inventory inventory, int capacity) {
+        List<SlotData> result = new ArrayList<>();
+
+        inventory.itemsProperty().entrySet().stream()
+            .filter(e -> e.getValue() != null && e.getValue().get() > 0)
+            .sorted(Comparator.comparing(e -> itemName(e.getKey()), String.CASE_INSENSITIVE_ORDER))
+            .limit(capacity)
+            .forEach(e -> result.add(new SlotData(e.getKey(), e.getValue().get())));
+
+        return result;
+    }
+
+    private void refreshSlots(List<SlotData> slots, List<ImageView> images, List<Label> labels, List<Button> buttons, SelectionSource source) {
+        for (int i = 0; i < images.size(); i++) {
+            SlotData slot = (i < slots.size()) ? slots.get(i) : null;
+            ImageView imageView = images.get(i);
+            Label label = labels.get(i);
+            Button button = buttons.get(i);
+
+            if (slot == null) {
+                if (imageView != null) {
+                    imageView.setImage(null);
+                    imageView.setVisible(false);
+                }
+                if (label != null) {
+                    label.setText("");
+                }
+                if (button != null) {
+                    button.setDisable(true);
+                }
+                continue;
+            }
+
+            if (imageView != null) {
+                imageView.setImage(loadItemImage(slot.itemId()));
+                imageView.setVisible(true);
+            }
+            if (label != null) {
+                label.setText("x" + slot.quantity());
+            }
+            if (button != null) {
+                button.setDisable(false);
+            }
+        }
+
+        refreshSelectionHighlight();
+    }
+
+    private void refreshSelectionHighlight() {
+        highlightSelection(chestInventory, CHEST_SLOT_CAPACITY, chestImages, SelectionSource.CHEST);
+        highlightSelection(player.getInventory(), PLAYER_SLOT_CAPACITY, playerImages, SelectionSource.PLAYER);
+    }
+
+    private void highlightSelection(Inventory inventory, int capacity, List<ImageView> images, SelectionSource source) {
+        List<SlotData> slots = snapshotSlots(inventory, capacity);
+        for (int i = 0; i < images.size(); i++) {
+            ImageView imageView = images.get(i);
+            if (imageView == null) continue;
+            SlotData slot = (i < slots.size()) ? slots.get(i) : null;
+            boolean selected = slot != null && source == selectedSource && selectedItemId != null && slot.itemId() == selectedItemId;
+            imageView.setStyle(selected ? "-fx-effect: dropshadow(gaussian, yellow, 14, 0.7, 0, 0);" : "");
+            imageView.setOpacity(slot == null ? 0.0 : (selected ? 1.0 : 0.9));
+            imageView.setScaleX(selected ? 1.08 : 1.0);
+            imageView.setScaleY(selected ? 1.08 : 1.0);
+        }
+    }
+
+    private Image loadItemImage(int itemId) {
+        item itm = ItemDatabase.getItemById(itemId);
+        if (itm == null) return null;
+
+        for (String path : imageCandidates(itm)) {
+            try (InputStream is = getClass().getResourceAsStream(path)) {
+                if (is != null) {
+                    return new Image(is);
+                }
+            } catch (Exception ignored) {
+            }
+        }
+        return null;
+    }
+
+    private List<String> imageCandidates(item itm) {
+        String name = itm.getItem_name();
+        String normalized = name.toLowerCase()
+            .replace(" ", "_")
+            .replace("-", "_")
+            .replace("'", "")
+            .replace("__", "_");
+
+        List<String> candidates = new ArrayList<>();
+        candidates.add("/image/items/" + normalized + ".png");
+        if (normalized.endsWith("_seeds")) {
+            candidates.add("/image/items/" + normalized.replace("_seeds", "") + "_seeds.png");
+        }
+        if (normalized.endsWith("s") && !normalized.endsWith("ss")) {
+            candidates.add("/image/items/" + normalized.substring(0, normalized.length() - 1) + ".png");
+        }
+        return candidates;
+    }
+
+    private String itemName(int itemId) {
+        item itm = ItemDatabase.getItemById(itemId);
+        return (itm == null) ? ("item-" + itemId) : itm.getItem_name();
     }
     
 }
