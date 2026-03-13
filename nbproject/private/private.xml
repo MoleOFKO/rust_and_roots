@@ -7,9 +7,10 @@
             <file>file:/E:/PJ/rust_and_roots/src/controller/home_mapController.java</file>
             <file>file:/E:/PJ/rust_and_roots/src/model/Player.java</file>
             <file>file:/E:/PJ/rust_and_roots/src/controller/AccountViewController.java</file>
-            <file>file:/E:/PJ/rust_and_roots/src/controller/BaseMapController.java</file>
             <file>file:/E:/PJ/rust_and_roots/src/controller/ShopController.java</file>
-            <file>file:/E:/PJ/rust_and_roots/src/controller/New_gameController.java</file>
+            <file>file:/E:/PJ/rust_and_roots/src/model/ItemDatabase.java</file>
+            <file>file:/E:/PJ/rust_and_roots/src/game/GameState.java</file>
+            <file>file:/E:/PJ/rust_and_roots/src/game/GameTimeManager.java</file>
         </group>
     </open-files>
 </project-private>

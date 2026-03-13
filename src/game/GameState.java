@@ -1,12 +1,18 @@
 package game;
 
+import db.dbcon;
+import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import model.PlayerState;
 import java.util.HashMap;
 import java.util.Map;
+import javafx.scene.image.Image;
 
 import util.SpawnTag;
 import model.FarmState;
-import model.Inventory;
+import model.item;
 /**
  * Persistent, cross-scene game state (singleton).
  * Keeps player data alive between map loads.
@@ -76,5 +82,6 @@ public final class GameState {
     public java.util.List<model.Merchant.ShopItem> getCurrentMerchantItems() {
         return currentMerchantItems;
     }
+    
     
 }
