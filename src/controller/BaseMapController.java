@@ -27,6 +27,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
+import javafx.event.ActionEvent;
 import model.CollisionRegistry;
 import model.Farm;
 import model.FarmPlotRegistrar;
@@ -157,7 +158,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     protected abstract String mapKey();
     protected abstract void configureExits();
     
-    protected static final double MAP_EXIT_DELAY_GAME_SECONDS =3.0;
+    protected static final double MAP_EXIT_DELAY_GAME_SECONDS =0.5;
 
     protected void configureFarm(Farm farm) {
         // default: do nothing
@@ -202,6 +203,8 @@ public abstract class BaseMapController implements Initializable, SceneControlle
             150_000_000L
         );
 
+        player.setOnToggleHotbarRequest(this::toggleHotbarVisible);
+        
         view.sceneProperty().addListener((obs, oldScene, newScene) -> {
             if (newScene != null) {
                 player.attachInput(newScene);
@@ -317,9 +320,37 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         }
 
         selectedHotbarIndex = idx;
-        System.out.println("Selected slot: " + (idx + 1));
+        if(playerState != null){
+            playerState.setSelectedHotbarIndex(selectedHotbarIndex);
+        }
     }
 
+    @FXML
+    protected void onCloseInventory(ActionEvent event){
+        setInventoryOpen(false);
+    }
+    
+    protected void toggleHotbarVisible(){
+        if(hotbar == null) return;
+        setHotbarVisible(!hotbar.isVisible());
+    }
+    
+    protected void setHotbarVisible(boolean visible){
+        if(hotbar == null) return;
+        
+        hotbar.setVisible(visible);
+        hotbar.setManaged(visible);
+        hotbar.setDisable(!visible);
+        
+        if(!visible){
+            setHotbarVisible(false);
+        }
+        
+        if(playerState != null){
+            playerState.setHotbarVisible(visible);
+        }
+    }
+    
     protected void toggleInventory() {
         if (inventoryOverlay == null) return;
         setInventoryOpen(!inventoryOverlay.isVisible());
@@ -392,8 +423,17 @@ public abstract class BaseMapController implements Initializable, SceneControlle
             slotBtn5.setOnAction(e -> toggleInventory());
         }
 
+        if(playerState != null){
+            setHotbarVisible(playerState.isHotbarVisible());
+        }
+        
         if (!hotbarSlots.isEmpty()) {
-            selectHotbarSlot(0);
+            int savedIdx = 0;
+            if(playerState != null){
+                savedIdx = Math.min(playerState.getselectedHotbarIndex(),hotbarSlots.size() -1);
+            }
+            
+            selectHotbarSlot(savedIdx);
         }
     }
 

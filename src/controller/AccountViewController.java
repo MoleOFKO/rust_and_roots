@@ -144,5 +144,7 @@ public class AccountViewController implements Initializable {
         colcreateddate.setCellValueFactory(new PropertyValueFactory("created_date"));
         
     }
+    
+    
 
 }

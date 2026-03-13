@@ -1,11 +1,19 @@
 package game;
 
+import db.dbcon;
+import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import model.PlayerState;
 import java.util.HashMap;
 import java.util.Map;
+import javafx.scene.image.Image;
 
 import util.SpawnTag;
 import model.FarmState;
+import model.Inventory;
+import model.item;
 /**
  * Persistent, cross-scene game state (singleton).
  * Keeps player data alive between map loads.
@@ -15,6 +23,7 @@ public final class GameState {
     public static GameState get() { return INSTANCE; }
 
     private final PlayerState playerState = new PlayerState(100); // starting coins
+    private final Inventory chestInventory = new Inventory(0);
 
     // ---- Scene transition spawn ----
     private SpawnTag pendingSpawn = SpawnTag.DEFAULT;
@@ -34,6 +43,10 @@ public final class GameState {
 
     public PlayerState getPlayerState() {
         return playerState;
+    }
+
+    public Inventory getChestInventory() {
+        return chestInventory;
     }
 
     public void setPendingSpawn(SpawnTag tag) {
@@ -70,5 +83,6 @@ public final class GameState {
     public java.util.List<model.Merchant.ShopItem> getCurrentMerchantItems() {
         return currentMerchantItems;
     }
+    
     
 }

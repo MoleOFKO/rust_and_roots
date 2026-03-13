@@ -9,9 +9,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -23,9 +21,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import model.Farm;
-import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
 import static model.Farm.SeedType.CARROT;
 import static model.Farm.SeedType.CORN;
 import static model.Farm.SeedType.GRAPE;
@@ -477,15 +472,15 @@ public class home_mapController extends BaseMapController {
         return "home_map";
     }
 
-//    @Override
-//    protected String dayBackgroundPath() {
-//        return DAY_BG_PATH;
-//    }
-//
-//    @Override
-//    protected String nightBackgroundPath() {
-//        return NIGHT_BG_PATH;
-//    }
+    @Override
+    protected String dayBackgroundPath() {
+        return DAY_BG_PATH;
+    }
+
+    @Override
+    protected String nightBackgroundPath() {
+        return NIGHT_BG_PATH;
+    }
 
     @Override
     protected void configureExits() {
@@ -579,10 +574,10 @@ public class home_mapController extends BaseMapController {
 
     @FXML
     private void onMerchantShopClick(ActionEvent event) {
-        if (!shop) return;
+        if (btnmerchant == null || btnmerchant.isDisable()) return;
 
         gameState.setReturnScene("/view/home_map.fxml", SpawnTag.FROM_SHOP);
-        gameState.setCurrentMerchantItems(merChant.getItems());
+//        gameState.setCurrentMerchantItems(merChant.getItems());
         stopAndSwitchScene("/view/shop.fxml", SpawnTag.FROM_SHOP);
     }
 

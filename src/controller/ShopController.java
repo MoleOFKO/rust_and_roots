@@ -4,18 +4,15 @@
  */
 package controller;
 
-import static controller.Edit_itemController.itemList;
-import static controller.Edit_itemController.item_id;
 import db.dbcon;
 import game.GameState;
+import game.GameTimeManager;
 import game.SceneController;
-import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
@@ -32,7 +29,6 @@ import javafx.collections.*;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.util.converter.IntegerStringConverter;
 import model.Inventory;
-import model.Inventory;
 import model.ItemDatabase;
 import model.item;
 import java.util.*;
@@ -42,6 +38,7 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.StackPane;
 import model.ItemDatabase;
 import java.util.Objects;
+import javafx.scene.Group;
 import util.SpawnTag;
 
 /**
@@ -62,7 +59,7 @@ public class ShopController implements Initializable, SceneController {
     @FXML
     private StackPane view;
     @FXML
-    private Pane world;
+    private Group world;
 
     @Override
     public void init(GameState gs) {
@@ -450,7 +447,7 @@ public class ShopController implements Initializable, SceneController {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         ItemDatabase.loadItems();
-        
+
         buyImages.add(imgbuy1);
         buyImages.add(imgbuy2);
         buyImages.add(imgbuy3);
@@ -463,7 +460,7 @@ public class ShopController implements Initializable, SceneController {
         buyImages.add(imgbuy10);
         buyImages.add(imgbuy11);
         buyImages.add(imgbuy12);
-        
+
         buyLabels.add(lblbuy1);
         buyLabels.add(lblbuy2);
         buyLabels.add(lblbuy3);
@@ -476,7 +473,7 @@ public class ShopController implements Initializable, SceneController {
         buyLabels.add(lblbuy10);
         buyLabels.add(lblbuy11);
         buyLabels.add(lblbuy12);
-        
+
         buyNameLabels.add(buyname1);
         buyNameLabels.add(buyname2);
         buyNameLabels.add(buyname3);
@@ -489,7 +486,7 @@ public class ShopController implements Initializable, SceneController {
         buyNameLabels.add(buyname10);
         buyNameLabels.add(buyname11);
         buyNameLabels.add(buyname12);
-        
+
         buyItemButtons.add(btnbuy1);
         buyItemButtons.add(btnbuy2);
         buyItemButtons.add(btnbuy3);
@@ -503,38 +500,24 @@ public class ShopController implements Initializable, SceneController {
         buyItemButtons.add(btnbuy11);
         buyItemButtons.add(btnbuy12);
 
-        System.out.println("view = " + view);
-        System.out.println("world = " + world);
-        System.out.println("buypane = " + buypane);
-        System.out.println("sellpane = " + sellpane);
-
-        for (int i = 0; i < buyNameLabels.size(); i++) {
-            System.out.println("buyNameLabels[" + i + "] = " + buyNameLabels.get(i));
-        }
-        loadItemImages();
-        
-        for(int i = 0; i < 12; i++){
-            buyStock.add(10); // default quantity
-        }
-        refreshBuyStock();
-        
-        for (int i = 0; i < buyItemButtons.size(); i++) {
-            final int index = i;
-            buyItemButtons.get(i).setOnAction(e -> handleBuyClick(index));
-        }
-        
-        
         if (gameState == null) gameState = GameState.get();
         if (inv == null) inv = gameState.getPlayerState().getInventory();
+
+        refreshShopForNewDay();
+
+        GameTimeManager.get().dayNumberProperty().addListener((obs, oldDay, newDay) -> {
+            if (!Objects.equals(oldDay, newDay)) {
+                refreshShopForNewDay();
+            }
+        });
 
         setupMerchantCatalog();
         setupTable();
         bindCoins();
-        setMode(Mode.BUY);     // default
+        setMode(Mode.BUY);
         refreshTableFromBuyCart();
         refreshAllPanels();
-        
-    }    
+    }
 
     private void setupMerchantCatalog() {
 //        buyPriceByType.clear();
@@ -591,6 +574,9 @@ public class ShopController implements Initializable, SceneController {
 
     @FXML
     private void handlebuyaction(ActionEvent event) {
+        sellpane.setVisible(false);
+        buypane.setVisible(true);
+        
         if (mode != Mode.BUY) return;
 
         int total = computeBuyTotal();
@@ -608,6 +594,8 @@ public class ShopController implements Initializable, SceneController {
 
     @FXML
     private void handlesellaction(ActionEvent event) {
+        sellpane.setVisible(true);
+        buypane.setVisible(false);
         if (mode != Mode.SELL) return;
 
         for (var e : sellCart.entrySet()) {
@@ -837,11 +825,7 @@ public class ShopController implements Initializable, SceneController {
             b.setOnAction(null);
         }
     }
-    
-    
-
-    
-    
+        
     private void loadItemImages() {
         String sql = "SELECT item_id, item_name, price, image FROM items LIMIT 12";
         dbcon db = new dbcon();
@@ -888,6 +872,20 @@ public class ShopController implements Initializable, SceneController {
         }
     }
     
+    public void refreshShopForNewDay() {
+        loadItemImages();
+
+        buyStock.clear();
+        for (int i = 0; i < 12; i++) {
+            buyStock.add(10);
+        }
+
+        refreshBuyStock();
+
+        if (inv != null) {
+            refreshAllPanels();
+        }
+    }
     private void refreshBuyStock() {
 
         for(int i = 0; i < buyLabels.size(); i++){

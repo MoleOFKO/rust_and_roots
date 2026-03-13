@@ -4,7 +4,6 @@
  */
 package controller;
 
-import static controller.Account_managementController.accname;
 import db.dbcon;
 import java.io.File;
 import java.io.IOException;
@@ -20,11 +19,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Group;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
@@ -36,11 +33,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javax.swing.JOptionPane;
-import model.Account;
 import model.item;
-import model.mobs;
 import rust_and_roots.Rust_and_roots;
-import static rust_and_roots.Rust_and_roots.stage;
 import util.WorldScaler;
 
 /**
