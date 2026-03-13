@@ -12,6 +12,7 @@ import javafx.scene.image.Image;
 
 import util.SpawnTag;
 import model.FarmState;
+import model.Inventory;
 import model.item;
 /**
  * Persistent, cross-scene game state (singleton).
