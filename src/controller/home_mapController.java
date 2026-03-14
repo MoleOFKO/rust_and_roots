@@ -5,6 +5,8 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 import game.GameState;
+import java.util.ArrayList;
+import java.util.List;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
@@ -543,6 +545,7 @@ public class home_mapController extends BaseMapController {
 
         setupMerchant();
         setupMerchantZone();
+        bindStatusLabels();
         
         if (farm1_button != null) {
             farm1_button.setOnAction(e -> openFarmTable());
@@ -554,6 +557,25 @@ public class home_mapController extends BaseMapController {
         
         gameState.setReturnScene("/view/home_map.fxml", SpawnTag.FROM_FARM);
         stopAndSwitchScene("/view/farm_table.fxml", SpawnTag.FROM_FARM);
+    }
+
+    private void bindStatusLabels() {
+        if (playerState == null) return;
+
+        if (statusHP  != null) {
+            statusHP .textProperty().unbind();
+            statusHP .textProperty().bind(playerState.hpProperty().asString());
+        }
+
+        if (statusSP  != null) {
+            statusSP .textProperty().unbind();
+            statusSP .textProperty().bind(playerState.staminaProperty().asString());
+        }
+
+        if (statusAGI  != null) {
+            statusAGI .textProperty().unbind();
+            statusAGI .textProperty().bind(playerState.agiProperty().asString());
+        }
     }
     
     private void setupMerchant() {
@@ -577,12 +599,8 @@ public class home_mapController extends BaseMapController {
         if (btnmerchant == null || btnmerchant.isDisable()) return;
 
         gameState.setReturnScene("/view/home_map.fxml", SpawnTag.FROM_SHOP);
-//        gameState.setCurrentMerchantItems(merChant.getItems());
+        gameState.setCurrentMerchantItems(merChant.getItems());
         stopAndSwitchScene("/view/shop.fxml", SpawnTag.FROM_SHOP);
-    }
-
-    private void onCloseInventory(ActionEvent event) {
-        setInventoryOpen(false);
     }
 
     @Override
@@ -590,6 +608,17 @@ public class home_mapController extends BaseMapController {
         super.init(gameState);
     }
 
+    @Override
+    protected void toggleInventory() {
+        if (inventoryOverlay == null) return;
+        setInventoryOpen(!inventoryOverlay.isVisible());
+    }
+
+    @Override
+    protected void setInventoryOpen(boolean open) {
+        super.setInventoryOpen(open);
+    }
+    
     @FXML
     private void handledoorbtnaction(ActionEvent event) throws IOException {
         GameState.get().setReturnScene("/view/home_map.fxml", SpawnTag.FROM_DOOR);
@@ -616,6 +645,7 @@ public class home_mapController extends BaseMapController {
 
     @FXML
     private void handlecloseaction(MouseEvent event) {
+        setInventoryOpen(false);
     }
 
     @FXML

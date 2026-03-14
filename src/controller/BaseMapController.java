@@ -4,7 +4,13 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.Comparator;
+import javafx.scene.control.Label;
+import javafx.scene.image.ImageView;
 
+import model.Inventory;
+import model.ItemDatabase;
+import model.NodeCollectors;
 import game.GameLoopManager;
 import game.GameState;
 import game.GameTimeManager;
@@ -28,6 +34,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 import javafx.event.ActionEvent;
+import javafx.scene.layout.Pane;
 import model.CollisionRegistry;
 import model.Farm;
 import model.FarmPlotRegistrar;
@@ -123,7 +130,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     @FXML protected Button slotBtn5;
 
     // ---------- Optional shared inventory overlay ----------
-    @FXML protected AnchorPane inventoryOverlay;
+    @FXML protected Pane inventoryOverlay;
     @FXML protected TableView<InventoryRow> invTable;
     @FXML protected TableColumn<InventoryRow, String> colItem;
     @FXML protected TableColumn<InventoryRow, Number> colQty;
@@ -138,6 +145,18 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     @FXML protected Button btnNight;
     @FXML protected Button btnAddHour;
 
+    @FXML protected Group player_inv_group;
+
+    protected static final int DEFAULT_PLAYER_SLOT_CAPACITY = 20;
+
+    protected record SlotData(int itemId, int quantity) {}
+
+    protected final List<ImageView> playerInventoryImages = new ArrayList<>();
+    protected final List<Label> playerInventoryLabels = new ArrayList<>();
+    protected final List<Button> playerInventoryButtons = new ArrayList<>();
+
+    protected Integer selectedPlayerInventoryItemId = null;
+    
     // ---------- Runtime ----------
     protected GameState gameState;
     protected Player player;
@@ -337,15 +356,11 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     
     protected void setHotbarVisible(boolean visible){
         if(hotbar == null) return;
-        
+
         hotbar.setVisible(visible);
         hotbar.setManaged(visible);
         hotbar.setDisable(!visible);
-        
-        if(!visible){
-            setHotbarVisible(false);
-        }
-        
+
         if(playerState != null){
             playerState.setHotbarVisible(visible);
         }
@@ -361,6 +376,13 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
         inventoryOverlay.setVisible(open);
         inventoryOverlay.setManaged(open);
+        inventoryOverlay.setDisable(!open);
+
+        if (open) {
+            refreshPlayerInventoryView();
+        } else {
+            clearPlayerInventorySelection();
+        }
 
         if (view != null && view.getScene() != null) {
             if (open) {
@@ -388,19 +410,25 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     }
 
     private void setupInventoryUiIfPresent() {
-        if (invTable == null || colItem == null || colQty == null || invCoinsLabel == null) return;
+        boolean hasTableInventory =
+            invTable != null && colItem != null && colQty != null && invCoinsLabel != null;
 
-        inventoryUIManager = new InventoryUIManager(
-            invTable,
-            colItem,
-            colQty,
-            invCoinsLabel,
-            player.getInventory()
-        );
+        if (hasTableInventory) {
+            inventoryUIManager = new InventoryUIManager(
+                invTable,
+                colItem,
+                colQty,
+                invCoinsLabel,
+                player.getInventory()
+            );
+        }
+
+        setupPlayerInventoryGridIfPresent();
 
         if (inventoryOverlay != null) {
             inventoryOverlay.setVisible(false);
             inventoryOverlay.setManaged(false);
+            inventoryOverlay.setDisable(true);
         }
     }
 
@@ -534,4 +562,216 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
         gameLoop.start();
     }
+    
+        protected int playerInventorySlotCapacity() {
+        return DEFAULT_PLAYER_SLOT_CAPACITY;
+    }
+
+    protected String playerInventoryImagePrefix() {
+        return "Playerinvimg";
+    }
+
+    protected String playerInventoryLabelPrefix() {
+        return "Playerinvlbl";
+    }
+
+    protected String playerInventoryButtonPrefix() {
+        return "Playerinvbtn";
+    }
+
+    protected void onPlayerInventorySlotSelected(int index, SlotData slot) {
+        selectedPlayerInventoryItemId = (slot == null) ? null : slot.itemId();
+        refreshPlayerInventorySelectionHighlight();
+    }
+
+    protected void setupPlayerInventoryGridIfPresent() {
+        if (player_inv_group == null) return;
+
+        collectPlayerInventoryNodes();
+        wirePlayerInventoryButtons();
+
+        if (inventoryOverlay != null) {
+            inventoryOverlay.setVisible(false);
+            inventoryOverlay.setManaged(false);
+            inventoryOverlay.setDisable(true);
+        }
+
+        refreshPlayerInventoryView();
+    }
+
+    protected void collectPlayerInventoryNodes() {
+        if (!playerInventoryImages.isEmpty() || !playerInventoryLabels.isEmpty() || !playerInventoryButtons.isEmpty()) {
+            return;
+        }
+
+        playerInventoryImages.addAll(
+            NodeCollectors.byTypeAndPrefix(
+                player_inv_group,
+                ImageView.class,
+                playerInventoryImagePrefix()
+            )
+        );
+        NodeCollectors.sortByIdNumber(playerInventoryImages, playerInventoryImagePrefix());
+
+        playerInventoryLabels.addAll(
+            NodeCollectors.byTypeAndPrefix(
+                player_inv_group,
+                Label.class,
+                playerInventoryLabelPrefix()
+            )
+        );
+        NodeCollectors.sortByIdNumber(playerInventoryLabels, playerInventoryLabelPrefix());
+
+        playerInventoryButtons.addAll(
+            NodeCollectors.byTypeAndPrefix(
+                player_inv_group,
+                Button.class,
+                playerInventoryButtonPrefix()
+            )
+        );
+        NodeCollectors.sortByIdNumber(playerInventoryButtons, playerInventoryButtonPrefix());
+    }
+
+    protected void wirePlayerInventoryButtons() {
+        for (int i = 0; i < playerInventoryButtons.size(); i++) {
+            final int index = i;
+            Button button = playerInventoryButtons.get(i);
+            if (button != null) {
+                button.setOnAction(e -> selectPlayerInventorySlot(index));
+            }
+        }
+    }
+
+    protected void selectPlayerInventorySlot(int index) {
+        List<SlotData> slots = snapshotSlots(player.getInventory(), playerInventorySlotCapacity());
+        if (index < 0 || index >= slots.size()) return;
+
+        SlotData slot = slots.get(index);
+        if (slot == null) return;
+
+        onPlayerInventorySlotSelected(index, slot);
+    }
+
+    protected void refreshPlayerInventoryView() {
+        if (player == null) return;
+        if (playerInventoryImages.isEmpty() && playerInventoryLabels.isEmpty() && playerInventoryButtons.isEmpty()) return;
+
+        List<SlotData> slots = snapshotSlots(player.getInventory(), playerInventorySlotCapacity());
+        refreshSlots(
+            slots,
+            playerInventoryImages,
+            playerInventoryLabels,
+            playerInventoryButtons
+        );
+    }
+
+    protected List<SlotData> snapshotSlots(Inventory inventory, int capacity) {
+        List<SlotData> result = new ArrayList<>();
+        if (inventory == null) return result;
+
+        inventory.itemsProperty().entrySet().stream()
+            .filter(e -> e.getValue() != null && e.getValue().get() > 0)
+            .sorted(Comparator.comparing(
+                e -> itemName(e.getKey()),
+                String.CASE_INSENSITIVE_ORDER
+            ))
+            .limit(capacity)
+            .forEach(e -> result.add(new SlotData(e.getKey(), e.getValue().get())));
+
+        return result;
+    }
+
+    protected void refreshSlots(
+            List<SlotData> slots,
+            List<ImageView> images,
+            List<Label> labels,
+            List<Button> buttons
+    ) {
+        int max = Math.max(images.size(), Math.max(labels.size(), buttons.size()));
+
+        for (int i = 0; i < max; i++) {
+            SlotData slot = (i < slots.size()) ? slots.get(i) : null;
+
+            ImageView imageView = (i < images.size()) ? images.get(i) : null;
+            Label label = (i < labels.size()) ? labels.get(i) : null;
+            Button button = (i < buttons.size()) ? buttons.get(i) : null;
+
+            if (slot == null) {
+                if (imageView != null) {
+                    imageView.setImage(null);
+                    imageView.setVisible(false);
+                    imageView.setOpacity(0.0);
+                    imageView.setScaleX(1.0);
+                    imageView.setScaleY(1.0);
+                    imageView.setStyle("");
+                }
+                if (label != null) {
+                    label.setText("");
+                }
+                if (button != null) {
+                    button.setDisable(true);
+                }
+                continue;
+            }
+
+            if (imageView != null) {
+                imageView.setImage(ItemDatabase.getImage(slot.itemId()));
+                imageView.setVisible(true);
+                imageView.setOpacity(0.9);
+                imageView.setScaleX(1.0);
+                imageView.setScaleY(1.0);
+                imageView.setStyle("");
+            }
+
+            if (label != null) {
+                label.setText("x" + slot.quantity());
+            }
+
+            if (button != null) {
+                button.setDisable(false);
+            }
+        }
+
+        refreshPlayerInventorySelectionHighlight();
+    }
+
+    protected void refreshPlayerInventorySelectionHighlight() {
+        List<SlotData> slots = snapshotSlots(player.getInventory(), playerInventorySlotCapacity());
+
+        for (int i = 0; i < playerInventoryImages.size(); i++) {
+            ImageView imageView = playerInventoryImages.get(i);
+            if (imageView == null) continue;
+
+            SlotData slot = (i < slots.size()) ? slots.get(i) : null;
+            boolean selected =
+                slot != null &&
+                selectedPlayerInventoryItemId != null &&
+                slot.itemId() == selectedPlayerInventoryItemId;
+
+            imageView.setStyle(selected
+                ? "-fx-effect: dropshadow(gaussian, yellow, 14, 0.7, 0, 0);"
+                : "");
+
+            if (slot == null) {
+                imageView.setOpacity(0.0);
+                imageView.setScaleX(1.0);
+                imageView.setScaleY(1.0);
+            } else {
+                imageView.setOpacity(selected ? 1.0 : 0.9);
+                imageView.setScaleX(selected ? 1.08 : 1.0);
+                imageView.setScaleY(selected ? 1.08 : 1.0);
+            }
+        }
+    }
+
+    protected void clearPlayerInventorySelection() {
+        selectedPlayerInventoryItemId = null;
+        refreshPlayerInventorySelectionHighlight();
+    }
+
+    protected String itemName(int itemId) {
+        var itm = ItemDatabase.getItemById(itemId);
+        return (itm == null) ? ("item-" + itemId) : itm.getItem_name();
+    }
+    
 }

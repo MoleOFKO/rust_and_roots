@@ -9,7 +9,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
@@ -526,20 +525,13 @@ public class Home_interiorController extends BaseMapController {
     @FXML
     private ImageView Back;
 
-    private static final int CHEST_SLOT_CAPACITY = 42;
-    private static final int PLAYER_SLOT_CAPACITY = 20;
+    private static final int CHEST_SLOT_CAPACITY = 42;;
 
     private enum SelectionSource { NONE, PLAYER, CHEST }
-
-    private record SlotData(int itemId, int quantity) {}
 
     private final List<ImageView> chestImages = new ArrayList<>();
     private final List<Label> chestLabels = new ArrayList<>();
     private final List<Button> chestButtons = new ArrayList<>();
-
-    private final List<ImageView> playerImages = new ArrayList<>();
-    private final List<Label> playerLabels = new ArrayList<>();
-    private final List<Button> playerButtons = new ArrayList<>();
 
     private Inventory chestInventory;
     private SelectionSource selectedSource = SelectionSource.NONE;
@@ -647,6 +639,17 @@ public class Home_interiorController extends BaseMapController {
         }
     }
     
+    @Override
+    protected void onPlayerInventorySlotSelected(int index, SlotData slot) {
+        if (slot == null) return;
+
+        selectedSource = SelectionSource.PLAYER;
+        selectedItemId = slot.itemId();
+        selectedPlayerInventoryItemId = slot.itemId();
+
+        refreshChestAndInventoryViews();
+    }
+    
     @FXML
     private void handleSleepAction(ActionEvent event) {
         if (btntoSleep.isDisable()) return;
@@ -728,9 +731,7 @@ public class Home_interiorController extends BaseMapController {
 
     private void setupChestUi() {
         collectChestNodes();
-        collectPlayerNodes();
         wireChestButtons();
-        wirePlayerButtons();
         refreshChestAndInventoryViews();
     }
 
@@ -759,28 +760,6 @@ public class Home_interiorController extends BaseMapController {
         ));
     }
 
-    private void collectPlayerNodes() {
-        if (!playerImages.isEmpty()) return;
-        playerImages.addAll(List.of(
-            Playerinvimg, Playerinvimg1, Playerinvimg2, Playerinvimg3, Playerinvimg4,
-            Playerinvimg5, Playerinvimg6, Playerinvimg7, Playerinvimg8, Playerinvimg9,
-            Playerinvimg10, Playerinvimg11, Playerinvimg12, Playerinvimg13, Playerinvimg14,
-            Playerinvimg15, Playerinvimg16, Playerinvimg17, Playerinvimg18, Playerinvimg19
-        ));
-        playerLabels.addAll(List.of(
-            Playerinvlbl, Playerinvlbl1, Playerinvlbl2, Playerinvlbl3, Playerinvlbl4,
-            Playerinvlbl5, Playerinvlbl6, Playerinvlbl7, Playerinvlbl8, Playerinvlbl9,
-            Playerinvlbl10, Playerinvlbl11, Playerinvlbl12, Playerinvlbl13, Playerinvlbl14,
-            Playerinvlbl15, Playerinvlbl16, Playerinvlbl17, Playerinvlbl18, Playerinvlbl19
-        ));
-        playerButtons.addAll(List.of(
-            Playerinvbtn, Playerinvbtn1, Playerinvbtn2, Playerinvbtn3, Playerinvbtn4,
-            Playerinvbtn5, Playerinvbtn6, Playerinvbtn7, Playerinvbtn8, Playerinvbtn9,
-            Playerinvbtn10, Playerinvbtn11, Playerinvbtn12, Playerinvbtn13, Playerinvbtn14,
-            Playerinvbtn15, Playerinvbtn16, Playerinvbtn17, Playerinvbtn18, Playerinvbtn19
-        ));
-    }
-
     private void wireChestButtons() {
         for (int i = 0; i < chestButtons.size(); i++) {
             final int index = i;
@@ -791,34 +770,18 @@ public class Home_interiorController extends BaseMapController {
         }
     }
 
-    private void wirePlayerButtons() {
-        for (int i = 0; i < playerButtons.size(); i++) {
-            final int index = i;
-            Button button = playerButtons.get(i);
-            if (button != null) {
-                button.setOnAction(e -> selectPlayerSlot(index));
-            }
-        }
-    }
-
-    private void selectPlayerSlot(int index) {
-        List<SlotData> slots = snapshotSlots(player.getInventory(), PLAYER_SLOT_CAPACITY);
-        if (index < 0 || index >= slots.size()) return;
-        SlotData slot = slots.get(index);
-        if (slot == null) return;
-        selectedSource = SelectionSource.PLAYER;
-        selectedItemId = slot.itemId();
-        refreshSelectionHighlight();
-    }
-
     private void selectChestSlot(int index) {
         List<SlotData> slots = snapshotSlots(chestInventory, CHEST_SLOT_CAPACITY);
         if (index < 0 || index >= slots.size()) return;
+
         SlotData slot = slots.get(index);
         if (slot == null) return;
+
         selectedSource = SelectionSource.CHEST;
         selectedItemId = slot.itemId();
-        refreshSelectionHighlight();
+        selectedPlayerInventoryItemId = null;
+
+        refreshChestAndInventoryViews();
     }
 
     private void moveSelectedItem(SelectionSource expectedSource) {
@@ -826,7 +789,7 @@ public class Home_interiorController extends BaseMapController {
 
         Inventory from = (expectedSource == SelectionSource.PLAYER) ? player.getInventory() : chestInventory;
         Inventory to = (expectedSource == SelectionSource.PLAYER) ? chestInventory : player.getInventory();
-        int targetCapacity = (expectedSource == SelectionSource.PLAYER) ? CHEST_SLOT_CAPACITY : PLAYER_SLOT_CAPACITY;
+        int targetCapacity = (expectedSource == SelectionSource.PLAYER) ? CHEST_SLOT_CAPACITY : playerInventorySlotCapacity();
 
         int qty = from.getCount(selectedItemId);
         if (qty <= 0) {
@@ -856,37 +819,35 @@ public class Home_interiorController extends BaseMapController {
     private void clearSelection() {
         selectedSource = SelectionSource.NONE;
         selectedItemId = null;
-        refreshSelectionHighlight();
+        clearPlayerInventorySelection();
+        refreshChestAndInventoryViews();
     }
 
     private void refreshChestAndInventoryViews() {
-        refreshSlots(snapshotSlots(chestInventory, CHEST_SLOT_CAPACITY), chestImages, chestLabels, chestButtons, SelectionSource.CHEST);
-        refreshSlots(snapshotSlots(player.getInventory(), PLAYER_SLOT_CAPACITY), playerImages, playerLabels, playerButtons, SelectionSource.PLAYER);
+        refreshChestSlots();
+        refreshPlayerInventoryView();
+        refreshSelectionHighlight();
     }
 
-    private List<SlotData> snapshotSlots(Inventory inventory, int capacity) {
-        List<SlotData> result = new ArrayList<>();
+    private void refreshChestSlots() {
+        List<SlotData> slots = snapshotSlots(chestInventory, CHEST_SLOT_CAPACITY);
+        int max = Math.max(chestImages.size(), Math.max(chestLabels.size(), chestButtons.size()));
 
-        inventory.itemsProperty().entrySet().stream()
-            .filter(e -> e.getValue() != null && e.getValue().get() > 0)
-            .sorted(Comparator.comparing(e -> itemName(e.getKey()), String.CASE_INSENSITIVE_ORDER))
-            .limit(capacity)
-            .forEach(e -> result.add(new SlotData(e.getKey(), e.getValue().get())));
-
-        return result;
-    }
-
-    private void refreshSlots(List<SlotData> slots, List<ImageView> images, List<Label> labels, List<Button> buttons, SelectionSource source) {
-        for (int i = 0; i < images.size(); i++) {
+        for (int i = 0; i < max; i++) {
             SlotData slot = (i < slots.size()) ? slots.get(i) : null;
-            ImageView imageView = images.get(i);
-            Label label = labels.get(i);
-            Button button = buttons.get(i);
+
+            ImageView imageView = (i < chestImages.size()) ? chestImages.get(i) : null;
+            Label label = (i < chestLabels.size()) ? chestLabels.get(i) : null;
+            Button button = (i < chestButtons.size()) ? chestButtons.get(i) : null;
 
             if (slot == null) {
                 if (imageView != null) {
                     imageView.setImage(null);
                     imageView.setVisible(false);
+                    imageView.setOpacity(0.0);
+                    imageView.setScaleX(1.0);
+                    imageView.setScaleY(1.0);
+                    imageView.setStyle("");
                 }
                 if (label != null) {
                     label.setText("");
@@ -898,76 +859,132 @@ public class Home_interiorController extends BaseMapController {
             }
 
             if (imageView != null) {
-                imageView.setImage(loadItemImage(slot.itemId()));
+                imageView.setImage(ItemDatabase.getImage(slot.itemId()));
                 imageView.setVisible(true);
+                imageView.setOpacity(0.9);
+                imageView.setScaleX(1.0);
+                imageView.setScaleY(1.0);
+                imageView.setStyle("");
             }
+
             if (label != null) {
                 label.setText("x" + slot.quantity());
             }
+
             if (button != null) {
                 button.setDisable(false);
             }
         }
-
-        refreshSelectionHighlight();
     }
+    
+//    private void refreshSlots(List<SlotData> slots, List<ImageView> images, List<Label> labels, List<Button> buttons, SelectionSource source) {
+//        for (int i = 0; i < images.size(); i++) {
+//            SlotData slot = (i < slots.size()) ? slots.get(i) : null;
+//            ImageView imageView = images.get(i);
+//            Label label = labels.get(i);
+//            Button button = buttons.get(i);
+//
+//            if (slot == null) {
+//                if (imageView != null) {
+//                    imageView.setImage(null);
+//                    imageView.setVisible(false);
+//                }
+//                if (label != null) {
+//                    label.setText("");
+//                }
+//                if (button != null) {
+//                    button.setDisable(true);
+//                }
+//                continue;
+//            }
+//
+//            if (imageView != null) {
+//                imageView.setImage(loadItemImage(slot.itemId()));
+//                imageView.setVisible(true);
+//            }
+//            if (label != null) {
+//                label.setText("x" + slot.quantity());
+//            }
+//            if (button != null) {
+//                button.setDisable(false);
+//            }
+//        }
+//
+//        refreshSelectionHighlight();
+//    }
 
     private void refreshSelectionHighlight() {
-        highlightSelection(chestInventory, CHEST_SLOT_CAPACITY, chestImages, SelectionSource.CHEST);
-        highlightSelection(player.getInventory(), PLAYER_SLOT_CAPACITY, playerImages, SelectionSource.PLAYER);
+        highlightChestSelection();
+        refreshPlayerInventorySelectionHighlight();
     }
 
-    private void highlightSelection(Inventory inventory, int capacity, List<ImageView> images, SelectionSource source) {
-        List<SlotData> slots = snapshotSlots(inventory, capacity);
-        for (int i = 0; i < images.size(); i++) {
-            ImageView imageView = images.get(i);
+    private void highlightChestSelection() {
+        List<SlotData> slots = snapshotSlots(chestInventory, CHEST_SLOT_CAPACITY);
+
+        for (int i = 0; i < chestImages.size(); i++) {
+            ImageView imageView = chestImages.get(i);
             if (imageView == null) continue;
+
             SlotData slot = (i < slots.size()) ? slots.get(i) : null;
-            boolean selected = slot != null && source == selectedSource && selectedItemId != null && slot.itemId() == selectedItemId;
-            imageView.setStyle(selected ? "-fx-effect: dropshadow(gaussian, yellow, 14, 0.7, 0, 0);" : "");
-            imageView.setOpacity(slot == null ? 0.0 : (selected ? 1.0 : 0.9));
-            imageView.setScaleX(selected ? 1.08 : 1.0);
-            imageView.setScaleY(selected ? 1.08 : 1.0);
-        }
-    }
+            boolean selected =
+                slot != null &&
+                selectedSource == SelectionSource.CHEST &&
+                selectedItemId != null &&
+                slot.itemId() == selectedItemId;
 
-    private Image loadItemImage(int itemId) {
-        item itm = ItemDatabase.getItemById(itemId);
-        if (itm == null) return null;
+            imageView.setStyle(selected
+                ? "-fx-effect: dropshadow(gaussian, yellow, 14, 0.7, 0, 0);"
+                : "");
 
-        for (String path : imageCandidates(itm)) {
-            try (InputStream is = getClass().getResourceAsStream(path)) {
-                if (is != null) {
-                    return new Image(is);
-                }
-            } catch (Exception ignored) {
+            if (slot == null) {
+                imageView.setOpacity(0.0);
+                imageView.setScaleX(1.0);
+                imageView.setScaleY(1.0);
+            } else {
+                imageView.setOpacity(selected ? 1.0 : 0.9);
+                imageView.setScaleX(selected ? 1.08 : 1.0);
+                imageView.setScaleY(selected ? 1.08 : 1.0);
             }
         }
-        return null;
     }
 
-    private List<String> imageCandidates(item itm) {
-        String name = itm.getItem_name();
-        String normalized = name.toLowerCase()
-            .replace(" ", "_")
-            .replace("-", "_")
-            .replace("'", "")
-            .replace("__", "_");
+//    private Image loadItemImage(int itemId) {
+//        item itm = ItemDatabase.getItemById(itemId);
+//        if (itm == null) return null;
+//
+//        for (String path : imageCandidates(itm)) {
+//            try (InputStream is = getClass().getResourceAsStream(path)) {
+//                if (is != null) {
+//                    return new Image(is);
+//                }
+//            } catch (Exception ignored) {
+//            }
+//        }
+//        return null;
+//    }
 
-        List<String> candidates = new ArrayList<>();
-        candidates.add("/image/items/" + normalized + ".png");
-        if (normalized.endsWith("_seeds")) {
-            candidates.add("/image/items/" + normalized.replace("_seeds", "") + "_seeds.png");
-        }
-        if (normalized.endsWith("s") && !normalized.endsWith("ss")) {
-            candidates.add("/image/items/" + normalized.substring(0, normalized.length() - 1) + ".png");
-        }
-        return candidates;
-    }
-
-    private String itemName(int itemId) {
-        item itm = ItemDatabase.getItemById(itemId);
-        return (itm == null) ? ("item-" + itemId) : itm.getItem_name();
-    }
+//    private List<String> imageCandidates(item itm) {
+//        String name = itm.getItem_name();
+//        String normalized = name.toLowerCase()
+//            .replace(" ", "_")
+//            .replace("-", "_")
+//            .replace("'", "")
+//            .replace("__", "_");
+//
+//        List<String> candidates = new ArrayList<>();
+//        candidates.add("/image/items/" + normalized + ".png");
+//        if (normalized.endsWith("_seeds")) {
+//            candidates.add("/image/items/" + normalized.replace("_seeds", "") + "_seeds.png");
+//        }
+//        if (normalized.endsWith("s") && !normalized.endsWith("ss")) {
+//            candidates.add("/image/items/" + normalized.substring(0, normalized.length() - 1) + ".png");
+//        }
+//        return candidates;
+//    }
+//
+//    private String itemName(int itemId) {
+//        item itm = ItemDatabase.getItemById(itemId);
+//        return (itm == null) ? ("item-" + itemId) : itm.getItem_name();
+//    }
     
 }
