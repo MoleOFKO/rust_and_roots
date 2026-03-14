@@ -32,7 +32,7 @@
                   <ImageView fx:id="farm_img1" fitHeight="49.0" fitWidth="27.0" layoutX="94.0" layoutY="33.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
                   <ImageView fx:id="farm_img2" fitHeight="49.0" fitWidth="27.0" layoutX="154.0" layoutY="35.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
                   <ImageView fx:id="farm_img4" fitHeight="49.0" fitWidth="27.0" layoutX="277.0" layoutY="27.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
-                  <ImageView fx:id="farm_img3" fitHeight="49.0" fitWidth="27.0" layoutX="277.0" layoutY="27.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
+                  <ImageView fx:id="farm_img3" fitHeight="49.0" fitWidth="27.0" layoutX="218.0" layoutY="27.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
                   <ImageView fx:id="farm_img5" fitHeight="49.0" fitWidth="27.0" layoutX="340.0" layoutY="25.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
                   <ImageView fx:id="farm_img6" fitHeight="49.0" fitWidth="27.0" layoutX="402.0" layoutY="25.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
                   <ImageView fx:id="farm_img7" fitHeight="49.0" fitWidth="27.0" layoutX="464.0" layoutY="25.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
