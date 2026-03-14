@@ -573,10 +573,7 @@ public class ShopController implements Initializable, SceneController {
 
 
     @FXML
-    private void handlebuyaction(ActionEvent event) {
-        sellpane.setVisible(false);
-        buypane.setVisible(true);
-        
+    private void handlebuyaction(ActionEvent event) {        
         if (mode != Mode.BUY) return;
 
         int total = computeBuyTotal();
@@ -594,8 +591,6 @@ public class ShopController implements Initializable, SceneController {
 
     @FXML
     private void handlesellaction(ActionEvent event) {
-        sellpane.setVisible(true);
-        buypane.setVisible(false);
         if (mode != Mode.SELL) return;
 
         for (var e : sellCart.entrySet()) {
@@ -637,11 +632,15 @@ public class ShopController implements Initializable, SceneController {
 
     @FXML
     private void handlecolbuyaction(ActionEvent event) {
+        sellpane.setVisible(false);
+        buypane.setVisible(true);
         setMode(Mode.BUY);
     }
 
     @FXML
     private void handlecolsellaction(ActionEvent event) {
+        sellpane.setVisible(true);
+        buypane.setVisible(false);
         setMode(Mode.SELL);
     }
     
@@ -827,7 +826,7 @@ public class ShopController implements Initializable, SceneController {
     }
         
     private void loadItemImages() {
-        String sql = "SELECT item_id, item_name, price, image FROM items LIMIT 12";
+        String sql = "SELECT item_id, item_name, price FROM items";
         dbcon db = new dbcon();
 
         try (
@@ -835,36 +834,80 @@ public class ShopController implements Initializable, SceneController {
             PreparedStatement ps = con.prepareStatement(sql);
             ResultSet rs = ps.executeQuery()
         ) {
-            int i = 0;
-            shopItems.clear();
-            dbItemsById.clear();
+            List<item> allItems = new ArrayList<>();
+            Map<Integer, item> allById = new LinkedHashMap<>();
 
-            while (rs.next() && i < 12) {
+            while (rs.next()) {
                 int itemId = rs.getInt("item_id");
                 String itemName = rs.getString("item_name");
                 int price = rs.getInt("price");
-                String imageName = rs.getString("image");
 
                 item itm = new item(itemId, itemName, price);
+                allItems.add(itm);
+                allById.put(itemId, itm);
+            }
+
+            shopItems.clear();
+            dbItemsById.clear();
+
+            // ---------- fixed 8 items ----------
+            for (int i = 0; i < 8 && i < allItems.size(); i++) {
+                item itm = allItems.get(i);
                 shopItems.add(itm);
-                dbItemsById.put(itemId, itm);
+                dbItemsById.put(itm.getItem_id(), itm);
+            }
 
-                if (i < buyImages.size() && buyImages.get(i) != null) {
-                    InputStream is = getClass().getResourceAsStream("/image/items/" + imageName);
-                    if (is != null) {
-                        buyImages.get(i).setImage(new Image(is));
-                    } else {
-                        System.out.println("Missing image file: " + imageName);
-                    }
+            // ---------- random 4 items, only when day changes ----------
+            int today = GameTimeManager.get().dayNumberProperty().get();
+            List<Integer> savedRandomIds = gameState.getDailyRandomShopItemIds();
+
+            boolean needNewRandom =
+                gameState.getShopRandomDay() != today ||
+                savedRandomIds == null ||
+                savedRandomIds.size() < 4;
+
+            if (needNewRandom) {
+                List<item> randomPool = new ArrayList<>(allItems);
+                randomPool.removeIf(itm -> dbItemsById.containsKey(itm.getItem_id()));
+                Collections.shuffle(randomPool);
+
+                List<Integer> newRandomIds = new ArrayList<>();
+
+                for (int i = 0; i < 4 && i < randomPool.size(); i++) {
+                    newRandomIds.add(randomPool.get(i).getItem_id());
                 }
 
-                if (i < buyNameLabels.size() && buyNameLabels.get(i) != null) {
-                    buyNameLabels.get(i).setText(itemName);
-                } else {
-                    System.out.println("Missing buyname label at index: " + i);
+                gameState.setShopRandomDay(today);
+                gameState.setDailyRandomShopItemIds(newRandomIds);
+                savedRandomIds = newRandomIds;
+            }
+
+            // use saved daily random items
+            for (Integer itemId : savedRandomIds) {
+                item itm = allById.get(itemId);
+                if (itm != null && !dbItemsById.containsKey(itemId) && shopItems.size() < 12) {
+                    shopItems.add(itm);
+                    dbItemsById.put(itemId, itm);
+                }
+            }
+
+            // ---------- clear UI first ----------
+            for (int i = 0; i < buyImages.size(); i++) {
+                if (buyImages.get(i) != null) buyImages.get(i).setImage(null);
+                if (buyNameLabels.get(i) != null) buyNameLabels.get(i).setText("");
+            }
+
+            // ---------- update UI ----------
+            for (int i = 0; i < shopItems.size() && i < buyImages.size(); i++) {
+                item itm = shopItems.get(i);
+
+                if (buyImages.get(i) != null) {
+                    buyImages.get(i).setImage(ItemDatabase.getImage(itm.getItem_id()));
                 }
 
-                i++;
+                if (buyNameLabels.get(i) != null) {
+                    buyNameLabels.get(i).setText(itm.getItem_name());
+                }
             }
 
         } catch (Exception e) {
