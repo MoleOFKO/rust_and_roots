@@ -5,6 +5,8 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 import game.GameState;
+import java.util.ArrayList;
+import java.util.List;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
@@ -14,9 +16,11 @@ import javafx.scene.control.Slider;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import model.Farm;
 import static model.Farm.SeedType.CARROT;
@@ -60,15 +64,6 @@ public class home_mapController extends BaseMapController {
     @FXML private Rectangle uppermapdetect;
     @FXML private Button uppermsp;
 
-    @FXML private Label lbName;
-    @FXML private Label lbHP;
-    @FXML private Label lbSP;
-    @FXML private Label lbEXP;
-    @FXML private Label lbSTR;
-    @FXML private Label lbAGI;
-    @FXML private Label lbDEX;
-    @FXML private Label lbVIT;
-    @FXML private Button btnSave;
     @FXML
     private StackPane view;
     @FXML
@@ -286,29 +281,7 @@ public class home_mapController extends BaseMapController {
     @FXML
     private Button slotBtn5;
     @FXML
-    private AnchorPane inventoryOverlay;
-    @FXML
-    private Label invCoinsLabel;
-    @FXML
-    private TableView<?> invTable;
-    @FXML
-    private TableColumn<?, ?> colItem;
-    @FXML
-    private TableColumn<?, ?> colQty;
-    @FXML
-    private Label timeLabel;
-    @FXML
-    private Button pauseTimeBtn;
-    @FXML
-    private Slider timeSpeedSlider;
-    @FXML
-    private Label timeSpeedValueLabel;
-    @FXML
-    private Button btnMorning;
-    @FXML
-    private Button btnNight;
-    @FXML
-    private Button btnAddHour;
+    private Pane inventoryOverlay;
     @FXML
     private Rectangle spawn_default;
     @FXML
@@ -323,6 +296,178 @@ public class home_mapController extends BaseMapController {
     private Rectangle spawn_from_farm;
     @FXML
     private Rectangle spawn_from_shop;
+    @FXML
+    private Group menuInventory;
+    @FXML
+    private Group player_inv_group;
+    @FXML
+    private ImageView Playerinvimg;
+    @FXML
+    private Button Playerinvbtn;
+    @FXML
+    private Label Playerinvlbl;
+    @FXML
+    private ImageView Playerinvimg1;
+    @FXML
+    private Button Playerinvbtn1;
+    @FXML
+    private Label Playerinvlbl1;
+    @FXML
+    private ImageView Playerinvimg2;
+    @FXML
+    private Button Playerinvbtn2;
+    @FXML
+    private Label Playerinvlbl2;
+    @FXML
+    private ImageView Playerinvimg3;
+    @FXML
+    private Button Playerinvbtn3;
+    @FXML
+    private Label Playerinvlbl3;
+    @FXML
+    private ImageView Playerinvimg4;
+    @FXML
+    private Button Playerinvbtn4;
+    @FXML
+    private Label Playerinvlbl4;
+    @FXML
+    private ImageView Playerinvimg5;
+    @FXML
+    private Button Playerinvbtn5;
+    @FXML
+    private Label Playerinvlbl5;
+    @FXML
+    private ImageView Playerinvimg6;
+    @FXML
+    private Button Playerinvbtn6;
+    @FXML
+    private Label Playerinvlbl6;
+    @FXML
+    private ImageView Playerinvimg7;
+    @FXML
+    private Button Playerinvbtn7;
+    @FXML
+    private Label Playerinvlbl7;
+    @FXML
+    private ImageView Playerinvimg8;
+    @FXML
+    private Button Playerinvbtn8;
+    @FXML
+    private Label Playerinvlbl8;
+    @FXML
+    private ImageView Playerinvimg9;
+    @FXML
+    private Button Playerinvbtn9;
+    @FXML
+    private Label Playerinvlbl9;
+    @FXML
+    private ImageView Playerinvimg10;
+    @FXML
+    private Button Playerinvbtn10;
+    @FXML
+    private Label Playerinvlbl10;
+    @FXML
+    private ImageView Playerinvimg11;
+    @FXML
+    private Button Playerinvbtn11;
+    @FXML
+    private Label Playerinvlbl11;
+    @FXML
+    private ImageView Playerinvimg12;
+    @FXML
+    private Button Playerinvbtn12;
+    @FXML
+    private Label Playerinvlbl12;
+    @FXML
+    private ImageView Playerinvimg13;
+    @FXML
+    private Button Playerinvbtn13;
+    @FXML
+    private Label Playerinvlbl13;
+    @FXML
+    private ImageView Playerinvimg14;
+    @FXML
+    private Button Playerinvbtn14;
+    @FXML
+    private Label Playerinvlbl14;
+    @FXML
+    private ImageView Playerinvimg15;
+    @FXML
+    private Button Playerinvbtn15;
+    @FXML
+    private Label Playerinvlbl15;
+    @FXML
+    private ImageView Playerinvimg16;
+    @FXML
+    private Button Playerinvbtn16;
+    @FXML
+    private Label Playerinvlbl16;
+    @FXML
+    private ImageView Playerinvimg17;
+    @FXML
+    private Button Playerinvbtn17;
+    @FXML
+    private Label Playerinvlbl17;
+    @FXML
+    private ImageView Playerinvimg18;
+    @FXML
+    private Button Playerinvbtn18;
+    @FXML
+    private Label Playerinvlbl18;
+    @FXML
+    private ImageView Playerinvimg19;
+    @FXML
+    private Button Playerinvbtn19;
+    @FXML
+    private Label Playerinvlbl19;
+    @FXML
+    private ImageView btnclose1;
+    @FXML
+    private Label statusName;
+    @FXML
+    private Label statusEXP;
+    @FXML
+    private Label statusHP;
+    @FXML
+    private Label statusSP;
+    @FXML
+    private Label statusSTR;
+    @FXML
+    private Label statusVIT;
+    @FXML
+    private Label statusDEX;
+    @FXML
+    private Label statusAGI;
+    @FXML
+    private ImageView btnHPminus;
+    @FXML
+    private ImageView btnHPplus;
+    @FXML
+    private ImageView btnSPminus;
+    @FXML
+    private ImageView btnSTRminus;
+    @FXML
+    private ImageView btnVITminus;
+    @FXML
+    private ImageView btnDEXminus;
+    @FXML
+    private ImageView btnAGIminus;
+    @FXML
+    private ImageView btnSPplus;
+    @FXML
+    private ImageView btnSTRplus;
+    @FXML
+    private ImageView btnVITplus;
+    @FXML
+    private ImageView btnDEXplus;
+    @FXML
+    private ImageView btnAGIplus;
+    @FXML
+    private ImageView btnUsePoint;
+    @FXML
+    private ImageView btnConfirm;
+    @FXML
+    private ImageView btnclose;
 
     @Override
     protected String mapKey() {
@@ -400,6 +545,7 @@ public class home_mapController extends BaseMapController {
 
         setupMerchant();
         setupMerchantZone();
+        bindStatusLabels();
         
         if (farm1_button != null) {
             farm1_button.setOnAction(e -> openFarmTable());
@@ -411,6 +557,25 @@ public class home_mapController extends BaseMapController {
         
         gameState.setReturnScene("/view/home_map.fxml", SpawnTag.FROM_FARM);
         stopAndSwitchScene("/view/farm_table.fxml", SpawnTag.FROM_FARM);
+    }
+
+    private void bindStatusLabels() {
+        if (playerState == null) return;
+
+        if (statusHP  != null) {
+            statusHP .textProperty().unbind();
+            statusHP .textProperty().bind(playerState.hpProperty().asString());
+        }
+
+        if (statusSP  != null) {
+            statusSP .textProperty().unbind();
+            statusSP .textProperty().bind(playerState.staminaProperty().asString());
+        }
+
+        if (statusAGI  != null) {
+            statusAGI .textProperty().unbind();
+            statusAGI .textProperty().bind(playerState.agiProperty().asString());
+        }
     }
     
     private void setupMerchant() {
@@ -434,20 +599,26 @@ public class home_mapController extends BaseMapController {
         if (btnmerchant == null || btnmerchant.isDisable()) return;
 
         gameState.setReturnScene("/view/home_map.fxml", SpawnTag.FROM_SHOP);
-//        gameState.setCurrentMerchantItems(merChant.getItems());
+        gameState.setCurrentMerchantItems(merChant.getItems());
         stopAndSwitchScene("/view/shop.fxml", SpawnTag.FROM_SHOP);
     }
-
-//    @FXML
-//    private void onCloseInventory(ActionEvent event) {
-//        setInventoryOpen(false);
-//    }
 
     @Override
     public void init(GameState gameState) {
         super.init(gameState);
     }
 
+    @Override
+    protected void toggleInventory() {
+        if (inventoryOverlay == null) return;
+        setInventoryOpen(!inventoryOverlay.isVisible());
+    }
+
+    @Override
+    protected void setInventoryOpen(boolean open) {
+        super.setInventoryOpen(open);
+    }
+    
     @FXML
     private void handledoorbtnaction(ActionEvent event) throws IOException {
         GameState.get().setReturnScene("/view/home_map.fxml", SpawnTag.FROM_DOOR);
@@ -473,6 +644,63 @@ public class home_mapController extends BaseMapController {
     }
 
     @FXML
-    private void handlebtnSave(ActionEvent event) {
+    private void handlecloseaction(MouseEvent event) {
+        setInventoryOpen(false);
+    }
+
+    @FXML
+    private void handleHPminusaction(MouseEvent event) {
+    }
+
+    @FXML
+    private void handleHPplusaction(MouseEvent event) {
+    }
+
+    @FXML
+    private void handleSPminusaction(MouseEvent event) {
+    }
+
+    @FXML
+    private void handleSTRminusaction(MouseEvent event) {
+    }
+
+    @FXML
+    private void handleVITminusaction(MouseEvent event) {
+    }
+
+    @FXML
+    private void handleDEXminusaction(MouseEvent event) {
+    }
+
+    @FXML
+    private void handleAGIminusaction(MouseEvent event) {
+    }
+
+    @FXML
+    private void handleSPplusaction(MouseEvent event) {
+    }
+
+    @FXML
+    private void handleSTRplusaction(MouseEvent event) {
+    }
+
+    @FXML
+    private void handleVITplusaction(MouseEvent event) {
+    }
+
+    @FXML
+    private void handleDEXplusaction(MouseEvent event) {
+    }
+
+    @FXML
+    private void handleAGIplusaction(MouseEvent event) {
+    }
+
+    @FXML
+    private void handleusepointaction(MouseEvent event) {
+    }
+
+    @FXML
+    private void handleconfirmaction(MouseEvent event) {
     }
 }

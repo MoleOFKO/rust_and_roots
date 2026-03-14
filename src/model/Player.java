@@ -18,6 +18,9 @@ public class Player {
 
     private static final double INV_SQRT_2 = 1.0 / Math.sqrt(2.0);
     private static final double NANOS_PER_60FPS_FRAME = 16_666_666.0;
+    private static final double NORMAL_AGI = 5.0;
+    private static final double RUN_MULTIPLIER = 1.6;
+    private static final double STAMINA_DRAIN_PER_SECOND = 12.0;
 
     private final Group node;               // the player group in FXML (human)
     private final ImageView sprite;         // human_img
@@ -34,9 +37,11 @@ public class Player {
     private final long frameDelayNanos;
 
     private boolean moving = false;
-    private final double speed;
+    private final double baseSpeed;
     private final PlayerState state;
     private final Set<KeyCode> pressedKeys = EnumSet.noneOf(KeyCode.class);
+
+    private double staminaDrainRemainder = 0.0;
 
     private List<Rectangle> walls = List.of();
 
@@ -67,7 +72,7 @@ public class Player {
         this.hitbox = hitbox;
         this.frameWidth = frameWidth;
         this.frameHeight = frameHeight;
-        this.speed = speed;
+        this.baseSpeed = speed;
         this.frameDelayNanos = frameDelayNanos;
 
         this.sprite.setImage(walkSpriteSheet);
@@ -91,16 +96,16 @@ public class Player {
         this.onNoDetection = onNoDetection;
     }
 
-    public void setOnToggleHotbarRequest(Runnable onToggleHotbarRequest){
+    public void setOnToggleHotbarRequest(Runnable onToggleHotbarRequest) {
         this.onToggleHotbarRequest = onToggleHotbarRequest;
     }
-    
+
     public void attachInput(Scene scene) {
         clearInputState();
 
         scene.setOnKeyPressed(e -> {
             KeyCode code = e.getCode();
-            
+
             if (code == KeyCode.E) {
                 if (!pressedKeys.contains(code)) {
                     pressedKeys.add(code);
@@ -111,7 +116,7 @@ public class Player {
                 return;
             }
 
-            if (isMovementKey(code)) {
+            if (isMovementKey(code) || isRunKey(code)) {
                 pressedKeys.add(code);
             }
         });
@@ -124,7 +129,7 @@ public class Player {
                 return;
             }
 
-            if (!isMovementKey(code)) {
+            if (!isMovementKey(code) && !isRunKey(code)) {
                 return;
             }
 
@@ -218,6 +223,13 @@ public class Player {
     }
 
     private void updateMovement(long dtNanos) {
+        if (state.isDead()) {
+            moving = false;
+            currentFrame = 2;
+            updateViewport();
+            return;
+        }
+
         double inputX = 0;
         double inputY = 0;
 
@@ -253,7 +265,9 @@ public class Player {
             currentRow = 0; // Down
         }
 
-        double frameScale = Math.min(0.15, dtNanos / NANOS_PER_60FPS_FRAME); //character's speed
+        boolean isRunning = pressedKeys.contains(KeyCode.SHIFT);
+        double speed = getCurrentMovementSpeed(isRunning);
+        double frameScale = Math.min(0.15, dtNanos / NANOS_PER_60FPS_FRAME);
         double dx = inputX * speed * frameScale;
         double dy = inputY * speed * frameScale;
 
@@ -264,10 +278,41 @@ public class Player {
 
         moving = move(dx, dy);
 
+        if (moving && isRunning) {
+            applyRunCost(dtNanos / 1_000_000_000.0);
+        }
+
         if (!moving) {
             currentFrame = 2;
         }
         updateViewport();
+    }
+
+    private double getCurrentMovementSpeed(boolean running) {
+        double agiModifier = Math.max(0.2, state.getAgi() / NORMAL_AGI);
+        double currentSpeed = baseSpeed * agiModifier;
+        if (running) {
+            currentSpeed *= RUN_MULTIPLIER;
+        }
+        return currentSpeed;
+    }
+
+    private void applyRunCost(double seconds) {
+        if (seconds <= 0 || state.isDead()) {
+            return;
+        }
+
+        staminaDrainRemainder += STAMINA_DRAIN_PER_SECOND * seconds;
+        int staminaCost = (int) staminaDrainRemainder;
+        staminaDrainRemainder -= staminaCost;
+
+        if (staminaCost > 0) {
+            state.consumeEnergyOrHp(staminaCost);
+        }
+
+        if (state.isDead()) {
+            clearInputState();
+        }
     }
 
     private boolean collides(double dx, double dy) {
@@ -303,6 +348,10 @@ public class Player {
                 || code == KeyCode.D;
     }
 
+    private boolean isRunKey(KeyCode code) {
+        return code == KeyCode.SHIFT;
+    }
+
     private void updateViewport() {
         int x = currentFrame * frameWidth;
         int y = currentRow * frameHeight;
@@ -314,6 +363,4 @@ public class Player {
         Bounds targetBounds = target.localToScene(target.getBoundsInLocal());
         return playerBounds.intersects(targetBounds);
     }
-    
-    
 }
