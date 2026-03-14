@@ -84,5 +84,24 @@ public final class GameState {
         return currentMerchantItems;
     }
     
-    
+    private int shopRandomDay = -1;
+    private java.util.List<Integer> dailyRandomShopItemIds = new java.util.ArrayList<>();
+
+    public int getShopRandomDay() {
+        return shopRandomDay;
+    }
+
+    public void setShopRandomDay(int day) {
+        this.shopRandomDay = day;
+    }
+
+    public java.util.List<Integer> getDailyRandomShopItemIds() {
+        return java.util.List.copyOf(dailyRandomShopItemIds);
+    }
+
+    public void setDailyRandomShopItemIds(java.util.List<Integer> ids) {
+        this.dailyRandomShopItemIds = (ids == null)
+            ? new java.util.ArrayList<>()
+            : new java.util.ArrayList<>(ids);
+    }
 }
