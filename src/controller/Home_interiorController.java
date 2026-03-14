@@ -789,6 +789,7 @@ public class Home_interiorController extends BaseMapController {
 
         Inventory from = (expectedSource == SelectionSource.PLAYER) ? player.getInventory() : chestInventory;
         Inventory to = (expectedSource == SelectionSource.PLAYER) ? chestInventory : player.getInventory();
+
         int targetCapacity = (expectedSource == SelectionSource.PLAYER) ? CHEST_SLOT_CAPACITY : playerInventorySlotCapacity();
 
         int qty = from.getCount(selectedItemId);
