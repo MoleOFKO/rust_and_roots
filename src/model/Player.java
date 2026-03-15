@@ -40,7 +40,8 @@ public class Player {
     private final double baseSpeed;
     private final PlayerState state;
     private final Set<KeyCode> pressedKeys = EnumSet.noneOf(KeyCode.class);
-
+    private java.util.function.IntConsumer onHotbarSlotRequest;
+    
     private double staminaDrainRemainder = 0.0;
 
     private List<Rectangle> walls = List.of();
@@ -100,6 +101,10 @@ public class Player {
         this.onToggleHotbarRequest = onToggleHotbarRequest;
     }
 
+    public void setOnHotbarSlotRequest(java.util.function.IntConsumer onHotbarSlotRequest) {
+        this.onHotbarSlotRequest = onHotbarSlotRequest;
+    }
+    
     public void attachInput(Scene scene) {
         clearInputState();
 
