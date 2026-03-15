@@ -24,6 +24,28 @@ public final class PlayerState {
     private final IntegerProperty stamina = new SimpleIntegerProperty(DEFAULT_STAMINA);
     private final IntegerProperty agi = new SimpleIntegerProperty(DEFAULT_AGI);
 
+    private static final int HOTBAR_SIZE = 5;
+    private final int[] hotbarItemIds = new int[HOTBAR_SIZE];
+
+    public int getHotbarSize() {
+        return HOTBAR_SIZE;
+    }
+
+    public int getHotbarItemId(int index) {
+        if (index < 0 || index >= HOTBAR_SIZE) return -1;
+        return hotbarItemIds[index];
+    }
+
+    public void setHotbarItemId(int index, int itemId) {
+        if (index < 0 || index >= HOTBAR_SIZE) return;
+        hotbarItemIds[index] = itemId;
+    }
+
+    public void clearHotbarItem(int index) {
+        if (index < 0 || index >= HOTBAR_SIZE) return;
+        hotbarItemIds[index] = 0;
+    }
+    
     public PlayerState(int startingCoins) {
         this.inventory = new Inventory(startingCoins);
     }
