@@ -590,6 +590,10 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
     private void startLoop() {
         gameLoop = new GameLoopManager(() -> {
+            if (player == null || player.isRemovedFromWorld()) {
+                return;
+            }
+
             Bounds playerBounds = human_hitbox.localToScene(human_hitbox.getBoundsInLocal());
 
             if (interactionManager != null) {
