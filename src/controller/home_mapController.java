@@ -33,6 +33,9 @@ import model.Merchant;
 import model.InteractionZone;
 import util.SceneManager;
 import util.SpawnTag;
+import java.util.Comparator;
+import javafx.collections.MapChangeListener;
+import javafx.beans.property.IntegerProperty;
 
 public class home_mapController extends BaseMapController {
 
@@ -539,6 +542,10 @@ public class home_mapController extends BaseMapController {
 //        setupMerchantZone();
 //    }
     
+    private final List<ImageView> playerInvImages = new ArrayList<>();
+    private final List<Label> playerInvLabels = new ArrayList<>();
+    private final List<Button> playerInvButtons = new ArrayList<>();
+    
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         super.initialize(url, rb);
@@ -546,9 +553,128 @@ public class home_mapController extends BaseMapController {
         setupMerchant();
         setupMerchantZone();
         bindStatusLabels();
-        
+
+        playerInvImages.clear();
+        playerInvLabels.clear();
+        playerInvButtons.clear();
+
+        playerInvImages.add(Playerinvimg);
+        playerInvImages.add(Playerinvimg1);
+        playerInvImages.add(Playerinvimg2);
+        playerInvImages.add(Playerinvimg3);
+        playerInvImages.add(Playerinvimg4);
+        playerInvImages.add(Playerinvimg5);
+        playerInvImages.add(Playerinvimg6);
+        playerInvImages.add(Playerinvimg7);
+        playerInvImages.add(Playerinvimg8);
+        playerInvImages.add(Playerinvimg9);
+        playerInvImages.add(Playerinvimg10);
+        playerInvImages.add(Playerinvimg11);
+        playerInvImages.add(Playerinvimg12);
+        playerInvImages.add(Playerinvimg13);
+        playerInvImages.add(Playerinvimg14);
+        playerInvImages.add(Playerinvimg15);
+        playerInvImages.add(Playerinvimg16);
+        playerInvImages.add(Playerinvimg17);
+        playerInvImages.add(Playerinvimg18);
+        playerInvImages.add(Playerinvimg19);
+
+        playerInvLabels.add(Playerinvlbl);
+        playerInvLabels.add(Playerinvlbl1);
+        playerInvLabels.add(Playerinvlbl2);
+        playerInvLabels.add(Playerinvlbl3);
+        playerInvLabels.add(Playerinvlbl4);
+        playerInvLabels.add(Playerinvlbl5);
+        playerInvLabels.add(Playerinvlbl6);
+        playerInvLabels.add(Playerinvlbl7);
+        playerInvLabels.add(Playerinvlbl8);
+        playerInvLabels.add(Playerinvlbl9);
+        playerInvLabels.add(Playerinvlbl10);
+        playerInvLabels.add(Playerinvlbl11);
+        playerInvLabels.add(Playerinvlbl12);
+        playerInvLabels.add(Playerinvlbl13);
+        playerInvLabels.add(Playerinvlbl14);
+        playerInvLabels.add(Playerinvlbl15);
+        playerInvLabels.add(Playerinvlbl16);
+        playerInvLabels.add(Playerinvlbl17);
+        playerInvLabels.add(Playerinvlbl18);
+        playerInvLabels.add(Playerinvlbl19);
+
+        playerInvButtons.add(Playerinvbtn);
+        playerInvButtons.add(Playerinvbtn1);
+        playerInvButtons.add(Playerinvbtn2);
+        playerInvButtons.add(Playerinvbtn3);
+        playerInvButtons.add(Playerinvbtn4);
+        playerInvButtons.add(Playerinvbtn5);
+        playerInvButtons.add(Playerinvbtn6);
+        playerInvButtons.add(Playerinvbtn7);
+        playerInvButtons.add(Playerinvbtn8);
+        playerInvButtons.add(Playerinvbtn9);
+        playerInvButtons.add(Playerinvbtn10);
+        playerInvButtons.add(Playerinvbtn11);
+        playerInvButtons.add(Playerinvbtn12);
+        playerInvButtons.add(Playerinvbtn13);
+        playerInvButtons.add(Playerinvbtn14);
+        playerInvButtons.add(Playerinvbtn15);
+        playerInvButtons.add(Playerinvbtn16);
+        playerInvButtons.add(Playerinvbtn17);
+        playerInvButtons.add(Playerinvbtn18);
+        playerInvButtons.add(Playerinvbtn19);
+
+        refreshPlayerInventorySlots();
+
+        player.getInventory().itemsProperty().addListener(
+            (javafx.collections.MapChangeListener<Integer, javafx.beans.property.IntegerProperty>) change -> {
+                refreshPlayerInventorySlots();
+            }
+        );
+
         if (farm1_button != null) {
             farm1_button.setOnAction(e -> openFarmTable());
+        }
+    }
+    
+    private void refreshPlayerInventorySlots() {
+        if (player == null || player.getInventory() == null) return;
+
+        List<Integer> owned = new ArrayList<>(player.getInventory().itemsProperty().keySet());
+        owned.sort(Comparator.comparing(id -> {
+            item itm = ItemDatabase.getItemById(id);
+            return itm == null ? "" : itm.getItem_name();
+        }));
+
+        for (int i = 0; i < playerInvImages.size(); i++) {
+            ImageView img = playerInvImages.get(i);
+            Label lbl = playerInvLabels.get(i);
+            Button btn = playerInvButtons.get(i);
+
+            if (i >= owned.size()) {
+                if (img != null) img.setImage(null);
+                if (lbl != null) lbl.setText("");
+                if (btn != null) {
+                    btn.setText("");
+                    btn.setDisable(true);
+                    btn.setOnAction(null);
+                }
+                continue;
+            }
+
+            int itemId = owned.get(i);
+            int qty = player.getInventory().getCount(itemId);
+            item itm = ItemDatabase.getItemById(itemId);
+
+            if (img != null) {
+                img.setImage(ItemDatabase.getImage(itemId));
+            }
+
+            if (lbl != null) {
+                lbl.setText("x" + qty);
+            }
+
+            if (btn != null) {
+                btn.setDisable(false);
+                btn.setText(itm == null ? "" : itm.getItem_name());
+            }
         }
     }
 

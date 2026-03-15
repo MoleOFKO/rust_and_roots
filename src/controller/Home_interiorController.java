@@ -26,6 +26,14 @@ import model.Inventory;
 import model.ItemDatabase;
 import model.item;
 import util.SpawnTag;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import javafx.beans.property.IntegerProperty;
+import javafx.collections.MapChangeListener;
+import model.Inventory;
+import model.ItemDatabase;
+import model.item;
 
 /**
  * FXML Controller class
@@ -550,42 +558,133 @@ public class Home_interiorController extends BaseMapController {
         registerExit(craft_detect, "/view/craft.fxml", SpawnTag.FROM_CRAFT);
     }
 
+    private final List<ImageView> pinvImages = new ArrayList<>();
+    private final List<Label> pinvLabels = new ArrayList<>();
+    private final List<Button> pinvButtons = new ArrayList<>();
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         super.initialize(url, rb);
 
-        ItemDatabase.loadItems();
-        chestInventory = gameState.getChestInventory();
-        setupChestUi();
-        setupInteriorZones();
+        pinvImages.clear();
+        pinvLabels.clear();
+        pinvButtons.clear();
 
-        if (btntoSleep != null) btntoSleep.setDisable(true);
-        if (btnOpenInv != null) btnOpenInv.setDisable(true);
-        if (btncook != null) btncook.setDisable(true);
-        if (btnmelt != null) btnmelt.setDisable(true);
-        if (btncraft != null) btncraft.setDisable(true);
+        pinvImages.add(Playerinvimg);
+        pinvImages.add(Playerinvimg1);
+        pinvImages.add(Playerinvimg2);
+        pinvImages.add(Playerinvimg3);
+        pinvImages.add(Playerinvimg4);
+        pinvImages.add(Playerinvimg5);
+        pinvImages.add(Playerinvimg6);
+        pinvImages.add(Playerinvimg7);
+        pinvImages.add(Playerinvimg8);
+        pinvImages.add(Playerinvimg9);
+        pinvImages.add(Playerinvimg10);
+        pinvImages.add(Playerinvimg11);
+        pinvImages.add(Playerinvimg12);
+        pinvImages.add(Playerinvimg13);
+        pinvImages.add(Playerinvimg14);
+        pinvImages.add(Playerinvimg15);
+        pinvImages.add(Playerinvimg16);
+        pinvImages.add(Playerinvimg17);
+        pinvImages.add(Playerinvimg18);
+        pinvImages.add(Playerinvimg19);
 
-        if(btncook != null){
-            btncook.setOnAction(e -> openCook());
-        }
-        if (btnmelt != null) {
-            btnmelt.setOnAction(e -> openMelt());
-        }
-        if (btncraft != null) {
-            btncraft.setOnAction(e -> openCraft());
-        }
+        pinvLabels.add(Playerinvlbl);
+        pinvLabels.add(Playerinvlbl1);
+        pinvLabels.add(Playerinvlbl2);
+        pinvLabels.add(Playerinvlbl3);
+        pinvLabels.add(Playerinvlbl4);
+        pinvLabels.add(Playerinvlbl5);
+        pinvLabels.add(Playerinvlbl6);
+        pinvLabels.add(Playerinvlbl7);
+        pinvLabels.add(Playerinvlbl8);
+        pinvLabels.add(Playerinvlbl9);
+        pinvLabels.add(Playerinvlbl10);
+        pinvLabels.add(Playerinvlbl11);
+        pinvLabels.add(Playerinvlbl12);
+        pinvLabels.add(Playerinvlbl13);
+        pinvLabels.add(Playerinvlbl14);
+        pinvLabels.add(Playerinvlbl15);
+        pinvLabels.add(Playerinvlbl16);
+        pinvLabels.add(Playerinvlbl17);
+        pinvLabels.add(Playerinvlbl18);
+        pinvLabels.add(Playerinvlbl19);
+
+        pinvButtons.add(Playerinvbtn);
+        pinvButtons.add(Playerinvbtn1);
+        pinvButtons.add(Playerinvbtn2);
+        pinvButtons.add(Playerinvbtn3);
+        pinvButtons.add(Playerinvbtn4);
+        pinvButtons.add(Playerinvbtn5);
+        pinvButtons.add(Playerinvbtn6);
+        pinvButtons.add(Playerinvbtn7);
+        pinvButtons.add(Playerinvbtn8);
+        pinvButtons.add(Playerinvbtn9);
+        pinvButtons.add(Playerinvbtn10);
+        pinvButtons.add(Playerinvbtn11);
+        pinvButtons.add(Playerinvbtn12);
+        pinvButtons.add(Playerinvbtn13);
+        pinvButtons.add(Playerinvbtn14);
+        pinvButtons.add(Playerinvbtn15);
+        pinvButtons.add(Playerinvbtn16);
+        pinvButtons.add(Playerinvbtn17);
+        pinvButtons.add(Playerinvbtn18);
+        pinvButtons.add(Playerinvbtn19);
         
-        if (sleepStackPane != null) {
-            sleepStackPane.setVisible(false);
-            sleepStackPane.setDisable(true);
-            sleepStackPane.setManaged(false);
-        }
 
-        if (chestStackPane != null) {
-            chestStackPane.setVisible(false);
-            chestStackPane.setDisable(true);
-            chestStackPane.setManaged(false);
+        refreshInteriorInventorySlots();
+
+        Inventory inv = player.getInventory();
+        inv.itemsProperty().addListener(
+            (MapChangeListener<Integer, IntegerProperty>) change -> refreshInteriorInventorySlots()
+        );
+    }
+    
+    private void refreshInteriorInventorySlots() {
+        if (player == null || player.getInventory() == null) return;
+
+        Inventory inv = player.getInventory();
+        List<Integer> owned = new ArrayList<>(inv.itemsProperty().keySet());
+
+        owned.sort(Comparator.comparing(id -> {
+            item itm = ItemDatabase.getItemById(id);
+            return itm == null ? "" : itm.getItem_name();
+        }));
+
+        for (int i = 0; i < pinvImages.size(); i++) {
+            ImageView img = pinvImages.get(i);
+            Label lbl = pinvLabels.get(i);
+            Button btn = pinvButtons.get(i);
+
+            if (i >= owned.size()) {
+                if (img != null) img.setImage(null);
+                if (lbl != null) lbl.setText("");
+                if (btn != null) {
+                    btn.setText("");
+                    btn.setDisable(true);
+                    btn.setOnAction(null);
+                }
+                continue;
+            }
+
+            int itemId = owned.get(i);
+            int qty = inv.getCount(itemId);
+            item itm = ItemDatabase.getItemById(itemId);
+
+            if (img != null) {
+                img.setImage(ItemDatabase.getImage(itemId));
+            }
+
+            if (lbl != null) {
+                lbl.setText("x" + qty);
+            }
+
+            if (btn != null) {
+                btn.setDisable(false);
+                btn.setText(itm == null ? "" : itm.getItem_name());
+            }
         }
     }
 

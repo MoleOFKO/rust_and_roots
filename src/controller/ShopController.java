@@ -40,6 +40,9 @@ import model.ItemDatabase;
 import java.util.Objects;
 import javafx.scene.Group;
 import util.SpawnTag;
+import ui.InventorySlotsUIManager;
+
+
 
 /**
  * FXML Controller class
@@ -442,11 +445,25 @@ public class ShopController implements Initializable, SceneController {
     private List<Integer> buyStock = new ArrayList<>();
     private List<Label> buyNameLabels = new ArrayList<>();
     private final List<Button> buyItemButtons = new ArrayList<>();
+    private final List<ImageView> invImages = new ArrayList<>();
+    private final List<Label> invLabels = new ArrayList<>();
+    private InventorySlotsUIManager inventorySlotsUIManager;
+    
     
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         ItemDatabase.loadItems();
+
+        if (gameState == null) gameState = GameState.get();
+        if (inv == null) inv = gameState.getPlayerState().getInventory();
+
+        buyImages.clear();
+        buyLabels.clear();
+        buyNameLabels.clear();
+        buyItemButtons.clear();
+        invImages.clear();
+        invLabels.clear();
 
         buyImages.add(imgbuy1);
         buyImages.add(imgbuy2);
@@ -500,8 +517,51 @@ public class ShopController implements Initializable, SceneController {
         buyItemButtons.add(btnbuy11);
         buyItemButtons.add(btnbuy12);
 
-        if (gameState == null) gameState = GameState.get();
-        if (inv == null) inv = gameState.getPlayerState().getInventory();
+        invImages.add(inyimg1);
+        invImages.add(inyimg2);
+        invImages.add(inyimg3);
+        invImages.add(inyimg4);
+        invImages.add(inyimg5);
+        invImages.add(inyimg6);
+        invImages.add(inyimg7);
+        invImages.add(inyimg8);
+        invImages.add(inyimg9);
+        invImages.add(inyimg10);
+        invImages.add(inyimg11);
+        invImages.add(inyimg12);
+        invImages.add(inyimg13);
+        invImages.add(inyimg14);
+        invImages.add(inyimg15);
+        invImages.add(inyimg16);
+        invImages.add(inyimg17);
+        invImages.add(inyimg18);
+        invImages.add(inyimg19);
+        invImages.add(inyimg20);
+
+        invLabels.add(invlbl1);
+        invLabels.add(invlbl2);
+        invLabels.add(invlbl3);
+        invLabels.add(invlbl4);
+        invLabels.add(invlbl5);
+        invLabels.add(invlbl6);
+        invLabels.add(invlbl7);
+        invLabels.add(invlbl8);
+        invLabels.add(invlbl9);
+        invLabels.add(invlbl10);
+        invLabels.add(invlbl11);
+        invLabels.add(invlbl12);
+        invLabels.add(invlbl13);
+        invLabels.add(invlbl14);
+        invLabels.add(invlbl15);
+        invLabels.add(invlbl16);
+        invLabels.add(invlbl17);
+        invLabels.add(invlbl18);
+        invLabels.add(invlbl19);
+        invLabels.add(invlbl20);
+
+        collectButtonsOnce();
+
+        inventorySlotsUIManager = new InventorySlotsUIManager(inv, invImages, invLabels, invBtns);
 
         refreshShopForNewDay();
 
@@ -572,8 +632,8 @@ public class ShopController implements Initializable, SceneController {
 
 
 
-    @FXML
-    private void handlebuyaction(ActionEvent event) {        
+   @FXML
+    private void handlebuyaction(ActionEvent event) {
         if (mode != Mode.BUY) return;
 
         int total = computeBuyTotal();
@@ -619,7 +679,7 @@ public class ShopController implements Initializable, SceneController {
 
     private void refreshTotalLabel() {
         int total = (mode == Mode.BUY) ? computeBuyTotal() : computeSellTotal();
-        lbltotal.setText("Total: " + total + "g");
+        lbltotal.setText( total + "g");
     }
     
     @FXML
@@ -683,7 +743,7 @@ public class ShopController implements Initializable, SceneController {
     
     private void bindCoins() {
         lblcoin.textProperty().unbind();
-        lblcoin.textProperty().bind(inv.coinsProperty().asString("Coins: %d"));
+        lblcoin.textProperty().bind(inv.coinsProperty().asString(": %d"));
     }
     
     private void collectButtonsOnce() {
@@ -736,6 +796,7 @@ public class ShopController implements Initializable, SceneController {
         refreshBuyButtons();
         refreshSellButtons();
         refreshTotalLabel();
+        refreshInventoryButtons();
     }
     
     private void refreshInventoryButtons() {
@@ -748,26 +809,24 @@ public class ShopController implements Initializable, SceneController {
         for (int i = 0; i < invBtns.size(); i++) {
             Button b = invBtns.get(i);
 
+            if (b == null) continue;
+
             if (i >= owned.size()) {
-                b.setText("");
-                b.setDisable(true);
                 b.setOnAction(null);
                 continue;
             }
 
             int itemId = owned.get(i);
-            int count = inv.getCount(itemId);
-            item itm = ItemDatabase.getItemById(itemId);
-            String name = (itm == null) ? ("Item " + itemId) : itm.getItem_name();
-
-            b.setDisable(false);
-            b.setText(name + " x" + count);
 
             b.setOnAction(e -> {
                 if (mode == Mode.SELL) {
                     addToCart(itemId, +1);
                 }
             });
+        }
+
+        if (inventorySlotsUIManager != null) {
+            inventorySlotsUIManager.refresh();
         }
     }
     
@@ -778,7 +837,7 @@ public class ShopController implements Initializable, SceneController {
             if (i >= shopItems.size()) {
                 b.setText("");
                 b.setDisable(true);
-                b.setOnAction(null);
+                b.setOnMouseClicked(null);
                 continue;
             }
 
@@ -789,9 +848,13 @@ public class ShopController implements Initializable, SceneController {
             b.setText(itm.getItem_name() + " (" + price + "g)");
 
             final int index = i;
-            b.setOnAction(e -> {
-                if (mode == Mode.BUY) {
-                    handleBuyClick(index);
+            b.setOnMouseClicked(e -> {
+                if (mode != Mode.BUY) return;
+
+                if (e.getButton() == javafx.scene.input.MouseButton.PRIMARY) {
+                    handleBuyClick(index);      // +1
+                } else if (e.getButton() == javafx.scene.input.MouseButton.SECONDARY) {
+                    handleBuyDecrease(index);   // -1
                 }
             });
         }
@@ -939,12 +1002,31 @@ public class ShopController implements Initializable, SceneController {
     
     private void handleBuyClick(int index) {
         if (index < 0 || index >= shopItems.size()) return;
+        if (index >= buyStock.size()) return;
+        if (buyStock.get(index) <= 0) return;   // no stock left
 
         item selectedItem = shopItems.get(index);
 
-        System.out.println("Clicked: " + selectedItem.getItem_name());
+        buyStock.set(index, buyStock.get(index) - 1);   // reduce available stock
+        refreshBuyStock();
 
         addDbItemToCart(selectedItem, 1);
+    }
+    
+    private void handleBuyDecrease(int index) {
+        if (index < 0 || index >= shopItems.size()) return;
+        if (index >= buyStock.size()) return;
+
+        item selectedItem = shopItems.get(index);
+        int itemId = selectedItem.getItem_id();
+
+        IntegerProperty qtyProp = buyCart.get(itemId);
+        if (qtyProp == null || qtyProp.get() <= 0) return;
+
+        buyStock.set(index, buyStock.get(index) + 1);   // restore stock
+        refreshBuyStock();
+
+        addDbItemToCart(selectedItem, -1);
     }
     
     private void removeFromBuyCart(int itemId) {
@@ -1024,6 +1106,8 @@ public class ShopController implements Initializable, SceneController {
 
         return sum;
     }
+    
+    
     
 
 //    private void loadShopItems() {
