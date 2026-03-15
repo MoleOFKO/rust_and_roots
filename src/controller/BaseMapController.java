@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Comparator;
-import javafx.scene.control.Label;
-import javafx.scene.image.ImageView;
 
 import model.Inventory;
 import model.ItemDatabase;
@@ -29,7 +27,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
@@ -179,6 +176,10 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     
     protected static final double MAP_EXIT_DELAY_GAME_SECONDS =0.5;
 
+    protected final List<ImageView> hotbarImages = new ArrayList<>();
+    protected final List<Label> hotbarLabels = new ArrayList<>();
+    protected int hotbarAssignmentIndex = 0;
+    
     protected void configureFarm(Farm farm) {
         // default: do nothing
     }
@@ -223,6 +224,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         );
 
         player.setOnToggleHotbarRequest(this::toggleHotbarVisible);
+        player.setOnHotbarSlotRequest(this::selectHotbarSlot);
         
         view.sceneProperty().addListener((obs, oldScene, newScene) -> {
             if (newScene != null) {
@@ -435,36 +437,77 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     private void setupHotbarIfPresent() {
         hotbarSlots.clear();
         hotbarSlotButtons.clear();
+        hotbarImages.clear();
+        hotbarLabels.clear();
 
-        addHotbarSlot(Hslot, slotBtn);
-        addHotbarSlot(Hslot1, slotBtn1);
-        addHotbarSlot(Hslot2, slotBtn2);
-        addHotbarSlot(Hslot3, slotBtn3);
-        addHotbarSlot(Hslot4, slotBtn4);
+        addHotbarSlot(Hslot, slotBtn, slotImg, slotLb);
+        addHotbarSlot(Hslot1, slotBtn1, slotImg1, slotLb1);
+        addHotbarSlot(Hslot2, slotBtn2, slotImg2, slotLb2);
+        addHotbarSlot(Hslot3, slotBtn3, slotImg3, slotLb3);
+        addHotbarSlot(Hslot4, slotBtn4, slotImg4, slotLb4);
 
         for (int i = 0; i < hotbarSlotButtons.size(); i++) {
             final int idx = i;
-            hotbarSlotButtons.get(i).setOnAction(e -> selectHotbarSlot(idx));
+            hotbarSlotButtons.get(i).setOnAction(e -> {
+                selectHotbarSlot(idx);
+                hotbarAssignmentIndex = idx;
+            });
         }
 
         if (slotBtn5 != null) {
             slotBtn5.setOnAction(e -> toggleInventory());
         }
 
-        if(playerState != null){
+        if (playerState != null) {
             setHotbarVisible(playerState.isHotbarVisible());
         }
-        
+
         if (!hotbarSlots.isEmpty()) {
             int savedIdx = 0;
-            if(playerState != null){
-                savedIdx = Math.min(playerState.getselectedHotbarIndex(),hotbarSlots.size() -1);
+            if (playerState != null) {
+                savedIdx = Math.min(playerState.getselectedHotbarIndex(), hotbarSlots.size() - 1);
             }
-            
             selectHotbarSlot(savedIdx);
+            hotbarAssignmentIndex = savedIdx;
         }
+
+        refreshHotbarView();
     }
 
+    private void addHotbarSlot(StackPane slot, Button button, ImageView imageView, Label label) {
+        if (slot != null && button != null) {
+            hotbarSlots.add(slot);
+            hotbarSlotButtons.add(button);
+            hotbarImages.add(imageView);
+            hotbarLabels.add(label);
+        }
+    }
+    
+    protected void refreshHotbarView() {
+        if (playerState == null) return;
+
+        for (int i = 0; i < hotbarImages.size(); i++) {
+            ImageView img = hotbarImages.get(i);
+            Label lbl = (i < hotbarLabels.size()) ? hotbarLabels.get(i) : null;
+
+            int itemId = playerState.getHotbarItemId(i);
+
+            if (itemId <= 0 || player.getInventory().getCount(itemId) <= 0) {
+                if (img != null) img.setImage(null);
+                if (lbl != null) lbl.setText("");
+                continue;
+            }
+
+            if (img != null) {
+                img.setImage(ItemDatabase.getImage(itemId));
+            }
+
+            if (lbl != null) {
+                lbl.setText("x" + player.getInventory().getCount(itemId));
+            }
+        }
+    }
+    
     private void addHotbarSlot(StackPane slot, Button button) {
         if (slot != null && button != null) {
             hotbarSlots.add(slot);
@@ -582,6 +625,11 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     protected void onPlayerInventorySlotSelected(int index, SlotData slot) {
         selectedPlayerInventoryItemId = (slot == null) ? null : slot.itemId();
         refreshPlayerInventorySelectionHighlight();
+
+        if (slot != null && playerState != null) {
+            playerState.setHotbarItemId(hotbarAssignmentIndex, slot.itemId());
+            refreshHotbarView();
+        }
     }
 
     protected void setupPlayerInventoryGridIfPresent() {
@@ -663,6 +711,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
             playerInventoryLabels,
             playerInventoryButtons
         );
+        refreshHotbarView();
     }
 
     protected List<SlotData> snapshotSlots(Inventory inventory, int capacity) {
