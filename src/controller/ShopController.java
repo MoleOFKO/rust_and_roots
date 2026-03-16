@@ -1,20 +1,19 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/javafx/FXMLController.java to edit this template
- */
 package controller;
 
 import db.dbcon;
 import game.GameState;
 import game.GameTimeManager;
 import game.SceneController;
-import java.io.InputStream;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.ResourceBundle;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -22,47 +21,24 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
-import javafx.beans.property.*;
-import javafx.collections.*;
-import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.layout.StackPane;
 import javafx.util.converter.IntegerStringConverter;
 import model.Inventory;
 import model.ItemDatabase;
 import model.item;
 import java.util.*;
-import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.image.Image;
-import javafx.scene.layout.StackPane;
-import model.ItemDatabase;
-import java.util.Objects;
 import javafx.scene.Group;
-import util.SpawnTag;
 import ui.InventorySlotsUIManager;
+import util.SpawnTag;
 
-
-
-/**
- * FXML Controller class
- *
- * @author larry
- */
 public class ShopController implements Initializable, SceneController {
 
     private GameState gameState;
     private Inventory inv;
-    @FXML
-    private ImageView inyimg11;
-    @FXML
-    private Button buybtn;
-    @FXML
-    private Button sellbtn;
-    @FXML
-    private StackPane view;
-    @FXML
-    private Group world;
 
     @Override
     public void init(GameState gs) {
@@ -72,21 +48,32 @@ public class ShopController implements Initializable, SceneController {
 
     private enum Mode { BUY, SELL }
     private Mode mode = Mode.BUY;
-    
 
-    private final Map<Integer, IntegerProperty> buyCart = new LinkedHashMap<>();
-    private final Map<Integer, IntegerProperty> sellCart = new LinkedHashMap<>();
-
+    // ---------- persistent/current shop data ----------
     private final List<item> shopItems = new ArrayList<>();
     private final Map<Integer, item> dbItemsById = new LinkedHashMap<>();
 
-    // rows shown in tableitemdetail
-    public static class DetailRow {
-    private final item itemData;
-    private final IntegerProperty qty;
-    private final IntegerProperty unitPrice;
+    // ---------- stock / selection state ----------
+    // BUY side:
+    // shopAvailable = remaining stock still in shop pane
+    // buyCart = selected quantity in table
+    private final Map<Integer, IntegerProperty> shopAvailable = new LinkedHashMap<>();
+    private final Map<Integer, IntegerProperty> buyCart = new LinkedHashMap<>();
+    private final Map<Integer, Integer> dailyTotalShopStock = new LinkedHashMap<>();
 
-    public DetailRow(item itemData, IntegerProperty qty, int unitPrice) {
+    // SELL side:
+    // inventoryAvailableForSell = remaining qty still shown as available from inventory
+    // sellCart = selected qty in sell pane / table
+    private final Map<Integer, IntegerProperty> inventoryAvailableForSell = new LinkedHashMap<>();
+    private final Map<Integer, IntegerProperty> sellCart = new LinkedHashMap<>();
+
+    // ---------- rows shown in table ----------
+    public static class DetailRow {
+        private final item itemData;
+        private final IntegerProperty qty;
+        private final IntegerProperty unitPrice;
+
+        public DetailRow(item itemData, IntegerProperty qty, int unitPrice) {
             this.itemData = itemData;
             this.qty = qty;
             this.unitPrice = new SimpleIntegerProperty(unitPrice);
@@ -120,337 +107,195 @@ public class ShopController implements Initializable, SceneController {
             return getQty() * getUnitPrice();
         }
     }
-    
+
     private final ObservableList<DetailRow> detailRows = FXCollections.observableArrayList();
-    
+
+    // ---------- button collections ----------
     private final List<Button> invBtns = new ArrayList<>();
     private final List<Button> buyBtns = new ArrayList<>();
     private final List<Button> sellBtns = new ArrayList<>();
-    
-    @FXML
-    private Label lblcoin;
-    @FXML
-    private ImageView inyimg1;
-    @FXML
-    private Button invbtn1;
-    @FXML
-    private Label invlbl1;
-    @FXML
-    private ImageView inyimg2;
-    @FXML
-    private Button invbtn2;
-    @FXML
-    private Label invlbl2;
-    @FXML
-    private ImageView inyimg3;
-    @FXML
-    private Button invbtn3;
-    @FXML
-    private Label invlbl3;
-    @FXML
-    private ImageView inyimg4;
-    @FXML
-    private Button invbtn4;
-    @FXML
-    private Label invlbl4;
-    @FXML
-    private ImageView inyimg5;
-    @FXML
-    private Button invbtn5;
-    @FXML
-    private Label invlbl5;
-    @FXML
-    private ImageView inyimg6;
-    @FXML
-    private Button invbtn6;
-    @FXML
-    private Label invlbl6;
-    @FXML
-    private ImageView inyimg7;
-    @FXML
-    private Button invbtn7;
-    @FXML
-    private Label invlbl7;
-    @FXML
-    private ImageView inyimg8;
-    @FXML
-    private Button invbtn8;
-    @FXML
-    private Label invlbl8;
-    @FXML
-    private ImageView inyimg9;
-    @FXML
-    private Button invbtn9;
-    @FXML
-    private Label invlbl9;
-    @FXML
-    private ImageView inyimg10;
-    @FXML
-    private Button invbtn10;
-    @FXML
-    private Label invlbl10;
-    @FXML
-    private ImageView inyimg12;
-    @FXML
-    private Button invbtn11;
-    @FXML
-    private Label invlbl11;
-    @FXML
-    private ImageView inyimg13;
-    @FXML
-    private Button invbtn12;
-    @FXML
-    private Label invlbl12;
-    @FXML
-    private ImageView inyimg14;
-    @FXML
-    private Button invbtn13;
-    @FXML
-    private Label invlbl13;
-    @FXML
-    private ImageView inyimg15;
-    @FXML
-    private Button invbtn14;
-    @FXML
-    private Label invlbl14;
-    @FXML
-    private Button invbtn15;
-    @FXML
-    private Label invlbl15;
-    @FXML
-    private ImageView inyimg16;
-    @FXML
-    private Button invbtn16;
-    @FXML
-    private Label invlbl16;
-    @FXML
-    private ImageView inyimg17;
-    @FXML
-    private Button invbtn17;
-    @FXML
-    private Label invlbl17;
-    @FXML
-    private ImageView inyimg18;
-    @FXML
-    private Button invbtn18;
-    @FXML
-    private Label invlbl18;
-    @FXML
-    private ImageView inyimg19;
-    @FXML
-    private Button invbtn19;
-    @FXML
-    private Label invlbl19;
-    @FXML
-    private ImageView inyimg20;
-    @FXML
-    private Button invbtn20;
-    @FXML
-    private Label invlbl20;
-    @FXML
-    private Pane buypane;
-    @FXML
-    private ImageView imgbuy1;
-    @FXML
-    private Button btnbuy1;
-    @FXML
-    private Label lblbuy1;
-    @FXML
-    private ImageView imgbuy2;
-    @FXML
-    private Button btnbuy2;
-    @FXML
-    private Label lblbuy2;
-    @FXML
-    private ImageView imgbuy3;
-    @FXML
-    private Button btnbuy3;
-    @FXML
-    private Label lblbuy3;
-    @FXML
-    private ImageView imgbuy4;
-    @FXML
-    private Button btnbuy4;
-    @FXML
-    private Label lblbuy4;
-    @FXML
-    private ImageView imgbuy5;
-    @FXML
-    private Button btnbuy5;
-    @FXML
-    private Label lblbuy5;
-    @FXML
-    private ImageView imgbuy6;
-    @FXML
-    private Button btnbuy6;
-    @FXML
-    private Label lblbuy6;
-    @FXML
-    private ImageView imgbuy7;
-    @FXML
-    private Button btnbuy7;
-    @FXML
-    private Label lblbuy7;
-    @FXML
-    private ImageView imgbuy8;
-    @FXML
-    private Button btnbuy8;
-    @FXML
-    private Label lblbuy8;
-    @FXML
-    private ImageView imgbuy9;
-    @FXML
-    private Button btnbuy9;
-    @FXML
-    private Label lblbuy9;
-    @FXML
-    private ImageView imgbuy10;
-    @FXML
-    private Button btnbuy10;
-    @FXML
-    private Label lblbuy10;
-    @FXML
-    private ImageView imgbuy11;
-    @FXML
-    private Button btnbuy11;
-    @FXML
-    private Label lblbuy11;
-    @FXML
-    private ImageView imgbuy12;
-    @FXML
-    private Button btnbuy12;
-    @FXML
-    private Label lblbuy12;
-    @FXML
-    private Label buyname1;
-    @FXML
-    private Label buyname2;
-    @FXML
-    private Label buyname3;
-    @FXML
-    private Label buyname4;
-    @FXML
-    private Label buyname5;
-    @FXML
-    private Label buyname6;
-    @FXML
-    private Label buyname7;
-    @FXML
-    private Label buyname8;
-    @FXML
-    private Label buyname9;
-    @FXML
-    private Label buyname10;
-    @FXML
-    private Label buyname11;
-    @FXML
-    private Label buyname12;
-    @FXML
-    private Pane sellpane;
-    @FXML
-    private ImageView imgsell1;
-    @FXML
-    private Button btnsell1;
-    @FXML
-    private Label lblsell1;
-    @FXML
-    private ImageView imgsell2;
-    @FXML
-    private Button btnsell2;
-    @FXML
-    private Label lblsell2;
-    @FXML
-    private ImageView imgsell3;
-    @FXML
-    private Button btnsell3;
-    @FXML
-    private Label lblsell3;
-    @FXML
-    private ImageView imgsell4;
-    @FXML
-    private Button btnsell4;
-    @FXML
-    private Label lblsell4;
-    @FXML
-    private ImageView imgsell5;
-    @FXML
-    private Button btnsell5;
-    @FXML
-    private Label lblsell5;
-    @FXML
-    private ImageView imgsell6;
-    @FXML
-    private Button btnsell6;
-    @FXML
-    private Label lblsell6;
-    @FXML
-    private ImageView imgsell7;
-    @FXML
-    private Button btnsell7;
-    @FXML
-    private Label lblsell7;
-    @FXML
-    private ImageView imgsell8;
-    @FXML
-    private Button btnsell8;
-    @FXML
-    private Label lblsell8;
-    @FXML
-    private ImageView imgsell9;
-    @FXML
-    private Button btnsell9;
-    @FXML
-    private Label lblsell9;
-    @FXML
-    private ImageView imgsell10;
-    @FXML
-    private Button btnsell10;
-    @FXML
-    private Label lblsell10;
-    @FXML
-    private ImageView imgsell11;
-    @FXML
-    private Button btnsell11;
-    @FXML
-    private Label lblsell11;
-    @FXML
-    private ImageView imgsell12;
-    @FXML
-    private Button btnsell12;
-    @FXML
-    private Label lblsell12;
-    @FXML
-    private Button btnback;
-    @FXML
-    private Label lbltotal;
-    @FXML
-    private TableView<DetailRow> tableitemdetail;
-    @FXML
-    private TableColumn<DetailRow, String> tableimg;
-    @FXML
-    private TableColumn<DetailRow, Integer> tablequantity;
-    @FXML
-    private TableColumn<DetailRow, Integer> tablecost;
-    @FXML
-    private Button colbuy;
-    @FXML
-    private Button colsell;
 
-    Connection con;
-    ResultSet rs;
-    PreparedStatement pst;
-    Statement st;
-    private List<ImageView> buyImages = new ArrayList<>();
-    private List<Label> buyLabels = new ArrayList<>();
-    private List<Integer> buyStock = new ArrayList<>();
-    private List<Label> buyNameLabels = new ArrayList<>();
+    // ---------- buy pane collections ----------
+    private final List<ImageView> buyImages = new ArrayList<>();
+    private final List<Label> buyStockLabels = new ArrayList<>();
+    private final List<Label> buyNameLabels = new ArrayList<>();
     private final List<Button> buyItemButtons = new ArrayList<>();
+
+    // ---------- sell pane collections ----------
+    private final List<ImageView> sellImages = new ArrayList<>();
+    private final List<Label> sellLabels = new ArrayList<>();
+
+    // ---------- inventory ui ----------
     private final List<ImageView> invImages = new ArrayList<>();
     private final List<Label> invLabels = new ArrayList<>();
     private InventorySlotsUIManager inventorySlotsUIManager;
-    
-    
-    
+
+    // ---------- FXML ----------
+    @FXML private Button buybtn;
+    @FXML private Button sellbtn;
+    @FXML private StackPane view;
+    @FXML private Group world;
+    @FXML private Label lblcoin;
+
+    @FXML private ImageView inyimg1;
+    @FXML private Button invbtn1;
+    @FXML private Label invlbl1;
+    @FXML private ImageView inyimg2;
+    @FXML private Button invbtn2;
+    @FXML private Label invlbl2;
+    @FXML private ImageView inyimg3;
+    @FXML private Button invbtn3;
+    @FXML private Label invlbl3;
+    @FXML private ImageView inyimg4;
+    @FXML private Button invbtn4;
+    @FXML private Label invlbl4;
+    @FXML private ImageView inyimg5;
+    @FXML private Button invbtn5;
+    @FXML private Label invlbl5;
+    @FXML private ImageView inyimg6;
+    @FXML private Button invbtn6;
+    @FXML private Label invlbl6;
+    @FXML private ImageView inyimg7;
+    @FXML private Button invbtn7;
+    @FXML private Label invlbl7;
+    @FXML private ImageView inyimg8;
+    @FXML private Button invbtn8;
+    @FXML private Label invlbl8;
+    @FXML private ImageView inyimg9;
+    @FXML private Button invbtn9;
+    @FXML private Label invlbl9;
+    @FXML private ImageView inyimg10;
+    @FXML private Button invbtn10;
+    @FXML private Label invlbl10;
+    @FXML private ImageView inyimg11;
+    @FXML private Button invbtn11;
+    @FXML private Label invlbl11;
+    @FXML private ImageView inyimg12;
+    @FXML private Button invbtn12;
+    @FXML private Label invlbl12;
+    @FXML private ImageView inyimg13;
+    @FXML private Button invbtn13;
+    @FXML private Label invlbl13;
+    @FXML private ImageView inyimg14;
+    @FXML private Button invbtn14;
+    @FXML private Label invlbl14;
+    @FXML private ImageView inyimg15;
+    @FXML private Button invbtn15;
+    @FXML private Label invlbl15;
+    @FXML private ImageView inyimg16;
+    @FXML private Button invbtn16;
+    @FXML private Label invlbl16;
+    @FXML private ImageView inyimg17;
+    @FXML private Button invbtn17;
+    @FXML private Label invlbl17;
+    @FXML private ImageView inyimg18;
+    @FXML private Button invbtn18;
+    @FXML private Label invlbl18;
+    @FXML private ImageView inyimg19;
+    @FXML private Button invbtn19;
+    @FXML private Label invlbl19;
+    @FXML private ImageView inyimg20;
+    @FXML private Button invbtn20;
+    @FXML private Label invlbl20;
+
+    @FXML private Pane buypane;
+    @FXML private ImageView imgbuy1;
+    @FXML private Button btnbuy1;
+    @FXML private Label lblbuy1;
+    @FXML private ImageView imgbuy2;
+    @FXML private Button btnbuy2;
+    @FXML private Label lblbuy2;
+    @FXML private ImageView imgbuy3;
+    @FXML private Button btnbuy3;
+    @FXML private Label lblbuy3;
+    @FXML private ImageView imgbuy4;
+    @FXML private Button btnbuy4;
+    @FXML private Label lblbuy4;
+    @FXML private ImageView imgbuy5;
+    @FXML private Button btnbuy5;
+    @FXML private Label lblbuy5;
+    @FXML private ImageView imgbuy6;
+    @FXML private Button btnbuy6;
+    @FXML private Label lblbuy6;
+    @FXML private ImageView imgbuy7;
+    @FXML private Button btnbuy7;
+    @FXML private Label lblbuy7;
+    @FXML private ImageView imgbuy8;
+    @FXML private Button btnbuy8;
+    @FXML private Label lblbuy8;
+    @FXML private ImageView imgbuy9;
+    @FXML private Button btnbuy9;
+    @FXML private Label lblbuy9;
+    @FXML private ImageView imgbuy10;
+    @FXML private Button btnbuy10;
+    @FXML private Label lblbuy10;
+    @FXML private ImageView imgbuy11;
+    @FXML private Button btnbuy11;
+    @FXML private Label lblbuy11;
+    @FXML private ImageView imgbuy12;
+    @FXML private Button btnbuy12;
+    @FXML private Label lblbuy12;
+
+    @FXML private Label buyname1;
+    @FXML private Label buyname2;
+    @FXML private Label buyname3;
+    @FXML private Label buyname4;
+    @FXML private Label buyname5;
+    @FXML private Label buyname6;
+    @FXML private Label buyname7;
+    @FXML private Label buyname8;
+    @FXML private Label buyname9;
+    @FXML private Label buyname10;
+    @FXML private Label buyname11;
+    @FXML private Label buyname12;
+
+    @FXML private Pane sellpane;
+    @FXML private ImageView imgsell1;
+    @FXML private Button btnsell1;
+    @FXML private Label lblsell1;
+    @FXML private ImageView imgsell2;
+    @FXML private Button btnsell2;
+    @FXML private Label lblsell2;
+    @FXML private ImageView imgsell3;
+    @FXML private Button btnsell3;
+    @FXML private Label lblsell3;
+    @FXML private ImageView imgsell4;
+    @FXML private Button btnsell4;
+    @FXML private Label lblsell4;
+    @FXML private ImageView imgsell5;
+    @FXML private Button btnsell5;
+    @FXML private Label lblsell5;
+    @FXML private ImageView imgsell6;
+    @FXML private Button btnsell6;
+    @FXML private Label lblsell6;
+    @FXML private ImageView imgsell7;
+    @FXML private Button btnsell7;
+    @FXML private Label lblsell7;
+    @FXML private ImageView imgsell8;
+    @FXML private Button btnsell8;
+    @FXML private Label lblsell8;
+    @FXML private ImageView imgsell9;
+    @FXML private Button btnsell9;
+    @FXML private Label lblsell9;
+    @FXML private ImageView imgsell10;
+    @FXML private Button btnsell10;
+    @FXML private Label lblsell10;
+    @FXML private ImageView imgsell11;
+    @FXML private Button btnsell11;
+    @FXML private Label lblsell11;
+    @FXML private ImageView imgsell12;
+    @FXML private Button btnsell12;
+    @FXML private Label lblsell12;
+
+    @FXML private Button btnback;
+    @FXML private Label lbltotal;
+    @FXML private TableView<DetailRow> tableitemdetail;
+    @FXML private TableColumn<DetailRow, String> tableimg;
+    @FXML private TableColumn<DetailRow, Integer> tablequantity;
+    @FXML private TableColumn<DetailRow, Integer> tablecost;
+    @FXML private Button colbuy;
+    @FXML private Button colsell;
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         ItemDatabase.loadItems();
@@ -458,133 +303,89 @@ public class ShopController implements Initializable, SceneController {
         if (gameState == null) gameState = GameState.get();
         if (inv == null) inv = gameState.getPlayerState().getInventory();
 
-        buyImages.clear();
-        buyLabels.clear();
-        buyNameLabels.clear();
-        buyItemButtons.clear();
-        invImages.clear();
-        invLabels.clear();
-
-        buyImages.add(imgbuy1);
-        buyImages.add(imgbuy2);
-        buyImages.add(imgbuy3);
-        buyImages.add(imgbuy4);
-        buyImages.add(imgbuy5);
-        buyImages.add(imgbuy6);
-        buyImages.add(imgbuy7);
-        buyImages.add(imgbuy8);
-        buyImages.add(imgbuy9);
-        buyImages.add(imgbuy10);
-        buyImages.add(imgbuy11);
-        buyImages.add(imgbuy12);
-
-        buyLabels.add(lblbuy1);
-        buyLabels.add(lblbuy2);
-        buyLabels.add(lblbuy3);
-        buyLabels.add(lblbuy4);
-        buyLabels.add(lblbuy5);
-        buyLabels.add(lblbuy6);
-        buyLabels.add(lblbuy7);
-        buyLabels.add(lblbuy8);
-        buyLabels.add(lblbuy9);
-        buyLabels.add(lblbuy10);
-        buyLabels.add(lblbuy11);
-        buyLabels.add(lblbuy12);
-
-        buyNameLabels.add(buyname1);
-        buyNameLabels.add(buyname2);
-        buyNameLabels.add(buyname3);
-        buyNameLabels.add(buyname4);
-        buyNameLabels.add(buyname5);
-        buyNameLabels.add(buyname6);
-        buyNameLabels.add(buyname7);
-        buyNameLabels.add(buyname8);
-        buyNameLabels.add(buyname9);
-        buyNameLabels.add(buyname10);
-        buyNameLabels.add(buyname11);
-        buyNameLabels.add(buyname12);
-
-        buyItemButtons.add(btnbuy1);
-        buyItemButtons.add(btnbuy2);
-        buyItemButtons.add(btnbuy3);
-        buyItemButtons.add(btnbuy4);
-        buyItemButtons.add(btnbuy5);
-        buyItemButtons.add(btnbuy6);
-        buyItemButtons.add(btnbuy7);
-        buyItemButtons.add(btnbuy8);
-        buyItemButtons.add(btnbuy9);
-        buyItemButtons.add(btnbuy10);
-        buyItemButtons.add(btnbuy11);
-        buyItemButtons.add(btnbuy12);
-
-        invImages.add(inyimg1);
-        invImages.add(inyimg2);
-        invImages.add(inyimg3);
-        invImages.add(inyimg4);
-        invImages.add(inyimg5);
-        invImages.add(inyimg6);
-        invImages.add(inyimg7);
-        invImages.add(inyimg8);
-        invImages.add(inyimg9);
-        invImages.add(inyimg10);
-        invImages.add(inyimg11);
-        invImages.add(inyimg12);
-        invImages.add(inyimg13);
-        invImages.add(inyimg14);
-        invImages.add(inyimg15);
-        invImages.add(inyimg16);
-        invImages.add(inyimg17);
-        invImages.add(inyimg18);
-        invImages.add(inyimg19);
-        invImages.add(inyimg20);
-
-        invLabels.add(invlbl1);
-        invLabels.add(invlbl2);
-        invLabels.add(invlbl3);
-        invLabels.add(invlbl4);
-        invLabels.add(invlbl5);
-        invLabels.add(invlbl6);
-        invLabels.add(invlbl7);
-        invLabels.add(invlbl8);
-        invLabels.add(invlbl9);
-        invLabels.add(invlbl10);
-        invLabels.add(invlbl11);
-        invLabels.add(invlbl12);
-        invLabels.add(invlbl13);
-        invLabels.add(invlbl14);
-        invLabels.add(invlbl15);
-        invLabels.add(invlbl16);
-        invLabels.add(invlbl17);
-        invLabels.add(invlbl18);
-        invLabels.add(invlbl19);
-        invLabels.add(invlbl20);
-
+        buildUiCollections();
         collectButtonsOnce();
 
         inventorySlotsUIManager = new InventorySlotsUIManager(inv, invImages, invLabels, invBtns);
 
-        refreshShopForNewDay();
+        loadShopItemsForToday();
+        rebuildDailyShopAvailability();
+        rebuildSellAvailabilityFromInventory();
 
         GameTimeManager.get().dayNumberProperty().addListener((obs, oldDay, newDay) -> {
             if (!Objects.equals(oldDay, newDay)) {
-                refreshShopForNewDay();
+                gameState.resetDailyShopStateForNewDay(newDay.intValue());
+                loadShopItemsForToday();
+                rebuildDailyShopAvailability();
+                clearBuySelection();
+                if (mode == Mode.BUY) {
+                    refreshTableFromBuyCart();
+                }
+                refreshAllPanels();
             }
         });
 
-        setupMerchantCatalog();
         setupTable();
         bindCoins();
         setMode(Mode.BUY);
-        refreshTableFromBuyCart();
         refreshAllPanels();
     }
 
-    private void setupMerchantCatalog() {
-//        buyPriceByType.clear();
-        // no-op now
-    // items come directly from database / ItemDatabase
+    private void buildUiCollections() {
+        buyImages.clear();
+        buyStockLabels.clear();
+        buyNameLabels.clear();
+        buyItemButtons.clear();
+        invImages.clear();
+        invLabels.clear();
+        sellImages.clear();
+        sellLabels.clear();
+
+        buyImages.addAll(Arrays.asList(
+            imgbuy1, imgbuy2, imgbuy3, imgbuy4, imgbuy5, imgbuy6,
+            imgbuy7, imgbuy8, imgbuy9, imgbuy10, imgbuy11, imgbuy12
+        ));
+
+        buyStockLabels.addAll(Arrays.asList(
+            lblbuy1, lblbuy2, lblbuy3, lblbuy4, lblbuy5, lblbuy6,
+            lblbuy7, lblbuy8, lblbuy9, lblbuy10, lblbuy11, lblbuy12
+        ));
+
+        buyNameLabels.addAll(Arrays.asList(
+            buyname1, buyname2, buyname3, buyname4, buyname5, buyname6,
+            buyname7, buyname8, buyname9, buyname10, buyname11, buyname12
+        ));
+
+        buyItemButtons.addAll(Arrays.asList(
+            btnbuy1, btnbuy2, btnbuy3, btnbuy4, btnbuy5, btnbuy6,
+            btnbuy7, btnbuy8, btnbuy9, btnbuy10, btnbuy11, btnbuy12
+        ));
+
+        invImages.addAll(Arrays.asList(
+            inyimg1, inyimg2, inyimg3, inyimg4, inyimg5,
+            inyimg6, inyimg7, inyimg8, inyimg9, inyimg10,
+            inyimg11, inyimg12, inyimg13, inyimg14, inyimg15,
+            inyimg16, inyimg17, inyimg18, inyimg19, inyimg20
+        ));
+
+        invLabels.addAll(Arrays.asList(
+            invlbl1, invlbl2, invlbl3, invlbl4, invlbl5,
+            invlbl6, invlbl7, invlbl8, invlbl9, invlbl10,
+            invlbl11, invlbl12, invlbl13, invlbl14, invlbl15,
+            invlbl16, invlbl17, invlbl18, invlbl19, invlbl20
+        ));
+
+        sellImages.addAll(Arrays.asList(
+            imgsell1, imgsell2, imgsell3, imgsell4, imgsell5, imgsell6,
+            imgsell7, imgsell8, imgsell9, imgsell10, imgsell11, imgsell12
+        ));
+
+        sellLabels.addAll(Arrays.asList(
+            lblsell1, lblsell2, lblsell3, lblsell4, lblsell5, lblsell6,
+            lblsell7, lblsell8, lblsell9, lblsell10, lblsell11, lblsell12
+        ));
     }
-    
+
     private void setupTable() {
         tableitemdetail.setEditable(true);
         tableitemdetail.setItems(detailRows);
@@ -602,25 +403,13 @@ public class ShopController implements Initializable, SceneController {
         tablequantity.setOnEditCommit(e -> {
             DetailRow row = e.getRowValue();
             int itemId = row.getItemData().getItem_id();
-            int newQty = (e.getNewValue() == null) ? row.getQty() : e.getNewValue();
+            Integer newValue = e.getNewValue();
+            int newQty = (newValue == null) ? row.getQty() : newValue;
 
             if (mode == Mode.BUY) {
-                if (newQty <= 0) {
-                    buyCart.remove(itemId);
-                } else {
-                    buyCart.computeIfAbsent(itemId, k -> new SimpleIntegerProperty(0)).set(newQty);
-                }
-                refreshTableFromBuyCart();
+                setBuySelectionQty(itemId, newQty);
             } else {
-                int have = inv.getCount(itemId);
-                int clamped = Math.max(0, Math.min(newQty, have));
-
-                if (clamped <= 0) {
-                    sellCart.remove(itemId);
-                } else {
-                    sellCart.computeIfAbsent(itemId, k -> new SimpleIntegerProperty(0)).set(clamped);
-                }
-                refreshTableFromSellCart();
+                setSellSelectionQty(itemId, newQty);
             }
         });
 
@@ -628,11 +417,8 @@ public class ShopController implements Initializable, SceneController {
             new SimpleIntegerProperty(cd.getValue().getLineTotal()).asObject()
         );
     }
-    
 
-
-
-   @FXML
+    @FXML
     private void handlebuyaction(ActionEvent event) {
         if (mode != Mode.BUY) return;
 
@@ -641,10 +427,16 @@ public class ShopController implements Initializable, SceneController {
         if (!inv.spendCoins(total)) return;
 
         for (var e : buyCart.entrySet()) {
-            inv.addItem(e.getKey(), e.getValue().get());
+            int itemId = e.getKey();
+            int qty = e.getValue().get();
+            if (qty > 0) {
+                inv.addItem(itemId, qty);
+            }
         }
 
-        buyCart.clear();
+        clearBuySelection();
+        persistCurrentShopRemainingStock();
+        rebuildSellAvailabilityFromInventory();
         refreshTableFromBuyCart();
         refreshAllPanels();
     }
@@ -662,54 +454,47 @@ public class ShopController implements Initializable, SceneController {
         int totalGain = computeSellTotal();
 
         for (var e : sellCart.entrySet()) {
-            inv.removeItem(e.getKey(), e.getValue().get());
+            int itemId = e.getKey();
+            int qty = e.getValue().get();
+            inv.removeItem(itemId, qty);
         }
 
         inv.addCoins(totalGain);
-        sellCart.clear();
+
+        clearSellSelection();
+        rebuildSellAvailabilityFromInventory();
         refreshTableFromSellCart();
         refreshAllPanels();
     }
 
-    private int sellPrice(int itemId) {
-        item itm = ItemDatabase.getItemById(itemId);
-        if (itm == null) return 1;
-        return Math.max(1, itm.getPrice() / 2);
-    }
-
-    private void refreshTotalLabel() {
-        int total = (mode == Mode.BUY) ? computeBuyTotal() : computeSellTotal();
-        lbltotal.setText( total + "g");
-    }
-    
     @FXML
     private void handlebackaction(ActionEvent event) {
         String back = gameState.getReturnFxml();
-//        util.SpawnTag spawn = gameState.getReturnSpawn();
-        if (back == null) back = "/view/home_map.fxml"; // fallback
+        if (back == null) back = "/view/home_map.fxml";
         util.SceneManager.switchScene(back, SpawnTag.FROM_SHOP);
     }
 
     @FXML
     private void handlecolbuyaction(ActionEvent event) {
-        sellpane.setVisible(false);
-        buypane.setVisible(true);
         setMode(Mode.BUY);
     }
 
     @FXML
     private void handlecolsellaction(ActionEvent event) {
-        sellpane.setVisible(true);
-        buypane.setVisible(false);
         setMode(Mode.SELL);
     }
-    
+
     private void setMode(Mode m) {
         this.mode = m;
 
         boolean buyMode = (m == Mode.BUY);
 
+        buypane.setVisible(buyMode);
+        buypane.setManaged(buyMode);
         buypane.setDisable(!buyMode);
+
+        sellpane.setVisible(!buyMode);
+        sellpane.setManaged(!buyMode);
         sellpane.setDisable(buyMode);
 
         buybtn.setDisable(!buyMode);
@@ -718,34 +503,18 @@ public class ShopController implements Initializable, SceneController {
         if (buyMode) {
             refreshTableFromBuyCart();
         } else {
+            rebuildSellAvailabilityFromInventory();
             refreshTableFromSellCart();
         }
 
         refreshAllPanels();
     }
-    
-    private void addToCart(int itemId, int delta) {
-        if (mode != Mode.SELL) return;
 
-        int have = inv.getCount(itemId);
-        int current = sellCart.containsKey(itemId) ? sellCart.get(itemId).get() : 0;
-        int next = Math.min(have, current + delta);
-
-        if (next <= 0) {
-            sellCart.remove(itemId);
-        } else {
-            sellCart.computeIfAbsent(itemId, k -> new SimpleIntegerProperty(0)).set(next);
-        }
-
-        refreshTableFromSellCart();
-        refreshAllPanels();
-    }
-    
     private void bindCoins() {
         lblcoin.textProperty().unbind();
         lblcoin.textProperty().bind(inv.coinsProperty().asString(": %d"));
     }
-    
+
     private void collectButtonsOnce() {
         if (!invBtns.isEmpty()) return;
 
@@ -770,57 +539,37 @@ public class ShopController implements Initializable, SceneController {
         buyBtns.removeIf(Objects::isNull);
         sellBtns.removeIf(Objects::isNull);
     }
-    
-
-//    private <T extends Node> List<T> collectByPrefix(Parent start, Class<T> type, String prefix) {
-//        List<T> out = new ArrayList<>();
-//        walk(start, n -> {
-//            if (type.isInstance(n)) {
-//                String id = n.getId();
-//                if (id != null && id.startsWith(prefix)) out.add(type.cast(n));
-//            }
-//        });
-//        return out;
-//    }
-
-    private void walk(Parent p, java.util.function.Consumer<Node> visitor) {
-        for (Node n : p.getChildrenUnmodifiable()) {
-            visitor.accept(n);
-            if (n instanceof Parent child) walk(child, visitor);
-        }
-    }
 
     private void refreshAllPanels() {
-        collectButtonsOnce();
         refreshInventoryButtons();
-        refreshBuyButtons();
-        refreshSellButtons();
+        refreshBuyPane();
+        refreshSellPane();
         refreshTotalLabel();
-        refreshInventoryButtons();
     }
-    
+
     private void refreshInventoryButtons() {
-        List<Integer> owned = new ArrayList<>(inv.itemsProperty().keySet());
-        owned.sort(Comparator.comparing(id -> {
-            item itm = ItemDatabase.getItemById(id);
-            return itm == null ? "" : itm.getItem_name();
-        }));
+        List<Integer> available = new ArrayList<>(inv.itemsProperty().keySet());
+        available.removeIf(id -> inv.getCount(id) <= 0);
+
+        available.sort(Comparator.comparing(this::itemNameSafe, String.CASE_INSENSITIVE_ORDER));
 
         for (int i = 0; i < invBtns.size(); i++) {
             Button b = invBtns.get(i);
 
             if (b == null) continue;
 
-            if (i >= owned.size()) {
+            if (i >= available.size()) {
                 b.setOnAction(null);
+                b.setDisable(true);
                 continue;
             }
 
-            int itemId = owned.get(i);
-
+            int itemId = available.get(i);
+            b.setDisable(false);
             b.setOnAction(e -> {
                 if (mode == Mode.SELL) {
-                    addToCart(itemId, +1);
+                    int current = sellCart.containsKey(itemId) ? sellCart.get(itemId).get() : 0;
+                    setSellSelectionQty(itemId, current + 1);
                 }
             });
         }
@@ -828,67 +577,104 @@ public class ShopController implements Initializable, SceneController {
         if (inventorySlotsUIManager != null) {
             inventorySlotsUIManager.refresh();
         }
+
+        // In SELL mode, visually subtract selected qty from inventory labels
+        if (mode == Mode.SELL) {
+            applySellAvailabilityToInventoryLabels(available);
+        }
     }
-    
-    private void refreshBuyButtons() {
-        for (int i = 0; i < buyBtns.size(); i++) {
-            Button b = buyBtns.get(i);
+
+    private void applySellAvailabilityToInventoryLabels(List<Integer> visibleInventoryIds) {
+        for (int i = 0; i < visibleInventoryIds.size() && i < invLabels.size(); i++) {
+            int itemId = visibleInventoryIds.get(i);
+            IntegerProperty remainingProp = inventoryAvailableForSell.get(itemId);
+            int remaining = (remainingProp == null) ? inv.getCount(itemId) : remainingProp.get();
+            invLabels.get(i).setText("x" + remaining);
+        }
+    }
+
+    private void refreshBuyPane() {
+        for (int i = 0; i < buyItemButtons.size(); i++) {
+            ImageView img = buyImages.get(i);
+            Label stockLbl = buyStockLabels.get(i);
+            Label nameLbl = buyNameLabels.get(i);
+            Button btn = buyItemButtons.get(i);
 
             if (i >= shopItems.size()) {
-                b.setText("");
-                b.setDisable(true);
-                b.setOnMouseClicked(null);
+                if (img != null) img.setImage(null);
+                if (stockLbl != null) stockLbl.setText("");
+                if (nameLbl != null) nameLbl.setText("");
+                if (btn != null) {
+                    btn.setDisable(true);
+                    btn.setOnMouseClicked(null);
+                }
                 continue;
             }
 
             item itm = shopItems.get(i);
-            int price = itm.getPrice();
+            int itemId = itm.getItem_id();
+            int available = shopAvailable.containsKey(itemId) ? shopAvailable.get(itemId).get() : 0;
 
-            b.setDisable(false);
-            b.setText(itm.getItem_name() + " (" + price + "g)");
+            if (img != null) img.setImage(ItemDatabase.getImage(itemId));
+            if (stockLbl != null) stockLbl.setText("x" + available);
+            if (nameLbl != null) nameLbl.setText(itm.getItem_name());
 
-            final int index = i;
-            b.setOnMouseClicked(e -> {
-                if (mode != Mode.BUY) return;
+            if (btn != null) {
+                btn.setDisable(mode != Mode.BUY);
+                final int finalItemId = itemId;
+                btn.setOnMouseClicked(e -> {
+                    if (mode != Mode.BUY) return;
 
-                if (e.getButton() == javafx.scene.input.MouseButton.PRIMARY) {
-                    handleBuyClick(index);      // +1
-                } else if (e.getButton() == javafx.scene.input.MouseButton.SECONDARY) {
-                    handleBuyDecrease(index);   // -1
-                }
-            });
+                    if (e.getButton() == javafx.scene.input.MouseButton.PRIMARY) {
+                        int current = buyCart.containsKey(finalItemId) ? buyCart.get(finalItemId).get() : 0;
+                        setBuySelectionQty(finalItemId, current + 1);
+                    } else if (e.getButton() == javafx.scene.input.MouseButton.SECONDARY) {
+                        int current = buyCart.containsKey(finalItemId) ? buyCart.get(finalItemId).get() : 0;
+                        setBuySelectionQty(finalItemId, current - 1);
+                    }
+                });
+            }
         }
     }
-    
-    private void refreshSellButtons() {
+
+    private void refreshSellPane() {
         List<Integer> selected = new ArrayList<>(sellCart.keySet());
-        selected.sort(Comparator.comparing(id -> {
-            item itm = ItemDatabase.getItemById(id);
-            return itm == null ? "" : itm.getItem_name();
-        }));
+        selected.sort(Comparator.comparing(this::itemNameSafe, String.CASE_INSENSITIVE_ORDER));
 
         for (int i = 0; i < sellBtns.size(); i++) {
-            Button b = sellBtns.get(i);
+            ImageView img = sellImages.get(i);
+            Label lbl = sellLabels.get(i);
+            Button btn = sellBtns.get(i);
 
             if (i >= selected.size()) {
-                b.setText("");
-                b.setDisable(true);
-                b.setOnAction(null);
+                if (img != null) img.setImage(null);
+                if (lbl != null) lbl.setText("");
+                if (btn != null) {
+                    btn.setDisable(true);
+                    btn.setOnAction(null);
+                }
                 continue;
             }
 
             int itemId = selected.get(i);
             int qty = sellCart.get(itemId).get();
-            item itm = ItemDatabase.getItemById(itemId);
-            String name = (itm == null) ? ("Item " + itemId) : itm.getItem_name();
 
-            b.setDisable(false);
-            b.setText(name + " x" + qty);
-            b.setOnAction(null);
+            if (img != null) {
+                img.setImage(ItemDatabase.getImage(itemId));
+            }
+
+            if (lbl != null) {
+                lbl.setText("x" + qty);
+            }
+
+            if (btn != null) {
+                btn.setDisable(mode != Mode.SELL);
+                btn.setOnAction(e -> setSellSelectionQty(itemId, qty - 1));
+            }
         }
     }
-        
-    private void loadItemImages() {
+
+    private void loadShopItemsForToday() {
         String sql = "SELECT item_id, item_name, price FROM items";
         dbcon db = new dbcon();
 
@@ -913,14 +699,12 @@ public class ShopController implements Initializable, SceneController {
             shopItems.clear();
             dbItemsById.clear();
 
-            // ---------- fixed 8 items ----------
             for (int i = 0; i < 8 && i < allItems.size(); i++) {
                 item itm = allItems.get(i);
                 shopItems.add(itm);
                 dbItemsById.put(itm.getItem_id(), itm);
             }
 
-            // ---------- random 4 items, only when day changes ----------
             int today = GameTimeManager.get().dayNumberProperty().get();
             List<Integer> savedRandomIds = gameState.getDailyRandomShopItemIds();
 
@@ -935,7 +719,6 @@ public class ShopController implements Initializable, SceneController {
                 Collections.shuffle(randomPool);
 
                 List<Integer> newRandomIds = new ArrayList<>();
-
                 for (int i = 0; i < 4 && i < randomPool.size(); i++) {
                     newRandomIds.add(randomPool.get(i).getItem_id());
                 }
@@ -945,7 +728,6 @@ public class ShopController implements Initializable, SceneController {
                 savedRandomIds = newRandomIds;
             }
 
-            // use saved daily random items
             for (Integer itemId : savedRandomIds) {
                 item itm = allById.get(itemId);
                 if (itm != null && !dbItemsById.containsKey(itemId) && shopItems.size() < 12) {
@@ -954,97 +736,129 @@ public class ShopController implements Initializable, SceneController {
                 }
             }
 
-            // ---------- clear UI first ----------
-            for (int i = 0; i < buyImages.size(); i++) {
-                if (buyImages.get(i) != null) buyImages.get(i).setImage(null);
-                if (buyNameLabels.get(i) != null) buyNameLabels.get(i).setText("");
-            }
-
-            // ---------- update UI ----------
-            for (int i = 0; i < shopItems.size() && i < buyImages.size(); i++) {
-                item itm = shopItems.get(i);
-
-                if (buyImages.get(i) != null) {
-                    buyImages.get(i).setImage(ItemDatabase.getImage(itm.getItem_id()));
-                }
-
-                if (buyNameLabels.get(i) != null) {
-                    buyNameLabels.get(i).setText(itm.getItem_name());
-                }
-            }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-    
-    public void refreshShopForNewDay() {
-        loadItemImages();
 
-        buyStock.clear();
-        for (int i = 0; i < 12; i++) {
-            buyStock.add(10);
+    private void rebuildDailyShopAvailability() {
+        int today = GameTimeManager.get().dayNumberProperty().get();
+
+        shopAvailable.clear();
+        dailyTotalShopStock.clear();
+
+        boolean hasSavedStock = gameState.hasDailyRemainingShopStockForDay(today);
+
+        Map<Integer, Integer> savedRemaining = hasSavedStock
+            ? gameState.getDailyRemainingShopStock()
+            : Map.of();
+
+        for (item itm : shopItems) {
+            int itemId = itm.getItem_id();
+            int defaultStock = getDefaultShopStock(itemId);
+
+            dailyTotalShopStock.put(itemId, defaultStock);
+
+            int remaining = hasSavedStock
+                ? savedRemaining.getOrDefault(itemId, defaultStock)
+                : defaultStock;
+
+            shopAvailable.put(itemId, new SimpleIntegerProperty(remaining));
         }
 
-        refreshBuyStock();
+        gameState.setShopStockDay(today);
+        persistCurrentShopRemainingStock();
+    }
 
-        if (inv != null) {
-            refreshAllPanels();
+    private void persistCurrentShopRemainingStock() {
+        Map<Integer, Integer> stock = new LinkedHashMap<>();
+
+        for (var e : shopAvailable.entrySet()) {
+            stock.put(e.getKey(), e.getValue().get());
+        }
+
+        gameState.setDailyRemainingShopStock(stock);
+    }
+    
+    private int getDefaultShopStock(int itemId) {
+        item itm = dbItemsById.get(itemId);
+        if (itm == null) return 10;
+
+        String name = itm.getItem_name().toLowerCase(Locale.ROOT);
+
+        if (name.contains("seed")) return 25;
+        if (name.contains("tool")) return 4;
+        return 10;
+    }
+
+    private void rebuildSellAvailabilityFromInventory() {
+        inventoryAvailableForSell.clear();
+
+        for (Integer itemId : inv.itemsProperty().keySet()) {
+            int owned = inv.getCount(itemId);
+            int selected = sellCart.containsKey(itemId) ? sellCart.get(itemId).get() : 0;
+            int remaining = Math.max(0, owned - selected);
+            inventoryAvailableForSell.put(itemId, new SimpleIntegerProperty(remaining));
         }
     }
-    private void refreshBuyStock() {
 
-        for(int i = 0; i < buyLabels.size(); i++){
-            buyLabels.get(i).setText("x" + buyStock.get(i));
-        }
+    // ---------- central synced quantity methods ----------
 
-    }
-    
-    private void handleBuyClick(int index) {
-        if (index < 0 || index >= shopItems.size()) return;
-        if (index >= buyStock.size()) return;
-        if (buyStock.get(index) <= 0) return;   // no stock left
+    private void setBuySelectionQty(int itemId, int newQty) {
+        int totalStock = dailyTotalShopStock.getOrDefault(itemId, 0);
+        int clamped = Math.max(0, Math.min(newQty, totalStock));
+        int available = totalStock - clamped;
 
-        item selectedItem = shopItems.get(index);
-
-        buyStock.set(index, buyStock.get(index) - 1);   // reduce available stock
-        refreshBuyStock();
-
-        addDbItemToCart(selectedItem, 1);
-    }
-    
-    private void handleBuyDecrease(int index) {
-        if (index < 0 || index >= shopItems.size()) return;
-        if (index >= buyStock.size()) return;
-
-        item selectedItem = shopItems.get(index);
-        int itemId = selectedItem.getItem_id();
-
-        IntegerProperty qtyProp = buyCart.get(itemId);
-        if (qtyProp == null || qtyProp.get() <= 0) return;
-
-        buyStock.set(index, buyStock.get(index) + 1);   // restore stock
-        refreshBuyStock();
-
-        addDbItemToCart(selectedItem, -1);
-    }
-    
-    private void removeFromBuyCart(int itemId) {
-        buyCart.remove(itemId);
-    }
-
-    private void addDbItemToCart(item selectedItem, int delta) {
-        int itemId = selectedItem.getItem_id();
-        int current = buyCart.containsKey(itemId) ? buyCart.get(itemId).get() : 0;
-        int next = current + delta;
-
-        if (next <= 0) {
+        if (clamped <= 0) {
             buyCart.remove(itemId);
         } else {
-            buyCart.computeIfAbsent(itemId, k -> new SimpleIntegerProperty(0)).set(next);
+            buyCart.computeIfAbsent(itemId, k -> new SimpleIntegerProperty(0)).set(clamped);
         }
 
+        shopAvailable
+            .computeIfAbsent(itemId, k -> new SimpleIntegerProperty(0))
+            .set(available);
+
+        persistCurrentShopRemainingStock();
         refreshTableFromBuyCart();
+        refreshBuyPane();
+        refreshTotalLabel();
+    }
+
+    private void setSellSelectionQty(int itemId, int newQty) {
+        int owned = inv.getCount(itemId);
+        int clamped = Math.max(0, Math.min(newQty, owned));
+        int remaining = owned - clamped;
+
+        if (clamped <= 0) {
+            sellCart.remove(itemId);
+        } else {
+            sellCart.computeIfAbsent(itemId, k -> new SimpleIntegerProperty(0)).set(clamped);
+        }
+
+        inventoryAvailableForSell
+            .computeIfAbsent(itemId, k -> new SimpleIntegerProperty(owned))
+            .set(remaining);
+
+        refreshTableFromSellCart();
+        refreshInventoryButtons();
+        refreshSellPane();
+        refreshTotalLabel();
+    }
+
+    private void clearBuySelection() {
+        buyCart.clear();
+        for (var e : dailyTotalShopStock.entrySet()) {
+            shopAvailable
+                .computeIfAbsent(e.getKey(), k -> new SimpleIntegerProperty(0))
+                .set(e.getValue());
+        }
+    }
+
+    private void clearSellSelection() {
+        sellCart.clear();
+        inventoryAvailableForSell.clear();
+        rebuildSellAvailabilityFromInventory();
     }
 
     private void refreshTableFromBuyCart() {
@@ -1062,7 +876,7 @@ public class ShopController implements Initializable, SceneController {
 
         refreshTotalLabel();
     }
-    
+
     private void refreshTableFromSellCart() {
         detailRows.clear();
 
@@ -1077,6 +891,12 @@ public class ShopController implements Initializable, SceneController {
         }
 
         refreshTotalLabel();
+    }
+
+    private int sellPrice(int itemId) {
+        item itm = ItemDatabase.getItemById(itemId);
+        if (itm == null) return 1;
+        return Math.max(1, itm.getPrice() / 2);
     }
 
     private int computeBuyTotal() {
@@ -1094,7 +914,7 @@ public class ShopController implements Initializable, SceneController {
 
         return sum;
     }
-    
+
     private int computeSellTotal() {
         int sum = 0;
 
@@ -1106,22 +926,14 @@ public class ShopController implements Initializable, SceneController {
 
         return sum;
     }
-    
-    
-    
 
-//    private void loadShopItems() {
-//        shopItems.clear();
-//        shopItems.addAll(ItemDatabase.getFirstItems(12));
-//
-//        for (int i = 0; i < shopItems.size() && i < buyNameLabels.size(); i++) {
-//            item itm = shopItems.get(i);
-//
-//            buyNameLabels.get(i).setText(itm.getItem_name());
-//
-//            if (i < buyImages.size()) {
-//                buyImages.get(i).setImage(ItemDatabase.getImage(itm.getItem_id()));
-//            }
-//        }
-//    }
+    private void refreshTotalLabel() {
+        int total = (mode == Mode.BUY) ? computeBuyTotal() : computeSellTotal();
+        lbltotal.setText(total + "g");
+    }
+
+    private String itemNameSafe(int itemId) {
+        item itm = ItemDatabase.getItemById(itemId);
+        return (itm == null) ? ("Item " + itemId) : itm.getItem_name();
+    }
 }
