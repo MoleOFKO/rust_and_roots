@@ -52,9 +52,13 @@ public final class GameState {
             this.agiDelta = agiDelta;
             this.success = success;
         }
-
+        
         public int getHpDelta() { return hpDelta; }
         public int getStaminaDelta() { return staminaDelta; }
+        public int getStrDelta() { return strDelta; }
+        public int getVitDelta() { return vitDelta; }
+        public int getDexDelta() { return dexDelta; }
+        public int getAgiDelta() { return agiDelta; }
         public boolean isSuccess() { return success; }
     }
 
@@ -239,11 +243,6 @@ public final class GameState {
         return activeCookingOutputItemId > 0 && activeCookingCompleteAtSeconds >= 0;
     }
 
-    public int getActiveCookingOutputItemId() { return activeCookingOutputItemId; }
-    public double getActiveCookingCompleteAtSeconds() { return activeCookingCompleteAtSeconds; }
-    public int getActiveCookingHpDelta() { return activeCookingHpDelta; }
-    public int getActiveCookingStaminaDelta() { return activeCookingStaminaDelta; }
-    public boolean isActiveCookingSuccess() { return activeCookingSuccess; }
     public int getActiveCookingOutputItemId() {
         return activeCookingOutputItemId;
     }
@@ -299,8 +298,7 @@ public final class GameState {
             boolean success
     ) {
         if (itemId <= 0) return;
-        cookedDishEffectsByItemId.computeIfAbsent(itemId, k -> new ArrayDeque<>())
-                .addLast(new FoodEffectOutcome(hpDelta, staminaDelta, success));
+
         cookedDishEffectsByItemId
                 .computeIfAbsent(itemId, ignored -> new ArrayDeque<>())
                 .addLast(new FoodEffectOutcome(
@@ -316,12 +314,10 @@ public final class GameState {
 
     public FoodEffectOutcome pollCookedDishEffect(int itemId) {
         Deque<FoodEffectOutcome> q = cookedDishEffectsByItemId.get(itemId);
-        if (q == null || q.isEmpty()) return null;
-        FoodEffectOutcome outcome = q.removeFirst();
-        if (q.isEmpty()) cookedDishEffectsByItemId.remove(itemId);
         if (q == null || q.isEmpty()) {
             return null;
         }
+
         FoodEffectOutcome outcome = q.pollFirst();
         if (q.isEmpty()) {
             cookedDishEffectsByItemId.remove(itemId);
