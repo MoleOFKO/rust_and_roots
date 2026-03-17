@@ -5,28 +5,45 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.StackPane?>
 
-<StackPane fx:id="view" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.AccountViewController">
+<StackPane fx:id="view" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.AccountViewController">
     <children>
+      <ImageView fitHeight="511.0" fitWidth="811.0" pickOnBounds="true">
+         <image>
+            <Image url="@../image/Admin/dashboard.png" />
+         </image>
+      </ImageView>
         <Group fx:id="uiRoot">
             <children>
                <Pane layoutX="25.0" layoutY="110.0" prefHeight="43.0" prefWidth="164.0" style="-fx-background-color: black; -fx-background-radius: 10px;" />
                <Label layoutX="49.0" layoutY="25.0" text="Admin :" />
                <Label fx:id="txtaname" layoutX="106.0" layoutY="25.0" text="Name" />
+            <ImageView fitHeight="267.0" fitWidth="173.0" layoutX="20.0" layoutY="83.0" pickOnBounds="true">
+               <image>
+                  <Image url="@../image/Admin/paper_1of3.png" />
+               </image>
+            </ImageView>
                <Button fx:id="btnecharacter" layoutX="37.0" layoutY="238.0" mnemonicParsing="false" onAction="#handlebtnecharacteraction" prefWidth="139.0" text="Edit Character" />
                <Button fx:id="btneitem" layoutX="37.0" layoutY="158.0" mnemonicParsing="false" onAction="#handlebtneitemaction" prefWidth="139.0" text="Edit Item" />
                <Button fx:id="btnaccmanagement" layoutX="37.0" layoutY="198.0" mnemonicParsing="false" onAction="#handlebtnaccmanagementaction" prefHeight="25.0" prefWidth="139.0" text="Account Management" />
                <Button fx:id="btnvplayer" layoutX="37.0" layoutY="118.0" mnemonicParsing="false" onAction="#handlebtnvplayeraction" prefWidth="139.0" text="Account View" />
                <Button fx:id="btnlogout" layoutX="37.0" layoutY="278.0" mnemonicParsing="false" onAction="#handlebtnlogoutaction" prefWidth="139.0" text="Logout" />
-               <TableView fx:id="account_view" layoutX="197.0" layoutY="41.0" prefHeight="467.0" prefWidth="616.0">
+            <ImageView fitHeight="487.0" fitWidth="643.0" layoutX="181.0" layoutY="23.0" pickOnBounds="true">
+               <image>
+                  <Image url="@../image/Admin/paper_2of3.png" />
+               </image>
+            </ImageView>
+               <TableView fx:id="account_view" layoutX="214.0" layoutY="41.0" prefHeight="451.0" prefWidth="584.0" stylesheets="@../css/tableview-rich.css">
                  <columns>
-                   <TableColumn fx:id="colaccid" prefWidth="70.0" text="Account ID" />
-                   <TableColumn fx:id="colaccname" prefWidth="155.5" text="Account Name" />
+                   <TableColumn fx:id="colaccid" prefWidth="89.0" text="Account ID" />
+                   <TableColumn fx:id="colaccname" prefWidth="137.0" text="Account Name" />
                      <TableColumn fx:id="colusertype" prefWidth="150.0" text="User Type" />
                      <TableColumn fx:id="colstatus" prefWidth="57.5" text="Status" />
-                     <TableColumn fx:id="colcreateddate" prefWidth="182.0" text="Created Date" />
+                     <TableColumn fx:id="colcreateddate" prefWidth="139.0" text="Created Date" />
                  </columns>
                </TableView>
             <Label layoutX="827.0" layoutY="510.0" />
