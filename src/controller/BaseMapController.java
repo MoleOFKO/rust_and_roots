@@ -836,17 +836,30 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
         int hpDelta;
         int staminaDelta;
+        int strDelta;
+        int vitDelta;
+        int dexDelta;
+        int agiDelta;
+
         if (cookedOutcome != null) {
             hpDelta = cookedOutcome.getHpDelta();
             staminaDelta = cookedOutcome.getStaminaDelta();
+            strDelta = cookedOutcome.getStrDelta();
+            vitDelta = cookedOutcome.getVitDelta();
+            dexDelta = cookedOutcome.getDexDelta();
+            agiDelta = cookedOutcome.getAgiDelta();
         } else {
             Object itm = ItemDatabase.getItemById(itemId);
             if (itm == null) return false;
 
             hpDelta = extractItemStat(itm, "getHp");
-            staminaDelta = extractItemStat(itm, "getStamana", "getStamina", "getStimana");
+            staminaDelta = extractItemStat(itm, "getStamina", "getStamana", "getStimana", "getMp");
+            strDelta = extractItemStat(itm, "getStr");
+            vitDelta = extractItemStat(itm, "getVit", "getVid");
+            dexDelta = extractItemStat(itm, "getDex");
+            agiDelta = extractItemStat(itm, "getAgi");
 
-            if (hpDelta == 0 && staminaDelta == 0) {
+            if (hpDelta == 0 && staminaDelta == 0 && strDelta == 0 && vitDelta == 0 && dexDelta == 0 && agiDelta == 0) {
                 return false;
             }
         }
@@ -856,9 +869,32 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         }
 
         playerState.applyFoodEffect(hpDelta, staminaDelta);
+        applyPersistentStatDelta("getStr", new String[]{"setStr"}, strDelta);
+        applyPersistentStatDelta("getVit", new String[]{"setVit", "setVid"}, vitDelta);
+        applyPersistentStatDelta("getDex", new String[]{"setDex"}, dexDelta);
+        applyPersistentStatDelta("getAgi", new String[]{"setAgi"}, agiDelta);
+
         refreshHotbarView();
         refreshPlayerInventoryView();
         return true;
+    }
+
+
+    protected void applyPersistentStatDelta(String getterName, String[] setterNames, int delta) {
+        if (playerState == null || delta == 0 || setterNames == null) return;
+
+        int currentValue = extractItemStat(playerState, getterName);
+        int nextValue = currentValue + delta;
+
+        for (String setterName : setterNames) {
+            if (setterName == null || setterName.isBlank()) continue;
+            try {
+                java.lang.reflect.Method method = playerState.getClass().getMethod(setterName, int.class);
+                method.invoke(playerState, nextValue);
+                return;
+            } catch (ReflectiveOperationException ignored) {
+            }
+        }
     }
 
     protected int extractItemStat(Object itm, String... methodNames) {
