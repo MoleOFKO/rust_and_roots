@@ -28,12 +28,7 @@
                               <Image url="@../image/items/tomato.png" />
                            </image>
                         </ImageView>
-                        <Button fx:id="cookbtn" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
-                        <Label fx:id="cooklbl1" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
-                           <font>
-                              <Font name="System Bold" size="12.0" />
-                           </font>
-                        </Label>
+                        <Button fx:id="cookbtn" mnemonicParsing="false" onAction="#handlerecipes" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                      </children>
                   </Pane>
                   <Pane layoutX="63.0" layoutY="2.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
@@ -43,12 +38,7 @@
                               <Image url="@../image/items/tomato.png" />
                            </image>
                         </ImageView>
-                        <Button fx:id="cookbtn1" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
-                        <Label fx:id="cooklbl2" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
-                           <font>
-                              <Font name="System Bold" size="12.0" />
-                           </font>
-                        </Label>
+                        <Button fx:id="cookbtn1" mnemonicParsing="false" onAction="#handlerecipes" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                      </children>
                   </Pane>
                   <Pane layoutX="125.0" layoutY="2.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
@@ -58,12 +48,7 @@
                               <Image url="@../image/items/tomato.png" />
                            </image>
                         </ImageView>
-                        <Button fx:id="cookbtn2" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
-                        <Label fx:id="cooklbl3" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
-                           <font>
-                              <Font name="System Bold" size="12.0" />
-                           </font>
-                        </Label>
+                        <Button fx:id="cookbtn2" mnemonicParsing="false" onAction="#handlerecipes" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                      </children>
                   </Pane>
                   <Pane layoutX="184.0" layoutY="2.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
@@ -73,12 +58,7 @@
                               <Image url="@../image/items/tomato.png" />
                            </image>
                         </ImageView>
-                        <Button fx:id="cookbtn3" layoutY="-1.0" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
-                        <Label fx:id="cooklbl4" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
-                           <font>
-                              <Font name="System Bold" size="12.0" />
-                           </font>
-                        </Label>
+                        <Button fx:id="cookbtn3" layoutY="-1.0" mnemonicParsing="false" onAction="#handlerecipes" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                      </children>
                   </Pane>
                   <Pane layoutX="2.0" layoutY="61.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
@@ -88,12 +68,7 @@
                               <Image url="@../image/items/tomato.png" />
                            </image>
                         </ImageView>
-                        <Button fx:id="cookbtn4" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
-                        <Label fx:id="cooklbl5" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
-                           <font>
-                              <Font name="System Bold" size="12.0" />
-                           </font>
-                        </Label>
+                        <Button fx:id="cookbtn4" mnemonicParsing="false" onAction="#handlerecipes" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                      </children>
                   </Pane>
                   <Pane layoutX="63.0" layoutY="61.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
@@ -103,12 +78,7 @@
                               <Image url="@../image/items/tomato.png" />
                            </image>
                         </ImageView>
-                        <Button fx:id="cookbtn5" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
-                        <Label fx:id="cooklbl6" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
-                           <font>
-                              <Font name="System Bold" size="12.0" />
-                           </font>
-                        </Label>
+                        <Button fx:id="cookbtn5" mnemonicParsing="false" onAction="#handlerecipes" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                      </children>
                   </Pane>
                   <Pane layoutX="125.0" layoutY="61.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
@@ -118,12 +88,7 @@
                               <Image url="@../image/items/tomato.png" />
                            </image>
                         </ImageView>
-                        <Button fx:id="cookbtn6" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
-                        <Label fx:id="cooklbl7" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
-                           <font>
-                              <Font name="System Bold" size="12.0" />
-                           </font>
-                        </Label>
+                        <Button fx:id="cookbtn6" mnemonicParsing="false" onAction="#handlerecipes" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                      </children>
                   </Pane>
                   <Pane layoutX="184.0" layoutY="61.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
@@ -133,12 +98,7 @@
                               <Image url="@../image/items/tomato.png" />
                            </image>
                         </ImageView>
-                        <Button fx:id="cookbtn7" layoutY="-1.0" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
-                        <Label fx:id="cooklbl8" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
-                           <font>
-                              <Font name="System Bold" size="12.0" />
-                           </font>
-                        </Label>
+                        <Button fx:id="cookbtn7" layoutY="-1.0" mnemonicParsing="false" onAction="#handlerecipes" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                      </children>
                   </Pane>
                   <Pane layoutX="2.0" layoutY="120.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
@@ -148,12 +108,7 @@
                               <Image url="@../image/items/tomato.png" />
                            </image>
                         </ImageView>
-                        <Button fx:id="cookbtn8" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
-                        <Label fx:id="cooklbl9" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
-                           <font>
-                              <Font name="System Bold" size="12.0" />
-                           </font>
-                        </Label>
+                        <Button fx:id="cookbtn8" mnemonicParsing="false" onAction="#handlerecipes" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                      </children>
                   </Pane>
                   <Pane layoutX="63.0" layoutY="120.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
@@ -163,12 +118,7 @@
                               <Image url="@../image/items/tomato.png" />
                            </image>
                         </ImageView>
-                        <Button fx:id="cookbtn9" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
-                        <Label fx:id="cooklbl10" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
-                           <font>
-                              <Font name="System Bold" size="12.0" />
-                           </font>
-                        </Label>
+                        <Button fx:id="cookbtn9" mnemonicParsing="false" onAction="#handlerecipes" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                      </children>
                   </Pane>
                   <Pane layoutX="125.0" layoutY="120.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
@@ -178,12 +128,7 @@
                               <Image url="@../image/items/tomato.png" />
                            </image>
                         </ImageView>
-                        <Button fx:id="cookbtn10" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
-                        <Label fx:id="cooklbl11" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
-                           <font>
-                              <Font name="System Bold" size="12.0" />
-                           </font>
-                        </Label>
+                        <Button fx:id="cookbtn10" mnemonicParsing="false" onAction="#handlerecipes" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                      </children>
                   </Pane>
                   <Pane layoutX="184.0" layoutY="120.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
@@ -193,12 +138,7 @@
                               <Image url="@../image/items/tomato.png" />
                            </image>
                         </ImageView>
-                        <Button fx:id="cookbtn11" layoutY="-1.0" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
-                        <Label fx:id="cooklbl12" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
-                           <font>
-                              <Font name="System Bold" size="12.0" />
-                           </font>
-                        </Label>
+                        <Button fx:id="cookbtn11" layoutY="-1.0" mnemonicParsing="false" onAction="#handlerecipes" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                      </children>
                   </Pane>
                   <Pane layoutX="2.0" layoutY="179.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
@@ -208,12 +148,7 @@
                               <Image url="@../image/items/tomato.png" />
                            </image>
                         </ImageView>
-                        <Button fx:id="cookbtn12" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
-                        <Label fx:id="cooklbl13" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
-                           <font>
-                              <Font name="System Bold" size="12.0" />
-                           </font>
-                        </Label>
+                        <Button fx:id="cookbtn12" mnemonicParsing="false" onAction="#handlerecipes" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                      </children>
                   </Pane>
                   <Pane layoutX="63.0" layoutY="179.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
@@ -223,12 +158,7 @@
                               <Image url="@../image/items/tomato.png" />
                            </image>
                         </ImageView>
-                        <Button fx:id="cookbtn13" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
-                        <Label fx:id="cooklbl14" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
-                           <font>
-                              <Font name="System Bold" size="12.0" />
-                           </font>
-                        </Label>
+                        <Button fx:id="cookbtn13" mnemonicParsing="false" onAction="#handlerecipes" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                      </children>
                   </Pane>
                   <Pane layoutX="125.0" layoutY="179.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
@@ -238,12 +168,7 @@
                               <Image url="@../image/items/tomato.png" />
                            </image>
                         </ImageView>
-                        <Button fx:id="cookbtn14" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
-                        <Label fx:id="cooklbl15" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
-                           <font>
-                              <Font name="System Bold" size="12.0" />
-                           </font>
-                        </Label>
+                        <Button fx:id="cookbtn14" mnemonicParsing="false" onAction="#handlerecipes" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                      </children>
                   </Pane>
                   <Pane layoutX="184.0" layoutY="179.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
@@ -253,12 +178,7 @@
                               <Image url="@../image/items/tomato.png" />
                            </image>
                         </ImageView>
-                        <Button fx:id="cookbtn15" layoutY="-1.0" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
-                        <Label fx:id="cooklbl16" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
-                           <font>
-                              <Font name="System Bold" size="12.0" />
-                           </font>
-                        </Label>
+                        <Button fx:id="cookbtn15" layoutY="-1.0" mnemonicParsing="false" onAction="#handlerecipes" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                      </children>
                   </Pane>
                   <Pane layoutX="2.0" layoutY="236.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
@@ -268,12 +188,7 @@
                               <Image url="@../image/items/tomato.png" />
                            </image>
                         </ImageView>
-                        <Button fx:id="cookbtn16" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
-                        <Label fx:id="cooklbl17" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
-                           <font>
-                              <Font name="System Bold" size="12.0" />
-                           </font>
-                        </Label>
+                        <Button fx:id="cookbtn16" mnemonicParsing="false" onAction="#handlerecipes" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                      </children>
                   </Pane>
                   <Pane layoutX="63.0" layoutY="236.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
@@ -283,12 +198,7 @@
                               <Image url="@../image/items/tomato.png" />
                            </image>
                         </ImageView>
-                        <Button fx:id="cookbtn17" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
-                        <Label fx:id="cooklbl18" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
-                           <font>
-                              <Font name="System Bold" size="12.0" />
-                           </font>
-                        </Label>
+                        <Button fx:id="cookbtn17" mnemonicParsing="false" onAction="#handlerecipes" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                      </children>
                   </Pane>
                   <Pane layoutX="125.0" layoutY="236.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
@@ -298,12 +208,7 @@
                               <Image url="@../image/items/tomato.png" />
                            </image>
                         </ImageView>
-                        <Button fx:id="cookbtn18" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
-                        <Label fx:id="cooklbl19" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
-                           <font>
-                              <Font name="System Bold" size="12.0" />
-                           </font>
-                        </Label>
+                        <Button fx:id="cookbtn18" mnemonicParsing="false" onAction="#handlerecipes" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                      </children>
                   </Pane>
                   <Pane layoutX="184.0" layoutY="236.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
@@ -313,12 +218,7 @@
                               <Image url="@../image/items/tomato.png" />
                            </image>
                         </ImageView>
-                        <Button fx:id="cookbtn19" layoutY="-1.0" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
-                        <Label fx:id="cooklbl20" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
-                           <font>
-                              <Font name="System Bold" size="12.0" />
-                           </font>
-                        </Label>
+                        <Button fx:id="cookbtn19" layoutY="14.0" mnemonicParsing="false" onAction="#handlerecipes" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                      </children>
                   </Pane>
                </children>
@@ -347,7 +247,7 @@
                   <DropShadow />
                </effect>
             </ImageView>
-            <ImageView fx:id="selectedcook" fitHeight="82.0" fitWidth="75.0" layoutX="504.0" layoutY="153.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="selectedcook" fitHeight="82.0" fitWidth="75.0" layoutX="504.0" layoutY="143.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../image/items/chili_pepper.png" />
                </image>
@@ -380,17 +280,17 @@
                   <DropShadow />
                </effect>
             </Label>
-            <Label fx:id="cookwaitingtimelbl" layoutX="484.0" layoutY="266.0" prefHeight="17.0" prefWidth="125.0" text="waiting time:">
+            <Label fx:id="cookwaitingtimelbl" layoutX="484.0" layoutY="244.0" prefHeight="17.0" prefWidth="125.0" text="waiting time:">
                <font>
                   <Font name="System Bold Italic" size="12.0" />
                </font>
             </Label>
-            <Label fx:id="cookname" alignment="CENTER" layoutX="484.0" layoutY="243.0" prefHeight="17.0" prefWidth="119.0" text="Name">
+            <Label fx:id="cookname" alignment="CENTER" layoutX="484.0" layoutY="221.0" prefHeight="17.0" prefWidth="119.0" text="Name">
                <font>
                   <Font name="System Bold Italic" size="15.0" />
                </font>
             </Label>
-            <Label fx:id="cookeffectlbl" alignment="TOP_LEFT" layoutX="487.0" layoutY="284.0" prefHeight="34.0" prefWidth="113.0" text="Effect:">
+            <Label fx:id="cookeffectlbl" alignment="TOP_LEFT" layoutX="487.0" layoutY="263.0" prefHeight="34.0" prefWidth="113.0" text="Effect:">
                <font>
                   <Font name="System Bold Italic" size="12.0" />
                </font>
@@ -403,6 +303,11 @@
                   <DropShadow height="17.1" radius="29.465000000000003" spread="0.06" width="102.76" />
                </effect>
             </ImageView>
+            <Label fx:id="cooksuccessrate" alignment="TOP_LEFT" layoutX="487.0" layoutY="294.0" prefHeight="34.0" prefWidth="113.0" text="Success rate : 100%">
+               <font>
+                  <Font name="System Bold Italic" size="12.0" />
+               </font>
+            </Label>
          </children></Group>
    </children>
 </StackPane>

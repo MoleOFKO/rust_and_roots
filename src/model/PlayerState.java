@@ -12,6 +12,7 @@ public final class PlayerState {
     private static final int DEFAULT_HP = 100;
     private static final int DEFAULT_STAMINA = 100;
     private static final int DEFAULT_AGI = 5;
+    private static final int DEFAULT_DEX = 5;
 
     private final Inventory inventory;
 
@@ -23,6 +24,7 @@ public final class PlayerState {
     private final IntegerProperty maxStamina = new SimpleIntegerProperty(DEFAULT_STAMINA);
     private final IntegerProperty stamina = new SimpleIntegerProperty(DEFAULT_STAMINA);
     private final IntegerProperty agi = new SimpleIntegerProperty(DEFAULT_AGI);
+    private final IntegerProperty dex = new SimpleIntegerProperty(DEFAULT_DEX);
 
     private static final int HOTBAR_SIZE = 5;
     private final int[] hotbarItemIds = new int[HOTBAR_SIZE];
@@ -114,6 +116,18 @@ public final class PlayerState {
         agi.set(Math.max(0, value));
     }
 
+    public IntegerProperty dexProperty() {
+        return dex;
+    }
+
+    public int getDex() {
+        return dex.get();
+    }
+
+    public void setDex(int value) {
+        dex.set(Math.max(0, value));
+    }
+
     public int getMaxHp() {
         return maxHp.get();
     }
@@ -131,9 +145,33 @@ public final class PlayerState {
         setHp(getHp() - amount);
     }
 
+    public void healHp(int amount) {
+        if (amount <= 0 || isDead()) return;
+        setHp(getHp() + amount);
+    }
+
     public void consumeStamina(int amount) {
         if (amount <= 0) return;
         setStamina(getStamina() - amount);
+    }
+
+    public void restoreStamina(int amount) {
+        if (amount <= 0 || isDead()) return;
+        setStamina(getStamina() + amount);
+    }
+
+    public void applyFoodEffect(int hpDelta, int staminaDelta) {
+        if (hpDelta > 0) {
+            healHp(hpDelta);
+        } else if (hpDelta < 0) {
+            damageHp(-hpDelta);
+        }
+
+        if (staminaDelta > 0) {
+            restoreStamina(staminaDelta);
+        } else if (staminaDelta < 0) {
+            consumeStamina(-staminaDelta);
+        }
     }
 
     /**
