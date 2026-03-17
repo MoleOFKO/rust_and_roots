@@ -31,6 +31,7 @@ public class CookController implements Initializable, SceneController {
 
     private static final int MAX_RECIPE_SLOTS = 20;
     private static final int DEFAULT_DEX = 5;
+    private static final int DEFAULT_WAIT_SECONDS = 30;
 
     private GameState gameState;
     private Inventory inventory;
@@ -156,7 +157,7 @@ public class CookController implements Initializable, SceneController {
 
         addRecipeIfValid(
             new RecipeTemplate(
-                "salad", "Salad", 45, 68, 5, 22, 10,
+                "salad", "Salad", 45, 68, 5,
                 new IngredientSpec("Tomato", 1),
                 new IngredientSpec("Carrot", 1),
                 new IngredientSpec("Corn", 1)
@@ -165,38 +166,38 @@ public class CookController implements Initializable, SceneController {
 
         addRecipeIfValid(
             new RecipeTemplate(
-                "grape_juice", "Grape Juice", 30, 78, 4, 0, 28,
+                "grape_juice", "Grape Juice", 30, 78, 4,
                 new IngredientSpec("Grape", 2)
             )
         );
 
         addRecipeIfValid(
             new RecipeTemplate(
-                "tomato_soup", "Tomato Soup", 40, 65, 5, 30, 8,
+                "tomato_soup", "Tomato Soup", 40, 65, 5,
                 new IngredientSpec("Tomato", 2)
             )
         );
 
         addRecipeIfValid(
             new RecipeTemplate(
-                "roasted_carrot", "Roasted Carrot", 25, 72, 4, 18, 0,
+                "roasted_carrot", "Roasted Carrot", 25, 72, 4,
                 new IngredientSpec("Carrot", 2)
             )
         );
 
         addRecipeIfValid(
             new RecipeTemplate(
-                "corn_stew", "Corn Stew", 50, 60, 6, 24, 20,
+                "corn_stew", "Corn Stew", 50, 60, 6,
                 new IngredientSpec("Corn", 2),
                 new IngredientSpec("Tomato", 1)
             )
         );
 
         if (unlockedRecipes.isEmpty()) {
-            addSelfCookFallback("Tomato", 20, 74, 12, 0);
-            addSelfCookFallback("Carrot", 20, 74, 10, 0);
-            addSelfCookFallback("Corn", 20, 74, 8, 10);
-            addSelfCookFallback("Grape", 20, 76, 0, 14);
+            addSelfCookFallback("Tomato", 74);
+            addSelfCookFallback("Carrot", 74);
+            addSelfCookFallback("Corn", 74);
+            addSelfCookFallback("Grape", 76);
         }
 
         unlockedRecipes.sort(Comparator.comparing(r -> r.name, String.CASE_INSENSITIVE_ORDER));
@@ -222,13 +223,11 @@ public class CookController implements Initializable, SceneController {
             template.waitSeconds,
             template.baseSuccessRate,
             template.dexScaling,
-            template.successHp,
-            template.successStamina,
             ingredients
         ));
     }
 
-    private void addSelfCookFallback(String itemName, int waitSeconds, int baseSuccessRate, int successHp, int successStamina) {
+    private void addSelfCookFallback(String itemName, int baseSuccessRate) {
         item itm = ItemDatabase.getItemByName(itemName);
         if (itm == null) return;
 
@@ -236,13 +235,57 @@ public class CookController implements Initializable, SceneController {
             "fallback_" + itm.getItem_id(),
             itm.getItem_id(),
             itm.getItem_name(),
-            waitSeconds,
+            DEFAULT_WAIT_SECONDS,
             baseSuccessRate,
             4,
-            successHp,
-            successStamina,
             Collections.singletonList(new IngredientRequirement(itm.getItem_id(), 1))
         ));
+    }
+
+    private item getOutputItem(Recipe recipe) {
+        if (recipe == null) return null;
+        return ItemDatabase.getItemById(recipe.outputItemId);
+    }
+
+    private int getRecipeHpDelta(Recipe recipe) {
+        return extractItemStat(getOutputItem(recipe), "getHp");
+    }
+
+    private int getRecipeStaminaDelta(Recipe recipe) {
+        return extractItemStat(getOutputItem(recipe), "getStamina", "getStamana", "getStimana", "getMp");
+    }
+
+    private int getRecipeStrDelta(Recipe recipe) {
+        return extractItemStat(getOutputItem(recipe), "getStr");
+    }
+
+    private int getRecipeVitDelta(Recipe recipe) {
+        return extractItemStat(getOutputItem(recipe), "getVit", "getVid");
+    }
+
+    private int getRecipeDexDelta(Recipe recipe) {
+        return extractItemStat(getOutputItem(recipe), "getDex");
+    }
+
+    private int getRecipeAgiDelta(Recipe recipe) {
+        return extractItemStat(getOutputItem(recipe), "getAgi");
+    }
+
+    private int extractItemStat(Object itm, String... methodNames) {
+        if (itm == null || methodNames == null) return 0;
+
+        for (String methodName : methodNames) {
+            if (methodName == null || methodName.isBlank()) continue;
+            try {
+                java.lang.reflect.Method method = itm.getClass().getMethod(methodName);
+                Object value = method.invoke(itm);
+                if (value instanceof Number number) {
+                    return number.intValue();
+                }
+            } catch (ReflectiveOperationException ignored) {
+            }
+        }
+        return 0;
     }
 
     private void refreshRecipeSlots() {
@@ -291,8 +334,12 @@ public class CookController implements Initializable, SceneController {
         if (selectedcook != null) {
             selectedcook.setImage(ItemDatabase.getImage(selectedRecipe.outputItemId));
         }
-        if (cookname != null) cookname.setText(selectedRecipe.name);
-        if (cookeffectlbl != null) cookeffectlbl.setText(buildEffectText(selectedRecipe));
+        if (cookname != null) {
+            cookname.setText(selectedRecipe.name);
+        }
+        if (cookeffectlbl != null) {
+            cookeffectlbl.setText(buildEffectText(selectedRecipe));
+        }
         if (cooksuccessrate != null) {
             cooksuccessrate.setText("Success rate : " + computeSuccessRate(selectedRecipe) + "%");
         }
@@ -302,22 +349,41 @@ public class CookController implements Initializable, SceneController {
     }
 
     private String buildEffectText(Recipe recipe) {
-        return "Success: " + formatEffect(recipe.successHp, recipe.successStamina)
-            + "\nFailure: " + formatEffect(-recipe.successHp, -recipe.successStamina);
+        return "Success: " + formatEffect(
+                    getRecipeHpDelta(recipe),
+                    getRecipeStaminaDelta(recipe),
+                    getRecipeStrDelta(recipe),
+                    getRecipeVitDelta(recipe),
+                    getRecipeDexDelta(recipe),
+                    getRecipeAgiDelta(recipe)
+                )
+            + "\nFailure: " + formatEffect(
+                    -getRecipeHpDelta(recipe),
+                    -getRecipeStaminaDelta(recipe),
+                    -getRecipeStrDelta(recipe),
+                    -getRecipeVitDelta(recipe),
+                    -getRecipeDexDelta(recipe),
+                    -getRecipeAgiDelta(recipe)
+                );
     }
 
-    private String formatEffect(int hpDelta, int staminaDelta) {
+    private String formatEffect(int hpDelta, int staminaDelta, int strDelta, int vitDelta, int dexDelta, int agiDelta) {
         List<String> parts = new ArrayList<>();
-        if (hpDelta != 0) {
-            parts.add((hpDelta > 0 ? "+" : "") + hpDelta + " HP");
-        }
-        if (staminaDelta != 0) {
-            parts.add((staminaDelta > 0 ? "+" : "") + staminaDelta + " SP");
-        }
+        appendEffect(parts, hpDelta, "HP");
+        appendEffect(parts, staminaDelta, "STAMINA");
+        appendEffect(parts, strDelta, "STR");
+        appendEffect(parts, vitDelta, "VIT");
+        appendEffect(parts, dexDelta, "DEX");
+        appendEffect(parts, agiDelta, "AGI");
         if (parts.isEmpty()) {
             return "No effect";
         }
         return String.join(" / ", parts);
+    }
+
+    private void appendEffect(List<String> parts, int delta, String label) {
+        if (delta == 0) return;
+        parts.add((delta > 0 ? "+" : "") + delta + label);
     }
 
     private void clearIngredientViews() {
@@ -342,8 +408,8 @@ public class CookController implements Initializable, SceneController {
                 continue;
             }
 
-            item itm = ItemDatabase.getItemById(req.itemId);
-            setIngredientSlot(images.get(i), labels.get(i), itm, inventory.getCount(req.itemId), req.requiredAmount);
+            item ingredient = ItemDatabase.getItemById(req.itemId);
+            setIngredientSlot(images.get(i), labels.get(i), ingredient, inventory.getCount(req.itemId), req.requiredAmount);
         }
     }
 
@@ -420,7 +486,9 @@ public class CookController implements Initializable, SceneController {
         double now = GameTimeManager.get().totalSecondsProperty().get();
         boolean hasJob = gameState.hasActiveCookingJob();
         boolean ready = gameState.isCookingReady(now);
-        boolean currentSelectionMatchesJob = selectedRecipe != null && hasJob && selectedRecipe.outputItemId == gameState.getActiveCookingOutputItemId();
+        boolean currentSelectionMatchesJob = selectedRecipe != null
+            && hasJob
+            && selectedRecipe.outputItemId == gameState.getActiveCookingOutputItemId();
 
         if (ready && currentSelectionMatchesJob) {
             if (cookwaitingtimelbl != null) {
@@ -432,7 +500,14 @@ public class CookController implements Initializable, SceneController {
                 selectedcook.setOpacity(1.0);
             }
             if (cookeffectlbl != null) {
-                cookeffectlbl.setText("Result: " + formatEffect(gameState.getActiveCookingHpDelta(), gameState.getActiveCookingStaminaDelta()));
+                cookeffectlbl.setText("Result: " + formatEffect(
+                    gameState.getActiveCookingHpDelta(),
+                    gameState.getActiveCookingStaminaDelta(),
+                    gameState.getActiveCookingStrDelta(),
+                    gameState.getActiveCookingVitDelta(),
+                    gameState.getActiveCookingDexDelta(),
+                    gameState.getActiveCookingAgiDelta()
+                ));
             }
             if (startcooking != null) startcooking.setDisable(true);
             return;
@@ -440,7 +515,9 @@ public class CookController implements Initializable, SceneController {
 
         if (hasJob && currentSelectionMatchesJob) {
             int remaining = (int) Math.ceil(Math.max(0, gameState.getActiveCookingCompleteAtSeconds() - now));
-            if (cookwaitingtimelbl != null) cookwaitingtimelbl.setText("waiting time: " + remaining + "s");
+            if (cookwaitingtimelbl != null) {
+                cookwaitingtimelbl.setText("waiting time: " + remaining + "s");
+            }
             if (selectedcook != null) {
                 selectedcook.setStyle("");
                 selectedcook.setOpacity(0.9);
@@ -453,7 +530,9 @@ public class CookController implements Initializable, SceneController {
         }
 
         if (selectedRecipe != null) {
-            if (cookwaitingtimelbl != null) cookwaitingtimelbl.setText("waiting time: " + selectedRecipe.waitSeconds + "s");
+            if (cookwaitingtimelbl != null) {
+                cookwaitingtimelbl.setText("waiting time: " + selectedRecipe.waitSeconds + "s");
+            }
             if (selectedcook != null) {
                 selectedcook.setStyle("");
                 selectedcook.setOpacity(canCook(selectedRecipe) ? 1.0 : 0.65);
@@ -461,7 +540,9 @@ public class CookController implements Initializable, SceneController {
             if (cookeffectlbl != null) {
                 cookeffectlbl.setText(buildEffectText(selectedRecipe));
             }
-            if (startcooking != null) startcooking.setDisable(!canCook(selectedRecipe) || hasJob);
+            if (startcooking != null) {
+                startcooking.setDisable(!canCook(selectedRecipe) || hasJob);
+            }
         }
     }
 
@@ -500,15 +581,18 @@ public class CookController implements Initializable, SceneController {
         }
 
         boolean success = rollSuccess(selectedRecipe);
-        int hpDelta = success ? selectedRecipe.successHp : -selectedRecipe.successHp;
-        int staminaDelta = success ? selectedRecipe.successStamina : -selectedRecipe.successStamina;
+        int sign = success ? 1 : -1;
 
         double now = GameTimeManager.get().totalSecondsProperty().get();
         gameState.startCookingJob(
             selectedRecipe.outputItemId,
             now + selectedRecipe.waitSeconds,
-            hpDelta,
-            staminaDelta,
+            sign * getRecipeHpDelta(selectedRecipe),
+            sign * getRecipeStaminaDelta(selectedRecipe),
+            sign * getRecipeStrDelta(selectedRecipe),
+            sign * getRecipeVitDelta(selectedRecipe),
+            sign * getRecipeDexDelta(selectedRecipe),
+            sign * getRecipeAgiDelta(selectedRecipe),
             success
         );
 
@@ -528,6 +612,10 @@ public class CookController implements Initializable, SceneController {
             selectedRecipe.outputItemId,
             gameState.getActiveCookingHpDelta(),
             gameState.getActiveCookingStaminaDelta(),
+            gameState.getActiveCookingStrDelta(),
+            gameState.getActiveCookingVitDelta(),
+            gameState.getActiveCookingDexDelta(),
+            gameState.getActiveCookingAgiDelta(),
             gameState.isActiveCookingSuccess()
         );
         gameState.clearCookingJob();
@@ -598,18 +686,14 @@ public class CookController implements Initializable, SceneController {
         private final int waitSeconds;
         private final int baseSuccessRate;
         private final int dexScaling;
-        private final int successHp;
-        private final int successStamina;
         private final IngredientSpec[] ingredients;
 
-        private RecipeTemplate(String key, String outputItemName, int waitSeconds, int baseSuccessRate, int dexScaling, int successHp, int successStamina, IngredientSpec... ingredients) {
+        private RecipeTemplate(String key, String outputItemName, int waitSeconds, int baseSuccessRate, int dexScaling, IngredientSpec... ingredients) {
             this.key = key;
             this.outputItemName = outputItemName;
             this.waitSeconds = waitSeconds;
             this.baseSuccessRate = baseSuccessRate;
             this.dexScaling = dexScaling;
-            this.successHp = successHp;
-            this.successStamina = successStamina;
             this.ingredients = ingredients;
         }
     }
@@ -621,19 +705,15 @@ public class CookController implements Initializable, SceneController {
         private final int waitSeconds;
         private final int baseSuccessRate;
         private final int dexScaling;
-        private final int successHp;
-        private final int successStamina;
         private final List<IngredientRequirement> ingredients;
 
-        private Recipe(String key, int outputItemId, String name, int waitSeconds, int baseSuccessRate, int dexScaling, int successHp, int successStamina, List<IngredientRequirement> ingredients) {
+        private Recipe(String key, int outputItemId, String name, int waitSeconds, int baseSuccessRate, int dexScaling, List<IngredientRequirement> ingredients) {
             this.key = key;
             this.outputItemId = outputItemId;
             this.name = name;
             this.waitSeconds = waitSeconds;
             this.baseSuccessRate = baseSuccessRate;
             this.dexScaling = dexScaling;
-            this.successHp = successHp;
-            this.successStamina = successStamina;
             this.ingredients = ingredients;
         }
     }

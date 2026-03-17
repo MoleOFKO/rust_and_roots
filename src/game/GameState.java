@@ -29,11 +29,27 @@ public final class GameState {
     public static final class FoodEffectOutcome {
         private final int hpDelta;
         private final int staminaDelta;
+        private final int strDelta;
+        private final int vitDelta;
+        private final int dexDelta;
+        private final int agiDelta;
         private final boolean success;
 
-        public FoodEffectOutcome(int hpDelta, int staminaDelta, boolean success) {
+        public FoodEffectOutcome(
+                int hpDelta,
+                int staminaDelta,
+                int strDelta,
+                int vitDelta,
+                int dexDelta,
+                int agiDelta,
+                boolean success
+        ) {
             this.hpDelta = hpDelta;
             this.staminaDelta = staminaDelta;
+            this.strDelta = strDelta;
+            this.vitDelta = vitDelta;
+            this.dexDelta = dexDelta;
+            this.agiDelta = agiDelta;
             this.success = success;
         }
 
@@ -105,9 +121,7 @@ public final class GameState {
 
     private int activeCookingOutputItemId = -1;
     private double activeCookingCompleteAtSeconds = -1;
-    private int activeCookingHpDelta = 0;
-    private int activeCookingStaminaDelta = 0;
-    private boolean activeCookingSuccess = true;
+    private FoodEffectOutcome activeCookingOutcome = null;
 
     private final Map<Integer, Deque<FoodEffectOutcome>> cookedDishEffectsByItemId = new HashMap<>();
     private ActiveSmeltJob activeSmeltJob = null;
@@ -197,12 +211,28 @@ public final class GameState {
         this.dailyRemainingShopStock.clear();
     }
 
-    public void startCookingJob(int outputItemId, double completeAtSeconds, int hpDelta, int staminaDelta, boolean success) {
+    public void startCookingJob(
+            int outputItemId,
+            double completeAtSeconds,
+            int hpDelta,
+            int staminaDelta,
+            int strDelta,
+            int vitDelta,
+            int dexDelta,
+            int agiDelta,
+            boolean success
+    ) {
         this.activeCookingOutputItemId = outputItemId;
         this.activeCookingCompleteAtSeconds = completeAtSeconds;
-        this.activeCookingHpDelta = hpDelta;
-        this.activeCookingStaminaDelta = staminaDelta;
-        this.activeCookingSuccess = success;
+        this.activeCookingOutcome = new FoodEffectOutcome(
+                hpDelta,
+                staminaDelta,
+                strDelta,
+                vitDelta,
+                dexDelta,
+                agiDelta,
+                success
+        );
     }
 
     public boolean hasActiveCookingJob() {
@@ -214,15 +244,74 @@ public final class GameState {
     public int getActiveCookingHpDelta() { return activeCookingHpDelta; }
     public int getActiveCookingStaminaDelta() { return activeCookingStaminaDelta; }
     public boolean isActiveCookingSuccess() { return activeCookingSuccess; }
+    public int getActiveCookingOutputItemId() {
+        return activeCookingOutputItemId;
+    }
+
+    public double getActiveCookingCompleteAtSeconds() {
+        return activeCookingCompleteAtSeconds;
+    }
+
+    public boolean isActiveCookingSuccess() {
+        return activeCookingOutcome != null && activeCookingOutcome.isSuccess();
+    }
+
+    public int getActiveCookingHpDelta() {
+        return activeCookingOutcome == null ? 0 : activeCookingOutcome.getHpDelta();
+    }
+
+    public int getActiveCookingStaminaDelta() {
+        return activeCookingOutcome == null ? 0 : activeCookingOutcome.getStaminaDelta();
+    }
+
+    public int getActiveCookingStrDelta() {
+        return activeCookingOutcome == null ? 0 : activeCookingOutcome.getStrDelta();
+    }
+
+    public int getActiveCookingVitDelta() {
+        return activeCookingOutcome == null ? 0 : activeCookingOutcome.getVitDelta();
+    }
+
+    public int getActiveCookingDexDelta() {
+        return activeCookingOutcome == null ? 0 : activeCookingOutcome.getDexDelta();
+    }
+
+    public int getActiveCookingAgiDelta() {
+        return activeCookingOutcome == null ? 0 : activeCookingOutcome.getAgiDelta();
+    }
+
+    public FoodEffectOutcome getActiveCookingOutcome() {
+        return activeCookingOutcome;
+    }
 
     public boolean isCookingReady(double nowSeconds) {
         return hasActiveCookingJob() && nowSeconds >= activeCookingCompleteAtSeconds;
     }
 
-    public void queueCookedDishEffect(int itemId, int hpDelta, int staminaDelta, boolean success) {
+    public void queueCookedDishEffect(
+            int itemId,
+            int hpDelta,
+            int staminaDelta,
+            int strDelta,
+            int vitDelta,
+            int dexDelta,
+            int agiDelta,
+            boolean success
+    ) {
         if (itemId <= 0) return;
         cookedDishEffectsByItemId.computeIfAbsent(itemId, k -> new ArrayDeque<>())
                 .addLast(new FoodEffectOutcome(hpDelta, staminaDelta, success));
+        cookedDishEffectsByItemId
+                .computeIfAbsent(itemId, ignored -> new ArrayDeque<>())
+                .addLast(new FoodEffectOutcome(
+                        hpDelta,
+                        staminaDelta,
+                        strDelta,
+                        vitDelta,
+                        dexDelta,
+                        agiDelta,
+                        success
+                ));
     }
 
     public FoodEffectOutcome pollCookedDishEffect(int itemId) {
@@ -230,15 +319,20 @@ public final class GameState {
         if (q == null || q.isEmpty()) return null;
         FoodEffectOutcome outcome = q.removeFirst();
         if (q.isEmpty()) cookedDishEffectsByItemId.remove(itemId);
+        if (q == null || q.isEmpty()) {
+            return null;
+        }
+        FoodEffectOutcome outcome = q.pollFirst();
+        if (q.isEmpty()) {
+            cookedDishEffectsByItemId.remove(itemId);
+        }
         return outcome;
     }
 
     public void clearCookingJob() {
         this.activeCookingOutputItemId = -1;
         this.activeCookingCompleteAtSeconds = -1;
-        this.activeCookingHpDelta = 0;
-        this.activeCookingStaminaDelta = 0;
-        this.activeCookingSuccess = true;
+        this.activeCookingOutcome = null;
     }
 
     public synchronized int getSmeltPointCap() {
