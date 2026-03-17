@@ -1,6 +1,8 @@
 package game;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -21,30 +23,55 @@ public final class GameState {
         return INSTANCE;
     }
 
+    public static final class FoodEffectOutcome {
+        private final int hpDelta;
+        private final int staminaDelta;
+        private final boolean success;
+
+        public FoodEffectOutcome(int hpDelta, int staminaDelta, boolean success) {
+            this.hpDelta = hpDelta;
+            this.staminaDelta = staminaDelta;
+            this.success = success;
+        }
+
+        public int getHpDelta() {
+            return hpDelta;
+        }
+
+        public int getStaminaDelta() {
+            return staminaDelta;
+        }
+
+        public boolean isSuccess() {
+            return success;
+        }
+    }
+
     private final PlayerState playerState = new PlayerState(100); // starting coins
     private final Inventory chestInventory = new Inventory(0);
 
-    // ---- Scene transition spawn ----
     private SpawnTag pendingSpawn = SpawnTag.DEFAULT;
 
-    // ---------- Shop navigation ----------
     private String returnFxml = null;
     private SpawnTag returnSpawn = SpawnTag.DEFAULT;
 
-    // ---------- Shop merchant catalog ----------
     private List<model.Merchant.ShopItem> currentMerchantItems = List.of();
 
-    // ---- Per-map farm persistence ----
     private final Map<String, FarmState> farmByMap = new HashMap<>();
 
-    // ---------- Daily shop random catalog ----------
     private int shopRandomDay = -1;
     private List<Integer> dailyRandomShopItemIds = new ArrayList<>();
 
-    // ---------- Daily shop remaining stock ----------
-    // Key = itemId, Value = remaining quantity for the current shop day
     private int shopStockDay = -1;
     private final Map<Integer, Integer> dailyRemainingShopStock = new LinkedHashMap<>();
+
+    private int activeCookingOutputItemId = -1;
+    private double activeCookingCompleteAtSeconds = -1;
+    private int activeCookingHpDelta = 0;
+    private int activeCookingStaminaDelta = 0;
+    private boolean activeCookingSuccess = true;
+
+    private final Map<Integer, Deque<FoodEffectOutcome>> cookedDishEffectsByItemId = new HashMap<>();
 
     private GameState() {
     }
@@ -110,10 +137,6 @@ public final class GameState {
                 : new ArrayList<>(ids);
     }
 
-    // =========================================================
-    // Daily persistent shop stock
-    // =========================================================
-
     public int getShopStockDay() {
         return shopStockDay;
     }
@@ -160,14 +183,73 @@ public final class GameState {
         dailyRemainingShopStock.clear();
     }
 
-    /**
-     * Call this when a new day starts and the shop should regenerate its stock.
-     */
     public void resetDailyShopStateForNewDay(int day) {
         this.shopRandomDay = day;
         this.dailyRandomShopItemIds.clear();
 
         this.shopStockDay = day;
         this.dailyRemainingShopStock.clear();
+    }
+
+    public void startCookingJob(int outputItemId, double completeAtSeconds, int hpDelta, int staminaDelta, boolean success) {
+        this.activeCookingOutputItemId = outputItemId;
+        this.activeCookingCompleteAtSeconds = completeAtSeconds;
+        this.activeCookingHpDelta = hpDelta;
+        this.activeCookingStaminaDelta = staminaDelta;
+        this.activeCookingSuccess = success;
+    }
+
+    public boolean hasActiveCookingJob() {
+        return activeCookingOutputItemId > 0 && activeCookingCompleteAtSeconds >= 0;
+    }
+
+    public int getActiveCookingOutputItemId() {
+        return activeCookingOutputItemId;
+    }
+
+    public double getActiveCookingCompleteAtSeconds() {
+        return activeCookingCompleteAtSeconds;
+    }
+
+    public int getActiveCookingHpDelta() {
+        return activeCookingHpDelta;
+    }
+
+    public int getActiveCookingStaminaDelta() {
+        return activeCookingStaminaDelta;
+    }
+
+    public boolean isActiveCookingSuccess() {
+        return activeCookingSuccess;
+    }
+
+    public boolean isCookingReady(double nowSeconds) {
+        return hasActiveCookingJob() && nowSeconds >= activeCookingCompleteAtSeconds;
+    }
+
+    public void queueCookedDishEffect(int itemId, int hpDelta, int staminaDelta, boolean success) {
+        if (itemId <= 0) return;
+        cookedDishEffectsByItemId
+            .computeIfAbsent(itemId, k -> new ArrayDeque<>())
+            .addLast(new FoodEffectOutcome(hpDelta, staminaDelta, success));
+    }
+
+    public FoodEffectOutcome pollCookedDishEffect(int itemId) {
+        Deque<FoodEffectOutcome> q = cookedDishEffectsByItemId.get(itemId);
+        if (q == null || q.isEmpty()) return null;
+
+        FoodEffectOutcome outcome = q.removeFirst();
+        if (q.isEmpty()) {
+            cookedDishEffectsByItemId.remove(itemId);
+        }
+        return outcome;
+    }
+
+    public void clearCookingJob() {
+        this.activeCookingOutputItemId = -1;
+        this.activeCookingCompleteAtSeconds = -1;
+        this.activeCookingHpDelta = 0;
+        this.activeCookingStaminaDelta = 0;
+        this.activeCookingSuccess = true;
     }
 }
