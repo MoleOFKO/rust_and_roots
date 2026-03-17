@@ -449,6 +449,9 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         for (int i = 0; i < hotbarSlotButtons.size(); i++) {
             final int idx = i;
             hotbarSlotButtons.get(i).setOnAction(e -> {
+                if (idx == selectedHotbarIndex && tryConsumeHotbarItem(idx)) {
+                    return;
+                }
                 selectHotbarSlot(idx);
                 hotbarAssignmentIndex = idx;
             });
@@ -820,6 +823,60 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     protected void clearPlayerInventorySelection() {
         selectedPlayerInventoryItemId = null;
         refreshPlayerInventorySelectionHighlight();
+    }
+
+    protected boolean tryConsumeHotbarItem(int index) {
+        if (playerState == null || player == null || gameState == null) return false;
+        if (index < 0 || index >= playerState.getHotbarSize()) return false;
+
+        int itemId = playerState.getHotbarItemId(index);
+        if (itemId <= 0 || player.getInventory().getCount(itemId) <= 0) return false;
+
+        GameState.FoodEffectOutcome cookedOutcome = gameState.pollCookedDishEffect(itemId);
+
+        int hpDelta;
+        int staminaDelta;
+        if (cookedOutcome != null) {
+            hpDelta = cookedOutcome.getHpDelta();
+            staminaDelta = cookedOutcome.getStaminaDelta();
+        } else {
+            Object itm = ItemDatabase.getItemById(itemId);
+            if (itm == null) return false;
+
+            hpDelta = extractItemStat(itm, "getHp");
+            staminaDelta = extractItemStat(itm, "getStamana", "getStamina", "getStimana");
+
+            if (hpDelta == 0 && staminaDelta == 0) {
+                return false;
+            }
+        }
+
+        if (!player.getInventory().removeItem(itemId, 1)) {
+            return false;
+        }
+
+        playerState.applyFoodEffect(hpDelta, staminaDelta);
+        refreshHotbarView();
+        refreshPlayerInventoryView();
+        return true;
+    }
+
+    protected int extractItemStat(Object itm, String... methodNames) {
+        if (itm == null || methodNames == null) return 0;
+
+        for (String methodName : methodNames) {
+            if (methodName == null || methodName.isBlank()) continue;
+            try {
+                java.lang.reflect.Method method = itm.getClass().getMethod(methodName);
+                Object value = method.invoke(itm);
+                if (value instanceof Number number) {
+                    return number.intValue();
+                }
+            } catch (ReflectiveOperationException ignored) {
+            }
+        }
+
+        return 0;
     }
 
     protected String itemName(int itemId) {

@@ -553,9 +553,6 @@ public class Home_interiorController extends BaseMapController {
     @Override
     protected void configureExits() {
         registerExit(exit_door, "/view/home_map.fxml", SpawnTag.FROM_DOOR);
-        registerExit(cook_detect, "/view/cook.fxml", SpawnTag.FROM_COOK);
-        registerExit(melt_detect, "/view/melt.fxml", SpawnTag.FROM_MELT);
-        registerExit(craft_detect, "/view/craft.fxml", SpawnTag.FROM_CRAFT);
     }
 
     private final List<ImageView> pinvImages = new ArrayList<>();
@@ -565,6 +562,15 @@ public class Home_interiorController extends BaseMapController {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         super.initialize(url, rb);
+
+        ItemDatabase.loadItems();
+        chestInventory = gameState.getChestInventory();
+        setupChestUi();
+        setupInteriorZones();
+
+        if (btncook != null) btncook.setOnAction(this::handlecookaction);
+        if (btncraft != null) btncraft.setOnAction(this::handlecraftaction);
+        if (btnmelt != null) btnmelt.setOnAction(e -> openMelt());
 
         pinvImages.clear();
         pinvLabels.clear();
@@ -707,35 +713,51 @@ public class Home_interiorController extends BaseMapController {
     }
     
     private void setupInteriorZones() {
+        applyInteractionState(btntoSleep, false);
+        applyInteractionState(btnOpenInv, false);
+        applyInteractionState(btncook, false);
+        applyInteractionState(btnmelt, false);
+        applyInteractionState(btncraft, false);
+
         if (bed_detect != null && btntoSleep != null) {
             interactionManager.addZone(new InteractionZone(bed_detect, inside -> {
-                btntoSleep.setDisable(!inside);
+                applyInteractionState(btntoSleep, inside);
             }));
         }
 
         if (chest_detect != null && btnOpenInv != null) {
             interactionManager.addZone(new InteractionZone(chest_detect, inside -> {
-                btnOpenInv.setDisable(!inside);
+                applyInteractionState(btnOpenInv, inside);
             }));
         }
 
         if (cook_detect != null && btncook != null) {
             interactionManager.addZone(new InteractionZone(cook_detect, inside -> {
-                btncook.setDisable(!inside);
+                applyInteractionState(btncook, inside);
             }));
         }
 
         if (melt_detect != null && btnmelt != null) {
             interactionManager.addZone(new InteractionZone(melt_detect, inside -> {
-                btnmelt.setDisable(!inside);
+                applyInteractionState(btnmelt, inside);
             }));
         }
 
         if (craft_detect != null && btncraft != null) {
             interactionManager.addZone(new InteractionZone(craft_detect, inside -> {
-                btncraft.setDisable(!inside);
+                applyInteractionState(btncraft, inside);
             }));
         }
+    }
+
+    private void applyInteractionState(Button button, boolean active) {
+        if (button == null) return;
+
+        button.setDisable(!active);
+        button.setOpacity(active ? 0.28 : 0.0);
+        button.setStyle(active
+            ? "-fx-background-color: rgba(255, 235, 59, 0.45); -fx-border-color: gold; -fx-border-width: 2; -fx-effect: dropshadow(gaussian, yellow, 14, 0.7, 0, 0);"
+            : "-fx-background-color: transparent; -fx-border-color: transparent;");
     }
     
     @Override
@@ -770,6 +792,8 @@ public class Home_interiorController extends BaseMapController {
             // move to next morning
             time.setDay(time.dayNumberProperty().get() + 1);
             time.setTimeOfDay(6, 0);
+            playerState.setHp((int) (playerState.getMaxHp() * 0.8));
+            playerState.setStamina((int) (playerState.getMaxStamina() * 0.8));
 
             sleepStackPane.setVisible(false);
             sleepStackPane.setDisable(true);
@@ -800,10 +824,12 @@ public class Home_interiorController extends BaseMapController {
 
     @FXML
     private void handlecraftaction(ActionEvent event) {
+        openCraft();
     }
 
     @FXML
     private void handlecookaction(ActionEvent event) {
+        openCook();
     }
 
     @FXML
