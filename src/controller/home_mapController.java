@@ -471,6 +471,14 @@ public class home_mapController extends BaseMapController {
     private ImageView btnConfirm;
     @FXML
     private ImageView btnclose;
+    @FXML
+    private ImageView btnclose2;
+    @FXML
+    private Button openInventory;
+    @FXML
+    private Button openstatus;
+    @FXML
+    private Button opensetting;
 
     @Override
     protected String mapKey() {
@@ -828,5 +836,17 @@ public class home_mapController extends BaseMapController {
 
     @FXML
     private void handleconfirmaction(MouseEvent event) {
+    }
+
+    @FXML
+    private void handleopenInventoryaction(ActionEvent event) {
+    }
+
+    @FXML
+    private void handleopenstatusaction(ActionEvent event) {
+    }
+
+    @FXML
+    private void handleopensettingaction(ActionEvent event) {
     }
 }
