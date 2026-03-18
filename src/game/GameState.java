@@ -19,6 +19,9 @@ import util.SpawnTag;
 public final class GameState {
     private static final GameState INSTANCE = new GameState();
 
+    private static final int DEFAULT_SMELT_POINT_CAP = 10;
+    private static final double DEFAULT_SMELT_POINT_REGEN_SECONDS = 15.0;
+
     public static GameState get() {
         return INSTANCE;
     }
@@ -26,24 +29,82 @@ public final class GameState {
     public static final class FoodEffectOutcome {
         private final int hpDelta;
         private final int staminaDelta;
+        private final int strDelta;
+        private final int vitDelta;
+        private final int dexDelta;
+        private final int agiDelta;
         private final boolean success;
 
-        public FoodEffectOutcome(int hpDelta, int staminaDelta, boolean success) {
+        public FoodEffectOutcome(
+                int hpDelta,
+                int staminaDelta,
+                int strDelta,
+                int vitDelta,
+                int dexDelta,
+                int agiDelta,
+                boolean success
+        ) {
             this.hpDelta = hpDelta;
             this.staminaDelta = staminaDelta;
+            this.strDelta = strDelta;
+            this.vitDelta = vitDelta;
+            this.dexDelta = dexDelta;
+            this.agiDelta = agiDelta;
             this.success = success;
         }
+        
+        public int getHpDelta() { return hpDelta; }
+        public int getStaminaDelta() { return staminaDelta; }
+        public int getStrDelta() { return strDelta; }
+        public int getVitDelta() { return vitDelta; }
+        public int getDexDelta() { return dexDelta; }
+        public int getAgiDelta() { return agiDelta; }
+        public boolean isSuccess() { return success; }
+    }
 
-        public int getHpDelta() {
-            return hpDelta;
+    public static final class ActiveSmeltJob {
+        private final int sourceItemId;
+        private final int resultItemId;
+        private final int quantity;
+        private final int costPerOre;
+        private final double secondsPerOre;
+        private final double startedAtSeconds;
+
+        public ActiveSmeltJob(int sourceItemId, int resultItemId, int quantity, int costPerOre, double secondsPerOre, double startedAtSeconds) {
+            this.sourceItemId = sourceItemId;
+            this.resultItemId = resultItemId;
+            this.quantity = quantity;
+            this.costPerOre = costPerOre;
+            this.secondsPerOre = secondsPerOre;
+            this.startedAtSeconds = startedAtSeconds;
         }
 
-        public int getStaminaDelta() {
-            return staminaDelta;
+        public int getSourceItemId() { return sourceItemId; }
+        public int getResultItemId() { return resultItemId; }
+        public int getQuantity() { return quantity; }
+        public int getCostPerOre() { return costPerOre; }
+        public double getSecondsPerOre() { return secondsPerOre; }
+        public double getStartedAtSeconds() { return startedAtSeconds; }
+
+        public int getReadyCount(double nowSeconds) {
+            if (quantity <= 0 || secondsPerOre <= 0) return 0;
+            double elapsed = Math.max(0, nowSeconds - startedAtSeconds);
+            int ready = (int) Math.floor(elapsed / secondsPerOre);
+            if (ready < 0) ready = 0;
+            if (ready > quantity) ready = quantity;
+            return ready;
         }
 
-        public boolean isSuccess() {
-            return success;
+        public int getRemainingCount(double nowSeconds) {
+            return Math.max(0, quantity - getReadyCount(nowSeconds));
+        }
+
+        public double getNextReadyAtSeconds(double nowSeconds) {
+            int ready = getReadyCount(nowSeconds);
+            if (ready >= quantity) {
+                return startedAtSeconds + (quantity * secondsPerOre);
+            }
+            return startedAtSeconds + ((ready + 1) * secondsPerOre);
         }
     }
 
@@ -51,38 +112,34 @@ public final class GameState {
     private final Inventory chestInventory = new Inventory(0);
 
     private SpawnTag pendingSpawn = SpawnTag.DEFAULT;
-
     private String returnFxml = null;
     private SpawnTag returnSpawn = SpawnTag.DEFAULT;
 
     private List<model.Merchant.ShopItem> currentMerchantItems = List.of();
-
     private final Map<String, FarmState> farmByMap = new HashMap<>();
 
     private int shopRandomDay = -1;
     private List<Integer> dailyRandomShopItemIds = new ArrayList<>();
-
     private int shopStockDay = -1;
     private final Map<Integer, Integer> dailyRemainingShopStock = new LinkedHashMap<>();
 
     private int activeCookingOutputItemId = -1;
     private double activeCookingCompleteAtSeconds = -1;
-    private int activeCookingHpDelta = 0;
-    private int activeCookingStaminaDelta = 0;
-    private boolean activeCookingSuccess = true;
+    private FoodEffectOutcome activeCookingOutcome = null;
 
     private final Map<Integer, Deque<FoodEffectOutcome>> cookedDishEffectsByItemId = new HashMap<>();
+    private ActiveSmeltJob activeSmeltJob = null;
+
+    private int smeltPointCap = DEFAULT_SMELT_POINT_CAP;
+    private double smeltPoints = DEFAULT_SMELT_POINT_CAP;
+    private double lastSmeltPointUpdateSeconds = 0.0;
+    private double smeltPointRegenSeconds = DEFAULT_SMELT_POINT_REGEN_SECONDS;
 
     private GameState() {
     }
 
-    public PlayerState getPlayerState() {
-        return playerState;
-    }
-
-    public Inventory getChestInventory() {
-        return chestInventory;
-    }
+    public PlayerState getPlayerState() { return playerState; }
+    public Inventory getChestInventory() { return chestInventory; }
 
     public void setPendingSpawn(SpawnTag tag) {
         this.pendingSpawn = (tag == null) ? SpawnTag.DEFAULT : tag;
@@ -103,47 +160,25 @@ public final class GameState {
         this.returnSpawn = (spawn == null) ? SpawnTag.DEFAULT : spawn;
     }
 
-    public String getReturnFxml() {
-        return returnFxml;
-    }
-
-    public SpawnTag getReturnSpawn() {
-        return returnSpawn;
-    }
+    public String getReturnFxml() { return returnFxml; }
+    public SpawnTag getReturnSpawn() { return returnSpawn; }
 
     public void setCurrentMerchantItems(List<model.Merchant.ShopItem> items) {
         this.currentMerchantItems = (items == null) ? List.of() : List.copyOf(items);
     }
 
-    public List<model.Merchant.ShopItem> getCurrentMerchantItems() {
-        return currentMerchantItems;
-    }
+    public List<model.Merchant.ShopItem> getCurrentMerchantItems() { return currentMerchantItems; }
 
-    public int getShopRandomDay() {
-        return shopRandomDay;
-    }
+    public int getShopRandomDay() { return shopRandomDay; }
+    public void setShopRandomDay(int day) { this.shopRandomDay = day; }
 
-    public void setShopRandomDay(int day) {
-        this.shopRandomDay = day;
-    }
-
-    public List<Integer> getDailyRandomShopItemIds() {
-        return List.copyOf(dailyRandomShopItemIds);
-    }
-
+    public List<Integer> getDailyRandomShopItemIds() { return List.copyOf(dailyRandomShopItemIds); }
     public void setDailyRandomShopItemIds(List<Integer> ids) {
-        this.dailyRandomShopItemIds = (ids == null)
-                ? new ArrayList<>()
-                : new ArrayList<>(ids);
+        this.dailyRandomShopItemIds = (ids == null) ? new ArrayList<>() : new ArrayList<>(ids);
     }
 
-    public int getShopStockDay() {
-        return shopStockDay;
-    }
-
-    public void setShopStockDay(int day) {
-        this.shopStockDay = day;
-    }
+    public int getShopStockDay() { return shopStockDay; }
+    public void setShopStockDay(int day) { this.shopStockDay = day; }
 
     public boolean hasDailyRemainingShopStockForDay(int day) {
         return shopStockDay == day && !dailyRemainingShopStock.isEmpty();
@@ -158,20 +193,12 @@ public final class GameState {
     }
 
     public void setRemainingShopStock(int itemId, int remainingQty) {
-        if (remainingQty <= 0) {
-            dailyRemainingShopStock.put(itemId, 0);
-        } else {
-            dailyRemainingShopStock.put(itemId, remainingQty);
-        }
+        dailyRemainingShopStock.put(itemId, Math.max(0, remainingQty));
     }
 
     public void setDailyRemainingShopStock(Map<Integer, Integer> stockByItemId) {
         dailyRemainingShopStock.clear();
-
-        if (stockByItemId == null) {
-            return;
-        }
-
+        if (stockByItemId == null) return;
         for (Map.Entry<Integer, Integer> e : stockByItemId.entrySet()) {
             int itemId = e.getKey();
             int qty = (e.getValue() == null) ? 0 : Math.max(0, e.getValue());
@@ -179,24 +206,37 @@ public final class GameState {
         }
     }
 
-    public void clearDailyRemainingShopStock() {
-        dailyRemainingShopStock.clear();
-    }
+    public void clearDailyRemainingShopStock() { dailyRemainingShopStock.clear(); }
 
     public void resetDailyShopStateForNewDay(int day) {
         this.shopRandomDay = day;
         this.dailyRandomShopItemIds.clear();
-
         this.shopStockDay = day;
         this.dailyRemainingShopStock.clear();
     }
 
-    public void startCookingJob(int outputItemId, double completeAtSeconds, int hpDelta, int staminaDelta, boolean success) {
+    public void startCookingJob(
+            int outputItemId,
+            double completeAtSeconds,
+            int hpDelta,
+            int staminaDelta,
+            int strDelta,
+            int vitDelta,
+            int dexDelta,
+            int agiDelta,
+            boolean success
+    ) {
         this.activeCookingOutputItemId = outputItemId;
         this.activeCookingCompleteAtSeconds = completeAtSeconds;
-        this.activeCookingHpDelta = hpDelta;
-        this.activeCookingStaminaDelta = staminaDelta;
-        this.activeCookingSuccess = success;
+        this.activeCookingOutcome = new FoodEffectOutcome(
+                hpDelta,
+                staminaDelta,
+                strDelta,
+                vitDelta,
+                dexDelta,
+                agiDelta,
+                success
+        );
     }
 
     public boolean hasActiveCookingJob() {
@@ -211,34 +251,74 @@ public final class GameState {
         return activeCookingCompleteAtSeconds;
     }
 
+    public boolean isActiveCookingSuccess() {
+        return activeCookingOutcome != null && activeCookingOutcome.isSuccess();
+    }
+
     public int getActiveCookingHpDelta() {
-        return activeCookingHpDelta;
+        return activeCookingOutcome == null ? 0 : activeCookingOutcome.getHpDelta();
     }
 
     public int getActiveCookingStaminaDelta() {
-        return activeCookingStaminaDelta;
+        return activeCookingOutcome == null ? 0 : activeCookingOutcome.getStaminaDelta();
     }
 
-    public boolean isActiveCookingSuccess() {
-        return activeCookingSuccess;
+    public int getActiveCookingStrDelta() {
+        return activeCookingOutcome == null ? 0 : activeCookingOutcome.getStrDelta();
+    }
+
+    public int getActiveCookingVitDelta() {
+        return activeCookingOutcome == null ? 0 : activeCookingOutcome.getVitDelta();
+    }
+
+    public int getActiveCookingDexDelta() {
+        return activeCookingOutcome == null ? 0 : activeCookingOutcome.getDexDelta();
+    }
+
+    public int getActiveCookingAgiDelta() {
+        return activeCookingOutcome == null ? 0 : activeCookingOutcome.getAgiDelta();
+    }
+
+    public FoodEffectOutcome getActiveCookingOutcome() {
+        return activeCookingOutcome;
     }
 
     public boolean isCookingReady(double nowSeconds) {
         return hasActiveCookingJob() && nowSeconds >= activeCookingCompleteAtSeconds;
     }
 
-    public void queueCookedDishEffect(int itemId, int hpDelta, int staminaDelta, boolean success) {
+    public void queueCookedDishEffect(
+            int itemId,
+            int hpDelta,
+            int staminaDelta,
+            int strDelta,
+            int vitDelta,
+            int dexDelta,
+            int agiDelta,
+            boolean success
+    ) {
         if (itemId <= 0) return;
+
         cookedDishEffectsByItemId
-            .computeIfAbsent(itemId, k -> new ArrayDeque<>())
-            .addLast(new FoodEffectOutcome(hpDelta, staminaDelta, success));
+                .computeIfAbsent(itemId, ignored -> new ArrayDeque<>())
+                .addLast(new FoodEffectOutcome(
+                        hpDelta,
+                        staminaDelta,
+                        strDelta,
+                        vitDelta,
+                        dexDelta,
+                        agiDelta,
+                        success
+                ));
     }
 
     public FoodEffectOutcome pollCookedDishEffect(int itemId) {
         Deque<FoodEffectOutcome> q = cookedDishEffectsByItemId.get(itemId);
-        if (q == null || q.isEmpty()) return null;
+        if (q == null || q.isEmpty()) {
+            return null;
+        }
 
-        FoodEffectOutcome outcome = q.removeFirst();
+        FoodEffectOutcome outcome = q.pollFirst();
         if (q.isEmpty()) {
             cookedDishEffectsByItemId.remove(itemId);
         }
@@ -248,8 +328,131 @@ public final class GameState {
     public void clearCookingJob() {
         this.activeCookingOutputItemId = -1;
         this.activeCookingCompleteAtSeconds = -1;
-        this.activeCookingHpDelta = 0;
-        this.activeCookingStaminaDelta = 0;
-        this.activeCookingSuccess = true;
+        this.activeCookingOutcome = null;
+    }
+
+    public synchronized int getSmeltPointCap() {
+        return smeltPointCap;
+    }
+
+    public synchronized void setSmeltPointCap(int newCap, double nowSeconds) {
+        refreshSmeltPoints(nowSeconds);
+        smeltPointCap = Math.max(0, newCap);
+        if (smeltPoints > smeltPointCap) {
+            smeltPoints = smeltPointCap;
+        }
+    }
+
+    public synchronized double getSmeltPointRegenSeconds() {
+        return smeltPointRegenSeconds;
+    }
+
+    public synchronized void setSmeltPointRegenSeconds(double regenSeconds, double nowSeconds) {
+        refreshSmeltPoints(nowSeconds);
+        smeltPointRegenSeconds = regenSeconds <= 0 ? DEFAULT_SMELT_POINT_REGEN_SECONDS : regenSeconds;
+    }
+
+    public synchronized int getCurrentSmeltPoints(double nowSeconds) {
+        refreshSmeltPoints(nowSeconds);
+        return (int) Math.floor(smeltPoints);
+    }
+
+    public synchronized boolean canAffordSmeltPoints(int cost, double nowSeconds) {
+        if (cost <= 0) return true;
+        return getCurrentSmeltPoints(nowSeconds) >= cost;
+    }
+
+    public synchronized boolean spendSmeltPoints(int cost, double nowSeconds) {
+        if (cost < 0) return false;
+        refreshSmeltPoints(nowSeconds);
+        if (cost > Math.floor(smeltPoints)) {
+            return false;
+        }
+        smeltPoints = Math.max(0.0, smeltPoints - cost);
+        lastSmeltPointUpdateSeconds = Math.max(0.0, nowSeconds);
+        return true;
+    }
+
+    public synchronized void restoreSmeltPoints(int amount, double nowSeconds) {
+        if (amount <= 0) return;
+        refreshSmeltPoints(nowSeconds);
+        smeltPoints = Math.min(smeltPointCap, smeltPoints + amount);
+    }
+
+    public synchronized void fillSmeltPoints(double nowSeconds) {
+        refreshSmeltPoints(nowSeconds);
+        smeltPoints = smeltPointCap;
+    }
+
+    private synchronized void refreshSmeltPoints(double nowSeconds) {
+        double safeNow = Math.max(0.0, nowSeconds);
+        if (lastSmeltPointUpdateSeconds < 0) {
+            lastSmeltPointUpdateSeconds = safeNow;
+        }
+        if (safeNow < lastSmeltPointUpdateSeconds) {
+            lastSmeltPointUpdateSeconds = safeNow;
+            return;
+        }
+        if (smeltPoints >= smeltPointCap) {
+            smeltPoints = smeltPointCap;
+            lastSmeltPointUpdateSeconds = safeNow;
+            return;
+        }
+        if (smeltPointRegenSeconds <= 0) {
+            smeltPoints = smeltPointCap;
+            lastSmeltPointUpdateSeconds = safeNow;
+            return;
+        }
+
+        double elapsed = safeNow - lastSmeltPointUpdateSeconds;
+        if (elapsed <= 0) return;
+
+        double regen = elapsed / smeltPointRegenSeconds;
+        if (regen > 0) {
+            smeltPoints = Math.min(smeltPointCap, smeltPoints + regen);
+            lastSmeltPointUpdateSeconds = safeNow;
+        }
+    }
+
+    public void startSmeltJob(int sourceItemId, int resultItemId, int quantity, int costPerOre, double secondsPerOre, double startedAtSeconds) {
+        if (sourceItemId <= 0 || resultItemId <= 0 || quantity <= 0 || secondsPerOre <= 0) return;
+        this.activeSmeltJob = new ActiveSmeltJob(sourceItemId, resultItemId, quantity, costPerOre, secondsPerOre, startedAtSeconds);
+    }
+
+    public boolean hasActiveSmeltJob() { return activeSmeltJob != null; }
+    public ActiveSmeltJob getActiveSmeltJob() { return activeSmeltJob; }
+    public int getReadySmeltCount(double nowSeconds) { return activeSmeltJob == null ? 0 : activeSmeltJob.getReadyCount(nowSeconds); }
+
+    public int collectReadySmeltedItems(double nowSeconds) {
+        if (activeSmeltJob == null) return 0;
+
+        int ready = activeSmeltJob.getReadyCount(nowSeconds);
+        if (ready <= 0) return 0;
+
+        int resultItemId = activeSmeltJob.getResultItemId();
+        playerState.getInventory().addItem(resultItemId, ready);
+
+        int remaining = activeSmeltJob.getQuantity() - ready;
+        if (remaining > 0) {
+            double nextStart = activeSmeltJob.getStartedAtSeconds() + (ready * activeSmeltJob.getSecondsPerOre());
+            activeSmeltJob = new ActiveSmeltJob(
+                activeSmeltJob.getSourceItemId(),
+                activeSmeltJob.getResultItemId(),
+                remaining,
+                activeSmeltJob.getCostPerOre(),
+                activeSmeltJob.getSecondsPerOre(),
+                nextStart
+            );
+        } else {
+            activeSmeltJob = null;
+        }
+
+        return ready;
+    }
+
+    public void cancelSmeltSelectionBackToInventory(int itemId, int quantity) {
+        if (itemId > 0 && quantity > 0) {
+            playerState.getInventory().addItem(itemId, quantity);
+        }
     }
 }

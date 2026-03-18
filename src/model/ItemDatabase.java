@@ -6,6 +6,7 @@ package model;
 
 import db.dbcon;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -69,12 +70,12 @@ public final class ItemDatabase {
 
                 item itm = new item(itemId, itemName, price);
 
-                itm.setStr(rs.getInt("str"));
-                itm.setAgi(rs.getInt("agi"));
-                itm.setDex(rs.getInt("dex"));
-                itm.setVid(rs.getInt("vit"));
-                itm.setHp(rs.getInt("hp"));
-                itm.setStimana(rs.getInt("stamina"));
+                setItemStat(itm, rs.getInt("str"), "setStr");
+                setItemStat(itm, rs.getInt("agi"), "setAgi");
+                setItemStat(itm, rs.getInt("dex"), "setDex");
+                setItemStat(itm, rs.getInt("vit"), "setVit", "setVid");
+                setItemStat(itm, rs.getInt("hp"), "setHp");
+                setItemStat(itm, rs.getInt("stamina"), "setStamina", "setStamana", "setStimana", "setMp");
 
                 allItems.add(itm);
                 itemById.put(itemId, itm);
@@ -86,10 +87,23 @@ public final class ItemDatabase {
 
             loaded = true;
             System.out.println("Loaded items: " + allItems.size());
-
         } catch (Exception e) {
             loaded = false;
             e.printStackTrace();
+        }
+    }
+
+    private static void setItemStat(item itm, int value, String... setterNames) {
+        if (itm == null || setterNames == null) return;
+
+        for (String setterName : setterNames) {
+            if (setterName == null || setterName.isBlank()) continue;
+            try {
+                Method method = itm.getClass().getMethod(setterName, int.class);
+                method.invoke(itm, value);
+                return;
+            } catch (ReflectiveOperationException ignored) {
+            }
         }
     }
 
@@ -123,30 +137,27 @@ public final class ItemDatabase {
             return imageCache.get(itemId);
         }
 
-        String fileName = imageFileById.get(itemId);
-        if (fileName == null || fileName.isBlank()) {
+        String file = imageFileById.get(itemId);
+        if (file == null || file.isBlank()) {
+            imageCache.put(itemId, null);
             return null;
         }
 
-        try {
-            InputStream is = ItemDatabase.class.getResourceAsStream("/image/items/" + fileName);
-            if (is == null) {
-                System.out.println("Image not found: " + fileName);
-                return null;
-            }
+        String[] attempts = {
+            "/image/item/" + file,
+            "/image/items/" + file,
+            "/image/" + file
+        };
 
-            Image img = new Image(is);
-            imageCache.put(itemId, img);
-            return img;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+        for (String path : attempts) {
+            InputStream is = ItemDatabase.class.getResourceAsStream(path);
+            if (is == null) continue;
+            Image image = new Image(is);
+            imageCache.put(itemId, image);
+            return image;
         }
-    }
 
-    public static List<item> getFirstItems(int limit) {
-        int end = Math.min(limit, allItems.size());
-        return new ArrayList<>(allItems.subList(0, end));
+        imageCache.put(itemId, null);
+        return null;
     }
 }
