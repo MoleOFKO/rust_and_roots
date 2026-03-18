@@ -20,18 +20,28 @@
         <Group fx:id="uiRoot">
             <children>
                <Pane layoutX="25.0" layoutY="110.0" prefHeight="43.0" prefWidth="164.0" style="-fx-background-color: black; -fx-background-radius: 10px;" />
+            <ImageView fitHeight="33.0" fitWidth="167.0" layoutX="25.0" layoutY="17.0" pickOnBounds="true">
+               <image>
+                  <Image url="@../image/Admin/admin_bar.png" />
+               </image>
+            </ImageView>
                <Label layoutX="49.0" layoutY="25.0" text="Admin :" />
-               <Label fx:id="txtaname" layoutX="106.0" layoutY="25.0" text="Name" />
+               <Label fx:id="txtaname" layoutX="106.0" layoutY="25.0" prefHeight="17.0" prefWidth="77.0" text="Name" />
             <ImageView fitHeight="267.0" fitWidth="173.0" layoutX="20.0" layoutY="83.0" pickOnBounds="true">
                <image>
                   <Image url="@../image/Admin/paper_1of3.png" />
                </image>
             </ImageView>
-               <Button fx:id="btnecharacter" layoutX="37.0" layoutY="238.0" mnemonicParsing="false" onAction="#handlebtnecharacteraction" prefWidth="139.0" text="Edit Character" />
-               <Button fx:id="btneitem" layoutX="37.0" layoutY="158.0" mnemonicParsing="false" onAction="#handlebtneitemaction" prefWidth="139.0" text="Edit Item" />
-               <Button fx:id="btnaccmanagement" layoutX="37.0" layoutY="198.0" mnemonicParsing="false" onAction="#handlebtnaccmanagementaction" prefHeight="25.0" prefWidth="139.0" text="Account Management" />
-               <Button fx:id="btnvplayer" layoutX="37.0" layoutY="118.0" mnemonicParsing="false" onAction="#handlebtnvplayeraction" prefWidth="139.0" text="Account View" />
-               <Button fx:id="btnlogout" layoutX="37.0" layoutY="278.0" mnemonicParsing="false" onAction="#handlebtnlogoutaction" prefWidth="139.0" text="Logout" />
+               <Button fx:id="btnecharacter" layoutX="46.0" layoutY="238.0" mnemonicParsing="false" onAction="#handlebtnecharacteraction" prefHeight="25.0" prefWidth="121.0" text="Edit Character" />
+               <Button fx:id="btneitem" layoutX="45.0" layoutY="158.0" mnemonicParsing="false" onAction="#handlebtneitemaction" prefHeight="25.0" prefWidth="121.0" text="Edit Item" />
+               <Button fx:id="btnaccmanagement" layoutX="45.0" layoutY="198.0" mnemonicParsing="false" onAction="#handlebtnaccmanagementaction" prefHeight="25.0" prefWidth="121.0" text="Account Management" />
+               <Button fx:id="btnvplayer" layoutX="44.0" layoutY="118.0" mnemonicParsing="false" onAction="#handlebtnvplayeraction" prefHeight="25.0" prefWidth="119.0" text="Account View" />
+            <ImageView fitHeight="32.0" fitWidth="120.0" layoutX="46.0" layoutY="276.0" pickOnBounds="true">
+               <image>
+                  <Image url="@../image/Admin/logout_btn.png" />
+               </image>
+            </ImageView>
+               <Button fx:id="btnlogout" layoutX="46.0" layoutY="278.0" mnemonicParsing="false" onAction="#handlebtnlogoutaction" opacity="0.0" prefHeight="25.0" prefWidth="120.0" text="Logout" />
             <ImageView fitHeight="487.0" fitWidth="643.0" layoutX="181.0" layoutY="23.0" pickOnBounds="true">
                <image>
                   <Image url="@../image/Admin/paper_2of3.png" />
