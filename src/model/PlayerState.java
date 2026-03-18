@@ -2,6 +2,8 @@ package model;
 
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 /**
  * Player data that must persist across map changes.
@@ -13,6 +15,9 @@ public final class PlayerState {
     private static final int DEFAULT_STAMINA = 100;
     private static final int DEFAULT_AGI = 5;
     private static final int DEFAULT_DEX = 5;
+    private static final int DEFAULT_STR = 5;
+    private static final int DEFAULT_VIT = 5;
+    private static final String DEFAULT_NAME = "Player";
 
     private final Inventory inventory;
 
@@ -25,6 +30,11 @@ public final class PlayerState {
     private final IntegerProperty stamina = new SimpleIntegerProperty(DEFAULT_STAMINA);
     private final IntegerProperty agi = new SimpleIntegerProperty(DEFAULT_AGI);
     private final IntegerProperty dex = new SimpleIntegerProperty(DEFAULT_DEX);
+    private final IntegerProperty str = new SimpleIntegerProperty(DEFAULT_STR);
+    private final IntegerProperty vit = new SimpleIntegerProperty(DEFAULT_VIT);
+    private final IntegerProperty exp = new SimpleIntegerProperty(0);
+//    private final IntegerProperty statPoints = new SimpleIntegerProperty(0);
+    private final StringProperty playerName = new SimpleStringProperty(DEFAULT_NAME);
 
     private static final int HOTBAR_SIZE = 5;
     private final int[] hotbarItemIds = new int[HOTBAR_SIZE];
@@ -134,6 +144,96 @@ public final class PlayerState {
 
     public int getMaxStamina() {
         return maxStamina.get();
+    }
+
+    public void setMaxHp(int value) {
+        maxHp.set(Math.max(1, value));
+        if (getHp() > getMaxHp()) {
+            setHp(getMaxHp());
+        }
+    }
+
+    public void setMaxStamina(int value) {
+        maxStamina.set(Math.max(1, value));
+        if (getStamina() > getMaxStamina()) {
+            setStamina(getMaxStamina());
+        }
+    }
+
+    public IntegerProperty strProperty() {
+        return str;
+    }
+
+    public int getStr() {
+        return str.get();
+    }
+
+    public void setStr(int value) {
+        str.set(Math.max(0, value));
+    }
+
+    public IntegerProperty vitProperty() {
+        return vit;
+    }
+
+    public int getVit() {
+        return vit.get();
+    }
+
+    public void setVit(int value) {
+        vit.set(Math.max(0, value));
+    }
+
+    public IntegerProperty expProperty() {
+        return exp;
+    }
+
+    public int getExp() {
+        return exp.get();
+    }
+
+    public void setExp(int value) {
+        exp.set(Math.max(0, value));
+    }
+
+//    public IntegerProperty statPointsProperty() {
+//        return statPoints;
+//    }
+
+//    public int getStatPoints() {
+//        return statPoints.get();
+//    }
+
+//    public void setStatPoints(int value) {
+//        statPoints.set(Math.max(0, value));
+//    }
+
+//    public void addStatPoints(int amount) {
+//        if (amount == 0) return;
+//        setStatPoints(getStatPoints() + amount);
+//    }
+
+//    public boolean consumeStatPoints(int amount) {
+//        if (amount <= 0) return true;
+//        if (getStatPoints() < amount) return false;
+//        setStatPoints(getStatPoints() - amount);
+//        return true;
+//    }
+
+    public StringProperty playerNameProperty() {
+        return playerName;
+    }
+
+    public String getPlayerName() {
+        return playerName.get();
+    }
+
+    public void setPlayerName(String value) {
+        if (value == null || value.isBlank()) {
+            playerName.set(DEFAULT_NAME);
+        } else {
+            playerName.set(value);
+        }
     }
 
     public boolean isDead() {

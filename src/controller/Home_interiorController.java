@@ -792,9 +792,12 @@ public class Home_interiorController extends BaseMapController {
             // move to next morning
             time.setDay(time.dayNumberProperty().get() + 1);
             time.setTimeOfDay(6, 0);
-            playerState.setHp((int) (playerState.getMaxHp() * 0.8));
-            playerState.setStamina((int) (playerState.getMaxStamina() * 0.8));
-
+            if(playerState.getMaxHp() <= playerState.getMaxHp() * 0.8){
+                playerState.setHp((int) (playerState.getMaxHp() * 0.8));
+            }
+            if(playerState.getMaxStamina() <= playerState.getMaxStamina() * 0.8){
+                playerState.setStamina((int) (playerState.getMaxStamina() * 0.8));
+            }
             sleepStackPane.setVisible(false);
             sleepStackPane.setDisable(true);
             sleepStackPane.setManaged(false);
