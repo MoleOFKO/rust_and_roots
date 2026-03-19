@@ -1,10 +1,201 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.Group?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.text.Font?>
 
-<StackPane fx:id="view" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
+<StackPane fx:id="view" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.CraftController">
    <children>
-      <Group fx:id="world" />
+      <Group fx:id="world">
+         <children>
+            <ImageView fitHeight="400.0" fitWidth="600.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../image/crafting.png" />
+               </image></ImageView>
+            <ImageView fx:id="resultitem" fitHeight="106.0" fitWidth="104.0" layoutX="325.0" layoutY="90.0" onMouseClicked="#handleresultitemaction" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../image/items/Skull4.png" />
+               </image>
+            </ImageView>
+            <Group fx:id="craftrecipe" layoutX="27.0" layoutY="66.0">
+               <children>
+                  <ImageView fx:id="craft" fitHeight="55.0" fitWidth="55.0" onMouseClicked="#handlecraftrecipeaction" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../image/items/tomato.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="craft1" fitHeight="55.0" fitWidth="55.0" layoutX="62.0" onMouseClicked="#handlecraftrecipeaction" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../image/items/tomato.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="craft2" fitHeight="55.0" fitWidth="55.0" layoutX="124.0" onMouseClicked="#handlecraftrecipeaction" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../image/items/tomato.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="craft3" fitHeight="55.0" fitWidth="55.0" layoutX="185.0" onMouseClicked="#handlecraftrecipeaction" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../image/items/tomato.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="craft4" fitHeight="55.0" fitWidth="55.0" layoutY="61.0" onMouseClicked="#handlecraftrecipeaction" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../image/items/tomato.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="craft5" fitHeight="55.0" fitWidth="55.0" layoutX="62.0" layoutY="61.0" onMouseClicked="#handlecraftrecipeaction" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../image/items/tomato.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="craft6" fitHeight="55.0" fitWidth="55.0" layoutX="124.0" layoutY="61.0" onMouseClicked="#handlecraftrecipeaction" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../image/items/tomato.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="craft7" fitHeight="55.0" fitWidth="55.0" layoutX="185.0" layoutY="61.0" onMouseClicked="#handlecraftrecipeaction" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../image/items/tomato.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="craft8" fitHeight="55.0" fitWidth="55.0" layoutY="121.0" onMouseClicked="#handlecraftrecipeaction" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../image/items/tomato.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="craft9" fitHeight="55.0" fitWidth="55.0" layoutX="62.0" layoutY="121.0" onMouseClicked="#handlecraftrecipeaction" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../image/items/tomato.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="craft10" fitHeight="55.0" fitWidth="55.0" layoutX="124.0" layoutY="121.0" onMouseClicked="#handlecraftrecipeaction" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../image/items/tomato.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="craft11" fitHeight="55.0" fitWidth="55.0" layoutX="185.0" layoutY="121.0" onMouseClicked="#handlecraftrecipeaction" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../image/items/tomato.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="craft12" fitHeight="55.0" fitWidth="55.0" layoutY="182.0" onMouseClicked="#handlecraftrecipeaction" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../image/items/tomato.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="craft13" fitHeight="55.0" fitWidth="55.0" layoutX="62.0" layoutY="182.0" onMouseClicked="#handlecraftrecipeaction" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../image/items/tomato.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="craft14" fitHeight="55.0" fitWidth="55.0" layoutX="124.0" layoutY="182.0" onMouseClicked="#handlecraftrecipeaction" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../image/items/tomato.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="craft15" fitHeight="55.0" fitWidth="55.0" layoutX="185.0" layoutY="182.0" onMouseClicked="#handlecraftrecipeaction" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../image/items/tomato.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="craft16" fitHeight="55.0" fitWidth="55.0" layoutY="243.0" onMouseClicked="#handlecraftrecipeaction" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../image/items/tomato.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="craft17" fitHeight="55.0" fitWidth="55.0" layoutX="62.0" layoutY="243.0" onMouseClicked="#handlecraftrecipeaction" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../image/items/tomato.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="craft18" fitHeight="55.0" fitWidth="55.0" layoutX="124.0" layoutY="243.0" onMouseClicked="#handlecraftrecipeaction" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../image/items/tomato.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="craft19" fitHeight="55.0" fitWidth="55.0" layoutX="185.0" layoutY="243.0" onMouseClicked="#handlecraftrecipeaction" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../image/items/tomato.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </Group>
+            <Group layoutX="319.0" layoutY="246.0">
+               <children>
+                  <ImageView fx:id="ing1" fitHeight="42.0" fitWidth="42.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../image/items/Skull4.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="ing2" fitHeight="42.0" fitWidth="42.0" layoutX="49.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../image/items/Blackened%20meat.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="ing3" fitHeight="42.0" fitWidth="42.0" layoutX="98.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../image/items/Blue%20cloth.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="ing4" fitHeight="42.0" fitWidth="42.0" layoutX="147.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../image/items/Tintoberry.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </Group>
+            <Label fx:id="ing1lbl" alignment="CENTER" layoutX="323.0" layoutY="288.0" prefHeight="17.0" prefWidth="38.0" text="/" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+            </Label>
+            <Label fx:id="ing2lbl" alignment="CENTER" layoutX="371.0" layoutY="288.0" prefHeight="17.0" prefWidth="38.0" text="/" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+            </Label>
+            <Label fx:id="ing3lbl" alignment="CENTER" layoutX="419.0" layoutY="288.0" prefHeight="17.0" prefWidth="38.0" text="/" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+            </Label>
+            <Label fx:id="ing4lbl" alignment="CENTER" layoutX="469.0" layoutY="288.0" prefHeight="17.0" prefWidth="38.0" text="/" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+            </Label>
+            <Label fx:id="lblname" layoutX="438.0" layoutY="96.0" prefHeight="17.0" prefWidth="129.0" text="Name :">
+               <font>
+                  <Font name="System Bold" size="13.0" />
+               </font>
+            </Label>
+            <Button fx:id="btncraftitem" layoutX="441.0" layoutY="310.0" mnemonicParsing="false" onAction="#handlecraftitemaction" opacity="0.0" prefHeight="40.0" prefWidth="121.0" />
+            <Label fx:id="lblwt" layoutX="438.0" layoutY="115.0" prefHeight="17.0" prefWidth="129.0" text="Waiting time :">
+               <font>
+                  <Font name="System Bold" size="13.0" />
+               </font>
+            </Label>
+            <Label fx:id="lblsr" layoutX="438.0" layoutY="161.0" prefHeight="17.0" prefWidth="129.0" text="Success rate: 100%">
+               <font>
+                  <Font name="System Bold" size="13.0" />
+               </font>
+            </Label>
+            <Label fx:id="lbleffect" layoutX="438.0" layoutY="139.0" prefHeight="17.0" prefWidth="129.0" text="Effect : ">
+               <font>
+                  <Font name="System Bold" size="13.0" />
+               </font>
+            </Label>
+            <Button fx:id="btnclose" layoutX="319.0" layoutY="313.0" mnemonicParsing="false" onAction="#handlecloseaction" opacity="0.0" prefHeight="34.0" prefWidth="112.0" />
+            <ImageView fitHeight="143.0" fitWidth="145.0" layoutX="301.0" layoutY="76.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../image/frame.png" />
+               </image>
+            </ImageView>
+         </children></Group>
    </children>
 </StackPane>
