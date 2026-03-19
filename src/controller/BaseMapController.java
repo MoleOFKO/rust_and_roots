@@ -204,13 +204,26 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         this.gameState = gs;
         SpawnTag spawn = gs.consumePendingSpawn();
 
-        Platform.runLater(() -> applySpawn(spawn));
+        Platform.runLater(() -> {
+            boolean shouldUseSavedPosition =
+                    gs.getCurrentSaveId() > 0 &&
+                    mapKey().equals(gs.getCurrentMapKey()) &&
+                    spawn == SpawnTag.DEFAULT;
+
+            if (shouldUseSavedPosition) {
+                human.setLayoutX(gs.getPlayerX());
+                human.setLayoutY(gs.getPlayerY());
+            } else {
+                applySpawn(spawn);
+            }
+        });
     }
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         if (gameState == null) gameState = GameState.get();
 
+        ItemDatabase.loadItems();
         playerState = gameState.getPlayerState();
 
         player = new Player(
@@ -225,7 +238,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
         player.setOnToggleHotbarRequest(this::toggleHotbarVisible);
         player.setOnHotbarSlotRequest(this::selectHotbarSlot);
-        
+
         view.sceneProperty().addListener((obs, oldScene, newScene) -> {
             if (newScene != null) {
                 player.attachInput(newScene);
@@ -235,8 +248,6 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         if (walls != null) {
             player.setWalls(CollisionRegistry.collectWalls(walls));
         }
-
-//        applySpawn(gameState.consumePendingSpawn());
 
         interactionManager = new InteractionManager();
         configureExits();
@@ -254,9 +265,13 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         player.start();
 
         afterBaseInitialize();
+        capturePlayerSnapshot();
+        applyLoadedPositionIfCurrentMap();
     }
 
     protected final void stopAndSwitchScene(String targetFxml, SpawnTag targetSpawn) {
+        capturePlayerSnapshot();
+        
         if (gameLoop != null) gameLoop.stop();
         if (player != null) player.stop();
         SceneManager.switchScene(targetFxml, targetSpawn);
@@ -920,4 +935,20 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         return (itm == null) ? ("item-" + itemId) : itm.getItem_name();
     }
     
+    protected void capturePlayerSnapshot() {
+        if (gameState == null || human == null) return;
+
+        gameState.setCurrentMapKey(mapKey());
+        gameState.setPlayerX(human.getLayoutX());
+        gameState.setPlayerY(human.getLayoutY());
+    }
+    
+    protected void applyLoadedPositionIfCurrentMap() {
+        if (gameState == null || human == null) return;
+
+        if (mapKey().equals(gameState.getCurrentMapKey())) {
+            human.setLayoutX(gameState.getPlayerX());
+            human.setLayoutY(gameState.getPlayerY());
+        }
+    }
 }
