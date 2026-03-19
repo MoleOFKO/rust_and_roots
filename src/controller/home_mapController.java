@@ -1,5 +1,6 @@
 package controller;
 
+import db.SaveGameService;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -36,6 +37,7 @@ import model.InteractionZone;
 import util.SceneManager;
 import util.SpawnTag;
 import java.util.Comparator;
+import javafx.application.Platform;
 import javafx.collections.MapChangeListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
@@ -427,8 +429,6 @@ public class home_mapController extends BaseMapController {
     @FXML
     private Label Playerinvlbl19;
     @FXML
-    private ImageView btnclose1;
-    @FXML
     private Label statusName;
     @FXML
     private Label statusEXP;
@@ -475,8 +475,6 @@ public class home_mapController extends BaseMapController {
     @FXML
     private ImageView btnclose;
     @FXML
-    private ImageView btnclose2;
-    @FXML
     private Button openInventory;
     @FXML
     private Button openstatus;
@@ -502,6 +500,7 @@ public class home_mapController extends BaseMapController {
     private Label lbldays;
     @FXML
     private Label lbltime;
+
 
     private enum MenuTab { INVENTORY, STATUS, SETTINGS }
 
@@ -1221,10 +1220,27 @@ public class home_mapController extends BaseMapController {
     }
 
     @FXML
-    private void handleopensettingaction(ActionEvent event) {
+        private void handleopensettingaction(ActionEvent event) {
         if (!inventoryOverlay.isVisible()) {
             setInventoryOpen(true);
         }
         setActiveMenuTab(MenuTab.SETTINGS);
+    }
+
+    @FXML
+    private void handlesaveexitaction(ActionEvent event) {
+        try {
+            capturePlayerSnapshot();
+
+            SaveGameService saveService = new SaveGameService();
+            saveService.saveGame(GameState.get());
+
+            if (gameLoop != null) gameLoop.stop();
+            if (player != null) player.stop();
+
+            Platform.exit();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
