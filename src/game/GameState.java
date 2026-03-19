@@ -455,4 +455,54 @@ public final class GameState {
             playerState.getInventory().addItem(itemId, quantity);
         }
     }
+    
+    private int currentCharacterId = -1;
+    private int currentSaveId = -1;
+    private String currentMapKey = "home_map";
+    private double playerX = 0;
+    private double playerY = 0;
+
+    public int getCurrentCharacterId() {
+        return currentCharacterId;
+    }
+
+    public void setCurrentCharacterId(int currentCharacterId) {
+        this.currentCharacterId = currentCharacterId;
+    }
+
+    public int getCurrentSaveId() {
+        return currentSaveId;
+    }
+
+    public void setCurrentSaveId(int currentSaveId) {
+        this.currentSaveId = currentSaveId;
+    }
+
+    public boolean hasActiveSave() {
+        return currentSaveId > 0;
+    }
+
+    public String getCurrentMapKey() {
+        return currentMapKey;
+    }
+
+    public void setCurrentMapKey(String currentMapKey) {
+        this.currentMapKey = currentMapKey;
+    }
+
+    public double getPlayerX() {
+        return playerX;
+    }
+
+    public void setPlayerX(double playerX) {
+        this.playerX = playerX;
+    }
+
+    public double getPlayerY() {
+        return playerY;
+    }
+
+    public void setPlayerY(double playerY) {
+        this.playerY = playerY;
+    }
 }
