@@ -1,6 +1,5 @@
 package controller;
 
-import db.SaveGameService;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -1229,18 +1228,18 @@ public class home_mapController extends BaseMapController {
 
     @FXML
     private void handlesaveexitaction(ActionEvent event) {
-        try {
-            capturePlayerSnapshot();
-
-            SaveGameService saveService = new SaveGameService();
-            saveService.saveGame(GameState.get());
-
-            if (gameLoop != null) gameLoop.stop();
-            if (player != null) player.stop();
-
-            Platform.exit();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        try {
+//            capturePlayerSnapshot();
+//
+//            SaveGameService saveService = new SaveGameService();
+//            saveService.saveGame(GameState.get());
+//
+//            if (gameLoop != null) gameLoop.stop();
+//            if (player != null) player.stop();
+//
+//            Platform.exit();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
     }
 }
