@@ -792,7 +792,7 @@
                         <Button fx:id="btnsetday" layoutX="199.0" layoutY="263.0" mnemonicParsing="false" text="Set Day" />
                         <Button fx:id="btnsetnight" layoutX="108.0" layoutY="263.0" mnemonicParsing="false" text="Set Night" />
                         <Button fx:id="btnplus1h" layoutX="277.0" layoutY="263.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="59.0" text="+1 h" />
-                        <Button fx:id="btnsaveandexit" layoutX="367.0" layoutY="263.0" mnemonicParsing="false" text="Save &amp; Exit" />
+                        <Button fx:id="btnsaveandexit" layoutX="367.0" layoutY="263.0" mnemonicParsing="false" onAction="#handlesaveexitaction" text="Save &amp; Exit" />
                         <Label fx:id="sliderscale" layoutX="108.0" layoutY="155.0" prefHeight="30.0" prefWidth="297.0" text="Current Time Speed :" textFill="WHITE">
                            <font>
                               <Font name="System Bold" size="15.0" />
