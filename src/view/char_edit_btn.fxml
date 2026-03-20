@@ -25,20 +25,23 @@
                </image>
             </ImageView>
                <Label layoutX="6.0" layoutY="28.0" prefHeight="17.0" prefWidth="49.0" text="Admin:" />
-               <Label fx:id="lblaname" layoutX="48.0" layoutY="28.0" prefHeight="17.0" prefWidth="67.0" text="Name" />
+               <Label fx:id="lblaname" layoutX="53.0" layoutY="28.0" prefHeight="21.0" prefWidth="62.0" text="Name" />
             <ImageView fitHeight="520.0" fitWidth="399.0" layoutX="105.0" layoutY="6.0" pickOnBounds="true">
                <image>
                   <Image url="@../image/Admin/paper_2of3.png" />
                </image>
             </ImageView>
                <TextField fx:id="txtmname" layoutX="233.0" layoutY="36.0" prefHeight="25.0" prefWidth="194.0" styleClass="textbox" stylesheets="@../css/style.css" />
-               <TextField fx:id="txtstr" layoutX="234.0" layoutY="104.0" prefHeight="25.0" prefWidth="195.0" styleClass="textbox" stylesheets="@../css/style.css" />
-               <TextField fx:id="txtagi" layoutX="235.0" layoutY="138.0" prefHeight="25.0" prefWidth="194.0" styleClass="textbox" stylesheets="@../css/style.css" />
-               <TextField fx:id="txtdex" layoutX="236.0" layoutY="175.0" prefHeight="25.0" prefWidth="193.0" styleClass="textbox" stylesheets="@../css/style.css" />
-               <TextField fx:id="txtvid" layoutX="235.0" layoutY="212.0" prefHeight="25.0" prefWidth="195.0" styleClass="textbox" stylesheets="@../css/style.css" />
-               <TextField fx:id="txthp" layoutX="235.0" layoutY="248.0" prefHeight="25.0" prefWidth="196.0" styleClass="textbox" stylesheets="@../css/style.css" />
-               <TextField fx:id="txtstamina" layoutX="235.0" layoutY="285.0" prefHeight="25.0" prefWidth="197.0" styleClass="textbox" stylesheets="@../css/style.css" />
-               <ImageView fx:id="mobimg" fitHeight="150.0" fitWidth="184.0" layoutX="209.0" layoutY="324.0" pickOnBounds="true" preserveRatio="true" />
+               <TextField fx:id="txtstr" layoutX="233.0" layoutY="104.0" prefHeight="25.0" prefWidth="195.0" styleClass="textbox" stylesheets="@../css/style.css" />
+               <TextField fx:id="txtagi" layoutX="233.0" layoutY="138.0" prefHeight="35.0" prefWidth="196.0" styleClass="textbox" stylesheets="@../css/style.css" />
+               <TextField fx:id="txtdex" layoutX="233.0" layoutY="175.0" prefHeight="35.0" prefWidth="196.0" styleClass="textbox" stylesheets="@../css/style.css" />
+               <TextField fx:id="txtvid" layoutX="233.0" layoutY="212.0" prefHeight="35.0" prefWidth="196.0" styleClass="textbox" stylesheets="@../css/style.css" />
+               <TextField fx:id="txthp" layoutX="233.0" layoutY="248.0" prefHeight="35.0" prefWidth="196.0" styleClass="textbox" stylesheets="@../css/style.css" />
+               <TextField fx:id="txtstamina" layoutX="233.0" layoutY="285.0" prefHeight="35.0" prefWidth="196.0" styleClass="textbox" stylesheets="@../css/style.css" />
+               <ImageView fx:id="mobimg" fitHeight="150.0" fitWidth="184.0" layoutX="209.0" layoutY="324.0" pickOnBounds="true">
+               <image>
+                  <Image url="@../image/Admin/image_box.png" />
+               </image></ImageView>
             <ImageView fitHeight="34.0" fitWidth="90.0" layoutX="394.0" layoutY="383.0" pickOnBounds="true">
                <image>
                   <Image url="@../image/Admin/upload_btn.png" />
@@ -59,9 +62,9 @@
                <Label layoutX="165.0" layoutY="216.0" prefHeight="17.0" prefWidth="67.0" text="VIT" />
                <Label layoutX="165.0" layoutY="252.0" prefHeight="17.0" prefWidth="67.0" text="HP" />
                <Label layoutX="165.0" layoutY="289.0" prefHeight="17.0" prefWidth="67.0" text="Stamina" />
-               <Label layoutX="270.0" layoutY="390.0" prefHeight="17.0" prefWidth="66.0" text="Inset Image" />
+               <Label layoutX="265.0" layoutY="390.0" prefHeight="21.0" prefWidth="80.0" text="Inset Image" />
             <ImageView fitHeight="149.0" fitWidth="181.0" layoutX="211.0" layoutY="324.0" pickOnBounds="true" />
-               <BorderPane layoutX="209.0" layoutY="324.0" prefHeight="150.0" prefWidth="183.0" style="-fx-border-color: black;" />
+               <BorderPane layoutX="209.0" layoutY="324.0" prefHeight="150.0" prefWidth="183.0" style="-fx-border-color: black; -fx-border-radius: 10px;" />
             <ImageView fitHeight="37.0" fitWidth="94.0" layoutX="503.0" layoutY="11.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../image/Admin/admin_back_button.png" />
@@ -72,7 +75,7 @@
                      <FontAwesomeIcon glyphName="ARROW_LEFT" />
                   </graphic>
                </Button>
-               <TextField fx:id="txtmobstype" layoutX="234.0" layoutY="69.0" prefHeight="25.0" prefWidth="194.0" styleClass="textbox" stylesheets="@../css/style.css" />
+               <TextField fx:id="txtmobstype" layoutX="233.0" layoutY="69.0" prefHeight="25.0" prefWidth="194.0" styleClass="textbox" stylesheets="@../css/style.css" />
             <Label layoutX="-3.0" layoutY="3.0" prefHeight="17.0" prefWidth="16.0" />
             <Label layoutX="589.0" layoutY="508.0" prefHeight="17.0" prefWidth="16.0" />
             </children>
