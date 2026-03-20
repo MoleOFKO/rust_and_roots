@@ -4,6 +4,8 @@
  */
 package controller;
 
+import db.LoadGameService;
+import game.GameState;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -19,6 +21,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.image.ImageView;
 import static rust_and_roots.Rust_and_roots.stage;
+import util.SceneManager;
 
 /**
  * FXML Controller class
@@ -64,6 +67,28 @@ public class SaveloadsController implements Initializable {
 
     @FXML
     private void handlebtnLoadaction(ActionEvent event) {
+        try {
+            int saveId = GameState.get().getCurrentSaveId();
+
+            if (saveId <= 0) {
+                System.out.println("No save found for current account.");
+                return;
+            }
+
+            LoadGameService loadService = new LoadGameService();
+            boolean ok = loadService.loadGame(saveId);
+
+            if (!ok) {
+                System.out.println("Load failed.");
+                return;
+            }
+
+            String mapKey = GameState.get().getCurrentMapKey();
+            SceneManager.switchScene("/view/" + mapKey + ".fxml");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML

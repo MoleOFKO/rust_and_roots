@@ -781,7 +781,23 @@ public class home_mapController extends BaseMapController {
         if (btnsetday != null) btnsetday.setOnAction(e -> time.setTimeOfDay(8, 0));
         if (btnsetnight != null) btnsetnight.setOnAction(e -> time.setTimeOfDay(20, 0));
         if (btnplus1h != null) btnplus1h.setOnAction(e -> time.addMinutes(60));
-        if (btnsaveandexit != null) btnsaveandexit.setOnAction(e -> setInventoryOpen(false));
+        if (btnsaveandexit != null) {
+            btnsaveandexit.setOnAction(e -> {
+                try {
+                    capturePlayerSnapshot();
+
+                    SaveGameService saveService = new SaveGameService();
+                    saveService.saveGame(GameState.get());
+
+                    if (gameLoop != null) gameLoop.stop();
+                    if (player != null) player.stop();
+
+                    Platform.exit();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            });
+        }
     }
 
     private void setupMenuTabs() {

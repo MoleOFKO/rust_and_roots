@@ -333,3 +333,96 @@ public final class GameState {
     }
     
 }
+
+    public void startSmeltJob(int sourceItemId, int resultItemId, int quantity, int costPerOre, double secondsPerOre, double startedAtSeconds) {
+        if (sourceItemId <= 0 || resultItemId <= 0 || quantity <= 0 || secondsPerOre <= 0) return;
+        this.activeSmeltJob = new ActiveSmeltJob(sourceItemId, resultItemId, quantity, costPerOre, secondsPerOre, startedAtSeconds);
+    }
+
+    public boolean hasActiveSmeltJob() { return activeSmeltJob != null; }
+    public ActiveSmeltJob getActiveSmeltJob() { return activeSmeltJob; }
+    public int getReadySmeltCount(double nowSeconds) { return activeSmeltJob == null ? 0 : activeSmeltJob.getReadyCount(nowSeconds); }
+
+    public int collectReadySmeltedItems(double nowSeconds) {
+        if (activeSmeltJob == null) return 0;
+
+        int ready = activeSmeltJob.getReadyCount(nowSeconds);
+        if (ready <= 0) return 0;
+
+        int resultItemId = activeSmeltJob.getResultItemId();
+        playerState.getInventory().addItem(resultItemId, ready);
+
+        int remaining = activeSmeltJob.getQuantity() - ready;
+        if (remaining > 0) {
+            double nextStart = activeSmeltJob.getStartedAtSeconds() + (ready * activeSmeltJob.getSecondsPerOre());
+            activeSmeltJob = new ActiveSmeltJob(
+                activeSmeltJob.getSourceItemId(),
+                activeSmeltJob.getResultItemId(),
+                remaining,
+                activeSmeltJob.getCostPerOre(),
+                activeSmeltJob.getSecondsPerOre(),
+                nextStart
+            );
+        } else {
+            activeSmeltJob = null;
+        }
+
+        return ready;
+    }
+
+    public void cancelSmeltSelectionBackToInventory(int itemId, int quantity) {
+        if (itemId > 0 && quantity > 0) {
+            playerState.getInventory().addItem(itemId, quantity);
+        }
+    }
+    
+    private int currentCharacterId = -1;
+    private int currentSaveId = -1;
+    private String currentMapKey = "home_map";
+    private double playerX = 0;
+    private double playerY = 0;
+
+    public int getCurrentCharacterId() {
+        return currentCharacterId;
+    }
+
+    public void setCurrentCharacterId(int currentCharacterId) {
+        this.currentCharacterId = currentCharacterId;
+    }
+
+    public int getCurrentSaveId() {
+        return currentSaveId;
+    }
+
+    public void setCurrentSaveId(int currentSaveId) {
+        this.currentSaveId = currentSaveId;
+    }
+
+    public boolean hasActiveSave() {
+        return currentSaveId > 0;
+    }
+
+    public String getCurrentMapKey() {
+        return currentMapKey;
+    }
+
+    public void setCurrentMapKey(String currentMapKey) {
+        this.currentMapKey = currentMapKey;
+    }
+
+    public double getPlayerX() {
+        return playerX;
+    }
+
+    public void setPlayerX(double playerX) {
+        this.playerX = playerX;
+    }
+
+    public double getPlayerY() {
+        return playerY;
+    }
+
+    public void setPlayerY(double playerY) {
+        this.playerY = playerY;
+    }
+}

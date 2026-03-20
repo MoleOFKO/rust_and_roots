@@ -5,6 +5,7 @@
 package controller;
 
 import db.dbcon;
+import game.GameState;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
@@ -106,7 +107,7 @@ public class LoginController implements Initializable {
                 if (rs.next()) {
                     // login success
                     
-                    String sql="select account_name, passwords, user_type,account_stats from accounts where account_name=? and passwords=?";
+                    String sql="select account_id,account_name, passwords, user_type,account_stats from accounts where account_name=? and passwords=?";
                     pst=con.prepareStatement(sql);
                     pst.setString(1, txtlname.getText());
                     pst.setString(2, txtlpassword.getText());
@@ -114,6 +115,7 @@ public class LoginController implements Initializable {
                     
                     while(rs.next()){
                         txtname = rs.getString("account_name");
+                        int id = rs.getInt("account_id");
                         String status = "active";
                         String dbstatus = rs.getString("account_stats");
                         
@@ -126,10 +128,40 @@ public class LoginController implements Initializable {
                         if(null==temp)JOptionPane.showMessageDialog(null, "Invalid!");else switch (temp) {
                             case "admin" ->                         {
                                     util.SceneManager.switchScene("/view/account_view.fxml");
-                                }
+                            }
                             case "user" ->                         {
-                                    util.SceneManager.switchScene("/view/main_menu.fxml");
+                                int accountId = rs.getInt("account_id");
+
+                                String charSql = "SELECT character_id FROM characters WHERE account_id=? LIMIT 1";
+                                try (PreparedStatement charPst = con.prepareStatement(charSql)) {
+                                    charPst.setInt(1, accountId);
+
+                                    try (ResultSet charRs = charPst.executeQuery()) {
+                                        if (!charRs.next()) {
+                                            JOptionPane.showMessageDialog(null, "No character found for this account.");
+                                            return;
+                                        }
+
+                                        int characterId = charRs.getInt("character_id");
+                                        GameState.get().setCurrentCharacterId(characterId);
+
+                                        String saveSql = "SELECT saved_id FROM save_game WHERE character_id=? ORDER BY saved_id LIMIT 1";
+                                        try (PreparedStatement savePst = con.prepareStatement(saveSql)) {
+                                            savePst.setInt(1, characterId);
+
+                                            try (ResultSet saveRs = savePst.executeQuery()) {
+                                                if (saveRs.next()) {
+                                                    GameState.get().setCurrentSaveId(saveRs.getInt("saved_id"));
+                                                } else {
+                                                    GameState.get().setCurrentSaveId(-1);
+                                                }
+                                            }
+                                        }
+
+                                        util.SceneManager.switchScene("/view/main_menu.fxml");
+                                    }
                                 }
+                            }
                             case "owner" -> {
                                 util.SceneManager.switchScene("/view/account_view.fxml");
                             }
@@ -207,19 +239,46 @@ public class LoginController implements Initializable {
                 
             }else{
                      
-            String sql="Insert into accounts (email,account_name,passwords,account_stats,user_type) values (?,?,?,'active','user')";
-            pst=con.prepareStatement(sql);
-            pst.setString(1, txtsgmail.getText());
-            pst.setString(2, txtsname.getText());
-            pst.setString(3, txtspassword.getText());
-            pst.executeUpdate();
-            JOptionPane.showMessageDialog(null, "Account created successfully");
-            
-            txtsname.setText("");
-            txtspassword.setText("");
-            txtscpassword.setText("");
-            
-            util.SceneManager.switchScene("/view/main_menu.fxml");
+                String sql = "INSERT INTO accounts (email,account_name,passwords,account_stats,user_type) VALUES (?,?,?,'active','user')";
+                try (PreparedStatement accPst = con.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
+                    accPst.setString(1, txtsgmail.getText());
+                    accPst.setString(2, txtsname.getText());
+                    accPst.setString(3, txtspassword.getText());
+                    accPst.executeUpdate();
+
+                    int accountId;
+                    try (ResultSet accKeys = accPst.getGeneratedKeys()) {
+                        if (!accKeys.next()) {
+                            JOptionPane.showMessageDialog(null, "Failed to create account.");
+                            return;
+                        }
+                        accountId = accKeys.getInt(1);
+                    }
+
+                    String charSql = "INSERT INTO characters (account_id, player_name, skin_id) VALUES (?, ?, NULL)";
+                    try (PreparedStatement charPst = con.prepareStatement(charSql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
+                        charPst.setInt(1, accountId);
+                        charPst.setString(2, txtsname.getText());
+                        charPst.executeUpdate();
+
+                        try (ResultSet charKeys = charPst.getGeneratedKeys()) {
+                            if (charKeys.next()) {
+                                int characterId = charKeys.getInt(1);
+                                GameState.get().setCurrentCharacterId(characterId);
+                                GameState.get().setCurrentSaveId(-1);
+                            }
+                        }
+                    }
+                }
+
+                JOptionPane.showMessageDialog(null, "Account created successfully");
+
+                txtsname.setText("");
+                txtspassword.setText("");
+                txtscpassword.setText("");
+                txtsgmail.setText("");
+
+                util.SceneManager.switchScene("/view/main_menu.fxml");
             }
                 
         
@@ -247,4 +306,17 @@ public class LoginController implements Initializable {
         Platform.exit();
     }
     
+    
+    private int findFirstSaveIdForCharacter(int characterId) throws SQLException {
+        String saveSql = "SELECT saved_id FROM save_game WHERE character_id=? ORDER BY saved_id LIMIT 1";
+        try (PreparedStatement savePst = con.prepareStatement(saveSql)) {
+            savePst.setInt(1, characterId);
+            try (ResultSet saveRs = savePst.executeQuery()) {
+                if (saveRs.next()) {
+                    return saveRs.getInt("saved_id");
+                }
+            }
+        }
+        return -1;
+    }
 }
