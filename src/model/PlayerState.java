@@ -5,6 +5,7 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+
 /**
  * Player data that must persist across map changes.
  * Keep this class free of JavaFX Nodes so it survives scene reloads.
