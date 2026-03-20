@@ -79,7 +79,6 @@ public class Merchant {
 
         view.setViewport(new Rectangle2D(0, 0, frameW, frameH));
         view.setMouseTransparent(true); // ✅ prevents button blocking
-//        setItems();
         }
         
     private void nextFrame() {
@@ -104,13 +103,6 @@ public class Merchant {
         timeline.stop();
     }
 
-//    public void setItems(){
-//        // starter list (edit as you like)
-//        items.add(new ShopItem("Parsnip Seeds", 20));
-//        items.add(new ShopItem("Potato Seeds", 50));
-//        items.add(new ShopItem("Watering Can Upgrade", 500));
-//    }
-    
     public List<ShopItem> getItems() {
         return Collections.unmodifiableList(items);
     }

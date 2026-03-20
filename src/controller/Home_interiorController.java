@@ -792,10 +792,10 @@ public class Home_interiorController extends BaseMapController {
             // move to next morning
             time.setDay(time.dayNumberProperty().get() + 1);
             time.setTimeOfDay(6, 0);
-            if(playerState.getMaxHp() <= playerState.getMaxHp() * 0.8){
+            if(playerState.getHp() <= playerState.getMaxHp() * 0.8){
                 playerState.setHp((int) (playerState.getMaxHp() * 0.8));
             }
-            if(playerState.getMaxStamina() <= playerState.getMaxStamina() * 0.8){
+            if(playerState.getStamina() <= playerState.getMaxStamina() * 0.8){
                 playerState.setStamina((int) (playerState.getMaxStamina() * 0.8));
             }
             sleepStackPane.setVisible(false);
@@ -1006,42 +1006,6 @@ public class Home_interiorController extends BaseMapController {
         }
     }
     
-//    private void refreshSlots(List<SlotData> slots, List<ImageView> images, List<Label> labels, List<Button> buttons, SelectionSource source) {
-//        for (int i = 0; i < images.size(); i++) {
-//            SlotData slot = (i < slots.size()) ? slots.get(i) : null;
-//            ImageView imageView = images.get(i);
-//            Label label = labels.get(i);
-//            Button button = buttons.get(i);
-//
-//            if (slot == null) {
-//                if (imageView != null) {
-//                    imageView.setImage(null);
-//                    imageView.setVisible(false);
-//                }
-//                if (label != null) {
-//                    label.setText("");
-//                }
-//                if (button != null) {
-//                    button.setDisable(true);
-//                }
-//                continue;
-//            }
-//
-//            if (imageView != null) {
-//                imageView.setImage(loadItemImage(slot.itemId()));
-//                imageView.setVisible(true);
-//            }
-//            if (label != null) {
-//                label.setText("x" + slot.quantity());
-//            }
-//            if (button != null) {
-//                button.setDisable(false);
-//            }
-//        }
-//
-//        refreshSelectionHighlight();
-//    }
-
     private void refreshSelectionHighlight() {
         highlightChestSelection();
         refreshPlayerInventorySelectionHighlight();
@@ -1076,44 +1040,5 @@ public class Home_interiorController extends BaseMapController {
             }
         }
     }
-
-//    private Image loadItemImage(int itemId) {
-//        item itm = ItemDatabase.getItemById(itemId);
-//        if (itm == null) return null;
-//
-//        for (String path : imageCandidates(itm)) {
-//            try (InputStream is = getClass().getResourceAsStream(path)) {
-//                if (is != null) {
-//                    return new Image(is);
-//                }
-//            } catch (Exception ignored) {
-//            }
-//        }
-//        return null;
-//    }
-
-//    private List<String> imageCandidates(item itm) {
-//        String name = itm.getItem_name();
-//        String normalized = name.toLowerCase()
-//            .replace(" ", "_")
-//            .replace("-", "_")
-//            .replace("'", "")
-//            .replace("__", "_");
-//
-//        List<String> candidates = new ArrayList<>();
-//        candidates.add("/image/items/" + normalized + ".png");
-//        if (normalized.endsWith("_seeds")) {
-//            candidates.add("/image/items/" + normalized.replace("_seeds", "") + "_seeds.png");
-//        }
-//        if (normalized.endsWith("s") && !normalized.endsWith("ss")) {
-//            candidates.add("/image/items/" + normalized.substring(0, normalized.length() - 1) + ".png");
-//        }
-//        return candidates;
-//    }
-//
-//    private String itemName(int itemId) {
-//        item itm = ItemDatabase.getItemById(itemId);
-//        return (itm == null) ? ("item-" + itemId) : itm.getItem_name();
-//    }
-    
+ 
 }
