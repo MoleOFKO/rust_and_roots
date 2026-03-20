@@ -15,6 +15,19 @@
     -fx-text-fill: #643302;
     -fx-prompt-text-fill: #643302;
 }
+.textbox{
+    -fx-border-color: #643302;
+    -fx-border-radius: 2px;
+    -fx-border-width: 2px;
+    -fx-background-color: transparent,transparent,transparent;
+    -fx-background-radius: 6px;
+    -fx-text-fill: #643302;
+    -fx-prompt-text-fill: #643302;
+}
+.textbox:focused {
+    -fx-background-color: transparent,transparent,transparent;
+    -fx-background-insets: 0,0,0;
+}
 .dashboard{
     -fx-background-image: url("../image/dashboard.png.png");
     -fx-background-size: cover;
@@ -119,4 +132,20 @@
     -fx-border-color: black;
     -fx-border-radius: 5px;
     -fx-background-radius: 5px;
+}
+.custom-cobo{
+    -fx-border-color: #643302;
+    -fx-border-radius: 2px;
+    -fx-border-width: 2px;
+    -fx-background-color: transparent;
+    -fx-background-radius: 6px;
+    -fx-text-fill: #643302;
+    -fx-prompt-text-fill: #643302;
+}
+.custom-cobo .list-view{
+    -fx-background-color: transparent;
+    -fx-border-color: #643302;
+}
+.custom-cobo .list-cell{
+    -fx-text-fill: #643302;
 }

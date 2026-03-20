@@ -28,6 +28,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javax.swing.JOptionPane;
 import model.Account;
@@ -89,6 +90,10 @@ public class Account_managementController implements Initializable {
     private Group uiRoot;
     @FXML
     private TableColumn<?, ?> user_type;
+    @FXML
+    private ImageView imgban;
+    @FXML
+    private ImageView imgactivate;
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         WorldScaler scaler = new WorldScaler(view, uiRoot);
@@ -116,14 +121,20 @@ public class Account_managementController implements Initializable {
             String status = newSel.getAccount_stats();
 
             if ("active".equalsIgnoreCase(status)) {
-                btnactive.setVisible(false); 
-                btnban.setVisible(true);     
+                btnactive.setVisible(false);
+                imgactivate.setVisible(false);
+                btnban.setVisible(true);
+                imgban.setVisible(true);
             } else if ("ban".equalsIgnoreCase(status)) {
-                btnactive.setVisible(true);  
-                btnban.setVisible(false);    
+                btnactive.setVisible(true);
+                imgactivate.setVisible(true);
+                btnban.setVisible(false);
+                imgban.setVisible(false);
             } else {
                 btnactive.setVisible(false);
+                imgactivate.setVisible(false);
                 btnban.setVisible(false);
+                imgban.setVisible(false);
             }
         });
 

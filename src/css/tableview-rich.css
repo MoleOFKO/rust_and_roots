@@ -2,10 +2,10 @@
 
 /* ---------- Root TableView container ---------- */
 .table-view {
-    -fx-background-color: #ffffff;
+    -fx-background-color: transparent;
     -fx-background-radius: 14;
     -fx-border-radius: 14;
-    -fx-border-color: #e6e8ee;
+    -fx-border-color: transparent;
     -fx-border-width: 1;
 
     /* subtle depth */
@@ -21,10 +21,10 @@
 
 /* ---------- Header ---------- */
 .table-view .column-header-background {
-    -fx-background-color: linear-gradient(to bottom, #fbfcff, #f3f6fb);
+    -fx-background-color: transparent;
     -fx-background-radius: 14 14 0 0;
     -fx-padding: 8 8 8 8;
-    -fx-border-color: transparent transparent #e6e8ee transparent;
+    -fx-border-color: transparent transparent #643302 transparent;
     -fx-border-width: 0 0 1 0;
 }
 
@@ -35,14 +35,14 @@
 }
 
 .table-view .column-header .label {
-    -fx-text-fill: #2b2f3a;
+    -fx-text-fill: #643302;
     -fx-font-size: 13px;
     -fx-font-weight: 700;
 }
 
 /* optional: style sort arrows */
 .table-view .arrow {
-    -fx-background-color: #6b7280;
+    -fx-background-color: transparent;
 }
 
 /* ---------- Rows & Cells ---------- */
@@ -54,10 +54,10 @@
 
 /* zebra striping */
 .table-view .table-row-cell:odd {
-    -fx-background-color: #fbfcff;
+    -fx-background-color: transparent;
 }
 .table-view .table-row-cell:even {
-    -fx-background-color: #ffffff;
+    -fx-background-color: transparent;
 }
 
 /* hover */
@@ -74,7 +74,7 @@
 .table-view .table-cell {
     -fx-padding: 0 12 0 12;
     -fx-border-color: transparent;
-    -fx-text-fill: #323847;
+    -fx-text-fill: #643302;
     -fx-font-size: 12.5px;
 }
 

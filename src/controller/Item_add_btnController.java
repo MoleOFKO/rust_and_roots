@@ -145,7 +145,7 @@ public class Item_add_btnController implements Initializable {
                 con.setAutoCommit(false);
 
                 // 1) insert stats
-                String sqlStats = "INSERT INTO stats (str, agi, dex, vit, hp, stamina) VALUES (?, ?, ?, ?, ?, ?)";
+                String sqlStats = "INSERT INTO stats (str, agi, dex, vit, hp, stamina, stats_type) VALUES (?, ?, ?, ?, ?, ?,?)";
                 pst = con.prepareStatement(sqlStats, Statement.RETURN_GENERATED_KEYS);
 
                 pst.setInt(1, Integer.parseInt(txtstr.getText()));
@@ -154,6 +154,7 @@ public class Item_add_btnController implements Initializable {
                 pst.setInt(4, Integer.parseInt(txtvid.getText()));
                 pst.setInt(5, Integer.parseInt(txthp.getText()));
                 pst.setInt(6, Integer.parseInt(txtstamina.getText()));
+                pst.setString(7,("item"));
                 pst.executeUpdate();
 
                 ResultSet gen = pst.getGeneratedKeys();

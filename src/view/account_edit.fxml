@@ -1,33 +1,80 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon?>
+<?import java.lang.String?>
 <?import javafx.scene.Group?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.text.Font?>
 
-<StackPane fx:id="view" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Account_editController">
+<StackPane fx:id="view" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Account_editController">
     <children>
+      <ImageView fitHeight="276.0" fitWidth="467.0" pickOnBounds="true">
+         <image>
+            <Image url="@../image/Admin/dashboard_with_cursed_paper.png" />
+         </image>
+      </ImageView>
         <Group fx:id="uiRoot">
             <children>
-               <Label layoutX="14.0" layoutY="27.0" prefHeight="17.0" prefWidth="49.0" text="Admin:" />
-               <Label fx:id="lblaname" layoutX="63.0" layoutY="27.0" prefHeight="17.0" prefWidth="49.0" text="Name" />
-               <TextField fx:id="txtaccname" layoutX="194.0" layoutY="87.0" prefHeight="25.0" prefWidth="242.0" />
-               <TextField fx:id="txtemail" layoutX="194.0" layoutY="155.0" prefHeight="25.0" prefWidth="242.0" />
-               <TextField fx:id="txtpwd" layoutX="194.0" layoutY="189.0" prefHeight="25.0" prefWidth="242.0" />
-               <Button fx:id="btnsave" layoutX="219.0" layoutY="257.0" mnemonicParsing="false" onAction="#handlebtnsaveaction" prefHeight="25.0" prefWidth="49.0" text="Save" />
-               <Label layoutX="63.0" layoutY="92.0" prefHeight="17.0" prefWidth="84.0" text="Account Name" />
-               <Label layoutX="63.0" layoutY="123.0" prefHeight="17.0" prefWidth="67.0" text="User Type" />
-               <Label layoutX="63.0" layoutY="158.0" prefHeight="17.0" prefWidth="67.0" text="Email" />
-               <Label layoutX="63.0" layoutY="192.0" prefHeight="17.0" prefWidth="67.0" text="Password" />
-               <Button fx:id="btnback" layoutX="394.0" layoutY="23.0" mnemonicParsing="false" onAction="#handlebtnbackaction" prefHeight="25.0" prefWidth="67.0" text="Back">
+            <ImageView fitHeight="28.0" fitWidth="147.0" layoutX="16.0" layoutY="24.0" pickOnBounds="true">
+               <image>
+                  <Image url="@../image/Admin/admin_bar.png" />
+               </image>
+            </ImageView>
+               <Label layoutX="29.0" layoutY="29.0" prefHeight="17.0" prefWidth="43.0" text="Admin:" textFill="#873e00">
+               <font>
+                  <Font name="Serif Regular" size="12.0" />
+               </font></Label>
+               <Label fx:id="lblaname" layoutX="74.0" layoutY="29.0" prefHeight="17.0" prefWidth="81.0" text="Name" textFill="#7a5500">
+               <font>
+                  <Font name="Serif Regular" size="12.0" />
+               </font></Label>
+            <TextField fx:id="txtaccname" layoutX="186.0" layoutY="84.0" prefHeight="29.0" prefWidth="201.0" styleClass="textbox" stylesheets="@../css/style.css" />
+               <TextField fx:id="txtemail" layoutX="186.0" layoutY="160.0" prefHeight="29.0" prefWidth="201.0" styleClass="textbox" stylesheets="@../css/style.css" />
+               <TextField fx:id="txtpwd" layoutX="185.0" layoutY="195.0" prefHeight="29.0" prefWidth="202.0" styleClass="textbox" stylesheets="@../css/style.css" />
+            <ImageView fitHeight="30.0" fitWidth="72.0" layoutX="209.0" layoutY="256.0" pickOnBounds="true">
+               <image>
+                  <Image url="@../image/Admin/admin_save_button.png" />
+               </image>
+            </ImageView>
+               <Button fx:id="btnsave" layoutX="210.0" layoutY="257.0" mnemonicParsing="false" onAction="#handlebtnsaveaction" opacity="0.0" prefHeight="25.0" prefWidth="68.0" text="Save" />
+               <Label layoutX="93.0" layoutY="92.0" prefHeight="17.0" prefWidth="84.0" text="Account Name" textFill="#572a00">
+               <font>
+                  <Font name="Serif Bold" size="12.0" />
+               </font></Label>
+               <Label layoutX="95.0" layoutY="126.0" prefHeight="17.0" prefWidth="67.0" text="User Type" textFill="#643302">
+               <font>
+                  <Font name="Serif Bold" size="12.0" />
+               </font></Label>
+               <Label layoutX="95.0" layoutY="166.0" prefHeight="17.0" prefWidth="67.0" text="Email" textFill="#643302">
+               <font>
+                  <Font name="Serif Bold" size="12.0" />
+               </font></Label>
+               <Label layoutX="95.0" layoutY="200.0" prefHeight="17.0" prefWidth="67.0" text="Password" textFill="#643302">
+               <font>
+                  <Font name="Serif Bold" size="12.0" />
+               </font></Label>
+            <ImageView fitHeight="30.0" fitWidth="72.0" layoutX="391.0" layoutY="21.0" pickOnBounds="true">
+               <image>
+                  <Image url="@../image/Admin/admin_back_button.png" />
+               </image>
+            </ImageView>
+               <Button fx:id="btnback" layoutX="394.0" layoutY="23.0" mnemonicParsing="false" onAction="#handlebtnbackaction" opacity="0.0" prefHeight="25.0" prefWidth="67.0" text="Back">
                   <graphic>
                      <FontAwesomeIcon glyphName="ARROW_LEFT" />
                   </graphic>
                </Button>
-               <ComboBox fx:id="user_type" layoutX="194.0" layoutY="122.0" onAction="#handleaction" prefHeight="25.0" prefWidth="242.0" />
+               <ComboBox fx:id="user_type" layoutX="185.0" layoutY="121.0" onAction="#handleaction" prefHeight="35.0" prefWidth="202.0" stylesheets="@../css/style.css">
+               <styleClass>
+                  <String fx:value="custom-cobo" />
+                  <String fx:value="list-view" />
+                  <String fx:value="list-cell" />
+               </styleClass></ComboBox>
             <Label layoutX="5.0" layoutY="15.0" prefHeight="17.0" prefWidth="22.0" />
             <Label layoutX="450.0" layoutY="274.0" prefHeight="17.0" prefWidth="22.0" />
             </children>
