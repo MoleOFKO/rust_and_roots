@@ -205,6 +205,8 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         SpawnTag spawn = gs.consumePendingSpawn();
 
         Platform.runLater(() -> {
+            if (human == null) return;
+
             boolean shouldUseSavedPosition =
                     gs.getCurrentSaveId() > 0 &&
                     mapKey().equals(gs.getCurrentMapKey()) &&

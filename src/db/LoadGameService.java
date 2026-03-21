@@ -57,12 +57,13 @@ public class LoadGameService {
 
     private boolean loadMainRow(Connection con, GameState gs, int saveId) throws Exception {
         String sql = """
-            SELECT saved_id, character_id, current_map_id, money,
+            SELECT saved_id, character_id, world_name, current_map_id, money,
                    saved_location_x, saved_location_y,
                    selected_hotbar_index, hotbar_visible
             FROM save_game
             WHERE saved_id = ?
             """;
+        
 
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, saveId);
@@ -77,6 +78,7 @@ public class LoadGameService {
                 gs.setCurrentMapKey(resolveMapKey(con, rs.getInt("current_map_id")));
                 gs.setPlayerX(rs.getDouble("saved_location_x"));
                 gs.setPlayerY(rs.getDouble("saved_location_y"));
+                gs.setCurrentWorldName(rs.getString("world_name"));
 
                 psState.setSelectedHotbarIndex(rs.getInt("selected_hotbar_index"));
                 psState.setHotbarVisible(rs.getBoolean("hotbar_visible"));
