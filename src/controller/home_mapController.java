@@ -500,8 +500,12 @@ public class home_mapController extends BaseMapController {
     private Label lbldays;
     @FXML
     private Label lbltime;
+    @FXML
+    private Button btnsave;
+    @FXML
+    private Button btnload;
 
-
+    
     private enum MenuTab { INVENTORY, STATUS, SETTINGS }
 
     private MenuTab activeMenuTab = MenuTab.INVENTORY;
@@ -1228,18 +1232,33 @@ public class home_mapController extends BaseMapController {
 
     @FXML
     private void handlesaveexitaction(ActionEvent event) {
-//        try {
-//            capturePlayerSnapshot();
-//
-//            SaveGameService saveService = new SaveGameService();
-//            saveService.saveGame(GameState.get());
-//
-//            if (gameLoop != null) gameLoop.stop();
-//            if (player != null) player.stop();
-//
-//            Platform.exit();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
+        try {
+            capturePlayerSnapshot();
+
+            SaveGameService saveService = new SaveGameService();
+            saveService.saveGameToSlot(GameState.get(), GameState.get().getSelectedSaveSlot());
+
+            if (gameLoop != null) gameLoop.stop();
+            if (player != null) player.stop();
+
+            Platform.exit();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    @FXML
+    private void handlesave(ActionEvent event) {
+        capturePlayerSnapshot();
+        GameState.get().setSaveMenuMode(true);
+        SceneManager.switchScene("/view/saveloads.fxml");
+    }
+    
+    @FXML
+    private void handleload(ActionEvent event) {
+        capturePlayerSnapshot();
+        GameState.get().setSaveMenuMode(false);
+        GameState.get().setReturnScene("/view/home_map.fxml", SpawnTag.DEFAULT);
+        SceneManager.switchScene("/view/saveloads.fxml");
     }
 }

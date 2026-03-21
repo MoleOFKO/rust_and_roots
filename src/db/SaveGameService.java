@@ -115,7 +115,8 @@ public class SaveGameService {
     private void saveMainRow(Connection con, GameState gs) throws Exception {
         String sql = """
             UPDATE save_game
-            SET current_map_id = ?,
+            SET world_name = ?,
+                current_map_id = ?,
                 money = ?,
                 saved_location_x = ?,
                 saved_location_y = ?,
@@ -128,13 +129,14 @@ public class SaveGameService {
         PlayerState ps = gs.getPlayerState();
 
         try (PreparedStatement psmt = con.prepareStatement(sql)) {
-            psmt.setInt(1, resolveMapId(con, gs.getCurrentMapKey()));
-            psmt.setInt(2, ps.getInventory().getCoins());
-            psmt.setInt(3, (int) Math.round(gs.getPlayerX()));
-            psmt.setInt(4, (int) Math.round(gs.getPlayerY()));
-            psmt.setInt(5, ps.getselectedHotbarIndex());
-            psmt.setBoolean(6, ps.isHotbarVisible());
-            psmt.setInt(7, gs.getCurrentSaveId());
+            psmt.setString(1, gs.getCurrentWorldName());
+            psmt.setInt(2, resolveMapId(con, gs.getCurrentMapKey()));
+            psmt.setInt(3, ps.getInventory().getCoins());
+            psmt.setInt(4, (int) Math.round(gs.getPlayerX()));
+            psmt.setInt(5, (int) Math.round(gs.getPlayerY()));
+            psmt.setInt(6, ps.getselectedHotbarIndex());
+            psmt.setBoolean(7, ps.isHotbarVisible());
+            psmt.setInt(8, gs.getCurrentSaveId());
             psmt.executeUpdate();
         }
     }
@@ -314,4 +316,116 @@ public class SaveGameService {
         }
         throw new IllegalStateException("stats_id not found for save_game.saved_id=" + saveId);
     }
+    
+    public void saveGameToSlot(GameState gs, int slotNumber) {
+        if (gs == null) return;
+        if (slotNumber < 1 || slotNumber > 4) {
+            throw new IllegalArgumentException("slotNumber must be 1..4");
+        }
+        if (gs.getCurrentCharacterId() <= 0) {
+            throw new IllegalStateException("GameState currentCharacterId is not set.");
+        }
+
+        String slotName = "Save " + slotNumber;
+
+        dbcon db = new dbcon();
+
+        try (Connection con = db.getConnection()) {
+            con.setAutoCommit(false);
+
+            Integer existingSaveId = findSaveIdByCharacterAndSlot(con, gs.getCurrentCharacterId(), slotName);
+
+            if (existingSaveId != null) {
+                gs.setCurrentSaveId(existingSaveId);
+            } else {
+                createSaveForSlot(con, gs, slotName);
+            }
+
+            saveMainRow(con, gs);
+            savePlayerStats(con, gs);
+            savePlayerInventory(con, gs);
+            saveHotbar(con, gs);
+            saveFarmPlots(con, gs);
+            saveChestItems(con, gs);
+            saveTime(con, gs);
+
+            con.commit();
+            System.out.println("Save complete. slot=" + slotName + ", saved_id=" + gs.getCurrentSaveId());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    private Integer findSaveIdByCharacterAndSlot(Connection con, int characterId, String slotName) throws Exception {
+        String sql = "SELECT saved_id FROM save_game WHERE character_id = ? AND saved_name = ? LIMIT 1";
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, characterId);
+            ps.setString(2, slotName);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("saved_id");
+                }
+            }
+        }
+        return null;
+    }
+
+    private void createSaveForSlot(Connection con, GameState gs, String saveName) throws Exception {
+        PlayerState ps = gs.getPlayerState();
+
+        int statsId;
+        String insertStats = """
+            INSERT INTO stats (stats_type, str, agi, dex, vit, hp, stamina)
+            VALUES ('player_save', 0, ?, 0, 0, ?, ?)
+            """;
+
+        try (PreparedStatement psStats = con.prepareStatement(insertStats, Statement.RETURN_GENERATED_KEYS)) {
+            psStats.setInt(1, ps.getAgi());
+            psStats.setInt(2, ps.getHp());
+            psStats.setInt(3, ps.getStamina());
+            psStats.executeUpdate();
+
+            try (ResultSet rs = psStats.getGeneratedKeys()) {
+                if (!rs.next()) {
+                    throw new IllegalStateException("Failed to create stats row.");
+                }
+                statsId = rs.getInt(1);
+            }
+        }
+
+        int mapId = resolveMapId(con, gs.getCurrentMapKey());
+
+        String insertSave = """
+            INSERT INTO save_game
+            (character_id, saved_name, world_name, current_map_id, stats_id, money,
+             saved_location_x, saved_location_y, exp,
+             selected_hotbar_index, hotbar_visible)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """;
+
+        try (PreparedStatement psSave = con.prepareStatement(insertSave, Statement.RETURN_GENERATED_KEYS)) {
+            psSave.setInt(1, gs.getCurrentCharacterId());
+            psSave.setString(2, saveName);
+            psSave.setString(3, gs.getCurrentWorldName());
+            psSave.setInt(4, mapId);
+            psSave.setInt(5, statsId);
+            psSave.setInt(6, ps.getInventory().getCoins());
+            psSave.setInt(7, (int) Math.round(gs.getPlayerX()));
+            psSave.setInt(8, (int) Math.round(gs.getPlayerY()));
+            psSave.setInt(9, ps.getExp());
+            psSave.setInt(10, ps.getselectedHotbarIndex());
+            psSave.setBoolean(11, ps.isHotbarVisible());
+            psSave.executeUpdate();
+
+            try (ResultSet rs = psSave.getGeneratedKeys()) {
+                if (!rs.next()) {
+                    throw new IllegalStateException("Failed to create save_game row.");
+                }
+                gs.setCurrentSaveId(rs.getInt(1));
+            }
+        }
+    }
+    
+    
 }

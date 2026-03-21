@@ -381,4 +381,46 @@ public final class GameState {
     public void setPlayerY(double playerY) {
         this.playerY = playerY;
     }
+    
+    private int selectedSaveSlot = 1;
+
+    public int getSelectedSaveSlot() {
+        return selectedSaveSlot;
+    }
+
+    public void setSelectedSaveSlot(int selectedSaveSlot) {
+        if (selectedSaveSlot < 1) selectedSaveSlot = 1;
+        if (selectedSaveSlot > 4) selectedSaveSlot = 4;
+        this.selectedSaveSlot = selectedSaveSlot;
+    }
+    
+    private boolean saveMenuMode = false;
+
+    public boolean isSaveMenuMode() {
+        return saveMenuMode;
+    }
+
+    public void setSaveMenuMode(boolean saveMenuMode) {
+        this.saveMenuMode = saveMenuMode;
+    }
+    
+    
+    private String currentPlayerName = "";
+    private String currentWorldName = "";
+
+    public String getCurrentPlayerName() {
+        return currentPlayerName;
+    }
+
+    public void setCurrentPlayerName(String currentPlayerName) {
+        this.currentPlayerName = currentPlayerName == null ? "" : currentPlayerName.trim();
+    }
+
+    public String getCurrentWorldName() {
+        return currentWorldName;
+    }
+
+    public void setCurrentWorldName(String currentWorldName) {
+        this.currentWorldName = currentWorldName == null ? "" : currentWorldName.trim();
+    }
 }

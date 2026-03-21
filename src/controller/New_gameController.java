@@ -4,6 +4,7 @@
  */
 package controller;
 
+import game.GameState;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
@@ -83,8 +84,10 @@ public class New_gameController implements Initializable {
             return;
         }
 
-        char_name = txtchaname.getText();
-        world_name = txtworldname.getText();
+        GameState.get().setCurrentPlayerName(txtchaname.getText());
+        GameState.get().setCurrentWorldName(txtworldname.getText());
+//        char_name = txtchaname.getText();
+//        world_name = txtworldname.getText();
 
         str = Integer.parseInt(lblstr.getText());
         agi = Integer.parseInt(lblagi.getText());
