@@ -38,8 +38,6 @@ import model.FarmPlotRegistrar;
 import model.InteractionZone;
 import model.Player;
 import model.PlayerState;
-import ui.InventoryRow;
-import ui.InventoryUIManager;
 import util.SceneManager;
 import util.SpawnTag;
 import util.WorldScaler;
@@ -128,9 +126,6 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
     // ---------- Optional shared inventory overlay ----------
     @FXML protected Pane inventoryOverlay;
-    @FXML protected TableView<InventoryRow> invTable;
-    @FXML protected TableColumn<InventoryRow, String> colItem;
-    @FXML protected TableColumn<InventoryRow, Number> colQty;
     @FXML protected Label invCoinsLabel;
 
     // ---------- Optional shared settings / time controls ----------
@@ -161,8 +156,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     protected Farm farm;
     protected InteractionManager interactionManager;
     protected GameLoopManager gameLoop;
-    protected InventoryUIManager inventoryUIManager;
-
+    
     protected final List<StackPane> hotbarSlots = new ArrayList<>();
     protected final List<Button> hotbarSlotButtons = new ArrayList<>();
     protected int selectedHotbarIndex = -1;
@@ -289,20 +283,6 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
         interactionManager.addZone(iz);
     }
-    
-//    protected final void registerExit(Rectangle zone, String targetFxml, SpawnTag targetSpawn) {
-//        if (zone == null) return;
-//
-//        InteractionZone iz = new InteractionZone(zone, inside -> {
-//            if (inside) {
-//                if (gameLoop != null) gameLoop.stop();
-//                if (player != null) player.stop();
-//                SceneManager.switchScene(targetFxml, targetSpawn);
-//            }
-//        });
-//
-//        interactionManager.addZone(iz);
-//    }
 
     protected final void applySpawn(SpawnTag tag) {
         Rectangle target = switch (tag) {
@@ -427,19 +407,6 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     }
 
     private void setupInventoryUiIfPresent() {
-        boolean hasTableInventory =
-            invTable != null && colItem != null && colQty != null && invCoinsLabel != null;
-
-        if (hasTableInventory) {
-            inventoryUIManager = new InventoryUIManager(
-                invTable,
-                colItem,
-                colQty,
-                invCoinsLabel,
-                player.getInventory()
-            );
-        }
-
         setupPlayerInventoryGridIfPresent();
 
         if (inventoryOverlay != null) {

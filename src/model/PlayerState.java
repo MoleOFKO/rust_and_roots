@@ -34,7 +34,6 @@ public final class PlayerState {
     private final IntegerProperty str = new SimpleIntegerProperty(DEFAULT_STR);
     private final IntegerProperty vit = new SimpleIntegerProperty(DEFAULT_VIT);
     private final IntegerProperty exp = new SimpleIntegerProperty(0);
-//    private final IntegerProperty statPoints = new SimpleIntegerProperty(0);
     private final StringProperty playerName = new SimpleStringProperty(DEFAULT_NAME);
 
     private static final int HOTBAR_SIZE = 5;
@@ -196,30 +195,6 @@ public final class PlayerState {
     public void setExp(int value) {
         exp.set(Math.max(0, value));
     }
-
-//    public IntegerProperty statPointsProperty() {
-//        return statPoints;
-//    }
-
-//    public int getStatPoints() {
-//        return statPoints.get();
-//    }
-
-//    public void setStatPoints(int value) {
-//        statPoints.set(Math.max(0, value));
-//    }
-
-//    public void addStatPoints(int amount) {
-//        if (amount == 0) return;
-//        setStatPoints(getStatPoints() + amount);
-//    }
-
-//    public boolean consumeStatPoints(int amount) {
-//        if (amount <= 0) return true;
-//        if (getStatPoints() < amount) return false;
-//        setStatPoints(getStatPoints() - amount);
-//        return true;
-//    }
 
     public StringProperty playerNameProperty() {
         return playerName;

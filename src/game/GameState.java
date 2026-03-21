@@ -331,59 +331,7 @@ public final class GameState {
             lastSmeltPointUpdateSeconds = safeNow;
         }
     }
-    
 
-
-//    public void startSmeltJob(int sourceItemId, int resultItemId, int quantity, int costPerOre, double secondsPerOre, double startedAtSeconds) {
-//        if (sourceItemId <= 0 || resultItemId <= 0 || quantity <= 0 || secondsPerOre <= 0) return;
-//        this.activeSmeltJob = new ActiveSmeltJob(sourceItemId, resultItemId, quantity, costPerOre, secondsPerOre, startedAtSeconds);
-//    }
-//
-//    public boolean hasActiveSmeltJob() { 
-//        return activeSmeltJob != null; 
-//    }
-//    
-//    public ActiveSmeltJob getActiveSmeltJob() { 
-//        return activeSmeltJob; 
-//    }
-//    
-//    public int getReadySmeltCount(double nowSeconds) { 
-//        return activeSmeltJob == null ? 0 : activeSmeltJob.getReadyCount(nowSeconds); 
-//    }
-//
-//    public int collectReadySmeltedItems(double nowSeconds) {
-//        if (activeSmeltJob == null) return 0;
-//
-//        int ready = activeSmeltJob.getReadyCount(nowSeconds);
-//        if (ready <= 0) return 0;
-//
-//        int resultItemId = activeSmeltJob.getResultItemId();
-//        playerState.getInventory().addItem(resultItemId, ready);
-//
-//        int remaining = activeSmeltJob.getQuantity() - ready;
-//        if (remaining > 0) {
-//            double nextStart = activeSmeltJob.getStartedAtSeconds() + (ready * activeSmeltJob.getSecondsPerOre());
-//            activeSmeltJob = new ActiveSmeltJob(
-//                activeSmeltJob.getSourceItemId(),
-//                activeSmeltJob.getResultItemId(),
-//                remaining,
-//                activeSmeltJob.getCostPerOre(),
-//                activeSmeltJob.getSecondsPerOre(),
-//                nextStart
-//            );
-//        } else {
-//            activeSmeltJob = null;
-//        }
-//
-//        return ready;
-//    }
-//
-//    public void cancelSmeltSelectionBackToInventory(int itemId, int quantity) {
-//        if (itemId > 0 && quantity > 0) {
-//            playerState.getInventory().addItem(itemId, quantity);
-//        }
-//    }
-    
     private int currentCharacterId = -1;
     private int currentSaveId = -1;
     private String currentMapKey = "home_map";
