@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.StackPane?>
 
-<StackPane fx:id="view" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Char_edit_btnController">
+<StackPane fx:id="view" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Char_edit_btnController">
     <children>
       <ImageView fitHeight="521.0" fitWidth="608.0" pickOnBounds="true">
          <image>
@@ -26,7 +26,7 @@
             </ImageView>
                <Label layoutX="6.0" layoutY="28.0" prefHeight="17.0" prefWidth="49.0" text="Admin:" />
                <Label fx:id="lblaname" layoutX="53.0" layoutY="28.0" prefHeight="21.0" prefWidth="62.0" text="Name" />
-            <ImageView fitHeight="520.0" fitWidth="399.0" layoutX="105.0" layoutY="6.0" pickOnBounds="true">
+            <ImageView fitHeight="519.0" fitWidth="399.0" layoutX="105.0" layoutY="6.0" pickOnBounds="true">
                <image>
                   <Image url="@../image/Admin/paper_2of3.png" />
                </image>
