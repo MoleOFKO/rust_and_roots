@@ -29,8 +29,7 @@ import util.SpawnTag;
 
 public class CraftController implements Initializable, SceneController {
     private static final int MAX_RECIPE_SLOTS = 20;
-    private static final int DEFAULT_DEX = 5;
-    private static final int DEFAULT_WAIT_SECONDS = 40;
+        private static final int DEFAULT_WAIT_SECONDS = 40;
 
     private GameState gameState;
     private Inventory inventory;
@@ -220,8 +219,8 @@ public class CraftController implements Initializable, SceneController {
             return;
         }
         if (resultitem != null) resultitem.setImage(ItemDatabase.getImage(selectedRecipe.outputItemId));
-        if (lblname != null) lblname.setText("Name : " + selectedRecipe.name);
-        if (lblwt != null) lblwt.setText("Waiting time : " + selectedRecipe.waitSeconds + "s  SP:-" + selectedRecipe.staminaCost);
+        if (lblname != null) lblname.setText("Name : " + selectedRecipe.name + " x" + selectedRecipe.baseOutputAmount);
+        if (lblwt != null) lblwt.setText("Waiting time : " + getAdjustedWaitSeconds(selectedRecipe) + "s  SP:-" + getAdjustedStaminaCost(selectedRecipe));
         if (lblsr != null) lblsr.setText("Success rate : " + computeSuccessRate(selectedRecipe) + "%");
         if (lbleffect != null) lbleffect.setText("Effect : " + buildEffectText(selectedRecipe));
         updateIngredientViews();
@@ -333,7 +332,7 @@ public class CraftController implements Initializable, SceneController {
             return;
         }
         if (selectedRecipe != null) {
-            if (lblwt != null) lblwt.setText("Waiting time : " + selectedRecipe.waitSeconds + "s  SP:-" + selectedRecipe.staminaCost);
+            if (lblwt != null) lblwt.setText("Waiting time : " + getAdjustedWaitSeconds(selectedRecipe) + "s  SP:-" + getAdjustedStaminaCost(selectedRecipe));
             if (resultitem != null) {
                 resultitem.setStyle("");
                 resultitem.setOpacity(canCraft(selectedRecipe) ? 1.0 : 0.65);
@@ -345,7 +344,7 @@ public class CraftController implements Initializable, SceneController {
 
     private boolean canCraft(Recipe recipe) {
         if (recipe == null) return false;
-        if (gameState.getPlayerState().getStamina() < recipe.staminaCost) return false;
+        if (gameState.getPlayerState().getStamina() < getAdjustedStaminaCost(recipe)) return false;
         for (IngredientRequirement req : recipe.ingredients) {
             if (inventory.getCount(req.itemId) < req.requiredAmount) return false;
         }
@@ -354,9 +353,17 @@ public class CraftController implements Initializable, SceneController {
 
     private int computeSuccessRate(Recipe recipe) {
         if (recipe == null || gameState == null) return 0;
-        int dex = gameState.getPlayerState().getDex();
-        int adjusted = recipe.baseSuccessRate + ((dex - DEFAULT_DEX) * recipe.dexScaling);
-        return Math.max(5, Math.min(95, adjusted));
+        return ProcessingRules.computeAdjustedSuccessRate(recipe.baseSuccessRate, recipe.dexScaling, gameState.getPlayerState().getDex());
+    }
+
+    private int getAdjustedWaitSeconds(Recipe recipe) {
+        if (recipe == null || gameState == null) return 0;
+        return ProcessingRules.computeAdjustedWaitSeconds(recipe.waitSeconds, recipe.dexScaling, gameState.getPlayerState().getDex());
+    }
+
+    private int getAdjustedStaminaCost(Recipe recipe) {
+        if (recipe == null || gameState == null) return 0;
+        return ProcessingRules.computeAdjustedStaminaCost(recipe.staminaCost, recipe.dexScaling, gameState.getPlayerState().getDex());
     }
 
     @FXML
@@ -366,7 +373,7 @@ public class CraftController implements Initializable, SceneController {
         if (!gameState.hasActiveCraftingJob()) return;
         if (selectedRecipe.outputItemId != gameState.getActiveCraftingOutputItemId()) return;
         if (!gameState.isCraftingReady(now)) return;
-        inventory.addItem(selectedRecipe.outputItemId, 1);
+        inventory.addItem(selectedRecipe.outputItemId, gameState.getActiveCraftingOutputQuantity());
         if (gameState.isActiveCraftingSuccess()) {
             gameState.queueCookedDishEffect(selectedRecipe.outputItemId, gameState.getActiveCraftingHpDelta(), gameState.getActiveCraftingStaminaDelta(), true);
         }
@@ -388,11 +395,14 @@ public class CraftController implements Initializable, SceneController {
         for (IngredientRequirement req : selectedRecipe.ingredients) {
             if (!inventory.removeItem(req.itemId, req.requiredAmount)) return;
         }
-        gameState.getPlayerState().consumeStamina(selectedRecipe.staminaCost);
-        boolean success = ThreadLocalRandom.current().nextInt(100) < computeSuccessRate(selectedRecipe);
+        int adjustedStaminaCost = getAdjustedStaminaCost(selectedRecipe);
+        gameState.getPlayerState().consumeStamina(adjustedStaminaCost);
+        int successRate = computeSuccessRate(selectedRecipe);
+        boolean success = ProcessingRules.rollSuccess(successRate);
+        int outputQty = success ? ProcessingRules.computeOutputAmount(selectedRecipe.baseOutputAmount, successRate) : 0;
         int sign = success ? 1 : -1;
         double now = GameTimeManager.get().totalSecondsProperty().get();
-        gameState.startCraftingJob(selectedRecipe.outputItemId, now + selectedRecipe.waitSeconds, sign * getRecipeHpDelta(selectedRecipe), sign * getRecipeStaminaDelta(selectedRecipe), success);
+        gameState.startCraftingJob(selectedRecipe.outputItemId, outputQty, now + getAdjustedWaitSeconds(selectedRecipe), sign * getRecipeHpDelta(selectedRecipe), sign * getRecipeStaminaDelta(selectedRecipe), success);
         updateIngredientViews();
         updateCraftingStateUi();
     }
@@ -434,7 +444,8 @@ public class CraftController implements Initializable, SceneController {
         private RecipeTemplate(String key, String outputItemName, int waitSeconds, int baseSuccessRate, int dexScaling, int staminaCost, IngredientSpec... ingredients) { this.key = key; this.outputItemName = outputItemName; this.waitSeconds = waitSeconds; this.baseSuccessRate = baseSuccessRate; this.dexScaling = dexScaling; this.staminaCost = staminaCost; this.ingredients = ingredients; }
     }
     private static final class Recipe {
-        private final String key; private final int outputItemId; private final String name; private final int waitSeconds; private final int baseSuccessRate; private final int dexScaling; private final int staminaCost; private final List<IngredientRequirement> ingredients;
-        private Recipe(String key, int outputItemId, String name, int waitSeconds, int baseSuccessRate, int dexScaling, int staminaCost, List<IngredientRequirement> ingredients) { this.key = key; this.outputItemId = outputItemId; this.name = name; this.waitSeconds = waitSeconds; this.baseSuccessRate = baseSuccessRate; this.dexScaling = dexScaling; this.staminaCost = staminaCost; this.ingredients = ingredients; }
+        private final String key; private final int outputItemId; private final String name; private final int waitSeconds; private final int baseSuccessRate; private final int dexScaling; private final int staminaCost; private final int baseOutputAmount; private final List<IngredientRequirement> ingredients;
+        private Recipe(String key, int outputItemId, String name, int waitSeconds, int baseSuccessRate, int dexScaling, int staminaCost, List<IngredientRequirement> ingredients) { this(key, outputItemId, name, waitSeconds, baseSuccessRate, dexScaling, staminaCost, 1, ingredients); }
+        private Recipe(String key, int outputItemId, String name, int waitSeconds, int baseSuccessRate, int dexScaling, int staminaCost, int baseOutputAmount, List<IngredientRequirement> ingredients) { this.key = key; this.outputItemId = outputItemId; this.name = name; this.waitSeconds = waitSeconds; this.baseSuccessRate = baseSuccessRate; this.dexScaling = dexScaling; this.staminaCost = staminaCost; this.baseOutputAmount = Math.max(1, baseOutputAmount); this.ingredients = ingredients; }
     }
 }

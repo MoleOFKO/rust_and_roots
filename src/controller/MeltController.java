@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.concurrent.ThreadLocalRandom;
 import javafx.animation.AnimationTimer;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -309,7 +310,19 @@ public class MeltController implements Initializable, SceneController {
             return;
         }
 
-        gameState.startSmeltJob(selectedOreItemId, selectedRule.resultItemId, selectedOreQuantity, selectedRule.costPerOre, selectedRule.secondsPerOre, now);
+        int staminaCost = getSelectedTotalStaminaCost();
+        if (gameState.getPlayerState().getStamina() < staminaCost) {
+            refreshDynamicUi();
+            return;
+        }
+        gameState.getPlayerState().consumeStamina(staminaCost);
+
+        int successRate = computeSuccessRate(selectedRule);
+        boolean success = ProcessingRules.rollSuccess(successRate);
+        int outputQty = success ? ProcessingRules.computeOutputAmount(selectedOreQuantity, successRate) : 0;
+        if (outputQty > 0) {
+            gameState.startSmeltJob(selectedOreItemId, selectedRule.resultItemId, outputQty, selectedRule.costPerOre, getAdjustedSecondsPerOre(selectedRule), now);
+        }
         clearSelection();
         refreshAll();
     }
@@ -390,9 +403,9 @@ public class MeltController implements Initializable, SceneController {
 
         int pendingCost = getSelectedTotalCost();
         if (selectedRule != null && selectedOreQuantity > 0) {
-            int totalSeconds = (int) Math.ceil(selectedRule.secondsPerOre * selectedOreQuantity);
+            int totalSeconds = (int) Math.ceil(getAdjustedSecondsPerOre(selectedRule) * selectedOreQuantity);
             if (totalwaitingtimelbl != null) totalwaitingtimelbl.setText("Waiting time: " + totalSeconds + "s");
-            if (smeltmp != null) smeltmp.setText("P : " + currentP + "(-" + pendingCost + ")");
+            if (smeltmp != null) smeltmp.setText("P : " + currentP + "(-" + pendingCost + ")  SP:-" + getSelectedTotalStaminaCost() + "  SR:" + computeSuccessRate(selectedRule) + "%");
         } else {
             if (totalwaitingtimelbl != null) totalwaitingtimelbl.setText("Waiting time:");
             if (smeltmp != null) smeltmp.setText("P : " + currentP + "(-0)");
@@ -430,11 +443,16 @@ public class MeltController implements Initializable, SceneController {
         if (hasActiveSmeltJob()) return true;
         if (selectedOreItemId == null || selectedRule == null || selectedOreQuantity <= 0) return true;
         int totalCost = getSelectedTotalCost();
-        return !gameState.canAffordSmeltPoints(totalCost, now);
+        return !gameState.canAffordSmeltPoints(totalCost, now)
+            || gameState.getPlayerState().getStamina() < getSelectedTotalStaminaCost();
     }
 
     private int getSelectedTotalCost() {
         return (selectedRule == null || selectedOreQuantity <= 0) ? 0 : selectedRule.costPerOre * selectedOreQuantity;
+    }
+
+    private int getSelectedTotalStaminaCost() {
+        return (selectedRule == null || selectedOreQuantity <= 0) ? 0 : getAdjustedStaminaCost(selectedRule) * selectedOreQuantity;
     }
 
     private boolean hasActiveSmeltJob() {
@@ -452,111 +470,76 @@ public class MeltController implements Initializable, SceneController {
         return itm == null ? ("Item " + itemId) : itm.getItem_name();
     }
 
+    private int computeSuccessRate(SmeltRule rule) {
+        if (rule == null || gameState == null) return 0;
+        return ProcessingRules.computeAdjustedSuccessRate(rule.baseSuccessRate, rule.dexScaling, gameState.getPlayerState().getDex());
+    }
+
+    private int getAdjustedStaminaCost(SmeltRule rule) {
+        if (rule == null || gameState == null) return 0;
+        return ProcessingRules.computeAdjustedStaminaCost(rule.staminaCost, rule.dexScaling, gameState.getPlayerState().getDex());
+    }
+
+    private double getAdjustedSecondsPerOre(SmeltRule rule) {
+        if (rule == null || gameState == null) return 1.0;
+        return ProcessingRules.computeAdjustedWaitSeconds((int)Math.ceil(rule.secondsPerOre), rule.dexScaling, gameState.getPlayerState().getDex());
+    }
+
     private SmeltRule resolveRule(item oreItem) {
         if (oreItem == null) return null;
-        String name = oreItem.getItem_name();
-        if (name == null || name.isBlank()) return null;
-        String base = extractOreBaseName(name);
-        if (base == null || base.isBlank()) return null;
+        int sourceItemId = oreItem.getItem_id();
 
-        item result = firstExistingItem(
-            base + " Ingot",
-            base + "ingot",
-            base + " Bar",
-            base + "bar",
-            "Refined " + base,
-            base + " Metal"
-        );
-        if (result == null) return null;
+        item copperOre = ItemDatabase.getItemByName("Copper Ore");
+        item copperIngot = ItemDatabase.getItemByName("Copper Ingot");
 
-        int secondsPerOre = inferSecondsPerOre(base);
-        int costPerOre = inferCostPerOre(base);
-        return new SmeltRule(oreItem.getItem_id(), result.getItem_id(), costPerOre, secondsPerOre);
-    }
+        item ironOre = ItemDatabase.getItemByName("Iron Ore");
+        item ironIngot = ItemDatabase.getItemByName("Iron Ingot");
 
-    private item firstExistingItem(String... names) {
-        for (String name : names) {
-            item itm = ItemDatabase.getItemByName(name);
-            if (itm != null) return itm;
+        item silverOre = ItemDatabase.getItemByName("Silver Ore");
+        item silverIngot = ItemDatabase.getItemByName("Silver Ingot");
+
+        item goldOre = ItemDatabase.getItemByName("Gold Ore");
+        item goldIngot = ItemDatabase.getItemByName("Gold Ingot");
+
+        item coalOre = ItemDatabase.getItemByName("Coal");
+        item coalBrick = ItemDatabase.getItemByName("Coal Brick");
+
+        if (copperOre != null && copperIngot != null && sourceItemId == copperOre.getItem_id()) {
+            return new SmeltRule(copperOre.getItem_id(), copperIngot.getItem_id(), 3, 10, 90, 2, 2);
         }
+        if (ironOre != null && ironIngot != null && sourceItemId == ironOre.getItem_id()) {
+            return new SmeltRule(ironOre.getItem_id(), ironIngot.getItem_id(), 4, 12, 88, 3, 3);
+        }
+        if (silverOre != null && silverIngot != null && sourceItemId == silverOre.getItem_id()) {
+            return new SmeltRule(silverOre.getItem_id(), silverIngot.getItem_id(), 6, 16, 82, 3, 4);
+        }
+        if (goldOre != null && goldIngot != null && sourceItemId == goldOre.getItem_id()) {
+            return new SmeltRule(goldOre.getItem_id(), goldIngot.getItem_id(), 8, 20, 76, 4, 5);
+        }
+        if (coalOre != null && coalBrick != null && sourceItemId == coalOre.getItem_id()) {
+            return new SmeltRule(coalOre.getItem_id(), coalBrick.getItem_id(), 1, 6, 96, 2, 1);
+        }
+
         return null;
     }
-
-    private String extractOreBaseName(String itemName) {
-        if (itemName == null) return null;
-        String name = itemName.trim();
-        String lower = name.toLowerCase();
-
-        String[] suffixes = {" ore", "ore", " chunk", "rock", " mineral"};
-        for (String suffix : suffixes) {
-            if (lower.endsWith(suffix)) {
-                String base = name.substring(0, name.length() - suffix.length()).trim();
-                if (!base.isBlank()) return titleCase(base);
-            }
-        }
-
-        String[] bases = {"Copper", "Iron", "Silver", "Gold", "Bronze", "Steel", "Tin", "Lead", "Coal"};
-        for (String base : bases) {
-            if (lower.contains(base.toLowerCase())) return base;
-        }
-        return null;
-    }
-
-    private int inferSecondsPerOre(String base) {
-        String n = normalize(base);
-        if (n.contains("gold")) return 20;
-        if (n.contains("silver")) return 16;
-        if (n.contains("steel")) return 18;
-        if (n.contains("bronze")) return 14;
-        if (n.contains("iron")) return 12;
-        if (n.contains("copper")) return 10;
-        if (n.contains("tin")) return 8;
-        if (n.contains("lead")) return 11;
-        if (n.contains("coal")) return 6;
-        return 10;
-    }
-
-    private int inferCostPerOre(String base) {
-        String n = normalize(base);
-        if (n.contains("gold")) return 8;
-        if (n.contains("silver")) return 6;
-        if (n.contains("steel")) return 7;
-        if (n.contains("bronze")) return 5;
-        if (n.contains("iron")) return 4;
-        if (n.contains("copper")) return 3;
-        if (n.contains("tin")) return 2;
-        if (n.contains("lead")) return 3;
-        if (n.contains("coal")) return 1;
-        return 3;
-    }
-
-    private String normalize(String value) {
-        return value == null ? "" : value.trim().toLowerCase();
-    }
-
-    private String titleCase(String value) {
-        if (value == null || value.isBlank()) return value;
-        String[] parts = value.trim().toLowerCase().split("\\s+");
-        StringBuilder sb = new StringBuilder();
-        for (String part : parts) {
-            if (part.isBlank()) continue;
-            if (sb.length() > 0) sb.append(' ');
-            sb.append(Character.toUpperCase(part.charAt(0))).append(part.substring(1));
-        }
-        return sb.toString();
-    }
-
+    
     private static final class SmeltRule {
         final int sourceItemId;
         final int resultItemId;
         final int costPerOre;
         final double secondsPerOre;
+        final int baseSuccessRate;
+        final int dexScaling;
+        final int staminaCost;
 
-        SmeltRule(int sourceItemId, int resultItemId, int costPerOre, double secondsPerOre) {
+        SmeltRule(int sourceItemId, int resultItemId, int costPerOre, double secondsPerOre, int baseSuccessRate, int dexScaling, int staminaCost) {
             this.sourceItemId = sourceItemId;
             this.resultItemId = resultItemId;
             this.costPerOre = Math.max(0, costPerOre);
             this.secondsPerOre = Math.max(1, secondsPerOre);
+            this.baseSuccessRate = Math.max(0, baseSuccessRate);
+            this.dexScaling = Math.max(0, dexScaling);
+            this.staminaCost = Math.max(0, staminaCost);
         }
     }
 }
