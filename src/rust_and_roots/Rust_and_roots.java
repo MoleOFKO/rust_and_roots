@@ -7,20 +7,14 @@ package rust_and_roots;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
-/**
- *
- * @author larry
- */
 public class Rust_and_roots extends Application {
     public static Stage stage;
     @Override
     public void start(Stage stage) throws Exception {
         Rust_and_roots.stage = stage;
-
-//        stage.setFullScreen(true);
-
+        
 //        util.SceneManager.switchScene("/view/login.fxml");
-        util.SceneManager.switchScene("/view/home_map.fxml");
+        util.SceneManager.switchScene("/view/main_menu.fxml");
         stage.show();
     }
 

@@ -76,7 +76,7 @@
                   <font>
                      <Font name="System Bold" size="13.0" />
                   </font></Label>
-               <Label layoutX="465.0" layoutY="150.0" text="[STAMINA] :" textFill="#643302">
+               <Label layoutX="508.0" layoutY="150.0" text="[SP] :" textFill="#643302">
                   <font>
                      <Font name="System Bold" size="13.0" />
                   </font></Label>
@@ -100,6 +100,76 @@
                   </image>
                </ImageView>
                <Button fx:id="btnStartGame" layoutX="454.0" layoutY="317.0" mnemonicParsing="false" onAction="#handlebtnStartGame" opacity="0.0" prefHeight="46.0" prefWidth="105.0" />
+            <Label layoutX="359.0" layoutY="241.0" prefHeight="19.0" prefWidth="50.0" text="[EXP] :" textFill="#643302">
+               <font>
+                  <Font name="System Bold" size="13.0" />
+               </font>
+            </Label>
+            <Label fx:id="lblvit1" layoutX="411.0" layoutY="241.0" prefHeight="17.0" prefWidth="31.0" text="0" textFill="#643302">
+               <font>
+                  <Font name="System Bold" size="13.0" />
+               </font>
+            </Label>
+            <ImageView fitHeight="17.0" fitWidth="18.0" layoutX="342.0" layoutY="153.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../image/tools/+.png" />
+               </image>
+            </ImageView>
+            <ImageView fitHeight="17.0" fitWidth="18.0" layoutX="313.0" layoutY="153.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../image/tools/-.png" />
+               </image>
+            </ImageView>
+            <ImageView fitHeight="17.0" fitWidth="18.0" layoutX="343.0" layoutY="182.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../image/tools/+.png" />
+               </image>
+            </ImageView>
+            <ImageView fitHeight="17.0" fitWidth="18.0" layoutX="314.0" layoutY="182.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../image/tools/-.png" />
+               </image>
+            </ImageView>
+            <ImageView fitHeight="17.0" fitWidth="18.0" layoutX="341.0" layoutY="214.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../image/tools/+.png" />
+               </image>
+            </ImageView>
+            <ImageView fitHeight="17.0" fitWidth="18.0" layoutX="312.0" layoutY="214.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../image/tools/-.png" />
+               </image>
+            </ImageView>
+            <ImageView fitHeight="17.0" fitWidth="18.0" layoutX="477.0" layoutY="151.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../image/tools/+.png" />
+               </image>
+            </ImageView>
+            <ImageView fitHeight="17.0" fitWidth="18.0" layoutX="448.0" layoutY="151.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../image/tools/-.png" />
+               </image>
+            </ImageView>
+            <ImageView fitHeight="17.0" fitWidth="18.0" layoutX="479.0" layoutY="182.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../image/tools/+.png" />
+               </image>
+            </ImageView>
+            <ImageView fitHeight="17.0" fitWidth="18.0" layoutX="450.0" layoutY="182.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../image/tools/-.png" />
+               </image>
+            </ImageView>
+            <ImageView fitHeight="17.0" fitWidth="18.0" layoutX="481.0" layoutY="214.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../image/tools/+.png" />
+               </image>
+            </ImageView>
+            <ImageView fitHeight="17.0" fitWidth="18.0" layoutX="452.0" layoutY="214.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../image/tools/-.png" />
+               </image>
+            </ImageView>
             </children>
         </Group>
     </children>     
