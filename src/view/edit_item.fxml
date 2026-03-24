@@ -7,38 +7,93 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.text.Font?>
 
-<StackPane fx:id="view" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Edit_itemController">
+<StackPane fx:id="view" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Edit_itemController">
     <children>
+      <ImageView fitHeight="541.0" fitWidth="906.0" pickOnBounds="true">
+         <image>
+            <Image url="@../image/Admin/dashboard.png" />
+         </image>
+      </ImageView>
         <Group fx:id="uiRoot">
             <children>
-               <Pane layoutX="25.0" layoutY="150.0" prefHeight="43.0" prefWidth="164.0" style="-fx-background-color: black; -fx-background-radius: 10px;" />
-               <Label layoutX="49.0" layoutY="25.0" text="Admin :" />
-               <Label fx:id="txtaname" layoutX="106.0" layoutY="25.0" text="Name" />
-               <Button fx:id="btnecharacter" layoutX="37.0" layoutY="238.0" mnemonicParsing="false" onAction="#handlebtnecharacteraction" prefWidth="139.0" text="Edit Character" />
-               <Button fx:id="btneitem" layoutX="37.0" layoutY="158.0" mnemonicParsing="false" onAction="#handlebtneitemaction" prefWidth="139.0" text="Edit Item" />
-               <Button fx:id="btnaccmanagement" layoutX="37.0" layoutY="198.0" mnemonicParsing="false" onAction="#handlebtnaccmanagementaction" prefHeight="25.0" prefWidth="139.0" text="Account Management" />
-               <Button fx:id="btnvplayer" layoutX="37.0" layoutY="118.0" mnemonicParsing="false" onAction="#handlebtnvplayeraction" prefWidth="139.0" text="Account View" />
-               <Button fx:id="btnlogout" layoutX="37.0" layoutY="278.0" mnemonicParsing="false" onAction="#handlebtnlogoutaction" prefWidth="139.0" text="Logout" />
-               <TableView fx:id="item_view" layoutX="227.0" layoutY="74.0" prefHeight="418.0" prefWidth="668.0">
+            <ImageView fitHeight="433.0" fitWidth="194.0" layoutX="13.0" layoutY="69.0" pickOnBounds="true">
+               <image>
+                  <Image url="@../image/Admin/paper_1of3.png" />
+               </image>
+            </ImageView>
+            <ImageView fitHeight="41.0" fitWidth="200.0" layoutX="15.0" layoutY="24.0" pickOnBounds="true">
+               <image>
+                  <Image url="@../image/Admin/admin_bar.png" />
+               </image>
+            </ImageView>
+               <Label layoutX="32.0" layoutY="32.0" text="Admin :" />
+               <Label fx:id="txtaname" layoutX="92.0" layoutY="32.0" prefHeight="21.0" prefWidth="115.0" text="Name" />
+            <ImageView fitHeight="47.0" fitWidth="146.0" layoutX="35.0" layoutY="264.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../image/Admin/edit_character.png" />
+               </image>
+            </ImageView>
+               <Button fx:id="btnecharacter" layoutX="36.0" layoutY="269.0" mnemonicParsing="false" onAction="#handlebtnecharacteraction" opacity="0.0" prefHeight="37.0" prefWidth="144.0" text="Edit Character" />
+            <ImageView fitHeight="47.0" fitWidth="146.0" layoutX="36.0" layoutY="153.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../image/Admin/Edit_items_btn.png" />
+               </image>
+            </ImageView>
+               <Button fx:id="btneitem" layoutX="37.0" layoutY="156.0" mnemonicParsing="false" onAction="#handlebtneitemaction" opacity="0.0" prefHeight="36.0" prefWidth="144.0" text="Edit Item" />
+            <ImageView fitHeight="47.0" fitWidth="146.0" layoutX="36.0" layoutY="206.0" pickOnBounds="true">
+               <image>
+                  <Image url="@../image/Admin/account_management.png" />
+               </image>
+            </ImageView>
+               <Button fx:id="btnaccmanagement" layoutX="37.0" layoutY="211.0" mnemonicParsing="false" onAction="#handlebtnaccmanagementaction" opacity="0.0" prefHeight="40.0" prefWidth="143.0" text="Account Management" />
+            <ImageView fitHeight="47.0" fitWidth="146.0" layoutX="37.0" layoutY="102.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../image/Admin/account_view.png" />
+               </image>
+            </ImageView>
+               <Button fx:id="btnvplayer" layoutX="39.0" layoutY="107.0" mnemonicParsing="false" onAction="#handlebtnvplayeraction" opacity="0.0" prefWidth="139.0" text="Account View" />
+            <ImageView fitHeight="47.0" fitWidth="146.0" layoutX="35.0" layoutY="435.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../image/Admin/logout_btn.png" />
+               </image>
+            </ImageView>
+               <Button fx:id="btnlogout" layoutX="39.0" layoutY="441.0" mnemonicParsing="false" onAction="#handlebtnlogoutaction" opacity="0.0" prefWidth="139.0" text="Logout" />
+            <ImageView fitHeight="429.0" fitWidth="694.0" layoutX="215.0" layoutY="71.0" pickOnBounds="true">
+               <image>
+                  <Image url="@../image/Admin/paper_2of3.png" />
+               </image>
+            </ImageView>
+               <TableView fx:id="item_view" layoutX="227.0" layoutY="74.0" prefHeight="418.0" prefWidth="668.0" stylesheets="@../css/tableview-rich.css">
                   <columns>
-                     <TableColumn fx:id="colaccid" prefWidth="70.0" text="Item ID" />
-                     <TableColumn fx:id="colaccname" prefWidth="186.5" text="Item Name" />
-                     <TableColumn fx:id="colprice" prefWidth="72.0" text="Price" />
-                     <TableColumn fx:id="colstr" prefWidth="34.5" text="STR" />
-                     <TableColumn fx:id="colagi" prefWidth="29.0" text="AGI" />
-                     <TableColumn fx:id="colvit" prefWidth="33.0" text="VIT" />
-                     <TableColumn fx:id="coldex" prefWidth="38.5" text="DEX" />
-                     <TableColumn fx:id="colhp" minWidth="0.0" prefWidth="37.0" text="HP" />
-                     <TableColumn fx:id="colstimana" prefWidth="54.0" text="Stamina" />
-                     <TableColumn fx:id="colimage" minWidth="0.0" prefWidth="111.0" text="Image" />
+                     <TableColumn fx:id="colaccid" prefWidth="67.0" text="Item ID" />
+                     <TableColumn fx:id="colaccname" prefWidth="126.0" text="Item Name" />
+                     <TableColumn fx:id="colprice" prefWidth="74.0" text="Price" />
+                     <TableColumn fx:id="colstr" prefWidth="45.0" text="STR" />
+                     <TableColumn fx:id="colagi" prefWidth="45.0" text="AGI" />
+                     <TableColumn fx:id="colvit" prefWidth="41.0" text="VIT" />
+                     <TableColumn fx:id="coldex" prefWidth="49.0" text="DEX" />
+                     <TableColumn fx:id="colhp" minWidth="0.0" prefWidth="45.0" text="HP" />
+                     <TableColumn fx:id="colstimana" prefWidth="78.0" text="Stamina" />
+                     <TableColumn fx:id="colimage" minWidth="0.0" prefWidth="81.0" text="Image" />
                   </columns>
                </TableView>
-               <TextField fx:id="txtsearch" layoutX="227.0" layoutY="35.0" prefHeight="25.0" prefWidth="164.0" promptText="Enter Item Name To Search...." />
-               <Button fx:id="btnban" layoutX="533.0" layoutY="507.0" mnemonicParsing="false" onAction="#handlebtnbanaction" prefHeight="25.0" prefWidth="83.0" style="-fx-background-color: red;" text="DELETE" textFill="WHITE">
+            <ImageView fitHeight="39.0" fitWidth="210.0" layoutX="226.0" layoutY="25.0" pickOnBounds="true">
+               <image>
+                  <Image url="@../image/Admin/admin_bar.png" />
+               </image>
+            </ImageView>
+               <TextField fx:id="txtsearch" layoutX="227.0" layoutY="28.0" prefHeight="35.0" prefWidth="204.0" promptText="Enter Item Name To Search...." styleClass="textbox" stylesheets="@../css/style.css" />
+            <ImageView fitHeight="34.0" fitWidth="85.0" layoutX="532.0" layoutY="503.0" pickOnBounds="true">
+               <image>
+                  <Image url="@../image/Admin/delete_btn.png" />
+               </image>
+            </ImageView>
+               <Button fx:id="btnban" layoutX="533.0" layoutY="507.0" mnemonicParsing="false" onAction="#handlebtnbanaction" opacity="0.0" prefHeight="25.0" prefWidth="83.0" style="-fx-background-color: red;" text="DELETE" textFill="WHITE">
                   <graphic>
                      <FontAwesomeIcon fill="WHITE" glyphName="BAN" />
                   </graphic>
@@ -46,12 +101,22 @@
                      <Font name="System Bold" size="12.0" />
                   </font>
                </Button>
-               <Button fx:id="btnsearch" layoutX="391.0" layoutY="35.0" mnemonicParsing="false" onAction="#handlesearchaction">
+            <ImageView fitHeight="36.0" fitWidth="52.0" layoutX="438.0" layoutY="26.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../image/Admin/search_icon.png" />
+               </image>
+            </ImageView>
+               <Button fx:id="btnsearch" layoutX="438.0" layoutY="29.0" mnemonicParsing="false" onAction="#handlesearchaction" opacity="0.0" prefHeight="30.0" prefWidth="37.0">
                   <graphic>
                      <FontAwesomeIcon glyphName="SEARCH" />
                   </graphic>
                </Button>
-               <Button fx:id="btnedit" layoutX="368.0" layoutY="507.0" mnemonicParsing="false" onAction="#handlebtneditaction" prefHeight="25.0" prefWidth="83.0" text="EDIT">
+            <ImageView fitHeight="34.0" fitWidth="85.0" layoutX="367.0" layoutY="504.0" pickOnBounds="true">
+               <image>
+                  <Image url="@../image/Admin/edit_btn.png" />
+               </image>
+            </ImageView>
+               <Button fx:id="btnedit" layoutX="368.0" layoutY="507.0" mnemonicParsing="false" onAction="#handlebtneditaction" opacity="0.0" prefHeight="25.0" prefWidth="83.0" text="EDIT">
                   <graphic>
                      <FontAwesomeIcon glyphName="EDIT" />
                   </graphic>
@@ -59,7 +124,12 @@
                      <Font name="System Bold" size="12.0" />
                   </font>
                </Button>
-               <Button fx:id="btnadd" layoutX="688.0" layoutY="507.0" mnemonicParsing="false" onAction="#handlebtnaddaction" prefHeight="25.0" prefWidth="83.0" text="ADD">
+            <ImageView fitHeight="34.0" fitWidth="85.0" layoutX="687.0" layoutY="504.0" pickOnBounds="true">
+               <image>
+                  <Image url="@../image/Admin/add_btn.png" />
+               </image>
+            </ImageView>
+               <Button fx:id="btnadd" layoutX="688.0" layoutY="507.0" mnemonicParsing="false" onAction="#handlebtnaddaction" opacity="0.0" prefHeight="25.0" prefWidth="83.0" text="ADD">
                   <graphic>
                      <FontAwesomeIcon glyphName="PLUS" />
                   </graphic>
