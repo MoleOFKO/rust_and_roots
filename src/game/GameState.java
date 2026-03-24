@@ -118,10 +118,12 @@ public final class GameState {
     private final Map<Integer, Integer> dailyRemainingShopStock = new LinkedHashMap<>();
 
     private int activeCookingOutputItemId = -1;
+    private int activeCookingOutputQuantity = 1;
     private double activeCookingCompleteAtSeconds = -1;
     private FoodEffectOutcome activeCookingOutcome = null;
 
     private int activeCraftingOutputItemId = -1;
+    private int activeCraftingOutputQuantity = 1;
     private double activeCraftingCompleteAtSeconds = -1;
     private int activeCraftingHpDelta = 0;
     private int activeCraftingStaminaDelta = 0;
@@ -165,21 +167,27 @@ public final class GameState {
     public void resetDailyShopStateForNewDay(int day) { this.shopRandomDay = day; this.dailyRandomShopItemIds.clear(); this.shopStockDay = day; this.dailyRemainingShopStock.clear(); }
 
     public void startCookingJob(int outputItemId, double completeAtSeconds) {
-        startCookingJob(outputItemId, completeAtSeconds, 0, 0, true);
+        startCookingJob(outputItemId, 1, completeAtSeconds, 0, 0, true);
     }
 
     public void startCookingJob(int outputItemId, double completeAtSeconds, int hpDelta, int staminaDelta, boolean success) {
-        startCookingJob(outputItemId, completeAtSeconds, hpDelta, staminaDelta, 0, 0, 0, 0, success);
+        startCookingJob(outputItemId, 1, completeAtSeconds, hpDelta, staminaDelta, 0, 0, 0, 0, success);
     }
 
-    public void startCookingJob(int outputItemId, double completeAtSeconds, int hpDelta, int staminaDelta, int strDelta, int vitDelta, int dexDelta, int agiDelta, boolean success) {
+    public void startCookingJob(int outputItemId, int outputQuantity, double completeAtSeconds, int hpDelta, int staminaDelta, boolean success) {
+        startCookingJob(outputItemId, outputQuantity, completeAtSeconds, hpDelta, staminaDelta, 0, 0, 0, 0, success);
+    }
+
+    public void startCookingJob(int outputItemId, int outputQuantity, double completeAtSeconds, int hpDelta, int staminaDelta, int strDelta, int vitDelta, int dexDelta, int agiDelta, boolean success) {
         this.activeCookingOutputItemId = outputItemId;
+        this.activeCookingOutputQuantity = Math.max(0, outputQuantity);
         this.activeCookingCompleteAtSeconds = completeAtSeconds;
         this.activeCookingOutcome = new FoodEffectOutcome(hpDelta, staminaDelta, strDelta, vitDelta, dexDelta, agiDelta, success);
     }
 
     public boolean hasActiveCookingJob() { return activeCookingOutputItemId > 0 && activeCookingCompleteAtSeconds >= 0; }
     public int getActiveCookingOutputItemId() { return activeCookingOutputItemId; }
+    public int getActiveCookingOutputQuantity() { return activeCookingOutputQuantity; }
     public double getActiveCookingCompleteAtSeconds() { return activeCookingCompleteAtSeconds; }
     public int getActiveCookingHpDelta() { return activeCookingOutcome == null ? 0 : activeCookingOutcome.getHpDelta(); }
     public int getActiveCookingStaminaDelta() { return activeCookingOutcome == null ? 0 : activeCookingOutcome.getStaminaDelta(); }
@@ -189,10 +197,15 @@ public final class GameState {
     public int getActiveCookingAgiDelta() { return activeCookingOutcome == null ? 0 : activeCookingOutcome.getAgiDelta(); }
     public boolean isActiveCookingSuccess() { return activeCookingOutcome != null && activeCookingOutcome.isSuccess(); }
     public boolean isCookingReady(double nowSeconds) { return hasActiveCookingJob() && nowSeconds >= activeCookingCompleteAtSeconds; }
-    public void clearCookingJob() { activeCookingOutputItemId = -1; activeCookingCompleteAtSeconds = -1; activeCookingOutcome = null; }
+    public void clearCookingJob() { activeCookingOutputItemId = -1; activeCookingOutputQuantity = 1; activeCookingCompleteAtSeconds = -1; activeCookingOutcome = null; }
 
     public void startCraftingJob(int outputItemId, double completeAtSeconds, int hpDelta, int staminaDelta, boolean success) {
+        startCraftingJob(outputItemId, 1, completeAtSeconds, hpDelta, staminaDelta, success);
+    }
+
+    public void startCraftingJob(int outputItemId, int outputQuantity, double completeAtSeconds, int hpDelta, int staminaDelta, boolean success) {
         this.activeCraftingOutputItemId = outputItemId;
+        this.activeCraftingOutputQuantity = Math.max(0, outputQuantity);
         this.activeCraftingCompleteAtSeconds = completeAtSeconds;
         this.activeCraftingHpDelta = hpDelta;
         this.activeCraftingStaminaDelta = staminaDelta;
@@ -200,12 +213,13 @@ public final class GameState {
     }
     public boolean hasActiveCraftingJob() { return activeCraftingOutputItemId > 0 && activeCraftingCompleteAtSeconds >= 0; }
     public int getActiveCraftingOutputItemId() { return activeCraftingOutputItemId; }
+    public int getActiveCraftingOutputQuantity() { return activeCraftingOutputQuantity; }
     public double getActiveCraftingCompleteAtSeconds() { return activeCraftingCompleteAtSeconds; }
     public int getActiveCraftingHpDelta() { return activeCraftingHpDelta; }
     public int getActiveCraftingStaminaDelta() { return activeCraftingStaminaDelta; }
     public boolean isActiveCraftingSuccess() { return activeCraftingSuccess; }
     public boolean isCraftingReady(double nowSeconds) { return hasActiveCraftingJob() && nowSeconds >= activeCraftingCompleteAtSeconds; }
-    public void clearCraftingJob() { activeCraftingOutputItemId = -1; activeCraftingCompleteAtSeconds = -1; activeCraftingHpDelta = 0; activeCraftingStaminaDelta = 0; activeCraftingSuccess = true; }
+    public void clearCraftingJob() { activeCraftingOutputItemId = -1; activeCraftingOutputQuantity = 1; activeCraftingCompleteAtSeconds = -1; activeCraftingHpDelta = 0; activeCraftingStaminaDelta = 0; activeCraftingSuccess = true; }
 
     public void queueCookedDishEffect(int itemId, int hpDelta, int staminaDelta, boolean success) {
         queueCookedDishEffect(itemId, hpDelta, staminaDelta, 0, 0, 0, 0, success);

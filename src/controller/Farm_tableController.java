@@ -33,6 +33,7 @@ public class Farm_tableController implements Initializable, SceneController {
 
     private static final double FARM_TABLE_TIME_SCALE = 0.25;
     private static final int TOTAL_GROWTH_STAGES = 3;
+    private static final int DEFAULT_DEX = 5;
 
     private GameState gameState;
 
@@ -218,11 +219,17 @@ public class Farm_tableController implements Initializable, SceneController {
         FarmState realFarm = gameState.getFarmState("home_map");
 
         Map<Integer, Integer> seedsToRemove = computeSeedConsumption();
+        int staminaCost = computePendingFarmStaminaCost();
+        if (gameState.getPlayerState().getStamina() < staminaCost) {
+            return;
+        }
+
         for (Map.Entry<Integer, Integer> entry : seedsToRemove.entrySet()) {
             if (!inv.removeItem(entry.getKey(), entry.getValue())) {
                 return;
             }
         }
+        gameState.getPlayerState().consumeStamina(staminaCost);
 
         for (Map.Entry<Integer, Integer> entry : pendingHarvests.entrySet()) {
             inv.addItem(entry.getKey(), entry.getValue());
@@ -395,10 +402,12 @@ public class Farm_tableController implements Initializable, SceneController {
 
                 if (alreadyReserved >= owned) return;
 
+                FarmRecipe recipe = getFarmRecipe(selectedSeedType);
                 pd.seed = selectedSeedType;
                 pd.plantedAt = now;
                 pd.lastWateredAt = -1;
                 pd.accumulatedWaterReduction = 0;
+                pd.totalGrowthSeconds = recipe == null ? pd.totalGrowthSeconds : recipe.waitSeconds;
             }
             case WATER -> {
                 if (!pd.canWater(now)) return;
@@ -407,9 +416,13 @@ public class Farm_tableController implements Initializable, SceneController {
             case SICKLE -> {
                 if (pd.seed == null || !pd.isReady(now)) return;
 
-                int cropItemId = toCropItemId(pd.seed);
-                if (cropItemId > 0) {
-                    pendingHarvests.merge(cropItemId, 1, Integer::sum);
+                FarmRecipe recipe = getFarmRecipe(pd.seed);
+                int cropItemId = (recipe == null) ? toCropItemId(pd.seed) : recipe.outputItemId;
+                int successRate = (recipe == null) ? 100 : computeSuccessRate(recipe);
+                boolean success = (recipe == null) || ProcessingRules.rollSuccess(successRate);
+                int outputAmount = success ? ProcessingRules.computeOutputAmount(recipe == null ? 1 : recipe.baseOutputAmount, successRate) : 0;
+                if (cropItemId > 0 && outputAmount > 0) {
+                    pendingHarvests.merge(cropItemId, outputAmount, Integer::sum);
                 }
 
                 pd.seed = null;
@@ -599,6 +612,50 @@ public class Farm_tableController implements Initializable, SceneController {
         return used;
     }
 
+
+    private int computePendingFarmStaminaCost() {
+        int total = 0;
+        FarmState realFarm = gameState.getFarmState("home_map");
+        for (Map.Entry<String, TempPlotData> entry : tempPlots.entrySet()) {
+            String plotId = entry.getKey();
+            TempPlotData temp = entry.getValue();
+            FarmState.PlotData real = realFarm.getPlot(plotId);
+            boolean newlyPlanted = real.seed == null && temp.seed != null;
+            if (!newlyPlanted) continue;
+            FarmRecipe recipe = getFarmRecipe(temp.seed);
+            if (recipe != null) total += getAdjustedStaminaCost(recipe);
+        }
+        return total;
+    }
+
+    private FarmRecipe getFarmRecipe(Farm.SeedType seedType) {
+        if (seedType == null) return null;
+        int usedItemId = toSeedItemId(seedType);
+        int outputItemId = toCropItemId(seedType);
+        if (usedItemId <= 0 || outputItemId <= 0) return null;
+        return switch (seedType) {
+            case CARROT -> new FarmRecipe(seedType, usedItemId, outputItemId, 45, 88, 3, 2, 1);
+            case GRAPE -> new FarmRecipe(seedType, usedItemId, outputItemId, 60, 84, 3, 3, 1);
+            case CORN -> new FarmRecipe(seedType, usedItemId, outputItemId, 55, 86, 3, 2, 1);
+            case TOMATO -> new FarmRecipe(seedType, usedItemId, outputItemId, 50, 90, 4, 2, 1);
+        };
+    }
+
+    private int computeSuccessRate(FarmRecipe recipe) {
+        if (recipe == null || gameState == null) return 0;
+        return ProcessingRules.computeAdjustedSuccessRate(recipe.baseSuccessRate, recipe.dexScaling, gameState.getPlayerState().getDex());
+    }
+
+//    private int getAdjustedWaitSeconds(FarmRecipe recipe) {
+//        if (recipe == null || gameState == null) return 0;
+//        return ProcessingRules.computeAdjustedWaitSeconds(recipe.waitSeconds, recipe.dexScaling, gameState.getPlayerState().getDex());
+//    } delete this if it's still unused later
+
+    private int getAdjustedStaminaCost(FarmRecipe recipe) {
+        if (recipe == null || gameState == null) return 0;
+        return ProcessingRules.computeAdjustedStaminaCost(recipe.staminaCost, recipe.dexScaling, gameState.getPlayerState().getDex());
+    }
+
     private int toSeedItemId(Farm.SeedType seedType) {
         String itemName = switch (seedType) {
             case CARROT -> "Carrot Seeds";
@@ -642,6 +699,28 @@ public class Farm_tableController implements Initializable, SceneController {
 
     private enum ToolMode {
         NONE, SEED, WATER, SICKLE
+    }
+
+    private static final class FarmRecipe {
+        final Farm.SeedType seedType;
+        final int usedItemId;
+        final int outputItemId;
+        final int waitSeconds;
+        final int baseSuccessRate;
+        final int dexScaling;
+        final int staminaCost;
+        final int baseOutputAmount;
+
+        FarmRecipe(Farm.SeedType seedType, int usedItemId, int outputItemId, int waitSeconds, int baseSuccessRate, int dexScaling, int staminaCost, int baseOutputAmount) {
+            this.seedType = seedType;
+            this.usedItemId = usedItemId;
+            this.outputItemId = outputItemId;
+            this.waitSeconds = waitSeconds;
+            this.baseSuccessRate = baseSuccessRate;
+            this.dexScaling = dexScaling;
+            this.staminaCost = staminaCost;
+            this.baseOutputAmount = Math.max(1, baseOutputAmount);
+        }
     }
 
     private static class TempPlotData {
