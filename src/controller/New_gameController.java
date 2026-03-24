@@ -66,6 +66,8 @@ public class New_gameController implements Initializable {
     public static int stamina;
     @FXML
     private ImageView bgImage;
+    @FXML
+    private Label lblvit1;
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
