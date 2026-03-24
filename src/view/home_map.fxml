@@ -12,6 +12,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.paint.Color?>
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
@@ -29,12 +30,6 @@
                   <Rectangle2D />
                </viewport>
             </ImageView>
-            <Group fx:id="human" layoutX="160.0" layoutY="135.0">
-         <children>
-            <Rectangle fx:id="human_hitbox" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" stroke="#ff000000" strokeType="INSIDE" translateX="24" translateY="28" width="14.0" />
-            <ImageView fx:id="human_img" fitHeight="64" fitWidth="64" pickOnBounds="true" preserveRatio="false" smooth="false" />
-         </children>
-      </Group>
             <Group>
                <children>
                   <Rectangle fx:id="spawn_default" height="10" layoutX="43.0" layoutY="69.0" opacity="0" width="10" />
@@ -46,38 +41,58 @@
                   <Rectangle fx:id="spawn_from_shop" height="10" layoutX="456.0" layoutY="210.0" opacity="0" stroke="BLACK" width="10" />
                </children>
             </Group>
+      <Group fx:id="merchant" layoutX="477.0" layoutY="201.0">
+         <children>
+            <ImageView fx:id="merchantImage" fitHeight="44.0" fitWidth="58.0" pickOnBounds="true" preserveRatio="true" />
+            <Rectangle fx:id="merchantdetect" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="44.0" stroke="TRANSPARENT" strokeType="INSIDE" width="57.0" />
+            <Button fx:id="btnmerchant" disable="true" mnemonicParsing="false" onAction="#onMerchantShopClick" prefHeight="41.0" prefWidth="58.0" styleClass="btn_transparent" stylesheets="@../css/style.css" />
+         </children>
+      </Group>
             <Group fx:id="walls" layoutX="-6.0" layoutY="-3.0">
                <children>
-            <Rectangle fx:id="wall" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="10.0" layoutX="354.0" stroke="TRANSPARENT" strokeType="INSIDE" width="252.0" />
-            <Rectangle fx:id="wall1" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="5.0" layoutX="3.0" layoutY="403.0" stroke="TRANSPARENT" strokeType="INSIDE" width="601.0" />
-            <Rectangle fx:id="wall2" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="74.0" layoutX="3.0" layoutY="169.0" stroke="TRANSPARENT" strokeType="INSIDE" width="23.0" />
-            <Rectangle fx:id="wall3" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="199.0" layoutX="600.0" layoutY="10.0" stroke="TRANSPARENT" strokeType="INSIDE" width="8.0" />
-            <Rectangle fx:id="wall4" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="157.0" layoutX="600.0" layoutY="237.0" stroke="TRANSPARENT" strokeType="INSIDE" width="8.0" />
-            <Rectangle fx:id="wall5" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="5.0" stroke="TRANSPARENT" strokeType="INSIDE" width="439.0" />
-            <Rectangle fx:id="wall6" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="168.0" layoutX="3.0" layoutY="239.0" stroke="TRANSPARENT" strokeType="INSIDE" width="10.0" />
-            <Rectangle fx:id="wall7" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="5.0" layoutX="223.0" layoutY="395.0" stroke="TRANSPARENT" strokeType="INSIDE" width="379.0" />
-            <Rectangle fx:id="wall8" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="55.0" layoutX="552.0" layoutY="180.0" stroke="TRANSPARENT" strokeType="INSIDE" width="53.0" y="1.0" />
-            <Rectangle fx:id="wall9" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="108.0" layoutX="3.0" layoutY="56.0" stroke="TRANSPARENT" strokeType="INSIDE" width="8.0" />
-            <Rectangle fx:id="wall10" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="5.0" layoutX="2.0" layoutY="48.0" stroke="TRANSPARENT" strokeType="INSIDE" width="126.0" />
-            <Rectangle fx:id="wall11" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="10.0" layoutX="284.0" layoutY="152.0" stroke="TRANSPARENT" strokeType="INSIDE" width="97.0" />
-            <Rectangle fx:id="wall12" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="5.0" layoutX="379.0" layoutY="157.0" stroke="TRANSPARENT" strokeType="INSIDE" width="52.0" />
-            <Rectangle fx:id="wall13" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="5.0" layoutX="285.0" layoutY="70.0" stroke="TRANSPARENT" strokeType="INSIDE" width="148.0" />
-            <Rectangle fx:id="wall14" arcHeight="5.0" arcWidth="5.0" fill="DODGERBLUE" height="74.0" layoutX="287.0" layoutY="80.0" stroke="TRANSPARENT" strokeType="INSIDE" />
-            <Rectangle fx:id="wall15" arcHeight="5.0" arcWidth="5.0" fill="DODGERBLUE" height="74.0" layoutX="429.0" layoutY="79.0" stroke="TRANSPARENT" strokeType="INSIDE" />
-            <Rectangle fx:id="wall16" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="83.0" layoutX="284.0" layoutY="73.0" stroke="TRANSPARENT" strokeType="INSIDE" width="8.0" />
-            <Rectangle fx:id="wall17" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="83.0" layoutX="420.0" layoutY="76.0" stroke="TRANSPARENT" strokeType="INSIDE" width="8.0" />
-            <Rectangle fx:id="wall18" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="55.0" layoutX="268.0" layoutY="1.0" stroke="TRANSPARENT" strokeType="INSIDE" width="100.0" />
-            <Rectangle fx:id="wall19" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="83.0" layoutX="114.0" layoutY="45.0" stroke="TRANSPARENT" strokeType="INSIDE" width="64.0" />
-            <Rectangle fx:id="wall20" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="83.0" layoutX="216.0" layoutY="45.0" stroke="TRANSPARENT" strokeType="INSIDE" width="52.0" />
-            <Rectangle fx:id="wall21" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="45.0" layoutX="163.0" layoutY="62.0" stroke="TRANSPARENT" strokeType="INSIDE" width="64.0" />
-            <Rectangle fx:id="wall22" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="5.0" layoutX="242.0" layoutY="385.0" stroke="TRANSPARENT" strokeType="INSIDE" width="356.0" />
-            <Rectangle fx:id="wall23" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="5.0" layoutX="273.0" layoutY="374.0" stroke="TRANSPARENT" strokeType="INSIDE" width="326.0" />
-            <Rectangle fx:id="wall24" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="5.0" layoutX="304.0" layoutY="362.0" stroke="TRANSPARENT" strokeType="INSIDE" width="296.0" />
-            <Rectangle fx:id="wall25" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="5.0" layoutX="341.0" layoutY="349.0" stroke="TRANSPARENT" strokeType="INSIDE" width="255.0" />
-            <Rectangle fx:id="wall26" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="5.0" layoutX="394.0" layoutY="335.0" stroke="TRANSPARENT" strokeType="INSIDE" width="200.0" />
-            <Rectangle fx:id="wall27" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="5.0" layoutX="430.0" layoutY="322.0" stroke="TRANSPARENT" strokeType="INSIDE" width="168.0" />
-            <Rectangle fx:id="wall28" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="5.0" layoutX="473.0" layoutY="309.0" stroke="TRANSPARENT" strokeType="INSIDE" width="126.0" />
-            <Rectangle fx:id="wall29" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="5.0" layoutX="551.0" layoutY="295.0" stroke="TRANSPARENT" strokeType="INSIDE" width="53.0" />
+            <Rectangle fx:id="wall" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="10.0" layoutX="354.0" stroke="TRANSPARENT" strokeType="INSIDE" width="252.0" />
+            <Rectangle fx:id="wall1" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="5.0" layoutX="3.0" layoutY="403.0" stroke="TRANSPARENT" strokeType="INSIDE" width="601.0" />
+            <Rectangle fx:id="wall2" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="74.0" layoutX="3.0" layoutY="169.0" stroke="TRANSPARENT" strokeType="INSIDE" width="23.0" />
+            <Rectangle fx:id="wall3" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="199.0" layoutX="600.0" layoutY="10.0" stroke="TRANSPARENT" strokeType="INSIDE" width="8.0" />
+            <Rectangle fx:id="wall4" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="157.0" layoutX="600.0" layoutY="237.0" stroke="TRANSPARENT" strokeType="INSIDE" width="8.0" />
+            <Rectangle fx:id="wall5" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="5.0" stroke="TRANSPARENT" strokeType="INSIDE" width="439.0" />
+            <Rectangle fx:id="wall6" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="168.0" layoutX="3.0" layoutY="239.0" stroke="TRANSPARENT" strokeType="INSIDE" width="10.0" />
+            <Rectangle fx:id="wall7" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="5.0" layoutX="223.0" layoutY="395.0" stroke="TRANSPARENT" strokeType="INSIDE" width="379.0" />
+            <Rectangle fx:id="wall8" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="55.0" layoutX="552.0" layoutY="180.0" stroke="TRANSPARENT" strokeType="INSIDE" width="53.0" y="1.0" />
+            <Rectangle fx:id="wall9" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="108.0" layoutX="3.0" layoutY="56.0" stroke="TRANSPARENT" strokeType="INSIDE" width="8.0" />
+            <Rectangle fx:id="wall10" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="5.0" layoutX="2.0" layoutY="48.0" stroke="TRANSPARENT" strokeType="INSIDE" width="126.0" />
+            <Rectangle fx:id="wall11" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="10.0" layoutX="284.0" layoutY="152.0" stroke="TRANSPARENT" strokeType="INSIDE" width="97.0" />
+            <Rectangle fx:id="wall12" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="5.0" layoutX="379.0" layoutY="157.0" stroke="TRANSPARENT" strokeType="INSIDE" width="52.0" />
+            <Rectangle fx:id="wall13" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="5.0" layoutX="285.0" layoutY="70.0" stroke="TRANSPARENT" strokeType="INSIDE" width="148.0" />
+            <Rectangle fx:id="wall14" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="74.0" layoutX="287.0" layoutY="80.0" stroke="TRANSPARENT" strokeType="INSIDE" />
+            <Rectangle fx:id="wall15" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="74.0" layoutX="429.0" layoutY="79.0" stroke="TRANSPARENT" strokeType="INSIDE" />
+            <Rectangle fx:id="wall16" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="83.0" layoutX="284.0" layoutY="73.0" stroke="TRANSPARENT" strokeType="INSIDE" width="8.0" />
+            <Rectangle fx:id="wall17" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="83.0" layoutX="420.0" layoutY="76.0" stroke="TRANSPARENT" strokeType="INSIDE" width="8.0" />
+            <Rectangle fx:id="wall18" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="55.0" layoutX="268.0" layoutY="1.0" stroke="TRANSPARENT" strokeType="INSIDE" width="100.0" />
+            <Rectangle fx:id="wall19" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="83.0" layoutX="114.0" layoutY="45.0" stroke="TRANSPARENT" strokeType="INSIDE" width="64.0" />
+            <Rectangle fx:id="wall20" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="83.0" layoutX="216.0" layoutY="45.0" stroke="TRANSPARENT" strokeType="INSIDE" width="52.0" />
+            <Rectangle fx:id="wall21" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="45.0" layoutX="163.0" layoutY="62.0" stroke="TRANSPARENT" strokeType="INSIDE" width="64.0" />
+            <Rectangle fx:id="wall22" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="5.0" layoutX="242.0" layoutY="385.0" stroke="TRANSPARENT" strokeType="INSIDE" width="356.0" />
+            <Rectangle fx:id="wall23" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="5.0" layoutX="273.0" layoutY="374.0" stroke="TRANSPARENT" strokeType="INSIDE" width="326.0" />
+            <Rectangle fx:id="wall24" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="5.0" layoutX="304.0" layoutY="362.0" stroke="TRANSPARENT" strokeType="INSIDE" width="296.0" />
+            <Rectangle fx:id="wall25" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="5.0" layoutX="341.0" layoutY="349.0" stroke="TRANSPARENT" strokeType="INSIDE" width="255.0" />
+            <Rectangle fx:id="wall26" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="5.0" layoutX="394.0" layoutY="335.0" stroke="TRANSPARENT" strokeType="INSIDE" width="200.0" />
+            <Rectangle fx:id="wall27" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="5.0" layoutX="430.0" layoutY="322.0" stroke="TRANSPARENT" strokeType="INSIDE" width="168.0" />
+            <Rectangle fx:id="wall28" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="5.0" layoutX="473.0" layoutY="309.0" stroke="TRANSPARENT" strokeType="INSIDE" width="126.0" />
+            <Rectangle fx:id="wall29" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="5.0" layoutX="551.0" layoutY="295.0" stroke="TRANSPARENT" strokeType="INSIDE" width="53.0" />
+                  <Rectangle fx:id="wall30" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="10.0" layoutX="497.0" layoutY="225.0" stroke="TRANSPARENT" strokeType="INSIDE" width="17.0" />
+                  <Label fx:id="hotbarguide" layoutX="250.0" layoutY="373.0" text="press 'e' to open hotbar">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
+                     <effect>
+                        <DropShadow height="10.5" radius="6.9925" spread="0.67" width="19.47">
+                           <color>
+                              <Color fx:value="white" />
+                           </color>
+                        </DropShadow>
+                     </effect>
+                  </Label>
                </children>
             </Group>
       <Group fx:id="farm1" layoutX="285.0" layoutY="68.0">
@@ -131,11 +146,10 @@
             <Button fx:id="farm1_button" disable="true" layoutX="-2.0" layoutY="8.0" mnemonicParsing="false" prefHeight="75.0" prefWidth="135.0" styleClass="btn_transparent" stylesheets="@../css/style.css" />
          </children>
       </Group>
-      <Group fx:id="merchant" layoutX="477.0" layoutY="201.0">
+            <Group fx:id="human" layoutX="160.0" layoutY="135.0">
          <children>
-            <ImageView fx:id="merchantImage" fitHeight="44.0" fitWidth="58.0" pickOnBounds="true" preserveRatio="true" />
-            <Rectangle fx:id="merchantdetect" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="44.0" stroke="TRANSPARENT" strokeType="INSIDE" width="57.0" />
-            <Button fx:id="btnmerchant" disable="true" mnemonicParsing="false" onAction="#onMerchantShopClick" prefHeight="41.0" prefWidth="58.0" styleClass="btn_transparent" stylesheets="@../css/style.css" />
+            <Rectangle fx:id="human_hitbox" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" stroke="#ff000000" strokeType="INSIDE" translateX="24" translateY="28" width="14.0" />
+            <ImageView fx:id="human_img" fitHeight="64" fitWidth="64" pickOnBounds="true" preserveRatio="false" smooth="false" />
          </children>
       </Group>
             <Group fx:id="home" layoutX="148.0" layoutY="81.0">
@@ -162,7 +176,7 @@
                   <Button fx:id="uppermsp" disable="true" mnemonicParsing="false" onAction="#handleuppermapaction" prefHeight="10.0" prefWidth="42.0" styleClass="btn_transparent" stylesheets="@../css/style.css" />
                </children>
             </Group>
-            <HBox fx:id="hotbar" alignment="CENTER" layoutX="148.0" layoutY="346.0" opacity="0.81" prefHeight="47.0" prefWidth="294.0" styleClass="hbox" stylesheets="@../css/style.css">
+            <HBox fx:id="hotbar" alignment="CENTER" layoutX="148.0" layoutY="346.0" opacity="0.81" prefHeight="47.0" prefWidth="294.0" styleClass="hbox" stylesheets="@../css/style.css" visible="false">
                <children>
                   <StackPane fx:id="Hslot" prefHeight="32.0" prefWidth="32.0" styleClass="stackpane" stylesheets="@../css/style.css">
                      <children>
@@ -588,7 +602,7 @@
                         </Group>
                      </children>
                   </Group>
-                  <Group fx:id="statusTab" managed="false" visible="false">
+                  <Group fx:id="statusTab" managed="false">
                      <children>
                         <ImageView fitHeight="337.0" fitWidth="569.0" layoutX="44.0" layoutY="-1.0" pickOnBounds="true" preserveRatio="true">
                            <image>
@@ -611,158 +625,8 @@
                               <DropShadow />
                            </effect>
                         </Label>
-                        <Label fx:id="statusHP" layoutX="131.0" layoutY="124.0" prefHeight="17.0" prefWidth="203.0" text="HP : " textFill="WHITE">
-                           <font>
-                              <Font name="System Bold" size="15.0" />
-                           </font>
-                           <effect>
-                              <DropShadow />
-                           </effect>
-                        </Label>
-                        <Label fx:id="statusSP" layoutX="131.0" layoutY="156.0" prefHeight="17.0" prefWidth="203.0" text="SP : " textFill="WHITE">
-                           <font>
-                              <Font name="System Bold" size="15.0" />
-                           </font>
-                           <effect>
-                              <DropShadow />
-                           </effect>
-                        </Label>
-                        <Label fx:id="statusSTR" layoutX="131.0" layoutY="186.0" prefHeight="17.0" prefWidth="203.0" text="STR : " textFill="WHITE">
-                           <font>
-                              <Font name="System Bold" size="15.0" />
-                           </font>
-                           <effect>
-                              <DropShadow height="176.73" radius="73.75" spread="0.53" width="120.27" />
-                           </effect>
-                        </Label>
-                        <Label fx:id="statusVIT" layoutX="131.0" layoutY="216.0" prefHeight="17.0" prefWidth="203.0" text="VIT : " textFill="WHITE">
-                           <font>
-                              <Font name="System Bold" size="15.0" />
-                           </font>
-                           <effect>
-                              <DropShadow />
-                           </effect>
-                        </Label>
-                        <Label fx:id="statusDEX" layoutX="131.0" layoutY="246.0" prefHeight="17.0" prefWidth="203.0" text="DEX : " textFill="WHITE">
-                           <font>
-                              <Font name="System Bold" size="15.0" />
-                           </font>
-                           <effect>
-                              <DropShadow />
-                           </effect>
-                        </Label>
-                        <Label fx:id="statusAGI" layoutX="131.0" layoutY="276.0" prefHeight="17.0" prefWidth="203.0" text="AGI : " textFill="WHITE">
-                           <font>
-                              <Font name="System Bold" size="15.0" />
-                           </font>
-                           <effect>
-                              <DropShadow />
-                           </effect>
-                        </Label>
                         <Line endX="363.66668701171875" endY="7.62939453125E-6" layoutX="123.0" layoutY="87.0" startX="-9.0" startY="7.62939453125E-6" stroke="WHITE" />
                         <Line endX="363.66668701171875" endY="7.62939453125E-6" layoutX="122.0" layoutY="118.0" startX="-9.0" startY="7.62939453125E-6" stroke="WHITE" />
-                        <Line endX="363.66668701171875" endY="7.62939453125E-6" layoutX="122.0" layoutY="149.0" startX="-9.0" startY="7.62939453125E-6" stroke="WHITE" />
-                        <Line endX="363.66668701171875" endY="7.62939453125E-6" layoutX="123.0" layoutY="177.0" startX="-9.0" startY="7.62939453125E-6" stroke="WHITE" />
-                        <Line endX="363.66668701171875" endY="7.62939453125E-6" layoutX="122.0" layoutY="209.0" startX="-9.0" startY="7.62939453125E-6" stroke="WHITE" />
-                        <Line endX="363.66668701171875" endY="7.62939453125E-6" layoutX="121.0" layoutY="239.0" startX="-9.0" startY="7.62939453125E-6" stroke="WHITE" />
-                        <Line endX="363.66668701171875" endY="7.62939453125E-6" layoutX="120.0" layoutY="270.0" startX="-9.0" startY="7.62939453125E-6" stroke="WHITE" />
-                        <Line endX="363.66668701171875" endY="7.62939453125E-6" layoutX="119.0" layoutY="298.0" startX="-9.0" startY="7.62939453125E-6" stroke="WHITE" />
-                        <ImageView fx:id="btnHPminus" fitHeight="22.0" fitWidth="23.0" layoutX="418.0" layoutY="123.0" managed="false" onMouseClicked="#handleHPminusaction" pickOnBounds="true" preserveRatio="true" visible="false">
-                           <image>
-                              <Image url="@../image/tools/-.png" />
-                           </image>
-                           <effect>
-                              <DropShadow />
-                           </effect>
-                        </ImageView>
-                        <ImageView fx:id="btnHPplus" fitHeight="22.0" fitWidth="23.0" layoutX="458.0" layoutY="124.0" managed="false" onMouseClicked="#handleHPplusaction" pickOnBounds="true" preserveRatio="true" visible="false">
-                           <image>
-                              <Image url="@../image/tools/+.png" />
-                           </image>
-                           <effect>
-                              <DropShadow />
-                           </effect>
-                        </ImageView>
-                        <ImageView fx:id="btnSPminus" fitHeight="22.0" fitWidth="23.0" layoutX="418.0" layoutY="154.0" managed="false" onMouseClicked="#handleSPminusaction" pickOnBounds="true" preserveRatio="true" visible="false">
-                           <image>
-                              <Image url="@../image/tools/-.png" />
-                           </image>
-                           <effect>
-                              <DropShadow />
-                           </effect>
-                        </ImageView>
-                        <ImageView fx:id="btnSTRminus" fitHeight="22.0" fitWidth="23.0" layoutX="418.0" layoutY="186.0" managed="false" onMouseClicked="#handleSTRminusaction" pickOnBounds="true" preserveRatio="true" visible="false">
-                           <image>
-                              <Image url="@../image/tools/-.png" />
-                           </image>
-                           <effect>
-                              <DropShadow />
-                           </effect>
-                        </ImageView>
-                        <ImageView fx:id="btnVITminus" fitHeight="22.0" fitWidth="23.0" layoutX="418.0" layoutY="216.0" managed="false" onMouseClicked="#handleVITminusaction" pickOnBounds="true" preserveRatio="true" visible="false">
-                           <image>
-                              <Image url="@../image/tools/-.png" />
-                           </image>
-                           <effect>
-                              <DropShadow />
-                           </effect>
-                        </ImageView>
-                        <ImageView fx:id="btnDEXminus" fitHeight="22.0" fitWidth="23.0" layoutX="418.0" layoutY="245.0" managed="false" onMouseClicked="#handleDEXminusaction" pickOnBounds="true" preserveRatio="true" visible="false">
-                           <image>
-                              <Image url="@../image/tools/-.png" />
-                           </image>
-                           <effect>
-                              <DropShadow />
-                           </effect>
-                        </ImageView>
-                        <ImageView fx:id="btnAGIminus" fitHeight="22.0" fitWidth="23.0" layoutX="418.0" layoutY="276.0" managed="false" onMouseClicked="#handleAGIminusaction" pickOnBounds="true" preserveRatio="true" visible="false">
-                           <image>
-                              <Image url="@../image/tools/-.png" />
-                           </image>
-                           <effect>
-                              <DropShadow />
-                           </effect>
-                        </ImageView>
-                        <ImageView fx:id="btnSPplus" fitHeight="22.0" fitWidth="23.0" layoutX="458.0" layoutY="154.0" managed="false" onMouseClicked="#handleSPplusaction" pickOnBounds="true" preserveRatio="true" visible="false">
-                           <image>
-                              <Image url="@../image/tools/+.png" />
-                           </image>
-                           <effect>
-                              <DropShadow />
-                           </effect>
-                        </ImageView>
-                        <ImageView fx:id="btnSTRplus" fitHeight="22.0" fitWidth="23.0" layoutX="458.0" layoutY="186.0" managed="false" onMouseClicked="#handleSTRplusaction" pickOnBounds="true" preserveRatio="true" visible="false">
-                           <image>
-                              <Image url="@../image/tools/+.png" />
-                           </image>
-                           <effect>
-                              <DropShadow />
-                           </effect>
-                        </ImageView>
-                        <ImageView fx:id="btnVITplus" fitHeight="22.0" fitWidth="23.0" layoutX="458.0" layoutY="216.0" managed="false" onMouseClicked="#handleVITplusaction" pickOnBounds="true" preserveRatio="true" visible="false">
-                           <image>
-                              <Image url="@../image/tools/+.png" />
-                           </image>
-                           <effect>
-                              <DropShadow />
-                           </effect>
-                        </ImageView>
-                        <ImageView fx:id="btnDEXplus" fitHeight="22.0" fitWidth="23.0" layoutX="458.0" layoutY="245.0" managed="false" onMouseClicked="#handleDEXplusaction" pickOnBounds="true" preserveRatio="true" visible="false">
-                           <image>
-                              <Image url="@../image/tools/+.png" />
-                           </image>
-                           <effect>
-                              <DropShadow />
-                           </effect>
-                        </ImageView>
-                        <ImageView fx:id="btnAGIplus" fitHeight="22.0" fitWidth="23.0" layoutX="458.0" layoutY="275.0" managed="false" onMouseClicked="#handleAGIplusaction" pickOnBounds="true" preserveRatio="true" visible="false">
-                           <image>
-                              <Image url="@../image/tools/+.png" />
-                           </image>
-                           <effect>
-                              <DropShadow />
-                           </effect>
-                        </ImageView>
                         <ImageView fx:id="btnUsePoint" fitHeight="24.0" fitWidth="84.0" layoutX="262.0" layoutY="91.0" onMouseClicked="#handleusepointaction" pickOnBounds="true" preserveRatio="true">
                            <image>
                               <Image url="@../image/tools/buttonMenu.png" />
@@ -779,6 +643,299 @@
                               <DropShadow />
                            </effect>
                         </ImageView>
+                        <Group fx:id="statusgroup" layoutX="90.0" layoutY="62.0" visible="false">
+                           <children>
+                              <Label fx:id="statusHP" layoutX="42.0" layoutY="63.0" prefHeight="17.0" prefWidth="203.0" text="HP : " textFill="WHITE">
+                                 <font>
+                                    <Font name="System Bold" size="15.0" />
+                                 </font>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </Label>
+                              <Label fx:id="statusSP" layoutX="43.0" layoutY="94.0" prefHeight="17.0" prefWidth="203.0" text="SP : " textFill="WHITE">
+                                 <font>
+                                    <Font name="System Bold" size="15.0" />
+                                 </font>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </Label>
+                              <Label fx:id="statusSTR" layoutX="44.0" layoutY="124.0" prefHeight="17.0" prefWidth="203.0" text="STR : " textFill="WHITE">
+                                 <font>
+                                    <Font name="System Bold" size="15.0" />
+                                 </font>
+                                 <effect>
+                                    <DropShadow height="176.73" radius="73.75" spread="0.53" width="120.27" />
+                                 </effect>
+                              </Label>
+                              <Label fx:id="statusVIT" layoutX="45.0" layoutY="154.0" prefHeight="17.0" prefWidth="203.0" text="VIT : " textFill="WHITE">
+                                 <font>
+                                    <Font name="System Bold" size="15.0" />
+                                 </font>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </Label>
+                              <Label fx:id="statusDEX" layoutX="44.0" layoutY="184.0" prefHeight="17.0" prefWidth="203.0" text="DEX : " textFill="WHITE">
+                                 <font>
+                                    <Font name="System Bold" size="15.0" />
+                                 </font>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </Label>
+                              <Label fx:id="statusAGI" layoutX="46.0" layoutY="214.0" prefHeight="17.0" prefWidth="203.0" text="AGI : " textFill="WHITE">
+                                 <font>
+                                    <Font name="System Bold" size="15.0" />
+                                 </font>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </Label>
+                              <Line endX="363.66668701171875" endY="7.62939453125E-6" layoutX="31.0" layoutY="86.0" startX="-9.0" startY="7.62939453125E-6" stroke="WHITE" />
+                              <Line endX="363.66668701171875" endY="7.62939453125E-6" layoutX="32.0" layoutY="114.0" startX="-9.0" startY="7.62939453125E-6" stroke="WHITE" />
+                              <Line endX="363.66668701171875" endY="7.62939453125E-6" layoutX="31.0" layoutY="146.0" startX="-9.0" startY="7.62939453125E-6" stroke="WHITE" />
+                              <Line endX="363.66668701171875" endY="7.62939453125E-6" layoutX="30.0" layoutY="176.0" startX="-9.0" startY="7.62939453125E-6" stroke="WHITE" />
+                              <Line endX="363.66668701171875" endY="7.62939453125E-6" layoutX="29.0" layoutY="207.0" startX="-9.0" startY="7.62939453125E-6" stroke="WHITE" />
+                              <Line endX="363.66668701171875" endY="7.62939453125E-6" layoutX="28.0" layoutY="235.0" startX="-9.0" startY="7.62939453125E-6" stroke="WHITE" />
+                              <ImageView fx:id="btnskill" fitHeight="19.0" fitWidth="78.0" layoutX="339.0" nodeOrientation="INHERIT" onMouseClicked="#handlebtnskillacion" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../image/tools/btnskill.png" />
+                                 </image>
+                              </ImageView>
+                              <ImageView fx:id="btnHPminus" fitHeight="22.0" fitWidth="23.0" layoutX="331.0" layoutY="59.0" managed="false" onMouseClicked="#handleHPminusaction" pickOnBounds="true" preserveRatio="true" visible="false">
+                                 <image>
+                                    <Image url="@../image/tools/-.png" />
+                                 </image>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </ImageView>
+                              <ImageView fx:id="btnHPplus" fitHeight="22.0" fitWidth="23.0" layoutX="371.0" layoutY="60.0" managed="false" onMouseClicked="#handleHPplusaction" pickOnBounds="true" preserveRatio="true" visible="false">
+                                 <image>
+                                    <Image url="@../image/tools/+.png" />
+                                 </image>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </ImageView>
+                              <ImageView fx:id="btnSPminus" fitHeight="22.0" fitWidth="23.0" layoutX="331.0" layoutY="90.0" managed="false" onMouseClicked="#handleSPminusaction" pickOnBounds="true" preserveRatio="true" visible="false">
+                                 <image>
+                                    <Image url="@../image/tools/-.png" />
+                                 </image>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </ImageView>
+                              <ImageView fx:id="btnSTRminus" fitHeight="22.0" fitWidth="23.0" layoutX="331.0" layoutY="122.0" managed="false" onMouseClicked="#handleSTRminusaction" pickOnBounds="true" preserveRatio="true" visible="false">
+                                 <image>
+                                    <Image url="@../image/tools/-.png" />
+                                 </image>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </ImageView>
+                              <ImageView fx:id="btnVITminus" fitHeight="22.0" fitWidth="23.0" layoutX="331.0" layoutY="152.0" managed="false" onMouseClicked="#handleVITminusaction" pickOnBounds="true" preserveRatio="true" visible="false">
+                                 <image>
+                                    <Image url="@../image/tools/-.png" />
+                                 </image>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </ImageView>
+                              <ImageView fx:id="btnDEXminus" fitHeight="22.0" fitWidth="23.0" layoutX="331.0" layoutY="181.0" managed="false" onMouseClicked="#handleDEXminusaction" pickOnBounds="true" preserveRatio="true" visible="false">
+                                 <image>
+                                    <Image url="@../image/tools/-.png" />
+                                 </image>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </ImageView>
+                              <ImageView fx:id="btnAGIminus" fitHeight="22.0" fitWidth="23.0" layoutX="331.0" layoutY="212.0" managed="false" onMouseClicked="#handleAGIminusaction" pickOnBounds="true" preserveRatio="true" visible="false">
+                                 <image>
+                                    <Image url="@../image/tools/-.png" />
+                                 </image>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </ImageView>
+                              <ImageView fx:id="btnSPplus" fitHeight="22.0" fitWidth="23.0" layoutX="371.0" layoutY="90.0" managed="false" onMouseClicked="#handleSPplusaction" pickOnBounds="true" preserveRatio="true" visible="false">
+                                 <image>
+                                    <Image url="@../image/tools/+.png" />
+                                 </image>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </ImageView>
+                              <ImageView fx:id="btnSTRplus" fitHeight="22.0" fitWidth="23.0" layoutX="371.0" layoutY="122.0" managed="false" onMouseClicked="#handleSTRplusaction" pickOnBounds="true" preserveRatio="true" visible="false">
+                                 <image>
+                                    <Image url="@../image/tools/+.png" />
+                                 </image>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </ImageView>
+                              <ImageView fx:id="btnVITplus" fitHeight="22.0" fitWidth="23.0" layoutX="371.0" layoutY="152.0" managed="false" onMouseClicked="#handleVITplusaction" pickOnBounds="true" preserveRatio="true" visible="false">
+                                 <image>
+                                    <Image url="@../image/tools/+.png" />
+                                 </image>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </ImageView>
+                              <ImageView fx:id="btnDEXplus" fitHeight="22.0" fitWidth="23.0" layoutX="371.0" layoutY="181.0" managed="false" onMouseClicked="#handleDEXplusaction" pickOnBounds="true" preserveRatio="true" visible="false">
+                                 <image>
+                                    <Image url="@../image/tools/+.png" />
+                                 </image>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </ImageView>
+                              <ImageView fx:id="btnAGIplus" fitHeight="22.0" fitWidth="23.0" layoutX="371.0" layoutY="211.0" managed="false" onMouseClicked="#handleAGIplusaction" pickOnBounds="true" preserveRatio="true" visible="false">
+                                 <image>
+                                    <Image url="@../image/tools/+.png" />
+                                 </image>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </ImageView>
+                           </children>
+                        </Group>
+                        <Group layoutX="429.0" layoutY="62.0">
+                           <children>
+                              <ImageView fx:id="btnstatus" fitHeight="19.0" fitWidth="78.0" onMouseClicked="#handlebtnstatusaction" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../image/tools/btnstatus.png" />
+                                 </image>
+                              </ImageView>
+                              <Label fx:id="farming" layoutX="-297.0" layoutY="61.0" prefHeight="21.0" prefWidth="127.0" text="Farming :" textFill="WHITE">
+                                 <font>
+                                    <Font name="System Bold" size="15.0" />
+                                 </font>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </Label>
+                              <Line endX="363.66668701171875" endY="7.62939453125E-6" layoutX="-307.0" layoutY="86.0" startX="-9.0" startY="7.62939453125E-6" stroke="WHITE" />
+                              <Label fx:id="gathering" layoutX="-297.0" layoutY="88.0" prefHeight="21.0" prefWidth="127.0" text="Gathering :" textFill="WHITE">
+                                 <font>
+                                    <Font name="System Bold" size="15.0" />
+                                 </font>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </Label>
+                              <Label fx:id="crafting" layoutX="-297.0" layoutY="116.0" prefHeight="21.0" prefWidth="127.0" text="Crafting" textFill="WHITE">
+                                 <font>
+                                    <Font name="System Bold" size="15.0" />
+                                 </font>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </Label>
+                              <Label fx:id="fishing" layoutX="-296.0" layoutY="143.0" prefHeight="21.0" prefWidth="127.0" text="Fishing :" textFill="WHITE">
+                                 <font>
+                                    <Font name="System Bold" size="15.0" />
+                                 </font>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </Label>
+                              <Label fx:id="cooking" layoutX="-295.0" layoutY="170.0" prefHeight="21.0" prefWidth="127.0" text="Cooking :" textFill="WHITE">
+                                 <font>
+                                    <Font name="System Bold" size="15.0" />
+                                 </font>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </Label>
+                              <Line endX="363.66668701171875" endY="7.62939453125E-6" layoutX="-306.0" layoutY="114.0" startX="-9.0" startY="7.62939453125E-6" stroke="WHITE" />
+                              <Line endX="363.66668701171875" endY="7.62939453125E-6" layoutX="-306.0" layoutY="141.0" startX="-9.0" startY="7.62939453125E-6" stroke="WHITE" />
+                              <Line endX="363.66668701171875" endY="7.62939453125E-6" layoutX="-306.0" layoutY="167.0" startX="-9.0" startY="7.62939453125E-6" stroke="WHITE" />
+                              <Line endX="363.66668701171875" endY="7.62939453125E-6" layoutX="-306.0" layoutY="196.0" startX="-9.0" startY="7.62939453125E-6" stroke="WHITE" />
+                              <ImageView fx:id="btnfarmingminus1" fitHeight="22.0" fitWidth="23.0" layoutX="-12.0" layoutY="59.0" managed="false" onMouseClicked="#handlefarmingminusaction" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../image/tools/-.png" />
+                                 </image>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </ImageView>
+                              <ImageView fx:id="btnfarmingplus1" fitHeight="22.0" fitWidth="23.0" layoutX="28.0" layoutY="60.0" managed="false" onMouseClicked="#handlefarmingplusaction" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../image/tools/+.png" />
+                                 </image>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </ImageView>
+                              <ImageView fx:id="btngatheringminus1" fitHeight="22.0" fitWidth="23.0" layoutX="-12.0" layoutY="88.0" managed="false" onMouseClicked="#handlegatheringminusaction" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../image/tools/-.png" />
+                                 </image>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </ImageView>
+                              <ImageView fx:id="btncraftingminus1" fitHeight="22.0" fitWidth="23.0" layoutX="-12.0" layoutY="116.0" managed="false" onMouseClicked="#handlecraftingminusaction" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../image/tools/-.png" />
+                                 </image>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </ImageView>
+                              <ImageView fx:id="btnfishingminus1" fitHeight="22.0" fitWidth="23.0" layoutX="-12.0" layoutY="143.0" managed="false" onMouseClicked="#handlefishingminusaction" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../image/tools/-.png" />
+                                 </image>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </ImageView>
+                              <ImageView fx:id="btncookingminus1" fitHeight="22.0" fitWidth="23.0" layoutX="-11.0" layoutY="170.0" managed="false" onMouseClicked="#handlecookingminusaction" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../image/tools/-.png" />
+                                 </image>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </ImageView>
+                              <ImageView fx:id="btngatheringplus1" fitHeight="22.0" fitWidth="23.0" layoutX="28.0" layoutY="90.0" managed="false" onMouseClicked="#handlegatheringplusaction" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../image/tools/+.png" />
+                                 </image>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </ImageView>
+                              <ImageView fx:id="btncraftingplus1" fitHeight="22.0" fitWidth="23.0" layoutX="28.0" layoutY="116.0" managed="false" onMouseClicked="#handlecraftingplusaction" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../image/tools/+.png" />
+                                 </image>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </ImageView>
+                              <ImageView fx:id="btnfishingplus1" fitHeight="22.0" fitWidth="23.0" layoutX="28.0" layoutY="143.0" managed="false" onMouseClicked="#handlefishingplusaction" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../image/tools/+.png" />
+                                 </image>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </ImageView>
+                              <ImageView fx:id="btncookingplus1" fitHeight="22.0" fitWidth="23.0" layoutX="28.0" layoutY="170.0" managed="false" onMouseClicked="#handlecookingplusaction" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../image/tools/+.png" />
+                                 </image>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </ImageView>
+                           </children>
+                        </Group>
                      </children>
                   </Group>
                                     <Group fx:id="settingsTab" managed="false" visible="false">
