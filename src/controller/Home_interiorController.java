@@ -31,6 +31,9 @@ import java.util.Comparator;
 import java.util.List;
 import javafx.beans.property.IntegerProperty;
 import javafx.collections.MapChangeListener;
+import javafx.scene.control.Slider;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import model.Inventory;
 import model.ItemDatabase;
 import model.item;
@@ -534,6 +537,328 @@ public class Home_interiorController extends BaseMapController {
     private ImageView Back;
 
     private static final int CHEST_SLOT_CAPACITY = 42;;
+    @FXML
+    private HBox hotbar;
+    @FXML
+    private StackPane Hslot;
+    @FXML
+    private ImageView slotImg;
+    @FXML
+    private Label slotLb;
+    @FXML
+    private Button slotBtn;
+    @FXML
+    private StackPane Hslot1;
+    @FXML
+    private ImageView slotImg1;
+    @FXML
+    private Label slotLb1;
+    @FXML
+    private Button slotBtn1;
+    @FXML
+    private StackPane Hslot2;
+    @FXML
+    private ImageView slotImg2;
+    @FXML
+    private Label slotLb2;
+    @FXML
+    private Button slotBtn2;
+    @FXML
+    private StackPane Hslot3;
+    @FXML
+    private ImageView slotImg3;
+    @FXML
+    private Label slotLb3;
+    @FXML
+    private Button slotBtn3;
+    @FXML
+    private StackPane Hslot4;
+    @FXML
+    private ImageView slotImg4;
+    @FXML
+    private Label slotLb4;
+    @FXML
+    private Button slotBtn4;
+    @FXML
+    private StackPane Hslot5;
+    @FXML
+    private Button slotBtn5;
+    @FXML
+    private Pane inventoryOverlay;
+    @FXML
+    private Group menuInventory;
+    @FXML
+    private Group player_inv_group1;
+    @FXML
+    private ImageView Playerinvimg21;
+    @FXML
+    private Button Playerinvbtn21;
+    @FXML
+    private Label Playerinvlbl21;
+    @FXML
+    private ImageView Playerinvimg31;
+    @FXML
+    private Button Playerinvbtn31;
+    @FXML
+    private Label Playerinvlbl31;
+    @FXML
+    private ImageView Playerinvimg41;
+    @FXML
+    private Button Playerinvbtn41;
+    @FXML
+    private Label Playerinvlbl41;
+    @FXML
+    private ImageView Playerinvimg51;
+    @FXML
+    private Button Playerinvbtn51;
+    @FXML
+    private Label Playerinvlbl51;
+    @FXML
+    private ImageView Playerinvimg61;
+    @FXML
+    private Button Playerinvbtn61;
+    @FXML
+    private Label Playerinvlbl61;
+    @FXML
+    private ImageView Playerinvimg71;
+    @FXML
+    private Button Playerinvbtn71;
+    @FXML
+    private Label Playerinvlbl71;
+    @FXML
+    private ImageView Playerinvimg81;
+    @FXML
+    private Button Playerinvbtn81;
+    @FXML
+    private Label Playerinvlbl81;
+    @FXML
+    private ImageView Playerinvimg91;
+    @FXML
+    private Button Playerinvbtn91;
+    @FXML
+    private Label Playerinvlbl91;
+    @FXML
+    private ImageView Playerinvimg101;
+    @FXML
+    private Button Playerinvbtn101;
+    @FXML
+    private Label Playerinvlbl101;
+    @FXML
+    private ImageView Playerinvimg111;
+    @FXML
+    private Button Playerinvbtn111;
+    @FXML
+    private Label Playerinvlbl111;
+    @FXML
+    private ImageView Playerinvimg121;
+    @FXML
+    private Button Playerinvbtn121;
+    @FXML
+    private Label Playerinvlbl121;
+    @FXML
+    private ImageView Playerinvimg131;
+    @FXML
+    private Button Playerinvbtn131;
+    @FXML
+    private Label Playerinvlbl131;
+    @FXML
+    private ImageView Playerinvimg141;
+    @FXML
+    private Button Playerinvbtn141;
+    @FXML
+    private Label Playerinvlbl141;
+    @FXML
+    private ImageView Playerinvimg151;
+    @FXML
+    private Button Playerinvbtn151;
+    @FXML
+    private Label Playerinvlbl151;
+    @FXML
+    private ImageView Playerinvimg161;
+    @FXML
+    private Button Playerinvbtn161;
+    @FXML
+    private Label Playerinvlbl161;
+    @FXML
+    private ImageView Playerinvimg171;
+    @FXML
+    private Button Playerinvbtn171;
+    @FXML
+    private Label Playerinvlbl171;
+    @FXML
+    private ImageView Playerinvimg181;
+    @FXML
+    private Button Playerinvbtn181;
+    @FXML
+    private Label Playerinvlbl181;
+    @FXML
+    private ImageView Playerinvimg191;
+    @FXML
+    private Button Playerinvbtn191;
+    @FXML
+    private Label Playerinvlbl191;
+    @FXML
+    private Group statusTab;
+    @FXML
+    private Label statusName;
+    @FXML
+    private Label statusEXP;
+    @FXML
+    private Label statusHP;
+    @FXML
+    private Label statusSP;
+    @FXML
+    private Label statusSTR;
+    @FXML
+    private Label statusVIT;
+    @FXML
+    private Label statusDEX;
+    @FXML
+    private Label statusAGI;
+    @FXML
+    private ImageView btnHPminus;
+    @FXML
+    private ImageView btnHPplus;
+    @FXML
+    private ImageView btnSPminus;
+    @FXML
+    private ImageView btnSTRminus;
+    @FXML
+    private ImageView btnVITminus;
+    @FXML
+    private ImageView btnDEXminus;
+    @FXML
+    private ImageView btnAGIminus;
+    @FXML
+    private ImageView btnSPplus;
+    @FXML
+    private ImageView btnSTRplus;
+    @FXML
+    private ImageView btnVITplus;
+    @FXML
+    private ImageView btnDEXplus;
+    @FXML
+    private ImageView btnAGIplus;
+    @FXML
+    private ImageView btnUsePoint;
+    @FXML
+    private ImageView btnConfirm;
+    @FXML
+    private Group settingsTab;
+    @FXML
+    private Slider timescaleslider;
+    @FXML
+    private Button btnsetday;
+    @FXML
+    private Button btnsetnight;
+    @FXML
+    private Button btnplus1h;
+    @FXML
+    private Button btnsaveandexit;
+    @FXML
+    private Label sliderscale;
+    @FXML
+    private Label lbldays;
+    @FXML
+    private Label lbltime;
+    @FXML
+    private Button btnsave;
+    @FXML
+    private Button btnload;
+    @FXML
+    private Button openInventory;
+    @FXML
+    private ImageView btnclose;
+    @FXML
+    private Button openstatus;
+    @FXML
+    private Button opensetting;
+    @FXML
+    private Label hotbarguide;
+
+    @FXML
+    private void handleHPminusaction(MouseEvent event) {
+    }
+
+    @FXML
+    private void handleHPplusaction(MouseEvent event) {
+    }
+
+    @FXML
+    private void handleSPminusaction(MouseEvent event) {
+    }
+
+    @FXML
+    private void handleSTRminusaction(MouseEvent event) {
+    }
+
+    @FXML
+    private void handleVITminusaction(MouseEvent event) {
+    }
+
+    @FXML
+    private void handleDEXminusaction(MouseEvent event) {
+    }
+
+    @FXML
+    private void handleAGIminusaction(MouseEvent event) {
+    }
+
+    @FXML
+    private void handleSPplusaction(MouseEvent event) {
+    }
+
+    @FXML
+    private void handleSTRplusaction(MouseEvent event) {
+    }
+
+    @FXML
+    private void handleVITplusaction(MouseEvent event) {
+    }
+
+    @FXML
+    private void handleDEXplusaction(MouseEvent event) {
+    }
+
+    @FXML
+    private void handleAGIplusaction(MouseEvent event) {
+    }
+
+    @FXML
+    private void handleusepointaction(MouseEvent event) {
+    }
+
+    @FXML
+    private void handleconfirmaction(MouseEvent event) {
+    }
+
+    @FXML
+    private void handlesaveexitaction(ActionEvent event) {
+    }
+
+    @FXML
+    private void handlesave(ActionEvent event) {
+    }
+
+    @FXML
+    private void handleload(ActionEvent event) {
+    }
+
+    @FXML
+    private void handleopenInventoryaction(ActionEvent event) {
+    }
+
+    @FXML
+    private void handlecloseaction(MouseEvent event) {
+    }
+
+    @FXML
+    private void handleopenstatusaction(ActionEvent event) {
+    }
+
+    @FXML
+    private void handleopensettingaction(ActionEvent event) {
+    }
 
     private enum SelectionSource { NONE, PLAYER, CHEST }
 
