@@ -879,12 +879,12 @@ public class home_mapController extends BaseMapController {
         if (playerState == null) return 0;
 
         return switch (Objects.requireNonNullElse(statKey, "")) {
-            case "hp" -> Math.max(0, playerState.getMaxHp() - 100);
-            case "sp" -> Math.max(0, playerState.getMaxStamina() - 100);
-            case "str" -> Math.max(0, playerState.getStr() - 5);
-            case "vit" -> Math.max(0, playerState.getVit() - 5);
-            case "dex" -> Math.max(0, playerState.getDex() - 5);
-            case "agi" -> Math.max(0, playerState.getAgi() - 5);
+            case "hp" -> Math.max(0, playerState.getMaxHp() - 45);
+            case "sp" -> Math.max(0, playerState.getMaxStamina() - 50);
+            case "str" -> Math.max(0, playerState.getStr() - 1);
+            case "vit" -> Math.max(0, playerState.getVit() - 1);
+            case "dex" -> Math.max(0, playerState.getDex() - 1);
+            case "agi" -> Math.max(0, playerState.getAgi() - 1);
             default -> 0;
         };
     }

@@ -100,74 +100,84 @@
                   </image>
                </ImageView>
                <Button fx:id="btnStartGame" layoutX="454.0" layoutY="317.0" mnemonicParsing="false" onAction="#handlebtnStartGame" opacity="0.0" prefHeight="46.0" prefWidth="105.0" />
-            <Label layoutX="359.0" layoutY="241.0" prefHeight="19.0" prefWidth="50.0" text="[EXP] :" textFill="#643302">
+            <Label layoutX="359.0" layoutY="261.0" prefHeight="19.0" prefWidth="50.0" text="[EXP] :" textFill="#643302">
                <font>
                   <Font name="System Bold" size="13.0" />
                </font>
             </Label>
-            <Label fx:id="lblvit1" layoutX="411.0" layoutY="241.0" prefHeight="17.0" prefWidth="31.0" text="0" textFill="#643302">
+            <Label fx:id="lblexp" layoutX="411.0" layoutY="261.0" prefHeight="17.0" prefWidth="31.0" text="0" textFill="#643302">
                <font>
                   <Font name="System Bold" size="13.0" />
                </font>
             </Label>
-            <ImageView fitHeight="17.0" fitWidth="18.0" layoutX="342.0" layoutY="153.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="btnHPplus" fitHeight="17.0" fitWidth="18.0" layoutX="342.0" layoutY="153.0" onMouseClicked="#handleHPplusaction" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../image/tools/+.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="17.0" fitWidth="18.0" layoutX="313.0" layoutY="153.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="btnHPminus" fitHeight="17.0" fitWidth="18.0" layoutX="313.0" layoutY="153.0" onMouseClicked="#handleHPminusaction" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../image/tools/-.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="17.0" fitWidth="18.0" layoutX="343.0" layoutY="182.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="btnSTRplus" fitHeight="17.0" fitWidth="18.0" layoutX="343.0" layoutY="182.0" onMouseClicked="#handleSTRplusaction" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../image/tools/+.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="17.0" fitWidth="18.0" layoutX="314.0" layoutY="182.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="btnSTRminus" fitHeight="17.0" fitWidth="18.0" layoutX="314.0" layoutY="182.0" onMouseClicked="#handleSTRminusaction" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../image/tools/-.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="17.0" fitWidth="18.0" layoutX="341.0" layoutY="214.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="btnVITplus" fitHeight="17.0" fitWidth="18.0" layoutX="341.0" layoutY="214.0" onMouseClicked="#handleVITplusaction" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../image/tools/+.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="17.0" fitWidth="18.0" layoutX="312.0" layoutY="214.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="btnVITminus" fitHeight="17.0" fitWidth="18.0" layoutX="312.0" layoutY="214.0" onMouseClicked="#handleVITminusaction" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../image/tools/-.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="17.0" fitWidth="18.0" layoutX="477.0" layoutY="151.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="btnSPplus" fitHeight="17.0" fitWidth="18.0" layoutX="477.0" layoutY="151.0" onMouseClicked="#handleSPplusaction" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../image/tools/+.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="17.0" fitWidth="18.0" layoutX="448.0" layoutY="151.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="btnSPminus" fitHeight="17.0" fitWidth="18.0" layoutX="448.0" layoutY="151.0" onMouseClicked="#handleSPminusaction" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../image/tools/-.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="17.0" fitWidth="18.0" layoutX="479.0" layoutY="182.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="btnDEXplus" fitHeight="17.0" fitWidth="18.0" layoutX="479.0" layoutY="182.0" onMouseClicked="#handleDEXplusaction" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../image/tools/+.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="17.0" fitWidth="18.0" layoutX="450.0" layoutY="182.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="btnDEXminus" fitHeight="17.0" fitWidth="18.0" layoutX="450.0" layoutY="182.0" onMouseClicked="#handleDEXminusaction" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../image/tools/-.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="17.0" fitWidth="18.0" layoutX="481.0" layoutY="214.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="btnAGIplus" fitHeight="17.0" fitWidth="18.0" layoutX="481.0" layoutY="214.0" onMouseClicked="#handleAGIplusaction" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../image/tools/+.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="17.0" fitWidth="18.0" layoutX="452.0" layoutY="214.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="btnAGIminus" fitHeight="17.0" fitWidth="18.0" layoutX="452.0" layoutY="214.0" onMouseClicked="#handleAGIminusaction" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../image/tools/-.png" />
+               </image>
+            </ImageView>
+            <ImageView fx:id="btnConfirm" fitHeight="19.0" fitWidth="59.0" layoutX="502.0" layoutY="262.0" onMouseClicked="#handleconfirmaction" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../image/tools/buttonMenuConfirm.png" />
+               </image>
+            </ImageView>
+            <ImageView fx:id="btnClear" fitHeight="19.0" fitWidth="59.0" layoutX="436.0" layoutY="263.0" onMouseClicked="#handleclearaction" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../image/tools/btnclear.png" />
                </image>
             </ImageView>
             </children>
