@@ -129,38 +129,42 @@ public class LoginController implements Initializable {
                             case "admin" ->                         {
                                     util.SceneManager.switchScene("/view/account_view.fxml");
                             }
-                            case "user" ->                         {
+                            case "user" -> {
                                 int accountId = rs.getInt("account_id");
 
-                                String charSql = "SELECT character_id FROM characters WHERE account_id=? LIMIT 1";
+                                GameState gs = GameState.get();
+                                gs.setCurrentAccountId(accountId);
+                                gs.setCurrentCharacterId(-1);
+                                gs.setCurrentSaveId(-1);
+
+                                String charSql = "SELECT character_id, player_name FROM characters WHERE account_id=? ORDER BY character_id LIMIT 1";
                                 try (PreparedStatement charPst = con.prepareStatement(charSql)) {
                                     charPst.setInt(1, accountId);
 
                                     try (ResultSet charRs = charPst.executeQuery()) {
-                                        if (!charRs.next()) {
-                                            JOptionPane.showMessageDialog(null, "No character found for this account.");
-                                            return;
-                                        }
+                                        if (charRs.next()) {
+                                            int characterId = charRs.getInt("character_id");
+                                            String playerName = charRs.getString("player_name");
 
-                                        int characterId = charRs.getInt("character_id");
-                                        GameState.get().setCurrentCharacterId(characterId);
+                                            gs.setCurrentCharacterId(characterId);
+                                            gs.setCurrentPlayerName(playerName);
 
-                                        String saveSql = "SELECT saved_id FROM save_game WHERE character_id=? ORDER BY saved_id LIMIT 1";
-                                        try (PreparedStatement savePst = con.prepareStatement(saveSql)) {
-                                            savePst.setInt(1, characterId);
+                                            String saveSql = "SELECT saved_id FROM save_game WHERE character_id=? ORDER BY saved_id LIMIT 1";
+                                            try (PreparedStatement savePst = con.prepareStatement(saveSql)) {
+                                                savePst.setInt(1, characterId);
 
-                                            try (ResultSet saveRs = savePst.executeQuery()) {
-                                                if (saveRs.next()) {
-                                                    GameState.get().setCurrentSaveId(saveRs.getInt("saved_id"));
-                                                } else {
-                                                    GameState.get().setCurrentSaveId(-1);
+                                                try (ResultSet saveRs = savePst.executeQuery()) {
+                                                    if (saveRs.next()) {
+                                                        gs.setCurrentSaveId(saveRs.getInt("saved_id"));
+                                                    } else {
+                                                        gs.setCurrentSaveId(-1);
+                                                    }
                                                 }
                                             }
                                         }
-
-                                        util.SceneManager.switchScene("/view/main_menu.fxml");
                                     }
                                 }
+                                util.SceneManager.switchScene("/view/main_menu.fxml");
                             }
                             case "owner" -> {
                                 util.SceneManager.switchScene("/view/account_view.fxml");
@@ -186,107 +190,88 @@ public class LoginController implements Initializable {
 
     @FXML
     private void handlebtnsigninaction(ActionEvent event) throws SQLException, IOException {
-        
-        
 
-        
-            String email = txtsgmail.getText();
-            String gmailRegex = "^[A-Za-z0-9+_.-]+@gmail\\.com$";
-            String pwd = txtspassword.getText();
-            String pwdRegex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$";
-            
-            if( txtsgmail.getText().isEmpty()){
-                JOptionPane.showMessageDialog(null, "Enter email!");
-                return;
-            }
-            if (txtsname.getText().isEmpty())  {
-                JOptionPane.showMessageDialog(null, "Enter Username");
-                return;
-            }
-            if(pwd.isEmpty()){
-                JOptionPane.showMessageDialog(null, "Enter password!");
-                return;
-            }
-            if(txtscpassword.getText().isEmpty()){
-                    JOptionPane.showMessageDialog(null, "Enter confirm password!");
-                    return;
-            }
-            if(!email.matches(gmailRegex)){
-                    JOptionPane.showMessageDialog(null, "Gamil Not Regonized");
-                    return;
-                }  
-            if(!pwd.matches(pwdRegex)){
-                JOptionPane.showMessageDialog(null, """
-                                                    Password must contain:
-                                                    - At least 8 characters
-                                                    - 1 uppercase letter
-                                                    - 1 lowercase letter
-                                                    - 1 number""");
-                    return;
-            }
-            if(!txtspassword.getText().equals(txtscpassword.getText())){
-                JOptionPane.showMessageDialog(null, "Password don't match!");
-                return;
-            }
-                
-            String sql1 = "SELECT account_name FROM accounts WHERE email=? or account_name=?";
-            pst = con.prepareStatement(sql1);
-            pst.setString(1, txtsgmail.getText().trim());
-            pst.setString(2, txtsname.getText());
-            rs = pst.executeQuery();
-            if (rs.next()) {
-               JOptionPane.showMessageDialog(null, "User Already exist");
-                
-            }else{
-                     
-                String sql = "INSERT INTO accounts (email,account_name,passwords,account_stats,user_type) VALUES (?,?,?,'active','user')";
-                try (PreparedStatement accPst = con.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
-                    accPst.setString(1, txtsgmail.getText());
-                    accPst.setString(2, txtsname.getText());
-                    accPst.setString(3, txtspassword.getText());
-                    accPst.executeUpdate();
+        String email = txtsgmail.getText();
+        String gmailRegex = "^[A-Za-z0-9+_.-]+@gmail\\.com$";
+        String pwd = txtspassword.getText();
+        String pwdRegex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$";
 
-                    int accountId;
-                    try (ResultSet accKeys = accPst.getGeneratedKeys()) {
-                        if (!accKeys.next()) {
-                            JOptionPane.showMessageDialog(null, "Failed to create account.");
-                            return;
-                        }
-                        accountId = accKeys.getInt(1);
+        if (txtsgmail.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Enter email!");
+            return;
+        }
+        if (txtsname.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Enter Username");
+            return;
+        }
+        if (pwd.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Enter password!");
+            return;
+        }
+        if (txtscpassword.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Enter confirm password!");
+            return;
+        }
+        if (!email.matches(gmailRegex)) {
+            JOptionPane.showMessageDialog(null, "Gamil Not Regonized");
+            return;
+        }
+        if (!pwd.matches(pwdRegex)) {
+            JOptionPane.showMessageDialog(null, """
+                                                Password must contain:
+                                                - At least 8 characters
+                                                - 1 uppercase letter
+                                                - 1 lowercase letter
+                                                - 1 number""");
+            return;
+        }
+        if (!txtspassword.getText().equals(txtscpassword.getText())) {
+            JOptionPane.showMessageDialog(null, "Password don't match!");
+            return;
+        }
+
+        String sql1 = "SELECT account_name FROM accounts WHERE email=? or account_name=?";
+        pst = con.prepareStatement(sql1);
+        pst.setString(1, txtsgmail.getText().trim());
+        pst.setString(2, txtsname.getText());
+        rs = pst.executeQuery();
+
+        if (rs.next()) {
+            JOptionPane.showMessageDialog(null, "User Already exist");
+        } else {
+
+            String sql = "INSERT INTO accounts (email,account_name,passwords,account_stats,user_type) VALUES (?,?,?,'active','user')";
+            try (PreparedStatement accPst = con.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
+                accPst.setString(1, txtsgmail.getText().trim());
+                accPst.setString(2, txtsname.getText().trim());
+                accPst.setString(3, txtspassword.getText());
+                accPst.executeUpdate();
+
+                int accountId;
+                try (ResultSet accKeys = accPst.getGeneratedKeys()) {
+                    if (!accKeys.next()) {
+                        JOptionPane.showMessageDialog(null, "Failed to create account.");
+                        return;
                     }
-
-                    String charSql = "INSERT INTO characters (account_id, player_name, skin_id) VALUES (?, ?, NULL)";
-                    try (PreparedStatement charPst = con.prepareStatement(charSql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
-                        charPst.setInt(1, accountId);
-                        charPst.setString(2, txtsname.getText());
-                        charPst.executeUpdate();
-
-                        try (ResultSet charKeys = charPst.getGeneratedKeys()) {
-                            if (charKeys.next()) {
-                                int characterId = charKeys.getInt(1);
-                                GameState.get().setCurrentCharacterId(characterId);
-                                GameState.get().setCurrentSaveId(-1);
-                            }
-                        }
-                    }
+                    accountId = accKeys.getInt(1);
                 }
 
-                JOptionPane.showMessageDialog(null, "Account created successfully");
-
-                txtsname.setText("");
-                txtspassword.setText("");
-                txtscpassword.setText("");
-                txtsgmail.setText("");
-
-                util.SceneManager.switchScene("/view/main_menu.fxml");
+                GameState gs = GameState.get();
+                gs.setCurrentAccountId(accountId);
+                gs.setCurrentCharacterId(-1);
+                gs.setCurrentSaveId(-1);
+                gs.setCurrentPlayerName(txtsname.getText().trim());
             }
-                
-        
-                
-                
-                
 
-        
+            JOptionPane.showMessageDialog(null, "Account created successfully");
+
+            txtsname.setText("");
+            txtspassword.setText("");
+            txtscpassword.setText("");
+            txtsgmail.setText("");
+
+            util.SceneManager.switchScene("/view/main_menu.fxml");
+        }
     }
 
     @FXML

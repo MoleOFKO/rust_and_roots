@@ -346,11 +346,21 @@ public final class GameState {
         }
     }
 
+    private int currentAccountId = -1;
     private int currentCharacterId = -1;
     private int currentSaveId = -1;
     private String currentMapKey = "home_map";
     private double playerX = 0;
     private double playerY = 0;
+
+
+    public int getCurrentAccountId() {
+        return currentAccountId;
+    }
+
+    public void setCurrentAccountId(int currentAccountId) {
+        this.currentAccountId = currentAccountId;
+    }
 
     public int getCurrentCharacterId() {
         return currentCharacterId;
