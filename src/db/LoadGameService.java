@@ -14,16 +14,6 @@ import model.FarmState;
 import model.Inventory;
 import model.PlayerState;
 
-/*
-    LoadGameService loadService = new LoadGameService();
-    boolean ok = loadService.loadGame(1);
-
-    if (ok) {
-        util.SceneManager.switchScene("/view/" + GameState.get().getCurrentMapKey() + ".fxml");
-    }
-
-*/
-
 public class LoadGameService {
 
     public boolean loadGame(int saveId) {
@@ -58,12 +48,11 @@ public class LoadGameService {
     private boolean loadMainRow(Connection con, GameState gs, int saveId) throws Exception {
         String sql = """
             SELECT saved_id, character_id, world_name, current_map_id, money,
-                   saved_location_x, saved_location_y,
+                   saved_location_x, saved_location_y, exp,
                    selected_hotbar_index, hotbar_visible
             FROM save_game
             WHERE saved_id = ?
             """;
-        
 
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, saveId);
@@ -82,6 +71,7 @@ public class LoadGameService {
 
                 psState.setSelectedHotbarIndex(rs.getInt("selected_hotbar_index"));
                 psState.setHotbarVisible(rs.getBoolean("hotbar_visible"));
+                psState.setExp(rs.getInt("exp"));
 
                 replaceCoins(psState.getInventory(), rs.getInt("money"));
                 return true;
@@ -91,7 +81,7 @@ public class LoadGameService {
 
     private void loadPlayerStats(Connection con, GameState gs, int saveId) throws Exception {
         String sql = """
-            SELECT s.agi, s.hp, s.stamina
+            SELECT s.str, s.agi, s.dex, s.vit, s.hp, s.stamina
             FROM save_game sg
             JOIN stats s ON sg.stats_id = s.stats_id
             WHERE sg.saved_id = ?
@@ -104,9 +94,18 @@ public class LoadGameService {
                 if (!rs.next()) return;
 
                 PlayerState psState = gs.getPlayerState();
+                psState.setStr(rs.getInt("str"));
                 psState.setAgi(rs.getInt("agi"));
-                psState.setHp(rs.getInt("hp"));
-                psState.setStamina(rs.getInt("stamina"));
+                psState.setDex(rs.getInt("dex"));
+                psState.setVit(rs.getInt("vit"));
+
+                int maxHp = rs.getInt("hp");
+                int maxStamina = rs.getInt("stamina");
+
+                psState.setMaxHp(maxHp);
+                psState.setHp(maxHp);
+                psState.setMaxStamina(maxStamina);
+                psState.setStamina(maxStamina);
             }
         }
     }

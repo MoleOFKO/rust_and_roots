@@ -12,8 +12,8 @@ import javafx.beans.property.StringProperty;
  */
 public final class PlayerState {
 
-    private static final int DEFAULT_HP = 100;
-    private static final int DEFAULT_STAMINA = 100;
+    private static final int DEFAULT_HP = 45;
+    private static final int DEFAULT_STAMINA = 50;
     private static final int DEFAULT_AGI = 5;
     private static final int DEFAULT_DEX = 5;
     private static final int DEFAULT_STR = 5;

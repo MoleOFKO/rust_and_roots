@@ -504,6 +504,92 @@ public class home_mapController extends BaseMapController {
     private Button btnsave;
     @FXML
     private Button btnload;
+    @FXML
+    private Label hotbarguide;
+    @FXML
+    private Group statusgroup;
+    @FXML
+    private ImageView btnskill;
+    @FXML
+    private Label farming;
+    @FXML
+    private ImageView btnstatus;
+    @FXML
+    private Label gathering;
+    @FXML
+    private Label crafting;
+    @FXML
+    private Label fishing;
+    @FXML
+    private Label cooking;
+    @FXML
+    private ImageView btnfarmingminus1;
+    @FXML
+    private ImageView btnfarmingplus1;
+    @FXML
+    private ImageView btngatheringminus1;
+    @FXML
+    private ImageView btncraftingminus1;
+    @FXML
+    private ImageView btnfishingminus1;
+    @FXML
+    private ImageView btncookingminus1;
+    @FXML
+    private ImageView btngatheringplus1;
+    @FXML
+    private ImageView btncraftingplus1;
+    @FXML
+    private ImageView btnfishingplus1;
+    @FXML
+    private ImageView btncookingplus1;
+
+    @FXML
+    private void handlebtnskillacion(MouseEvent event) {
+    }
+
+    @FXML
+    private void handlebtnstatusaction(MouseEvent event) {
+    }
+
+    @FXML
+    private void handlefarmingminusaction(MouseEvent event) {
+    }
+
+    @FXML
+    private void handlefarmingplusaction(MouseEvent event) {
+    }
+
+    @FXML
+    private void handlegatheringminusaction(MouseEvent event) {
+    }
+
+    @FXML
+    private void handlecraftingminusaction(MouseEvent event) {
+    }
+
+    @FXML
+    private void handlefishingminusaction(MouseEvent event) {
+    }
+
+    @FXML
+    private void handlecookingminusaction(MouseEvent event) {
+    }
+
+    @FXML
+    private void handlegatheringplusaction(MouseEvent event) {
+    }
+
+    @FXML
+    private void handlecraftingplusaction(MouseEvent event) {
+    }
+
+    @FXML
+    private void handlefishingplusaction(MouseEvent event) {
+    }
+
+    @FXML
+    private void handlecookingplusaction(MouseEvent event) {
+    }
 
     
     private enum MenuTab { INVENTORY, STATUS, SETTINGS }
@@ -879,12 +965,12 @@ public class home_mapController extends BaseMapController {
         if (playerState == null) return 0;
 
         return switch (Objects.requireNonNullElse(statKey, "")) {
-            case "hp" -> Math.max(0, playerState.getMaxHp() - 100);
-            case "sp" -> Math.max(0, playerState.getMaxStamina() - 100);
-            case "str" -> Math.max(0, playerState.getStr() - 5);
-            case "vit" -> Math.max(0, playerState.getVit() - 5);
-            case "dex" -> Math.max(0, playerState.getDex() - 5);
-            case "agi" -> Math.max(0, playerState.getAgi() - 5);
+            case "hp" -> Math.max(0, playerState.getMaxHp() - 45);
+            case "sp" -> Math.max(0, playerState.getMaxStamina() - 50);
+            case "str" -> Math.max(0, playerState.getStr() - 1);
+            case "vit" -> Math.max(0, playerState.getVit() - 1);
+            case "dex" -> Math.max(0, playerState.getDex() - 1);
+            case "agi" -> Math.max(0, playerState.getAgi() - 1);
             default -> 0;
         };
     }

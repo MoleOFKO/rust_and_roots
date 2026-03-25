@@ -162,6 +162,7 @@ public class LoginController implements Initializable {
                                 } else {
                                     GameState.get().setCurrentSaveId(-1);
                                 }
+                                util.SceneManager.switchScene("/view/main_menu.fxml");
                             }
                         }
                         util.SceneManager.switchScene("/view/main_menu.fxml");
@@ -179,107 +180,88 @@ public class LoginController implements Initializable {
 
     @FXML
     private void handlebtnsigninaction(ActionEvent event) throws SQLException, IOException {
-        
-        
 
-        
-            String email = txtsgmail.getText();
-            String gmailRegex = "^[A-Za-z0-9+_.-]+@gmail\\.com$";
-            String pwd = txtspassword.getText();
-            String pwdRegex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$";
-            
-            if( txtsgmail.getText().isEmpty()){
-                JOptionPane.showMessageDialog(null, "Enter email!");
-                return;
-            }
-            if (txtsname.getText().isEmpty())  {
-                JOptionPane.showMessageDialog(null, "Enter Username");
-                return;
-            }
-            if(pwd.isEmpty()){
-                JOptionPane.showMessageDialog(null, "Enter password!");
-                return;
-            }
-            if(txtscpassword.getText().isEmpty()){
-                    JOptionPane.showMessageDialog(null, "Enter confirm password!");
-                    return;
-            }
-            if(!email.matches(gmailRegex)){
-                    JOptionPane.showMessageDialog(null, "Gamil Not Regonized");
-                    return;
-                }  
-            if(!pwd.matches(pwdRegex)){
-                JOptionPane.showMessageDialog(null, """
-                                                    Password must contain:
-                                                    - At least 8 characters
-                                                    - 1 uppercase letter
-                                                    - 1 lowercase letter
-                                                    - 1 number""");
-                    return;
-            }
-            if(!txtspassword.getText().equals(txtscpassword.getText())){
-                JOptionPane.showMessageDialog(null, "Password don't match!");
-                return;
-            }
-                
-            String sql1 = "SELECT account_name FROM accounts WHERE email=? or account_name=?";
-            pst = con.prepareStatement(sql1);
-            pst.setString(1, txtsgmail.getText().trim());
-            pst.setString(2, txtsname.getText());
-            rs = pst.executeQuery();
-            if (rs.next()) {
-               JOptionPane.showMessageDialog(null, "User Already exist");
-                
-            }else{
-                     
-                String sql = "INSERT INTO accounts (email,account_name,passwords,account_stats,user_type) VALUES (?,?,?,'active','user')";
-                try (PreparedStatement accPst = con.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
-                    accPst.setString(1, txtsgmail.getText());
-                    accPst.setString(2, txtsname.getText());
-                    accPst.setString(3, txtspassword.getText());
-                    accPst.executeUpdate();
+        String email = txtsgmail.getText();
+        String gmailRegex = "^[A-Za-z0-9+_.-]+@gmail\\.com$";
+        String pwd = txtspassword.getText();
+        String pwdRegex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$";
 
-                    int accountId;
-                    try (ResultSet accKeys = accPst.getGeneratedKeys()) {
-                        if (!accKeys.next()) {
-                            JOptionPane.showMessageDialog(null, "Failed to create account.");
-                            return;
-                        }
-                        accountId = accKeys.getInt(1);
+        if (txtsgmail.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Enter email!");
+            return;
+        }
+        if (txtsname.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Enter Username");
+            return;
+        }
+        if (pwd.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Enter password!");
+            return;
+        }
+        if (txtscpassword.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Enter confirm password!");
+            return;
+        }
+        if (!email.matches(gmailRegex)) {
+            JOptionPane.showMessageDialog(null, "Gamil Not Regonized");
+            return;
+        }
+        if (!pwd.matches(pwdRegex)) {
+            JOptionPane.showMessageDialog(null, """
+                                                Password must contain:
+                                                - At least 8 characters
+                                                - 1 uppercase letter
+                                                - 1 lowercase letter
+                                                - 1 number""");
+            return;
+        }
+        if (!txtspassword.getText().equals(txtscpassword.getText())) {
+            JOptionPane.showMessageDialog(null, "Password don't match!");
+            return;
+        }
+
+        String sql1 = "SELECT account_name FROM accounts WHERE email=? or account_name=?";
+        pst = con.prepareStatement(sql1);
+        pst.setString(1, txtsgmail.getText().trim());
+        pst.setString(2, txtsname.getText());
+        rs = pst.executeQuery();
+
+        if (rs.next()) {
+            JOptionPane.showMessageDialog(null, "User Already exist");
+        } else {
+
+            String sql = "INSERT INTO accounts (email,account_name,passwords,account_stats,user_type) VALUES (?,?,?,'active','user')";
+            try (PreparedStatement accPst = con.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
+                accPst.setString(1, txtsgmail.getText().trim());
+                accPst.setString(2, txtsname.getText().trim());
+                accPst.setString(3, txtspassword.getText());
+                accPst.executeUpdate();
+
+                int accountId;
+                try (ResultSet accKeys = accPst.getGeneratedKeys()) {
+                    if (!accKeys.next()) {
+                        JOptionPane.showMessageDialog(null, "Failed to create account.");
+                        return;
                     }
-
-                    String charSql = "INSERT INTO characters (account_id, player_name, skin_id) VALUES (?, ?, NULL)";
-                    try (PreparedStatement charPst = con.prepareStatement(charSql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
-                        charPst.setInt(1, accountId);
-                        charPst.setString(2, txtsname.getText());
-                        charPst.executeUpdate();
-
-                        try (ResultSet charKeys = charPst.getGeneratedKeys()) {
-                            if (charKeys.next()) {
-                                int characterId = charKeys.getInt(1);
-                                GameState.get().setCurrentCharacterId(characterId);
-                                GameState.get().setCurrentSaveId(-1);
-                            }
-                        }
-                    }
+                    accountId = accKeys.getInt(1);
                 }
 
-                JOptionPane.showMessageDialog(null, "Account created successfully");
-
-                txtsname.setText("");
-                txtspassword.setText("");
-                txtscpassword.setText("");
-                txtsgmail.setText("");
-
-                util.SceneManager.switchScene("/view/main_menu.fxml");
+                GameState gs = GameState.get();
+                gs.setCurrentAccountId(accountId);
+                gs.setCurrentCharacterId(-1);
+                gs.setCurrentSaveId(-1);
+                gs.setCurrentPlayerName(txtsname.getText().trim());
             }
-                
-        
-                
-                
-                
 
-        
+            JOptionPane.showMessageDialog(null, "Account created successfully");
+
+            txtsname.setText("");
+            txtspassword.setText("");
+            txtscpassword.setText("");
+            txtsgmail.setText("");
+
+            util.SceneManager.switchScene("/view/main_menu.fxml");
+        }
     }
 
     @FXML
