@@ -96,91 +96,84 @@ public class LoginController implements Initializable {
  
     @FXML
     private void handlebtnloginaction(ActionEvent event) throws SQLException, IOException {
-       emailList = FXCollections.observableArrayList();
-       String sql1 = "SELECT user_type FROM accounts WHERE account_name=? AND passwords=?";
-                pst = con.prepareStatement(sql1);
-                pst.setString(1, txtlname.getText());
-                pst.setString(2, txtlpassword.getText());
+        String username = txtlname.getText().trim();
+        String password = txtlpassword.getText();
 
-                rs = pst.executeQuery();
-       
-                if (rs.next()) {
-                    // login success
-                    
-                    String sql="select account_id,account_name, passwords, user_type,account_stats from accounts where account_name=? and passwords=?";
-                    pst=con.prepareStatement(sql);
-                    pst.setString(1, txtlname.getText());
-                    pst.setString(2, txtlpassword.getText());
-                    rs=pst.executeQuery();
-                    
-                    while(rs.next()){
-                        txtname = rs.getString("account_name");
-                        int id = rs.getInt("account_id");
-                        String status = "active";
-                        String dbstatus = rs.getString("account_stats");
-                        
-                        if(!dbstatus.equals(status)){
-                        JOptionPane.showMessageDialog(null, "Account is Banned");
-                        return;
-                        }   
-                        
-                        String temp = rs.getString("user_type");
-                        if(null==temp)JOptionPane.showMessageDialog(null, "Invalid!");else switch (temp) {
-                            case "admin" ->                         {
-                                    util.SceneManager.switchScene("/view/account_view.fxml");
-                            }
-                            case "user" ->                         {
-                                int accountId = rs.getInt("account_id");
+        if (username.isEmpty() && password.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Invalid input!");
+            return;
+        }
+        if (username.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Enter Username!");
+            return;
+        }
+        if (password.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Enter password!");
+            return;
+        }
+        String sql = "SELECT account_id, account_name, passwords, user_type, account_stats " +
+                     "FROM accounts WHERE account_name = ?";
+        pst = con.prepareStatement(sql);
+        pst.setString(1, username);
+        rs = pst.executeQuery();
+        if (!rs.next()) {
+            JOptionPane.showMessageDialog(null, "Username does not exist!");
+            return;
+        }
+        String dbPassword = rs.getString("passwords");
+        if (!dbPassword.equals(password)) {
+            JOptionPane.showMessageDialog(null, "Password is incorrect!");
+            return;
+        }
+        txtname = rs.getString("account_name");
+        int accountId = rs.getInt("account_id");
+        String dbstatus = rs.getString("account_stats");
+        String temp = rs.getString("user_type");
+        if (!"active".equalsIgnoreCase(dbstatus)) {
+            JOptionPane.showMessageDialog(null, "Account is Banned");
+            return;
+        }
+        if (temp == null) {
+            JOptionPane.showMessageDialog(null, "Invalid input!");
+            return;
+        }
+        switch (temp) {
+            case "admin" -> {
+                util.SceneManager.switchScene("/view/account_view.fxml");
+            }
+            case "user" -> {
+                String charSql = "SELECT character_id FROM characters WHERE account_id=? LIMIT 1";
+                try (PreparedStatement charPst = con.prepareStatement(charSql)) {
+                    charPst.setInt(1, accountId);
 
-                                String charSql = "SELECT character_id FROM characters WHERE account_id=? LIMIT 1";
-                                try (PreparedStatement charPst = con.prepareStatement(charSql)) {
-                                    charPst.setInt(1, accountId);
-
-                                    try (ResultSet charRs = charPst.executeQuery()) {
-                                        if (!charRs.next()) {
-                                            JOptionPane.showMessageDialog(null, "No character found for this account.");
-                                            return;
-                                        }
-
-                                        int characterId = charRs.getInt("character_id");
-                                        GameState.get().setCurrentCharacterId(characterId);
-
-                                        String saveSql = "SELECT saved_id FROM save_game WHERE character_id=? ORDER BY saved_id LIMIT 1";
-                                        try (PreparedStatement savePst = con.prepareStatement(saveSql)) {
-                                            savePst.setInt(1, characterId);
-
-                                            try (ResultSet saveRs = savePst.executeQuery()) {
-                                                if (saveRs.next()) {
-                                                    GameState.get().setCurrentSaveId(saveRs.getInt("saved_id"));
-                                                } else {
-                                                    GameState.get().setCurrentSaveId(-1);
-                                                }
-                                            }
-                                        }
-
-                                        util.SceneManager.switchScene("/view/main_menu.fxml");
-                                    }
+                    try (ResultSet charRs = charPst.executeQuery()) {
+                        if (!charRs.next()) {
+                            JOptionPane.showMessageDialog(null, "No character found for this account.");
+                            return;
+                        }
+                        int characterId = charRs.getInt("character_id");
+                        GameState.get().setCurrentCharacterId(characterId);
+                        String saveSql = "SELECT saved_id FROM save_game WHERE character_id=? ORDER BY saved_id LIMIT 1";
+                        try (PreparedStatement savePst = con.prepareStatement(saveSql)) {
+                            savePst.setInt(1, characterId);
+                            try (ResultSet saveRs = savePst.executeQuery()) {
+                                if (saveRs.next()) {
+                                    GameState.get().setCurrentSaveId(saveRs.getInt("saved_id"));
+                                } else {
+                                    GameState.get().setCurrentSaveId(-1);
                                 }
                             }
-                            case "owner" -> {
-                                util.SceneManager.switchScene("/view/account_view.fxml");
-                            }
-                            default -> JOptionPane.showMessageDialog(null, "Invalid!");
                         }
-
+                        util.SceneManager.switchScene("/view/main_menu.fxml");
                     }
-                    
-                    
-                        } else {
-                            if( txtlname.getText().isEmpty())
-                                JOptionPane.showMessageDialog(null, "Enter Email!");
-                            else if( txtlpassword.getText().isEmpty())
-                                JOptionPane.showMessageDialog(null, "Enter password!");
-                            else{
-                                JOptionPane.showMessageDialog(null, "User Does Not Exist");
-                            }
-                        }
+                }
             }
+            case "owner" -> {
+                util.SceneManager.switchScene("/view/account_view.fxml");
+            }
+            default -> JOptionPane.showMessageDialog(null, "Invalid input!");
+        }
+    }
         
     
 
