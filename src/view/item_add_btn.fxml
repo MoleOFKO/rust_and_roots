@@ -1,44 +1,116 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon?>
+<?import javafx.scene.Group?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.Group?>
+<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.text.Font?>
 
-<StackPane fx:id="view" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Item_add_btnController">
+<StackPane fx:id="view" prefHeight="574.0" prefWidth="670.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Item_add_btnController">
     <children>
+      <ImageView fitHeight="591.0" fitWidth="669.0" pickOnBounds="true">
+         <image>
+            <Image url="@../image/Admin/dashboard.png" />
+         </image>
+      </ImageView>
         <Group fx:id="uiRoot">
             <children>
-               <Label layoutX="14.0" layoutY="27.0" prefHeight="17.0" prefWidth="49.0" text="Admin:" />
-               <Label fx:id="lblaname" layoutX="63.0" layoutY="27.0" prefHeight="17.0" prefWidth="49.0" text="Name" />
-               <TextField fx:id="txtmname" layoutX="242.0" layoutY="36.0" prefHeight="25.0" prefWidth="242.0" />
-               <TextField fx:id="txtstr" layoutX="242.0" layoutY="104.0" prefHeight="25.0" prefWidth="242.0" />
-               <TextField fx:id="txtagi" layoutX="242.0" layoutY="138.0" prefHeight="25.0" prefWidth="242.0" />
-               <TextField fx:id="txtdex" layoutX="242.0" layoutY="175.0" prefHeight="25.0" prefWidth="242.0" />
-               <TextField fx:id="txtvid" layoutX="242.0" layoutY="212.0" prefHeight="25.0" prefWidth="242.0" />
-               <TextField fx:id="txthp" layoutX="242.0" layoutY="248.0" prefHeight="25.0" prefWidth="242.0" />
-               <TextField fx:id="txtstamina" layoutX="242.0" layoutY="285.0" prefHeight="25.0" prefWidth="242.0" />
-               <Button fx:id="btnupload" layoutX="376.0" layoutY="557.0" mnemonicParsing="false" onAction="#handlebtnuploadaction" text="Upload" />
-               <Button fx:id="btnsave" layoutX="270.0" layoutY="557.0" mnemonicParsing="false" onAction="#handlebtnsaveaction" prefHeight="25.0" prefWidth="49.0" text="Save" />
-               <Label layoutX="165.0" layoutY="40.0" prefHeight="17.0" prefWidth="67.0" text="Item Name" />
-               <Label layoutX="165.0" layoutY="73.0" prefHeight="17.0" prefWidth="67.0" text="Price" />
-               <Label layoutX="165.0" layoutY="108.0" prefHeight="17.0" prefWidth="67.0" text="STR" />
-               <Label layoutX="165.0" layoutY="142.0" prefHeight="17.0" prefWidth="67.0" text="AGI" />
-               <Label layoutX="165.0" layoutY="179.0" prefHeight="17.0" prefWidth="67.0" text="DEX" />
-               <Label layoutX="165.0" layoutY="216.0" prefHeight="17.0" prefWidth="67.0" text="VIT" />
-               <Label layoutX="165.0" layoutY="252.0" prefHeight="17.0" prefWidth="67.0" text="HP" />
-               <Label layoutX="165.0" layoutY="289.0" prefHeight="17.0" prefWidth="67.0" text="Stamina" />
-               <Button fx:id="btnback" layoutX="526.0" layoutY="15.0" mnemonicParsing="false" onAction="#handlebtnbackaction" prefHeight="25.0" prefWidth="67.0" text="Back">
+            <ImageView fitHeight="581.0" fitWidth="443.0" layoutX="44.0" layoutY="9.0" pickOnBounds="true">
+               <image>
+                  <Image url="@../image/Admin/paper_2of3.png" />
+               </image>
+            </ImageView>
+            <ImageView fitHeight="40.0" fitWidth="126.0" layoutX="-66.0" layoutY="20.0" pickOnBounds="true">
+               <image>
+                  <Image url="@../image/Admin/admin_bar.png" />
+               </image>
+            </ImageView>
+               <Label layoutX="-59.0" layoutY="29.0" prefHeight="17.0" prefWidth="43.0" text="Admin:" textFill="#572a00">
+               <font>
+                  <Font name="Serif Bold" size="12.0" />
+               </font></Label>
+               <Label fx:id="lblaname" layoutX="-17.0" layoutY="27.0" prefHeight="21.0" prefWidth="71.0" text="Name" textFill="#572a00">
+               <font>
+                  <Font name="Serif Bold" size="12.0" />
+               </font></Label>
+               <TextField fx:id="txtmname" layoutX="191.0" layoutY="38.0" prefHeight="33.0" prefWidth="194.0" styleClass="textbox" stylesheets="@../css/style.css" />
+               <TextField fx:id="txtstr" layoutX="169.0" layoutY="144.0" prefHeight="35.0" prefWidth="68.0" styleClass="textbox" stylesheets="@../css/style.css" />
+               <TextField fx:id="txtagi" layoutX="339.0" layoutY="144.0" prefHeight="35.0" prefWidth="68.0" styleClass="textbox" stylesheets="@../css/style.css" />
+               <TextField fx:id="txtdex" layoutX="170.0" layoutY="225.0" prefHeight="35.0" prefWidth="68.0" styleClass="textbox" stylesheets="@../css/style.css" />
+               <TextField fx:id="txtvid" layoutX="339.0" layoutY="225.0" prefHeight="35.0" prefWidth="68.0" styleClass="textbox" stylesheets="@../css/style.css" />
+               <TextField fx:id="txthp" layoutX="169.0" layoutY="303.0" prefHeight="35.0" prefWidth="68.0" styleClass="textbox" stylesheets="@../css/style.css" />
+               <TextField fx:id="txtstamina" layoutX="339.0" layoutY="303.0" prefHeight="35.0" prefWidth="68.0" styleClass="textbox" stylesheets="@../css/style.css" />
+            <ImageView fitHeight="37.0" fitWidth="82.0" layoutX="385.0" layoutY="423.0" pickOnBounds="true">
+               <image>
+                  <Image url="@../image/Admin/upload_btn.png" />
+               </image>
+            </ImageView>
+               <Button fx:id="btnupload" layoutX="385.0" layoutY="425.0" mnemonicParsing="false" onAction="#handlebtnuploadaction" opacity="0.0" prefHeight="31.0" prefWidth="81.0" text="Upload" />
+            <ImageView fitHeight="37.0" fitWidth="82.0" layoutX="235.0" layoutY="534.0" pickOnBounds="true">
+               <image>
+                  <Image url="@../image/Admin/admin_save_button.png" />
+               </image>
+            </ImageView>
+               <Button fx:id="btnsave" layoutX="235.0" layoutY="537.0" mnemonicParsing="false" onAction="#handlebtnsaveaction" opacity="0.0" prefHeight="31.0" prefWidth="84.0" text="Save" />
+               <Label layoutX="119.0" layoutY="44.0" prefHeight="21.0" prefWidth="79.0" text="Item Name" textFill="#572a00">
+               <font>
+                  <Font name="Serif Bold" size="12.0" />
+               </font></Label>
+               <Label layoutX="120.0" layoutY="94.0" prefHeight="21.0" prefWidth="40.0" text="Price" textFill="#572a00">
+               <font>
+                  <Font name="Serif Bold" size="12.0" />
+               </font></Label>
+               <Label layoutX="126.0" layoutY="151.0" prefHeight="21.0" prefWidth="32.0" text="STR" textFill="#572a00">
+               <font>
+                  <Font name="Serif Bold" size="12.0" />
+               </font></Label>
+               <Label layoutX="308.0" layoutY="151.0" prefHeight="21.0" prefWidth="30.0" text="AGI" textFill="#572a00">
+               <font>
+                  <Font name="Serif Bold" size="12.0" />
+               </font></Label>
+               <Label layoutX="127.0" layoutY="232.0" prefHeight="21.0" prefWidth="31.0" text="DEX" textFill="#572a00">
+               <font>
+                  <Font name="Serif Bold" size="12.0" />
+               </font></Label>
+               <Label layoutX="307.0" layoutY="232.0" prefHeight="21.0" prefWidth="26.0" text="VIT" textFill="#572a00">
+               <font>
+                  <Font name="Serif Bold" size="12.0" />
+               </font></Label>
+               <Label layoutX="129.0" layoutY="310.0" prefHeight="21.0" prefWidth="26.0" text="HP" textFill="#572a00">
+               <font>
+                  <Font name="Serif Bold" size="12.0" />
+               </font></Label>
+               <Label layoutX="284.0" layoutY="312.0" prefHeight="17.0" prefWidth="54.0" text="Stamina" textFill="#572a00">
+               <font>
+                  <Font name="Serif Bold" size="12.0" />
+               </font></Label>
+            <ImageView fitHeight="37.0" fitWidth="82.0" layoutX="511.0" layoutY="12.0" pickOnBounds="true">
+               <image>
+                  <Image url="@../image/Admin/admin_back_button.png" />
+               </image>
+            </ImageView>
+               <Button fx:id="btnback" layoutX="513.0" layoutY="14.0" mnemonicParsing="false" onAction="#handlebtnbackaction" opacity="0.0" prefHeight="31.0" prefWidth="78.0" text="Back">
                   <graphic>
                      <FontAwesomeIcon glyphName="ARROW_LEFT" />
                   </graphic>
                </Button>
-               <TextField fx:id="txtmobstype" layoutX="242.0" layoutY="69.0" prefHeight="25.0" prefWidth="242.0" />
-               <ImageView fx:id="itemimage" fitHeight="150.0" fitWidth="200.0" layoutX="270.0" layoutY="324.0" pickOnBounds="true" preserveRatio="true" />
+               <TextField fx:id="txtmobstype" layoutX="192.0" layoutY="88.0" prefHeight="35.0" prefWidth="194.0" styleClass="textbox" stylesheets="@../css/style.css" />
+            <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="173.0" layoutY="372.0" opacity="0.74" pickOnBounds="true">
+               <image>
+                  <Image url="@../image/Admin/image_box1.png" />
+               </image>
+            </ImageView>
+            <BorderPane layoutX="177.0" layoutY="373.0" prefHeight="148.0" prefWidth="196.0" style="-fx-border-color: black; -fx-border-radius: 10px; -fx-border-width: 3px;" />
+            <Label layoutX="241.0" layoutY="437.0" prefHeight="21.0" prefWidth="70.0" text="Insert Image" textFill="#572a00">
+               <font>
+                  <Font name="Serif Bold" size="12.0" />
+               </font></Label>
+               <ImageView fx:id="itemimage" fitHeight="150.0" fitWidth="200.0" layoutX="173.0" layoutY="372.0" pickOnBounds="true" preserveRatio="true" />
             </children>
         </Group>
     </children>
