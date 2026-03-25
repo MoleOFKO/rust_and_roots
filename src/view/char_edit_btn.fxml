@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.text.Font?>
 
-<StackPane fx:id="view" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Char_edit_btnController">
+<StackPane fx:id="view" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Char_edit_btnController">
     <children>
       <ImageView fitHeight="528.0" fitWidth="608.0" pickOnBounds="true">
          <image>
@@ -25,8 +25,14 @@
                   <Image url="@../image/Admin/admin_bar.png" />
                </image>
             </ImageView>
-               <Label layoutX="6.0" layoutY="28.0" prefHeight="17.0" prefWidth="49.0" text="Admin:" />
-               <Label fx:id="lblaname" layoutX="51.0" layoutY="26.0" prefHeight="21.0" prefWidth="57.0" text="Name" />
+               <Label layoutX="6.0" layoutY="28.0" prefHeight="17.0" prefWidth="42.0" text="Admin:" textFill="#572a00">
+               <font>
+                  <Font name="Serif Bold" size="12.0" />
+               </font></Label>
+               <Label fx:id="lblaname" layoutX="51.0" layoutY="26.0" prefHeight="21.0" prefWidth="57.0" text="Name" textFill="#572a00">
+               <font>
+                  <Font name="Serif Bold" size="12.0" />
+               </font></Label>
             <ImageView fitHeight="528.0" fitWidth="399.0" layoutX="105.0" layoutY="1.0" pickOnBounds="true">
                <image>
                   <Image url="@../image/Admin/paper_2of3.png" />
