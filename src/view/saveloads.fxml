@@ -8,16 +8,27 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.SaveloadsController">
+<AnchorPane id="AnchorPane" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.SaveloadsController">
    <children>
       <ImageView fitHeight="362.0" fitWidth="547.0" pickOnBounds="true">
          <image>
             <Image url="@../image/Admin/dashboard.png" />
          </image>
       </ImageView>
-      <Button fx:id="btnLoad" layoutX="287.0" layoutY="326.0" mnemonicParsing="false" onAction="#handlebtnLoadaction" prefWidth="80.0" text="Load" />
-      <Button fx:id="btnback" layoutX="136.0" layoutY="326.0" mnemonicParsing="false" onAction="#handlebackaction" prefWidth="80.0" text="Back">
+      <ImageView fitHeight="36.0" fitWidth="80.0" layoutX="286.0" layoutY="322.0" pickOnBounds="true">
+         <image>
+            <Image url="@../image/Admin/load_btn.png" />
+         </image>
+      </ImageView>
+      <Button fx:id="btnLoad" layoutX="287.0" layoutY="326.0" mnemonicParsing="false" onAction="#handlebtnLoadaction" opacity="0.0" prefHeight="31.0" prefWidth="80.0" text="Load" />
+      <ImageView fitHeight="36.0" fitWidth="80.0" layoutX="136.0" layoutY="321.0" pickOnBounds="true">
+         <image>
+            <Image url="@../image/Admin/admin_back_button.png" />
+         </image>
+      </ImageView>
+      <Button fx:id="btnback" layoutX="136.0" layoutY="324.0" mnemonicParsing="false" onAction="#handlebackaction" opacity="0.0" prefHeight="31.0" prefWidth="80.0" text="Back">
          <graphic>
             <FontAwesomeIcon glyphName="ARROW_LEFT" />
          </graphic>
@@ -34,28 +45,40 @@
                   <Image url="@../image/Admin/admin_bar.png" />
                </image>
             </ImageView>
-            <Label fx:id="save1" alignment="CENTER" layoutX="12.0" layoutY="27.0" prefHeight="31.0" prefWidth="173.0" text="Saved Name" textFill="#572a00" />
+            <Label fx:id="save1" alignment="CENTER" layoutX="26.0" layoutY="27.0" prefHeight="36.0" prefWidth="151.0" text="Saved Name" textFill="#572a00">
+               <font>
+                  <Font name="Serif Bold" size="12.0" />
+               </font></Label>
             <Button fx:id="btnsave1" layoutX="22.0" layoutY="28.0" mnemonicParsing="false" onAction="#handlebtnsave1action" opacity="0.0" prefHeight="36.0" prefWidth="159.0" style="-fx-background-color: transparent; -fx-border-color: black;" />
             <ImageView fitHeight="36.0" fitWidth="159.0" layoutX="22.0" layoutY="92.0" pickOnBounds="true">
                <image>
                   <Image url="@../image/Admin/admin_bar.png" />
                </image>
             </ImageView>
-            <Label fx:id="save2" alignment="CENTER" layoutX="14.0" layoutY="98.0" prefHeight="17.0" prefWidth="173.0" text="Saved Name" textFill="#572a00" />
+            <Label fx:id="save2" alignment="CENTER" layoutX="28.0" layoutY="92.0" prefHeight="36.0" prefWidth="151.0" text="Saved Name" textFill="#572a00">
+               <font>
+                  <Font name="Serif Bold" size="12.0" />
+               </font></Label>
             <Button fx:id="btnsave2" layoutX="23.0" layoutY="94.0" mnemonicParsing="false" onAction="#handlebtnsave2action" opacity="0.0" prefHeight="36.0" prefWidth="159.0" style="-fx-background-color: transparent; -fx-border-color: black;" />
             <ImageView fitHeight="36.0" fitWidth="159.0" layoutX="22.0" layoutY="167.0" pickOnBounds="true">
                <image>
                   <Image url="@../image/Admin/admin_bar.png" />
                </image>
             </ImageView>
-            <Label fx:id="save3" alignment="CENTER" layoutX="14.0" layoutY="172.0" prefHeight="17.0" prefWidth="173.0" text="Saved Name" textFill="#572a00" />
+            <Label fx:id="save3" alignment="CENTER" layoutX="21.0" layoutY="167.0" prefHeight="36.0" prefWidth="159.0" text="Saved Name" textFill="#572a00">
+               <font>
+                  <Font name="Serif Bold" size="12.0" />
+               </font></Label>
             <Button fx:id="btnsave3" layoutX="22.0" layoutY="167.0" mnemonicParsing="false" onAction="#handlebtnsave3action" opacity="0.0" prefHeight="36.0" prefWidth="159.0" style="-fx-background-color: transparent; -fx-border-color: black;" />
             <ImageView fitHeight="36.0" fitWidth="159.0" layoutX="23.0" layoutY="240.0" pickOnBounds="true">
                <image>
                   <Image url="@../image/Admin/admin_bar.png" />
                </image>
             </ImageView>
-            <Label fx:id="save4" alignment="CENTER" layoutX="14.0" layoutY="246.0" prefHeight="17.0" prefWidth="173.0" text="Saved Name" textFill="#572a00" />
+            <Label fx:id="save4" alignment="CENTER" layoutX="28.0" layoutY="241.0" prefHeight="36.0" prefWidth="151.0" text="Saved Name" textFill="#572a00">
+               <font>
+                  <Font name="Serif Bold" size="12.0" />
+               </font></Label>
             <Button fx:id="btnsave4" layoutX="23.0" layoutY="240.0" mnemonicParsing="false" onAction="#handlebtnsave4action" opacity="0.0" prefHeight="36.0" prefWidth="159.0" style="-fx-background-color: transparent; -fx-border-color: black;" />
          </children>
       </Pane>
@@ -66,7 +89,10 @@
                   <Image url="@../image/Admin/paper_2of3.png" />
                </image>
             </ImageView>
-            <Label layoutX="38.0" layoutY="191.0" prefHeight="21.0" prefWidth="97.0" text="World Name :" />
+            <Label layoutX="43.0" layoutY="191.0" prefHeight="21.0" prefWidth="80.0" text="World Name :" textFill="#572a00">
+               <font>
+                  <Font name="Serif Bold" size="12.0" />
+               </font></Label>
             <ImageView fitHeight="134.0" fitWidth="200.0" layoutX="33.0" layoutY="21.0" pickOnBounds="true">
                <image>
                   <Image url="@../image/Admin/image_box1.png" />
@@ -74,11 +100,26 @@
             </ImageView>
             <BorderPane layoutX="36.0" layoutY="22.0" prefHeight="134.0" prefWidth="194.0" style="-fx-border-color: black; -fx-border-radius: 10px; -fx-border-width: 3px;" />
             <ImageView fx:id="cimg" fitHeight="134.0" fitWidth="194.0" layoutX="36.0" layoutY="23.0" pickOnBounds="true" preserveRatio="true" />
-            <Label layoutX="16.0" layoutY="161.0" prefHeight="21.0" prefWidth="116.0" text="Character Name :" />
-            <Label layoutX="95.0" layoutY="221.0" prefHeight="17.0" prefWidth="33.0" text="Day :" />
-            <Label fx:id="cname" layoutX="137.0" layoutY="160.0" prefHeight="17.0" prefWidth="116.0" text="?" />
-            <Label fx:id="wname" layoutX="138.0" layoutY="190.0" prefHeight="17.0" prefWidth="116.0" text="?" />
-            <Label fx:id="day" layoutX="138.0" layoutY="221.0" prefHeight="17.0" prefWidth="116.0" text="?" />
+            <Label layoutX="24.0" layoutY="161.0" prefHeight="21.0" prefWidth="100.0" text="Character Name :" textFill="#572a00">
+               <font>
+                  <Font name="Serif Bold" size="12.0" />
+               </font></Label>
+            <Label layoutX="90.0" layoutY="221.0" prefHeight="17.0" prefWidth="33.0" text="Day :" textFill="#572a00">
+               <font>
+                  <Font name="Serif Bold" size="12.0" />
+               </font></Label>
+            <Label fx:id="cname" layoutX="138.0" layoutY="163.0" prefHeight="17.0" prefWidth="116.0" text="?" textFill="#572a00">
+               <font>
+                  <Font name="Serif Bold" size="12.0" />
+               </font></Label>
+            <Label fx:id="wname" layoutX="138.0" layoutY="193.0" prefHeight="17.0" prefWidth="116.0" text="?" textFill="#572a00">
+               <font>
+                  <Font name="Serif Bold" size="12.0" />
+               </font></Label>
+            <Label fx:id="day" layoutX="138.0" layoutY="221.0" prefHeight="17.0" prefWidth="116.0" text="?" textFill="#572a00">
+               <font>
+                  <Font name="Serif Bold" size="12.0" />
+               </font></Label>
          </children>
       </Pane>
    </children>
