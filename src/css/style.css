@@ -149,3 +149,24 @@
 .custom-cobo .list-cell{
     -fx-text-fill: #643302;
 }
+.invisible-button {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.invisible-button:hover {
+    -fx-background-color: rgba(0,0,0,0.2);
+    -fx-border-color: transparent;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 15, 0.3, 0, 0);;
+    -fx-cursor: hand;
+}
+.invisible-button:pressed {
+    -fx-background-color: rgba(0,0,0,0.3);
+    -fx-border-color: transparent;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 15, 0.3, 0, 0);;
+}
+.invisible-button:focused {
+    -fx-background-color: rgba(0,0,0,0.1);
+    -fx-border-color: transparent;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 15, 0.3, 0, 0);;
+}
