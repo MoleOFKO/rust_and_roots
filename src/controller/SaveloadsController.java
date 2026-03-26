@@ -20,6 +20,7 @@ import util.SceneManager;
 import javafx.scene.image.Image;
 import java.io.InputStream;
 import javafx.scene.control.Alert;
+import javafx.scene.input.MouseEvent;
 
 public class SaveloadsController implements Initializable {
 
@@ -54,6 +55,10 @@ public class SaveloadsController implements Initializable {
     private Label day;
 
     private int selectedSlot = 1;
+    @FXML
+    private ImageView deletesaveload;
+    @FXML
+    private Button btndelete;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -62,6 +67,7 @@ public class SaveloadsController implements Initializable {
         refreshSlotLabels();
         refreshSelectionUi();
         refreshSelectedSlotPreview();
+        btnLoad.setText("");
     }
 
     private void refreshModeUi() {
@@ -264,6 +270,14 @@ public class SaveloadsController implements Initializable {
         if (cimg != null) {
             cimg.setImage(loadCharacterPreviewImage(preview.skinId));
         }
+    }
+
+    @FXML
+    private void handlesaveloaddeleteaction(MouseEvent event) {
+    }
+
+    @FXML
+    private void handledeleteaction(ActionEvent event) {
     }
 
     private static class SlotPreview {

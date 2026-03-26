@@ -975,8 +975,8 @@
                         <Image url="@../image/tools/x.png" />
                      </image>
                   </ImageView>
-                  <Button fx:id="openstatus" layoutX="267.0" layoutY="28.0" mnemonicParsing="false" onAction="#handleopenstatusaction" opacity="0.0" prefHeight="25.0" prefWidth="64.0" />
-                  <Button fx:id="opensetting" layoutX="374.0" layoutY="28.0" mnemonicParsing="false" onAction="#handleopensettingaction" opacity="0.0" prefHeight="25.0" prefWidth="64.0" />
+                  <Button fx:id="openstatus" layoutX="261.0" layoutY="28.0" mnemonicParsing="false" onAction="#handleopenstatusaction" opacity="0.0" prefHeight="25.0" prefWidth="64.0" />
+                  <Button fx:id="opensetting" layoutX="372.0" layoutY="28.0" mnemonicParsing="false" onAction="#handleopensettingaction" opacity="0.0" prefHeight="25.0" prefWidth="64.0" />
                </children>
             </Pane>
          </children>
