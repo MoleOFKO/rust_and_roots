@@ -9,36 +9,43 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.text.Font?>
 
 <StackPane fx:id="view" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Char_edit_btnController">
     <children>
-      <ImageView fitHeight="521.0" fitWidth="608.0" pickOnBounds="true">
+      <ImageView fitHeight="528.0" fitWidth="608.0" pickOnBounds="true">
          <image>
             <Image url="@../image/Admin/dashboard.png" />
          </image>
       </ImageView>
         <Group fx:id="uiRoot">
             <children>
-            <ImageView fitHeight="35.0" fitWidth="120.0" layoutY="20.0" pickOnBounds="true">
+            <ImageView fitHeight="35.0" fitWidth="115.0" layoutY="20.0" pickOnBounds="true">
                <image>
                   <Image url="@../image/Admin/admin_bar.png" />
                </image>
             </ImageView>
-               <Label layoutX="6.0" layoutY="28.0" prefHeight="17.0" prefWidth="49.0" text="Admin:" />
-               <Label fx:id="lblaname" layoutX="53.0" layoutY="28.0" prefHeight="21.0" prefWidth="62.0" text="Name" />
-            <ImageView fitHeight="520.0" fitWidth="399.0" layoutX="105.0" layoutY="6.0" pickOnBounds="true">
+               <Label layoutX="6.0" layoutY="28.0" prefHeight="17.0" prefWidth="42.0" text="Admin:" textFill="#572a00">
+               <font>
+                  <Font name="Serif Bold" size="12.0" />
+               </font></Label>
+               <Label fx:id="lblaname" layoutX="51.0" layoutY="26.0" prefHeight="21.0" prefWidth="57.0" text="Name" textFill="#572a00">
+               <font>
+                  <Font name="Serif Bold" size="12.0" />
+               </font></Label>
+            <ImageView fitHeight="528.0" fitWidth="399.0" layoutX="105.0" layoutY="1.0" pickOnBounds="true">
                <image>
                   <Image url="@../image/Admin/paper_2of3.png" />
                </image>
             </ImageView>
-               <TextField fx:id="txtmname" layoutX="233.0" layoutY="36.0" prefHeight="25.0" prefWidth="194.0" styleClass="textbox" stylesheets="@../css/style.css" />
-               <TextField fx:id="txtstr" layoutX="233.0" layoutY="104.0" prefHeight="25.0" prefWidth="195.0" styleClass="textbox" stylesheets="@../css/style.css" />
-               <TextField fx:id="txtagi" layoutX="233.0" layoutY="138.0" prefHeight="35.0" prefWidth="196.0" styleClass="textbox" stylesheets="@../css/style.css" />
-               <TextField fx:id="txtdex" layoutX="233.0" layoutY="175.0" prefHeight="35.0" prefWidth="196.0" styleClass="textbox" stylesheets="@../css/style.css" />
-               <TextField fx:id="txtvid" layoutX="233.0" layoutY="212.0" prefHeight="35.0" prefWidth="196.0" styleClass="textbox" stylesheets="@../css/style.css" />
-               <TextField fx:id="txthp" layoutX="233.0" layoutY="248.0" prefHeight="35.0" prefWidth="196.0" styleClass="textbox" stylesheets="@../css/style.css" />
-               <TextField fx:id="txtstamina" layoutX="233.0" layoutY="285.0" prefHeight="35.0" prefWidth="196.0" styleClass="textbox" stylesheets="@../css/style.css" />
-               <ImageView fx:id="mobimg" fitHeight="150.0" fitWidth="184.0" layoutX="209.0" layoutY="324.0" pickOnBounds="true">
+               <TextField fx:id="txtmname" layoutX="233.0" layoutY="36.0" prefHeight="29.0" prefWidth="174.0" styleClass="textbox" stylesheets="@../css/style.css" />
+               <TextField fx:id="txtstr" layoutX="207.0" layoutY="128.0" prefHeight="29.0" prefWidth="76.0" styleClass="textbox" stylesheets="@../css/style.css" />
+               <TextField fx:id="txtagi" layoutX="372.0" layoutY="128.0" prefHeight="29.0" prefWidth="76.0" styleClass="textbox" stylesheets="@../css/style.css" />
+               <TextField fx:id="txtdex" layoutX="207.0" layoutY="186.0" prefHeight="29.0" prefWidth="76.0" styleClass="textbox" stylesheets="@../css/style.css" />
+               <TextField fx:id="txtvid" layoutX="372.0" layoutY="186.0" prefHeight="29.0" prefWidth="76.0" styleClass="textbox" stylesheets="@../css/style.css" />
+               <TextField fx:id="txthp" layoutX="208.0" layoutY="244.0" prefHeight="29.0" prefWidth="76.0" styleClass="textbox" stylesheets="@../css/style.css" />
+               <TextField fx:id="txtstamina" layoutX="373.0" layoutY="243.0" prefHeight="29.0" prefWidth="76.0" styleClass="textbox" stylesheets="@../css/style.css" />
+               <ImageView fx:id="mobimg" fitHeight="150.0" fitWidth="184.0" layoutX="209.0" layoutY="324.0" opacity="0.74" pickOnBounds="true">
                <image>
                   <Image url="@../image/Admin/image_box.png" />
                </image></ImageView>
@@ -48,34 +55,58 @@
                </image>
             </ImageView>
                <Button fx:id="btnupload" layoutX="396.0" layoutY="387.0" mnemonicParsing="false" onAction="#handlebtnuploadaction" opacity="0.0" prefHeight="25.0" prefWidth="84.0" text="Upload" />
-            <ImageView fitHeight="32.0" fitWidth="101.0" layoutX="252.0" layoutY="478.0" pickOnBounds="true">
+            <ImageView fitHeight="32.0" fitWidth="101.0" layoutX="252.0" layoutY="484.0" pickOnBounds="true">
                <image>
                   <Image url="@../image/Admin/admin_save_button.png" />
                </image>
             </ImageView>
-               <Button fx:id="btnsave" layoutX="254.0" layoutY="482.0" mnemonicParsing="false" onAction="#handlebtnsaveaction" opacity="0.0" prefHeight="25.0" prefWidth="97.0" text="Save" />
-               <Label layoutX="157.0" layoutY="40.0" prefHeight="17.0" prefWidth="67.0" text="Mob Name" />
-               <Label layoutX="159.0" layoutY="73.0" prefHeight="17.0" prefWidth="67.0" text="Mob Type" />
-               <Label layoutX="165.0" layoutY="108.0" prefHeight="17.0" prefWidth="67.0" text="STR" />
-               <Label layoutX="165.0" layoutY="142.0" prefHeight="17.0" prefWidth="67.0" text="AGI" />
-               <Label layoutX="165.0" layoutY="179.0" prefHeight="17.0" prefWidth="67.0" text="DEX" />
-               <Label layoutX="165.0" layoutY="216.0" prefHeight="17.0" prefWidth="67.0" text="VIT" />
-               <Label layoutX="165.0" layoutY="252.0" prefHeight="17.0" prefWidth="67.0" text="HP" />
-               <Label layoutX="165.0" layoutY="289.0" prefHeight="17.0" prefWidth="67.0" text="Stamina" />
-               <Label layoutX="265.0" layoutY="390.0" prefHeight="21.0" prefWidth="80.0" text="Inset Image" />
+               <Button fx:id="btnsave" layoutX="254.0" layoutY="488.0" mnemonicParsing="false" onAction="#handlebtnsaveaction" opacity="0.0" prefHeight="25.0" prefWidth="97.0" text="Save" />
+               <Label layoutX="157.0" layoutY="40.0" prefHeight="17.0" prefWidth="67.0" text="Mob Name" textFill="#572a00">
+               <font>
+                  <Font name="Serif Bold" size="12.0" />
+               </font></Label>
+               <Label layoutX="159.0" layoutY="84.0" prefHeight="17.0" prefWidth="67.0" text="Mob Type" textFill="#572a00">
+               <font>
+                  <Font name="Serif Bold" size="12.0" />
+               </font></Label>
+               <Label layoutX="169.0" layoutY="134.0" prefHeight="17.0" prefWidth="30.0" text="STR" textFill="#572a00">
+               <font>
+                  <Font name="Serif Bold" size="12.0" />
+               </font></Label>
+               <Label layoutX="326.0" layoutY="134.0" prefHeight="17.0" prefWidth="30.0" text="AGI" textFill="#572a00">
+               <font>
+                  <Font name="Serif Bold" size="12.0" />
+               </font></Label>
+               <Label layoutX="169.0" layoutY="192.0" prefHeight="17.0" prefWidth="32.0" text="DEX" textFill="#572a00">
+               <font>
+                  <Font name="Serif Bold" size="12.0" />
+               </font></Label>
+               <Label layoutX="324.0" layoutY="192.0" prefHeight="17.0" prefWidth="25.0" text="VIT" textFill="#572a00">
+               <font>
+                  <Font name="Serif Bold" size="12.0" />
+               </font></Label>
+               <Label layoutX="176.0" layoutY="251.0" prefHeight="17.0" prefWidth="26.0" text="HP" textFill="#572a00">
+               <font>
+                  <Font name="Serif Bold" size="12.0" />
+               </font></Label>
+               <Label layoutX="311.0" layoutY="252.0" prefHeight="17.0" prefWidth="50.0" text="Stamina" textFill="#572a00">
+               <font>
+                  <Font name="Serif Bold" size="12.0" />
+               </font></Label>
+               <Label layoutX="265.0" layoutY="390.0" prefHeight="21.0" prefWidth="80.0" text="Inset Image" textFill="#572a00" />
             <ImageView fitHeight="149.0" fitWidth="181.0" layoutX="211.0" layoutY="324.0" pickOnBounds="true" />
-               <BorderPane layoutX="209.0" layoutY="324.0" prefHeight="150.0" prefWidth="183.0" style="-fx-border-color: black; -fx-border-radius: 10px;" />
-            <ImageView fitHeight="37.0" fitWidth="94.0" layoutX="503.0" layoutY="11.0" pickOnBounds="true" preserveRatio="true">
+               <BorderPane layoutX="209.0" layoutY="324.0" prefHeight="150.0" prefWidth="183.0" style="-fx-border-color: black; -fx-border-radius: 10px; -fx-border-width: 3px;" />
+            <ImageView fitHeight="37.0" fitWidth="94.0" layoutX="503.0" layoutY="26.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../image/Admin/admin_back_button.png" />
                </image>
             </ImageView>
-               <Button fx:id="btnback" layoutX="506.0" layoutY="12.0" mnemonicParsing="false" onAction="#handlebtnbackaction" opacity="0.0" prefHeight="25.0" prefWidth="88.0" text="Back">
+               <Button fx:id="btnback" layoutX="506.0" layoutY="24.0" mnemonicParsing="false" onAction="#handlebtnbackaction" opacity="0.0" prefHeight="15.0" prefWidth="88.0" text="Back">
                   <graphic>
                      <FontAwesomeIcon glyphName="ARROW_LEFT" />
                   </graphic>
                </Button>
-               <TextField fx:id="txtmobstype" layoutX="233.0" layoutY="69.0" prefHeight="25.0" prefWidth="194.0" styleClass="textbox" stylesheets="@../css/style.css" />
+               <TextField fx:id="txtmobstype" layoutX="233.0" layoutY="78.0" prefHeight="29.0" prefWidth="175.0" styleClass="textbox" stylesheets="@../css/style.css" />
             <Label layoutX="-3.0" layoutY="3.0" prefHeight="17.0" prefWidth="16.0" />
             <Label layoutX="589.0" layoutY="508.0" prefHeight="17.0" prefWidth="16.0" />
             </children>
