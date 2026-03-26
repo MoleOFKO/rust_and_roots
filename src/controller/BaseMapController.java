@@ -14,6 +14,7 @@ import game.GameState;
 import game.GameTimeManager;
 import game.InteractionManager;
 import game.SceneController;
+import java.util.Objects;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
@@ -29,6 +30,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 import javafx.event.ActionEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import model.CollisionRegistry;
 import model.Farm;
@@ -125,7 +127,24 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     // ---------- Optional shared inventory overlay ----------
     @FXML protected Pane inventoryOverlay;
     @FXML protected Label invCoinsLabel;
+    @FXML protected Group menuInventory;
+    @FXML protected Group statusTab;
+    @FXML protected Group settingsTab;
 
+    @FXML protected Button openInventory;
+    @FXML protected Button openstatus;
+    @FXML protected Button opensetting;
+
+    @FXML protected ImageView btnclose;
+    @FXML protected Label hotbarguide;
+
+    // ---------- Optional shared inventory overlay ----------
+    @FXML protected Group statusgroup;
+    @FXML protected Group skillsgroup;
+    
+    @FXML protected ImageView btnskill;
+    @FXML protected ImageView btnstatus;
+    
     // ---------- Optional shared settings / time controls ----------
     @FXML protected Label timeLabel;
     @FXML protected Button pauseTimeBtn;
@@ -171,6 +190,18 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     protected final List<ImageView> hotbarImages = new ArrayList<>();
     protected final List<Label> hotbarLabels = new ArrayList<>();
     protected int hotbarAssignmentIndex = 0;
+    
+    // ---------- Shared status allocation state ----------
+    protected boolean statusAllocationMode = false;
+    protected int pendingHpPoints = 0;
+    protected int pendingSpPoints = 0;
+    protected int pendingStrPoints = 0;
+    protected int pendingVitPoints = 0;
+    protected int pendingDexPoints = 0;
+    protected int pendingAgiPoints = 0;
+    
+    protected enum MenuTab { INVENTORY, STATUS, SETTINGS }
+    protected MenuTab activeMenuTab = MenuTab.INVENTORY;
     
     protected void configureFarm(Farm farm) {
         // default: do nothing
@@ -358,6 +389,10 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         hotbar.setManaged(visible);
         hotbar.setDisable(!visible);
 
+        hotbarguide.setVisible(!visible);
+        hotbarguide.setManaged(!visible);
+        hotbarguide.setDisable(visible);
+        
         if(playerState != null){
             playerState.setHotbarVisible(visible);
         }
@@ -392,6 +427,337 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         }
     }
 
+    protected void setStatusOpen(boolean open){
+        if (statusgroup == null) return;
+        if (btnstatus == null) return;
+
+        statusgroup.setVisible(open);
+        statusgroup.setManaged(open);
+        statusgroup.setDisable(!open);
+        btnskill.setVisible(open);
+        btnskill.setManaged(open);
+        btnskill.setDisable(!open);
+    }
+    
+    protected void setSkillsOpen(boolean open){
+        if (skillsgroup == null) return;
+        if (btnskill == null) return;
+
+        skillsgroup.setVisible(open);
+        skillsgroup.setManaged(open);
+        skillsgroup.setDisable(!open);
+        btnstatus.setVisible(open);
+        btnstatus.setManaged(open);
+        btnstatus.setDisable(!open);
+    }
+    
+    protected void setupMenuTabs() {
+        setActiveMenuTab(MenuTab.INVENTORY);
+    }
+
+    protected void setActiveMenuTab(MenuTab tab) {
+        activeMenuTab = (tab == null) ? MenuTab.INVENTORY : tab;
+
+        if (menuInventory != null) {
+            boolean show = activeMenuTab == MenuTab.INVENTORY;
+            menuInventory.setVisible(show);
+            menuInventory.setManaged(show);
+            menuInventory.setDisable(!show);
+        }
+
+        if (statusTab != null) {
+            boolean show = activeMenuTab == MenuTab.STATUS;
+            statusTab.setVisible(show);
+            statusTab.setManaged(show);
+            statusTab.setDisable(!show);
+        }
+
+        if (settingsTab != null) {
+            boolean show = activeMenuTab == MenuTab.SETTINGS;
+            settingsTab.setVisible(show);
+            settingsTab.setManaged(show);
+            settingsTab.setDisable(!show);
+        }
+
+        if (activeMenuTab == MenuTab.INVENTORY) {
+            refreshPlayerInventoryView();
+        }
+
+        refreshMenuButtons();
+    }
+
+    protected void refreshMenuButtons() {
+        styleMenuButton(openInventory, activeMenuTab == MenuTab.INVENTORY);
+        styleMenuButton(openstatus, activeMenuTab == MenuTab.STATUS);
+        styleMenuButton(opensetting, activeMenuTab == MenuTab.SETTINGS);
+    }
+
+    protected void styleMenuButton(Button button, boolean active) {
+        if (button == null) return;
+        button.setOpacity(active ? 0.18 : 0.0);
+    }
+
+    protected void refreshMenuState() {
+        refreshMenuButtons();
+    }
+    
+    // ---------- Shared status allocation logic ----------
+    protected void refreshStatusAllocationUi() {
+        // subclasses override if they have status labels/buttons to refresh
+    }
+
+    protected void resetPendingStatusChanges() {
+        pendingHpPoints = 0;
+        pendingSpPoints = 0;
+        pendingStrPoints = 0;
+        pendingVitPoints = 0;
+        pendingDexPoints = 0;
+        pendingAgiPoints = 0;
+    }
+
+    protected int getPendingPointCount(String statKey) {
+        return switch (Objects.requireNonNullElse(statKey, "")) {
+            case "hp" -> pendingHpPoints;
+            case "sp" -> pendingSpPoints;
+            case "str" -> pendingStrPoints;
+            case "vit" -> pendingVitPoints;
+            case "dex" -> pendingDexPoints;
+            case "agi" -> pendingAgiPoints;
+            default -> 0;
+        };
+    }
+
+    protected void setPendingPointCount(String statKey, int value) {
+        int nextValue = Math.max(0, value);
+        switch (Objects.requireNonNullElse(statKey, "")) {
+            case "hp" -> pendingHpPoints = nextValue;
+            case "sp" -> pendingSpPoints = nextValue;
+            case "str" -> pendingStrPoints = nextValue;
+            case "vit" -> pendingVitPoints = nextValue;
+            case "dex" -> pendingDexPoints = nextValue;
+            case "agi" -> pendingAgiPoints = nextValue;
+            default -> {
+            }
+        }
+    }
+
+    protected int getCommittedStatIncreases(String statKey) {
+        if (playerState == null) return 0;
+
+        return switch (Objects.requireNonNullElse(statKey, "")) {
+            case "hp" -> Math.max(0, playerState.getMaxHp() - 45);
+            case "sp" -> Math.max(0, playerState.getMaxStamina() - 50);
+            case "str" -> Math.max(0, playerState.getStr() - 1);
+            case "vit" -> Math.max(0, playerState.getVit() - 1);
+            case "dex" -> Math.max(0, playerState.getDex() - 1);
+            case "agi" -> Math.max(0, playerState.getAgi() - 1);
+            default -> 0;
+        };
+    }
+
+    protected int getNextPointCost(String statKey) {
+        int nextPointIndex = getCommittedStatIncreases(statKey) + getPendingPointCount(statKey);
+        return 1 + Math.max(0, nextPointIndex / 10);
+    }
+
+    protected int getPendingExpCostForStat(String statKey) {
+        int committed = getCommittedStatIncreases(statKey);
+        int pending = getPendingPointCount(statKey);
+        int total = 0;
+
+        for (int i = 0; i < pending; i++) {
+            total += 1 + ((committed + i) / 10);
+        }
+
+        return total;
+    }
+
+    protected int getPendingExpCost() {
+        return getPendingExpCostForStat("hp")
+            + getPendingExpCostForStat("sp")
+            + getPendingExpCostForStat("str")
+            + getPendingExpCostForStat("vit")
+            + getPendingExpCostForStat("dex")
+            + getPendingExpCostForStat("agi");
+    }
+
+    protected int getPreviewRemainingExp() {
+        if (playerState == null) return 0;
+        return Math.max(0, playerState.getExp() - getPendingExpCost());
+    }
+
+    protected int getCurrentCoreStatCap() {
+        int dayNumber = GameTimeManager.get().dayNumberProperty().get();
+        return 5 + Math.max(0, (dayNumber - 1) / 2);
+    }
+
+    protected int getCurrentStatValueWithPending(String statKey) {
+        if (playerState == null) return 0;
+
+        return switch (Objects.requireNonNullElse(statKey, "")) {
+            case "hp" -> playerState.getMaxHp() + pendingHpPoints;
+            case "sp" -> playerState.getMaxStamina() + pendingSpPoints;
+            case "str" -> playerState.getStr() + pendingStrPoints;
+            case "vit" -> playerState.getVit() + pendingVitPoints;
+            case "dex" -> playerState.getDex() + pendingDexPoints;
+            case "agi" -> playerState.getAgi() + pendingAgiPoints;
+            default -> 0;
+        };
+    }
+
+    protected int getAverageCoreStatWithPending() {
+        if (playerState == null) return 0;
+
+        int total =
+            (playerState.getStr() + pendingStrPoints) +
+            (playerState.getVit() + pendingVitPoints) +
+            (playerState.getDex() + pendingDexPoints) +
+            (playerState.getAgi() + pendingAgiPoints);
+
+        return Math.max(0, total / 4);
+    }
+
+    protected int getHpSpPointCap() {
+        return getAverageCoreStatWithPending() + getCurrentCoreStatCap();
+    }
+
+    protected int getHpSpInvestedPointsWithPending(String statKey) {
+        if (playerState == null) return 0;
+
+        return switch (Objects.requireNonNullElse(statKey, "")) {
+            case "hp" -> Math.max(0, (playerState.getMaxHp() - 45) + pendingHpPoints);
+            case "sp" -> Math.max(0, (playerState.getMaxStamina() - 50) + pendingSpPoints);
+            default -> 0;
+        };
+    }
+
+    protected boolean isStatAtCurrentCap(String statKey) {
+        int coreCap = getCurrentCoreStatCap();
+        int hpSpCap = getHpSpPointCap();
+
+        return switch (Objects.requireNonNullElse(statKey, "")) {
+            case "hp" -> getHpSpInvestedPointsWithPending("hp") >= hpSpCap;
+            case "sp" -> getHpSpInvestedPointsWithPending("sp") >= hpSpCap;
+            case "str" -> getCurrentStatValueWithPending("str") >= coreCap;
+            case "vit" -> getCurrentStatValueWithPending("vit") >= coreCap;
+            case "dex" -> getCurrentStatValueWithPending("dex") >= coreCap;
+            case "agi" -> getCurrentStatValueWithPending("agi") >= coreCap;
+            default -> false;
+        };
+    }
+
+    protected boolean canIncreaseStat(String statKey) {
+        return statusAllocationMode
+            && playerState != null
+            && !isStatAtCurrentCap(statKey)
+            && getPreviewRemainingExp() >= getNextPointCost(statKey);
+    }
+
+    protected void changePendingStat(String statKey, int delta) {
+        if (playerState == null || delta == 0) return;
+
+        int currentPending = getPendingPointCount(statKey);
+
+        if (delta < 0) {
+            if (currentPending <= 0) return;
+            setPendingPointCount(statKey, currentPending - 1);
+            refreshStatusAllocationUi();
+            return;
+        }
+
+        if (!canIncreaseStat(statKey)) return;
+
+        setPendingPointCount(statKey, currentPending + 1);
+        refreshStatusAllocationUi();
+    }
+
+    protected void applyPendingStatusChanges() {
+        if (playerState == null) return;
+
+        int spentExp = getPendingExpCost();
+        if (spentExp <= 0) return;
+        if (playerState.getExp() < spentExp) {
+            refreshStatusAllocationUi();
+            return;
+        }
+
+        playerState.setExp(playerState.getExp() - spentExp);
+
+        if (pendingHpPoints > 0) {
+            playerState.setMaxHp(playerState.getMaxHp() + pendingHpPoints);
+            playerState.setHp(playerState.getMaxHp());
+        }
+        if (pendingSpPoints > 0) {
+            playerState.setMaxStamina(playerState.getMaxStamina() + pendingSpPoints);
+            playerState.setStamina(playerState.getMaxStamina());
+        }
+        if (pendingStrPoints > 0) playerState.setStr(playerState.getStr() + pendingStrPoints);
+        if (pendingVitPoints > 0) playerState.setVit(playerState.getVit() + pendingVitPoints);
+        if (pendingDexPoints > 0) playerState.setDex(playerState.getDex() + pendingDexPoints);
+        if (pendingAgiPoints > 0) playerState.setAgi(playerState.getAgi() + pendingAgiPoints);
+
+        statusAllocationMode = false;
+        resetPendingStatusChanges();
+        refreshStatusAllocationUi();
+    }
+
+    protected void toggleStatusAllocationMode() {
+        if (playerState == null || playerState.getExp() <= 0) {
+            refreshStatusAllocationUi();
+            return;
+        }
+
+        if (statusAllocationMode) {
+            statusAllocationMode = false;
+            resetPendingStatusChanges();
+        } else {
+            statusAllocationMode = true;
+        }
+
+        refreshStatusAllocationUi();
+    }
+
+    // ---------- Shared status action delegates ----------
+    protected void onStatusHpMinus() { changePendingStat("hp", -1); }
+    protected void onStatusHpPlus() { changePendingStat("hp", 1); }
+    protected void onStatusSpMinus() { changePendingStat("sp", -1); }
+    protected void onStatusSpPlus() { changePendingStat("sp", 1); }
+    protected void onStatusStrMinus() { changePendingStat("str", -1); }
+    protected void onStatusStrPlus() { changePendingStat("str", 1); }
+    protected void onStatusVitMinus() { changePendingStat("vit", -1); }
+    protected void onStatusVitPlus() { changePendingStat("vit", 1); }
+    protected void onStatusDexMinus() { changePendingStat("dex", -1); }
+    protected void onStatusDexPlus() { changePendingStat("dex", 1); }
+    protected void onStatusAgiMinus() { changePendingStat("agi", -1); }
+    protected void onStatusAgiPlus() { changePendingStat("agi", 1); }
+    protected void onStatusUsePoint() { toggleStatusAllocationMode(); }
+    protected void onStatusConfirm() { applyPendingStatusChanges(); }
+    
+    protected void openInventory(){
+        if (inventoryOverlay != null && !inventoryOverlay.isVisible()) {
+            setInventoryOpen(true);
+        }
+        setActiveMenuTab(MenuTab.INVENTORY);
+    }
+
+    protected void closeMenuScreen(){
+        setInventoryOpen(false);
+    }
+    
+    protected void openStatus(){
+        if (inventoryOverlay != null && !inventoryOverlay.isVisible()) {
+            setInventoryOpen(true);
+        }
+        setActiveMenuTab(MenuTab.STATUS);
+    }
+
+    protected void openSetting(){
+        if (inventoryOverlay != null && !inventoryOverlay.isVisible()) {
+            setInventoryOpen(true);
+        }
+        setActiveMenuTab(MenuTab.SETTINGS);
+    }
+    
     private void setupFarmIfPresent() {
         if (farm1 == null || farm1_detection == null || farm1_button == null) return;
 
