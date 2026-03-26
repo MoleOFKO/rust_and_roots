@@ -15,12 +15,9 @@ import javafx.scene.Group;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
@@ -37,9 +34,7 @@ import util.SceneManager;
 import util.SpawnTag;
 import java.util.Comparator;
 import javafx.application.Platform;
-import javafx.collections.MapChangeListener;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.IntegerProperty;
 import db.SaveGameService;
 
 public class home_mapController extends BaseMapController {
@@ -542,14 +537,11 @@ public class home_mapController extends BaseMapController {
     private ImageView btnfishingplus1;
     @FXML
     private ImageView btncookingplus1;
-
     @FXML
-    private void handlebtnskillacion(MouseEvent event) {
-    }
-
+    private Rectangle wall30;
     @FXML
-    private void handlebtnstatusaction(MouseEvent event) {
-    }
+    private Group skillsgroup;
+
 
     @FXML
     private void handlefarmingminusaction(MouseEvent event) {
@@ -590,18 +582,6 @@ public class home_mapController extends BaseMapController {
     @FXML
     private void handlecookingplusaction(MouseEvent event) {
     }
-
-    
-    private enum MenuTab { INVENTORY, STATUS, SETTINGS }
-
-    private MenuTab activeMenuTab = MenuTab.INVENTORY;
-    private boolean statusAllocationMode = false;
-    private int pendingHpPoints = 0;
-    private int pendingSpPoints = 0;
-    private int pendingStrPoints = 0;
-    private int pendingVitPoints = 0;
-    private int pendingDexPoints = 0;
-    private int pendingAgiPoints = 0;
 
     @Override
     protected String mapKey() {
@@ -666,7 +646,6 @@ public class home_mapController extends BaseMapController {
 
         setupMerchant();
         setupMerchantZone();
-        setupMenuTabs();
         bindStatusLabels();
         bindSettingControls();
 
@@ -874,190 +853,11 @@ public class home_mapController extends BaseMapController {
         }
     }
 
-    private void setupMenuTabs() {
-        setActiveMenuTab(MenuTab.INVENTORY);
-    }
-
-    private void setActiveMenuTab(MenuTab tab) {
-        activeMenuTab = (tab == null) ? MenuTab.INVENTORY : tab;
-
-        if (menuInventory != null) {
-            boolean show = activeMenuTab == MenuTab.INVENTORY;
-            menuInventory.setVisible(show);
-            menuInventory.setManaged(show);
-            menuInventory.setDisable(!show);
-        }
-        if (statusTab != null) {
-            boolean show = activeMenuTab == MenuTab.STATUS;
-            statusTab.setVisible(show);
-            statusTab.setManaged(show);
-            statusTab.setDisable(!show);
-        }
-        if (settingsTab != null) {
-            boolean show = activeMenuTab == MenuTab.SETTINGS;
-            settingsTab.setVisible(show);
-            settingsTab.setManaged(show);
-            settingsTab.setDisable(!show);
-        }
-
-        if (activeMenuTab == MenuTab.INVENTORY) {
-            refreshPlayerInventoryView();
-        } else if (activeMenuTab == MenuTab.STATUS) {
-            refreshStatusView();
-        }
-
-        refreshMenuButtons();
-    }
-
-    private void refreshMenuButtons() {
-        styleMenuButton(openInventory, activeMenuTab == MenuTab.INVENTORY);
-        styleMenuButton(openstatus, activeMenuTab == MenuTab.STATUS);
-        styleMenuButton(opensetting, activeMenuTab == MenuTab.SETTINGS);
-    }
-
-    private void styleMenuButton(Button button, boolean active) {
-        if (button == null) return;
-        button.setOpacity(active ? 0.18 : 0.0);
-    }
-
-    private void refreshMenuState() {
-        refreshStatusView();
-        refreshMenuButtons();
-    }
-
-    private void resetPendingStatusChanges() {
-        pendingHpPoints = 0;
-        pendingSpPoints = 0;
-        pendingStrPoints = 0;
-        pendingVitPoints = 0;
-        pendingDexPoints = 0;
-        pendingAgiPoints = 0;
-    }
-
-    private int getPendingPointCount(String statKey) {
-        return switch (Objects.requireNonNullElse(statKey, "")) {
-            case "hp" -> pendingHpPoints;
-            case "sp" -> pendingSpPoints;
-            case "str" -> pendingStrPoints;
-            case "vit" -> pendingVitPoints;
-            case "dex" -> pendingDexPoints;
-            case "agi" -> pendingAgiPoints;
-            default -> 0;
-        };
-    }
-
-    private void setPendingPointCount(String statKey, int value) {
-        int nextValue = Math.max(0, value);
-        switch (Objects.requireNonNullElse(statKey, "")) {
-            case "hp" -> pendingHpPoints = nextValue;
-            case "sp" -> pendingSpPoints = nextValue;
-            case "str" -> pendingStrPoints = nextValue;
-            case "vit" -> pendingVitPoints = nextValue;
-            case "dex" -> pendingDexPoints = nextValue;
-            case "agi" -> pendingAgiPoints = nextValue;
-            default -> {
-                return;
-            }
-        }
-    }
-
-    private int getCommittedStatIncreases(String statKey) {
-        if (playerState == null) return 0;
-
-        return switch (Objects.requireNonNullElse(statKey, "")) {
-            case "hp" -> Math.max(0, playerState.getMaxHp() - 45);
-            case "sp" -> Math.max(0, playerState.getMaxStamina() - 50);
-            case "str" -> Math.max(0, playerState.getStr() - 1);
-            case "vit" -> Math.max(0, playerState.getVit() - 1);
-            case "dex" -> Math.max(0, playerState.getDex() - 1);
-            case "agi" -> Math.max(0, playerState.getAgi() - 1);
-            default -> 0;
-        };
-    }
-
-    private int getNextPointCost(String statKey) {
-        int nextPointIndex = getCommittedStatIncreases(statKey) + getPendingPointCount(statKey);
-        return 1 + Math.max(0, nextPointIndex / 10);
-    }
-
-    private int getPendingExpCostForStat(String statKey) {
-        int committed = getCommittedStatIncreases(statKey);
-        int pending = getPendingPointCount(statKey);
-        int total = 0;
-
-        for (int i = 0; i < pending; i++) {
-            total += 1 + ((committed + i) / 10);
-        }
-
-        return total;
-    }
-
-    private int getPendingExpCost() {
-        return getPendingExpCostForStat("hp")
-            + getPendingExpCostForStat("sp")
-            + getPendingExpCostForStat("str")
-            + getPendingExpCostForStat("vit")
-            + getPendingExpCostForStat("dex")
-            + getPendingExpCostForStat("agi");
-    }
-
-    private int getPreviewRemainingExp() {
-        if (playerState == null) return 0;
-        return Math.max(0, playerState.getExp() - getPendingExpCost());
-    }
-
-    private boolean canIncreaseStat(String statKey) {
-        return statusAllocationMode
-            && playerState != null
-            && getPreviewRemainingExp() >= getNextPointCost(statKey);
-    }
-
-    private void changePendingStat(String statKey, int delta) {
-        if (playerState == null || delta == 0 || !statusAllocationMode) return;
-
-        int currentPending = getPendingPointCount(statKey);
-
-        if (delta < 0) {
-            if (currentPending <= 0) return;
-            setPendingPointCount(statKey, currentPending - 1);
-            refreshStatusView();
-            return;
-        }
-
-        if (!canIncreaseStat(statKey)) return;
-
-        setPendingPointCount(statKey, currentPending + 1);
+    @Override
+    protected void refreshStatusAllocationUi() {
         refreshStatusView();
     }
-
-    private void applyPendingStatusChanges() {
-        if (playerState == null) return;
-
-        int spentExp = getPendingExpCost();
-        if (spentExp <= 0) return;
-        if (playerState.getExp() < spentExp) {
-            refreshStatusView();
-            return;
-        }
-
-        playerState.setExp(playerState.getExp() - spentExp);
-
-        if (pendingHpPoints > 0) {
-            playerState.setMaxHp(playerState.getMaxHp() + pendingHpPoints);
-        }
-        if (pendingSpPoints > 0) {
-            playerState.setMaxStamina(playerState.getMaxStamina() + pendingSpPoints);
-        }
-        if (pendingStrPoints > 0) playerState.setStr(playerState.getStr() + pendingStrPoints);
-        if (pendingVitPoints > 0) playerState.setVit(playerState.getVit() + pendingVitPoints);
-        if (pendingDexPoints > 0) playerState.setDex(playerState.getDex() + pendingDexPoints);
-        if (pendingAgiPoints > 0) playerState.setAgi(playerState.getAgi() + pendingAgiPoints);
-
-        statusAllocationMode = false;
-        resetPendingStatusChanges();
-        refreshStatusView();
-    }
-
+    
     private void refreshStatusView() {
         if (playerState == null) return;
 
@@ -1206,116 +1006,47 @@ public class home_mapController extends BaseMapController {
     }
 
     @FXML
-    private void handlecloseaction(MouseEvent event) {
-        setInventoryOpen(false);
-    }
+    private void handleHPminusaction(MouseEvent event) { onStatusHpMinus(); }
 
     @FXML
-    private void handleHPminusaction(MouseEvent event) {
-        changePendingStat("hp", -1);
-    }
+    private void handleHPplusaction(MouseEvent event) { onStatusHpPlus(); }
 
     @FXML
-    private void handleHPplusaction(MouseEvent event) {
-        changePendingStat("hp", 1);
-    }
+    private void handleSPminusaction(MouseEvent event) { onStatusSpMinus(); }
 
     @FXML
-    private void handleSPminusaction(MouseEvent event) {
-        changePendingStat("sp", -1);
-    }
+    private void handleSTRminusaction(MouseEvent event) { onStatusStrMinus(); }
 
     @FXML
-    private void handleSTRminusaction(MouseEvent event) {
-        changePendingStat("str", -1);
-    }
+    private void handleVITminusaction(MouseEvent event) { onStatusVitMinus(); }
 
     @FXML
-    private void handleVITminusaction(MouseEvent event) {
-        changePendingStat("vit", -1);
-    }
+    private void handleDEXminusaction(MouseEvent event) { onStatusDexMinus(); }
 
     @FXML
-    private void handleDEXminusaction(MouseEvent event) {
-        changePendingStat("dex", -1);
-    }
+    private void handleAGIminusaction(MouseEvent event) { onStatusAgiMinus(); }
 
     @FXML
-    private void handleAGIminusaction(MouseEvent event) {
-        changePendingStat("agi", -1);
-    }
+    private void handleSPplusaction(MouseEvent event) { onStatusSpPlus(); }
 
     @FXML
-    private void handleSPplusaction(MouseEvent event) {
-        changePendingStat("sp", 1);
-    }
+    private void handleSTRplusaction(MouseEvent event) { onStatusStrPlus(); }
 
     @FXML
-    private void handleSTRplusaction(MouseEvent event) {
-        changePendingStat("str", 1);
-    }
+    private void handleVITplusaction(MouseEvent event) { onStatusVitPlus(); }
 
     @FXML
-    private void handleVITplusaction(MouseEvent event) {
-        changePendingStat("vit", 1);
-    }
+    private void handleDEXplusaction(MouseEvent event) { onStatusDexPlus(); }
 
     @FXML
-    private void handleDEXplusaction(MouseEvent event) {
-        changePendingStat("dex", 1);
-    }
+    private void handleAGIplusaction(MouseEvent event) { onStatusAgiPlus(); }
 
     @FXML
-    private void handleAGIplusaction(MouseEvent event) {
-        changePendingStat("agi", 1);
-    }
+    private void handleusepointaction(MouseEvent event) { onStatusUsePoint(); }
 
     @FXML
-    private void handleusepointaction(MouseEvent event) {
-        if (playerState == null || playerState.getExp() <= 0) {
-            refreshStatusButtons();
-            return;
-        }
-
-        if (statusAllocationMode) {
-            statusAllocationMode = false;
-            resetPendingStatusChanges();
-        } else {
-            statusAllocationMode = true;
-        }
-
-        refreshStatusView();
-    }
-
-    @FXML
-    private void handleconfirmaction(MouseEvent event) {
-        applyPendingStatusChanges();
-    }
-
-    @FXML
-    private void handleopenInventoryaction(ActionEvent event) {
-        if (!inventoryOverlay.isVisible()) {
-            setInventoryOpen(true);
-        }
-        setActiveMenuTab(MenuTab.INVENTORY);
-    }
-
-    @FXML
-    private void handleopenstatusaction(ActionEvent event) {
-        if (!inventoryOverlay.isVisible()) {
-            setInventoryOpen(true);
-        }
-        setActiveMenuTab(MenuTab.STATUS);
-    }
-
-    @FXML
-        private void handleopensettingaction(ActionEvent event) {
-        if (!inventoryOverlay.isVisible()) {
-            setInventoryOpen(true);
-        }
-        setActiveMenuTab(MenuTab.SETTINGS);
-    }
-
+    private void handleconfirmaction(MouseEvent event) { onStatusConfirm(); }
+    
     @FXML
     private void handlesaveexitaction(ActionEvent event) {
         try {
@@ -1346,5 +1077,37 @@ public class home_mapController extends BaseMapController {
         GameState.get().setSaveMenuMode(false);
         GameState.get().setReturnScene("/view/home_map.fxml", SpawnTag.DEFAULT);
         SceneManager.switchScene("/view/saveloads.fxml");
+    }
+
+    @FXML
+    private void handlebtnskillacion(MouseEvent event) {
+        super.setSkillsOpen(true);
+        super.setStatusOpen(false);
+    }
+
+    @FXML
+    private void handlebtnstatusaction(MouseEvent event) {
+        super.setStatusOpen(true);
+        super.setSkillsOpen(false);
+    }
+
+    @FXML
+    private void handleopenInventoryaction(ActionEvent event) {
+        super.openInventory();
+    }
+
+    @FXML
+    private void handlecloseaction(MouseEvent event) {
+        super.closeMenuScreen();
+    }
+
+    @FXML
+    private void handleopenstatusaction(ActionEvent event) {
+        super.openStatus();
+    }
+
+    @FXML
+    private void handleopensettingaction(ActionEvent event) {
+        super.openSetting();
     }
 }

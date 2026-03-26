@@ -19,9 +19,11 @@ public class Player {
 
     private static final double INV_SQRT_2 = 1.0 / Math.sqrt(2.0);
     private static final double NANOS_PER_60FPS_FRAME = 16_666_666.0;
-    private static final double NORMAL_AGI = 1.0;
-    private static final double RUN_MULTIPLIER = 1.6;
+    private static final double NORMAL_AGI = 5.0;
+    private static final double RUN_MULTIPLIER = 1.35;
     private static final double STAMINA_DRAIN_PER_SECOND = 12.0;
+    private static final double MIN_AGI_SPEED_MULTIPLIER = 0.80;
+    private static final double MAX_AGI_SPEED_MULTIPLIER = 1.60;
 
     private static final int FRAME_SIZE = 64;
 
@@ -406,10 +408,16 @@ public class Player {
             return 0.0;
         }
 
-        double agiModifier = Math.max(0.2, state.getAgi() / NORMAL_AGI);
+        double agiRatio = state.getAgi() / NORMAL_AGI;
+        double agiModifier = 0.6 + (0.4 * agiRatio);
+        agiModifier = Math.max(MIN_AGI_SPEED_MULTIPLIER, Math.min(MAX_AGI_SPEED_MULTIPLIER, agiModifier));
+
         double currentSpeed = baseSpeed * agiModifier;
 
-        double staminaRatio = state.getMaxStamina() <= 0 ? 0.0 : (double) state.getStamina() / state.getMaxStamina();
+        double staminaRatio = state.getMaxStamina() <= 0
+            ? 0.0
+            : (double) state.getStamina() / state.getMaxStamina();
+
         if (staminaRatio < 0.30) {
             currentSpeed *= 0.65;
         }

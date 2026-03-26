@@ -777,60 +777,46 @@ public class Home_interiorController extends BaseMapController {
     private Label hotbarguide;
 
     @FXML
-    private void handleHPminusaction(MouseEvent event) {
-    }
+    private void handleHPminusaction(MouseEvent event) { onStatusHpMinus(); }
 
     @FXML
-    private void handleHPplusaction(MouseEvent event) {
-    }
+    private void handleHPplusaction(MouseEvent event) { onStatusHpPlus(); }
 
     @FXML
-    private void handleSPminusaction(MouseEvent event) {
-    }
+    private void handleSPminusaction(MouseEvent event) { onStatusSpMinus(); }
 
     @FXML
-    private void handleSTRminusaction(MouseEvent event) {
-    }
+    private void handleSTRminusaction(MouseEvent event) { onStatusStrMinus(); }
 
     @FXML
-    private void handleVITminusaction(MouseEvent event) {
-    }
+    private void handleVITminusaction(MouseEvent event) { onStatusVitMinus(); }
 
     @FXML
-    private void handleDEXminusaction(MouseEvent event) {
-    }
+    private void handleDEXminusaction(MouseEvent event) { onStatusDexMinus(); }
 
     @FXML
-    private void handleAGIminusaction(MouseEvent event) {
-    }
+    private void handleAGIminusaction(MouseEvent event) { onStatusAgiMinus(); }
 
     @FXML
-    private void handleSPplusaction(MouseEvent event) {
-    }
+    private void handleSPplusaction(MouseEvent event) { onStatusSpPlus(); }
 
     @FXML
-    private void handleSTRplusaction(MouseEvent event) {
-    }
+    private void handleSTRplusaction(MouseEvent event) { onStatusStrPlus(); }
 
     @FXML
-    private void handleVITplusaction(MouseEvent event) {
-    }
+    private void handleVITplusaction(MouseEvent event) { onStatusVitPlus(); }
 
     @FXML
-    private void handleDEXplusaction(MouseEvent event) {
-    }
+    private void handleDEXplusaction(MouseEvent event) { onStatusDexPlus(); }
 
     @FXML
-    private void handleAGIplusaction(MouseEvent event) {
-    }
+    private void handleAGIplusaction(MouseEvent event) { onStatusAgiPlus(); }
 
     @FXML
-    private void handleusepointaction(MouseEvent event) {
-    }
+    private void handleusepointaction(MouseEvent event) { onStatusUsePoint(); }
 
     @FXML
-    private void handleconfirmaction(MouseEvent event) {
-    }
+    private void handleconfirmaction(MouseEvent event) { onStatusConfirm(); }
 
     @FXML
     private void handlesaveexitaction(ActionEvent event) {
@@ -846,18 +832,22 @@ public class Home_interiorController extends BaseMapController {
 
     @FXML
     private void handleopenInventoryaction(ActionEvent event) {
+        super.openInventory();
     }
 
     @FXML
     private void handlecloseaction(MouseEvent event) {
+        super.closeMenuScreen();
     }
 
     @FXML
     private void handleopenstatusaction(ActionEvent event) {
+        super.openStatus();
     }
 
     @FXML
     private void handleopensettingaction(ActionEvent event) {
+        super.openSetting();
     }
 
     private enum SelectionSource { NONE, PLAYER, CHEST }
