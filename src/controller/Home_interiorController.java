@@ -815,6 +815,18 @@ public class Home_interiorController extends BaseMapController {
     private ImageView btnfishingplus1;
     @FXML
     private ImageView btncookingplus1;
+    @FXML
+    private ImageView Playerinvimg112;
+    @FXML
+    private Button Playerinvbtn112;
+    @FXML
+    private Label Playerinvlbl112;
+    @FXML
+    private ImageView Playerinvimg110;
+    @FXML
+    private Button Playerinvbtn110;
+    @FXML
+    private Label Playerinvlbl110;
 
     @FXML
     private void handleHPminusaction(MouseEvent event) { onStatusHpMinus(); }
@@ -1097,24 +1109,24 @@ public class Home_interiorController extends BaseMapController {
         );
 
         List<ImageView> playerInvImageNodes = List.of(
-            Playerinvimg, Playerinvimg1, Playerinvimg2, Playerinvimg3, Playerinvimg4,
-            Playerinvimg5, Playerinvimg6, Playerinvimg7, Playerinvimg8, Playerinvimg9,
-            Playerinvimg10, Playerinvimg11, Playerinvimg12, Playerinvimg13, Playerinvimg14,
-            Playerinvimg15, Playerinvimg16, Playerinvimg17, Playerinvimg18, Playerinvimg19
+            Playerinvimg112, Playerinvimg110, Playerinvimg21, Playerinvimg31, Playerinvimg41,
+            Playerinvimg51, Playerinvimg61, Playerinvimg71, Playerinvimg81, Playerinvimg91,
+            Playerinvimg101, Playerinvimg111, Playerinvimg121, Playerinvimg131, Playerinvimg141,
+            Playerinvimg151, Playerinvimg161, Playerinvimg171, Playerinvimg181, Playerinvimg191
         );
 
         List<Label> playerInvLabelNodes = List.of(
-            Playerinvlbl, Playerinvlbl1, Playerinvlbl2, Playerinvlbl3, Playerinvlbl4,
-            Playerinvlbl5, Playerinvlbl6, Playerinvlbl7, Playerinvlbl8, Playerinvlbl9,
-            Playerinvlbl10, Playerinvlbl11, Playerinvlbl12, Playerinvlbl13, Playerinvlbl14,
-            Playerinvlbl15, Playerinvlbl16, Playerinvlbl17, Playerinvlbl18, Playerinvlbl19
+            Playerinvlbl112, Playerinvlbl110, Playerinvlbl21, Playerinvlbl31, Playerinvlbl41,
+            Playerinvlbl51, Playerinvlbl61, Playerinvlbl71, Playerinvlbl81, Playerinvlbl91,
+            Playerinvlbl101, Playerinvlbl111, Playerinvlbl121, Playerinvlbl131, Playerinvlbl141,
+            Playerinvlbl151, Playerinvlbl161, Playerinvlbl171, Playerinvlbl181, Playerinvlbl191
         );
 
         List<Button> playerInvButtonNodes = List.of(
-            Playerinvbtn, Playerinvbtn1, Playerinvbtn2, Playerinvbtn3, Playerinvbtn4,
-            Playerinvbtn5, Playerinvbtn6, Playerinvbtn7, Playerinvbtn8, Playerinvbtn9,
-            Playerinvbtn10, Playerinvbtn11, Playerinvbtn12, Playerinvbtn13, Playerinvbtn14,
-            Playerinvbtn15, Playerinvbtn16, Playerinvbtn17, Playerinvbtn18, Playerinvbtn19
+            Playerinvbtn112, Playerinvbtn110, Playerinvbtn21, Playerinvbtn31, Playerinvbtn41,
+            Playerinvbtn51, Playerinvbtn61, Playerinvbtn71, Playerinvbtn81, Playerinvbtn91,
+            Playerinvbtn101, Playerinvbtn111, Playerinvbtn121, Playerinvbtn131, Playerinvbtn141,
+            Playerinvbtn151, Playerinvbtn161, Playerinvbtn171, Playerinvbtn181, Playerinvbtn191
         );
 
         bridgeSharedInventoryOverlayUi(
