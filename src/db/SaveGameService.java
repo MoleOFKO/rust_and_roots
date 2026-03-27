@@ -133,7 +133,7 @@ public class SaveGameService {
             }
         }
     }
-    
+
     private int getSkillIdForSave(Connection con, int saveId) throws Exception {
         String sql = "SELECT skill_id FROM save_game WHERE saved_id = ?";
         try (PreparedStatement ps = con.prepareStatement(sql)) {

@@ -104,18 +104,18 @@ public final class GameState {
     }
 
     private final PlayerSkills playerSkills = new PlayerSkills();
-    
+
     public PlayerSkills getPlayerSkills() {
         return playerSkills;
     }
-    
+
     public void addFarmingSkillExp(int amount) { playerSkills.addFarmingExp(amount); }
     public void addGatheringSkillExp(int amount) { playerSkills.addGatheringExp(amount); }
     public void addCraftingSkillExp(int amount) { playerSkills.addCraftingExp(amount); }
     public void addFishingSkillExp(int amount) { playerSkills.addFishingExp(amount); }
     public void addBattlingSkillExp(int amount) { playerSkills.addBattlingExp(amount); }
     public void addCookingSkillExp(int amount) { playerSkills.addCookingExp(amount); }
-    
+
     public static final class PlayerSkills {
         public static final int MAX_LEVEL = 10;
 

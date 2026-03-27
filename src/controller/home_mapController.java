@@ -6,6 +6,7 @@ import game.GameTimeManager;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
+
 import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -188,7 +189,7 @@ public class home_mapController extends BaseMapController {
     @FXML
     private Rectangle wall29;
     @FXML
-    private Rectangle wall30;
+     private Rectangle wall30;
     @FXML
     private Label hotbarguide;
     @FXML
@@ -546,7 +547,7 @@ public class home_mapController extends BaseMapController {
             System.out.println("Harvested: " + crop.getItem_name() + " x" + amount);
         });
     }
-
+    
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         super.initialize(url, rb);
@@ -560,15 +561,15 @@ public class home_mapController extends BaseMapController {
         if (playerState != null) {
             playerState.expProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
         }
-
+        
         if (farm1_button != null) {
             farm1_button.setOnAction(e -> openFarmTable());
         }
-
+   
         refreshStatusAllocationUi();
         refreshMenuState();
     }
-
+  
     private void openFarmTable() {
         if (farm1_button == null || farm1_button.isDisable()) return;
         gameState.setReturnScene("/view/home_map.fxml", SpawnTag.FROM_FARM);
@@ -609,21 +610,21 @@ public class home_mapController extends BaseMapController {
             Playerinvimg10, Playerinvimg11, Playerinvimg12, Playerinvimg13, Playerinvimg14,
             Playerinvimg15, Playerinvimg16, Playerinvimg17, Playerinvimg18, Playerinvimg19
         );
-
+        
         List<Label> playerInvLabelNodes = List.of(
             Playerinvlbl, Playerinvlbl1, Playerinvlbl2, Playerinvlbl3, Playerinvlbl4,
             Playerinvlbl5, Playerinvlbl6, Playerinvlbl7, Playerinvlbl8, Playerinvlbl9,
             Playerinvlbl10, Playerinvlbl11, Playerinvlbl12, Playerinvlbl13, Playerinvlbl14,
             Playerinvlbl15, Playerinvlbl16, Playerinvlbl17, Playerinvlbl18, Playerinvlbl19
         );
-
+        
         List<Button> playerInvButtonNodes = List.of(
             Playerinvbtn, Playerinvbtn1, Playerinvbtn2, Playerinvbtn3, Playerinvbtn4,
             Playerinvbtn5, Playerinvbtn6, Playerinvbtn7, Playerinvbtn8, Playerinvbtn9,
             Playerinvbtn10, Playerinvbtn11, Playerinvbtn12, Playerinvbtn13, Playerinvbtn14,
             Playerinvbtn15, Playerinvbtn16, Playerinvbtn17, Playerinvbtn18, Playerinvbtn19
         );
-
+        
         bridgeSharedInventoryOverlayUi(
             inventoryOverlay,
             menuInventory,
@@ -642,11 +643,11 @@ public class home_mapController extends BaseMapController {
             playerInvLabelNodes,
             playerInvButtonNodes
         );
-
+        
         rebuildSharedUiAfterBridge();
     }
     
-    private void bindStatusLabels() {
+     private void bindStatusLabels() {
         if (playerState == null) return;
 
         playerState.playerNameProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
@@ -658,9 +659,9 @@ public class home_mapController extends BaseMapController {
         playerState.strProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
         playerState.vitProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
         playerState.dexProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
-        playerState.agiProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
-    }
-
+        playerState.agiProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());      
+     }
+        
     private void bindSettingControls() {
         GameTimeManager time = GameTimeManager.get();
 
@@ -717,7 +718,7 @@ public class home_mapController extends BaseMapController {
         refreshSkillsView();
         refreshStatusButtons();
     }
-
+    
     private void refreshStatusView() {
         if (playerState == null) return;
 
@@ -737,12 +738,12 @@ public class home_mapController extends BaseMapController {
         if (statusVIT != null) statusVIT.setText("VIT : " + playerState.getVit() + formatPending(pendingVitPoints));
         if (statusDEX != null) statusDEX.setText("DEX : " + playerState.getDex() + formatPending(pendingDexPoints));
         if (statusAGI != null) statusAGI.setText("AGI : " + playerState.getAgi() + formatPending(pendingAgiPoints));
-    }
+         }
 
     private String formatPending(int points) {
         return points <= 0 ? "" : "(+" + points + ")";
     }
-
+    
     private String formatPendingSkill(int value) {
         return value <= 0 ? "" : "(+" + value + ")";
     }
@@ -793,7 +794,7 @@ public class home_mapController extends BaseMapController {
             configureImageButton(btnAGIminus, false, false, 1.0);
             return;
         }
-
+        
         configureImageButton(btnConfirm, statusAllocationMode && getPendingExpCost() > 0, statusAllocationMode, 1.0);
 
         configureImageButton(btnHPplus, canIncreaseStat("hp"), statusAllocationMode, 1.0);
@@ -809,7 +810,7 @@ public class home_mapController extends BaseMapController {
         configureImageButton(btnVITminus, statusAllocationMode && pendingVitPoints > 0, statusAllocationMode, 1.0);
         configureImageButton(btnDEXminus, statusAllocationMode && pendingDexPoints > 0, statusAllocationMode, 1.0);
         configureImageButton(btnAGIminus, statusAllocationMode && pendingAgiPoints > 0, statusAllocationMode, 1.0);
-
+    
         configureImageButton(btnfarmingplus1, false, false, 1.0);
         configureImageButton(btngatheringplus1, false, false, 1.0);
         configureImageButton(btncraftingplus1, false, false, 1.0);
@@ -838,7 +839,7 @@ public class home_mapController extends BaseMapController {
         gameState.setCurrentMerchantItems(merChant.getItems());
         stopAndSwitchScene("/view/shop.fxml", SpawnTag.FROM_SHOP);
     }
-
+    
     @FXML
     private void handledoorbtnaction(ActionEvent event) throws IOException {
         GameState.get().setReturnScene("/view/home_map.fxml", SpawnTag.FROM_DOOR);
@@ -862,7 +863,7 @@ public class home_mapController extends BaseMapController {
         GameState.get().setReturnScene("/view/home_map.fxml", SpawnTag.FROM_UP);
         SceneManager.switchScene("/view/upper_map.fxml", SpawnTag.FROM_DOWN);
     }
-
+ 
     @FXML private void handleHPminusaction(MouseEvent event) { onStatusHpMinus(); }
     @FXML private void handleHPplusaction(MouseEvent event) { onStatusHpPlus(); }
     @FXML private void handleSPminusaction(MouseEvent event) { onStatusSpMinus(); }
@@ -889,7 +890,7 @@ public class home_mapController extends BaseMapController {
 
     @FXML private void handleusepointaction(MouseEvent event) { onSharedUsePoint(); }
     @FXML private void handleconfirmaction(MouseEvent event) { onSharedConfirm(); }
-
+      
     @FXML
     private void handlesaveexitaction(ActionEvent event) {
         try {
@@ -902,14 +903,14 @@ public class home_mapController extends BaseMapController {
             e.printStackTrace();
         }
     }
-
+    
     @FXML
     private void handlesave(ActionEvent event) {
         capturePlayerSnapshot();
         GameState.get().setSaveMenuMode(true);
         SceneManager.switchScene("/view/saveloads.fxml");
     }
-
+    
     @FXML
     private void handleload(ActionEvent event) {
         capturePlayerSnapshot();
@@ -936,4 +937,5 @@ public class home_mapController extends BaseMapController {
     @FXML private void handlecloseaction(MouseEvent event) { closeMenuScreen(); }
     @FXML private void handleopenstatusaction(ActionEvent event) { openStatus(); }
     @FXML private void handleopensettingaction(ActionEvent event) { openSetting(); }
+    
 }

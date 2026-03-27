@@ -169,13 +169,14 @@ public class LoginController implements Initializable {
                                     } else {
                                         gs.setCurrentSaveId(-1);
                                     }
-                                }
+                                }      
+                                
                             }
-                        }
+                        }            
+                        
                     }
+                    util.SceneManager.switchScene("/view/main_menu.fxml");
                 }
-
-                util.SceneManager.switchScene("/view/main_menu.fxml");
             }
             case "owner" -> {
                 util.SceneManager.switchScene("/view/account_view.fxml");

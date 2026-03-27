@@ -482,7 +482,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
             hotbarguide.setManaged(!visible);
             hotbarguide.setDisable(visible);
         }
-
+        
         if(playerState != null){
             playerState.setHotbarVisible(visible);
         }
@@ -495,14 +495,14 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
     protected void setInventoryOpen(boolean open) {
         if (inventoryOverlay == null) return;
-
+        
         if (!open) {
             statusAllocationMode = false;
             skillAllocationMode = false;
             resetPendingStatusChanges();
             resetPendingSkillChanges();
         }
-
+        
         inventoryOverlay.setVisible(open);
         inventoryOverlay.setManaged(open);
         inventoryOverlay.setDisable(!open);
@@ -814,6 +814,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         refreshStatusAllocationUi();
     }
 
+    
     // ---------- Shared skills allocation logic ----------
     protected void resetPendingSkillChanges() {
         pendingCookingSkillExp = 0;
@@ -936,7 +937,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
         refreshStatusAllocationUi();
     }
-
+    
     // ---------- Shared status action delegates ----------
     protected void onStatusHpMinus() { changePendingStat("hp", -1); }
     protected void onStatusHpPlus() { changePendingStat("hp", 1); }
@@ -952,8 +953,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     protected void onStatusAgiPlus() { changePendingStat("agi", 1); }
     protected void onStatusUsePoint() { toggleStatusAllocationMode(); }
     protected void onStatusConfirm() { applyPendingStatusChanges(); }
-
-    // ---------- Shared skill action delegates ----------
+     // ---------- Shared skill action delegates ----------
     protected void onSkillFarmingMinus() { changePendingSkill("farming", -1); }
     protected void onSkillFarmingPlus() { changePendingSkill("farming", 1); }
     protected void onSkillGatheringMinus() { changePendingSkill("gathering", -1); }
@@ -980,7 +980,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
             applyPendingStatusChanges();
         }
     }
-
+    
     protected void openInventory(){
         if (inventoryOverlay != null && !inventoryOverlay.isVisible()) {
             setInventoryOpen(true);

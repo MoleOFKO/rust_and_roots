@@ -40,6 +40,7 @@ import javafx.scene.layout.Pane;
 import model.Inventory;
 import model.ItemDatabase;
 import model.item;
+import javafx.application.Platform;
 import util.SceneManager;
 
 /**
@@ -917,7 +918,7 @@ public class Home_interiorController extends BaseMapController {
     private void handleopensettingaction(ActionEvent event) {
         super.openSetting();
     }
-
+    
     @FXML
     private void handlebtnskillacion(MouseEvent event) {
         super.setSkillsOpen(true);
