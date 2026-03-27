@@ -4,8 +4,6 @@
  */
 package controller;
 
-import db.SaveGameService;
-import game.GameState;
 import game.GameTimeManager;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -31,7 +29,6 @@ import util.SpawnTag;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;
 import javafx.collections.MapChangeListener;
 import javafx.scene.control.Slider;
@@ -40,7 +37,6 @@ import javafx.scene.layout.Pane;
 import model.Inventory;
 import model.ItemDatabase;
 import model.item;
-import util.SceneManager;
 
 /**
  * FXML Controller class
@@ -779,42 +775,6 @@ public class Home_interiorController extends BaseMapController {
     private Button opensetting;
     @FXML
     private Label hotbarguide;
-    @FXML
-    private Group statusgroup;
-    @FXML
-    private ImageView btnskill;
-    @FXML
-    private ImageView btnstatus;
-    @FXML
-    private Label farming;
-    @FXML
-    private Label gathering;
-    @FXML
-    private Label crafting;
-    @FXML
-    private Label fishing;
-    @FXML
-    private Label cooking;
-    @FXML
-    private ImageView btnfarmingminus1;
-    @FXML
-    private ImageView btnfarmingplus1;
-    @FXML
-    private ImageView btngatheringminus1;
-    @FXML
-    private ImageView btncraftingminus1;
-    @FXML
-    private ImageView btnfishingminus1;
-    @FXML
-    private ImageView btncookingminus1;
-    @FXML
-    private ImageView btngatheringplus1;
-    @FXML
-    private ImageView btncraftingplus1;
-    @FXML
-    private ImageView btnfishingplus1;
-    @FXML
-    private ImageView btncookingplus1;
 
     @FXML
     private void handleHPminusaction(MouseEvent event) { onStatusHpMinus(); }
@@ -860,30 +820,14 @@ public class Home_interiorController extends BaseMapController {
 
     @FXML
     private void handlesaveexitaction(ActionEvent event) {
-        try {
-            capturePlayerSnapshot();
-            new SaveGameService().saveGameToSlot(GameState.get(), GameState.get().getSelectedSaveSlot());
-            if (gameLoop != null) gameLoop.stop();
-            if (player != null) player.stop();
-            Platform.exit();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     @FXML
     private void handlesave(ActionEvent event) {
-        capturePlayerSnapshot();
-        GameState.get().setSaveMenuMode(true);
-        SceneManager.switchScene("/view/saveloads.fxml");
     }
 
     @FXML
     private void handleload(ActionEvent event) {
-        capturePlayerSnapshot();
-        GameState.get().setSaveMenuMode(false);
-        GameState.get().setReturnScene("/view/home_map.fxml", SpawnTag.DEFAULT);
-        SceneManager.switchScene("/view/saveloads.fxml");
     }
 
     @FXML
@@ -904,68 +848,6 @@ public class Home_interiorController extends BaseMapController {
     @FXML
     private void handleopensettingaction(ActionEvent event) {
         super.openSetting();
-    }
-
-    @FXML
-    private void handlebtnskillacion(MouseEvent event) {
-        super.setSkillsOpen(true);
-        super.setStatusOpen(false);
-    }
-
-    @FXML
-    private void handlebtnstatusaction(MouseEvent event) {
-        super.setStatusOpen(true);
-        super.setSkillsOpen(false);
-    }
-
-    @FXML
-    private void handlefarmingminusaction(MouseEvent event) {
-        onSkillFarmingMinus();
-    }
-
-    @FXML
-    private void handlefarmingplusaction(MouseEvent event) {
-        onSkillFarmingPlus();
-    }
-
-    @FXML
-    private void handlegatheringminusaction(MouseEvent event) {
-        onSkillGatheringMinus();
-    }
-
-    @FXML
-    private void handlecraftingminusaction(MouseEvent event) {
-        onSkillCraftingMinus();
-    }
-
-    @FXML
-    private void handlefishingminusaction(MouseEvent event) {
-        onSkillFishingMinus();
-    }
-
-    @FXML
-    private void handlecookingminusaction(MouseEvent event) {
-        onSkillCookingMinus();
-    }
-
-    @FXML
-    private void handlegatheringplusaction(MouseEvent event) {
-        onSkillGatheringPlus();
-    }
-
-    @FXML
-    private void handlecraftingplusaction(MouseEvent event) {
-        onSkillCraftingPlus();
-    }
-
-    @FXML
-    private void handlefishingplusaction(MouseEvent event) {
-        onSkillFishingPlus();
-    }
-
-    @FXML
-    private void handlecookingplusaction(MouseEvent event) {
-        onSkillCookingPlus();
     }
 
     private enum SelectionSource { NONE, PLAYER, CHEST }
@@ -995,7 +877,7 @@ public class Home_interiorController extends BaseMapController {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         super.initialize(url, rb);
-        bridgeInteriorSharedUi();
+
         ItemDatabase.loadItems();
         chestInventory = gameState.getChestInventory();
         setupChestUi();
@@ -1079,64 +961,6 @@ public class Home_interiorController extends BaseMapController {
         inv.itemsProperty().addListener(
             (MapChangeListener<Integer, IntegerProperty>) change -> refreshInteriorInventorySlots()
         );
-    }
-    
-    private void bridgeInteriorSharedUi() {
-        List<StackPane> hotbarSlotNodes = List.of(Hslot, Hslot1, Hslot2, Hslot3, Hslot4);
-        List<ImageView> hotbarImageNodes = List.of(slotImg, slotImg1, slotImg2, slotImg3, slotImg4);
-        List<Label> hotbarLabelNodes = List.of(slotLb, slotLb1, slotLb2, slotLb3, slotLb4);
-        List<Button> hotbarButtonNodes = List.of(slotBtn, slotBtn1, slotBtn2, slotBtn3, slotBtn4);
-
-        bridgeSharedHotbarUi(
-            hotbar,
-            hotbarguide,
-            hotbarSlotNodes,
-            hotbarImageNodes,
-            hotbarLabelNodes,
-            hotbarButtonNodes
-        );
-
-        List<ImageView> playerInvImageNodes = List.of(
-            Playerinvimg, Playerinvimg1, Playerinvimg2, Playerinvimg3, Playerinvimg4,
-            Playerinvimg5, Playerinvimg6, Playerinvimg7, Playerinvimg8, Playerinvimg9,
-            Playerinvimg10, Playerinvimg11, Playerinvimg12, Playerinvimg13, Playerinvimg14,
-            Playerinvimg15, Playerinvimg16, Playerinvimg17, Playerinvimg18, Playerinvimg19
-        );
-
-        List<Label> playerInvLabelNodes = List.of(
-            Playerinvlbl, Playerinvlbl1, Playerinvlbl2, Playerinvlbl3, Playerinvlbl4,
-            Playerinvlbl5, Playerinvlbl6, Playerinvlbl7, Playerinvlbl8, Playerinvlbl9,
-            Playerinvlbl10, Playerinvlbl11, Playerinvlbl12, Playerinvlbl13, Playerinvlbl14,
-            Playerinvlbl15, Playerinvlbl16, Playerinvlbl17, Playerinvlbl18, Playerinvlbl19
-        );
-
-        List<Button> playerInvButtonNodes = List.of(
-            Playerinvbtn, Playerinvbtn1, Playerinvbtn2, Playerinvbtn3, Playerinvbtn4,
-            Playerinvbtn5, Playerinvbtn6, Playerinvbtn7, Playerinvbtn8, Playerinvbtn9,
-            Playerinvbtn10, Playerinvbtn11, Playerinvbtn12, Playerinvbtn13, Playerinvbtn14,
-            Playerinvbtn15, Playerinvbtn16, Playerinvbtn17, Playerinvbtn18, Playerinvbtn19
-        );
-
-        bridgeSharedInventoryOverlayUi(
-            inventoryOverlay,
-            menuInventory,
-            statusTab,
-            settingsTab,
-            statusgroup,
-            skillsgroup,
-            player_inv_group1,
-            openInventory,
-            openstatus,
-            opensetting,
-            btnclose,
-            btnskill,
-            btnstatus,
-            playerInvImageNodes,
-            playerInvLabelNodes,
-            playerInvButtonNodes
-        );
-
-        rebuildSharedUiAfterBridge();
     }
     
     private void refreshInteriorInventorySlots() {

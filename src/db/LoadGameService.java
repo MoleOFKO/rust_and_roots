@@ -30,7 +30,6 @@ public class LoadGameService {
             }
 
             loadPlayerStats(con, gs, saveId);
-            loadPlayerSkills(con, gs, saveId);
             loadPlayerInventory(con, gs, saveId);
             loadHotbar(con, gs, saveId);
             loadChestItems(con, gs, saveId);
@@ -111,33 +110,6 @@ public class LoadGameService {
         }
     }
 
-    private void loadPlayerSkills(Connection con, GameState gs, int saveId) throws Exception {
-        String sql = """
-            SELECT sk.farming, sk.gathering, sk.crafting, sk.fishing, sk.battling, sk.cooking
-            FROM save_game sg
-            LEFT JOIN skill sk ON sg.skill_id = sk.skill_id
-            WHERE sg.saved_id = ?
-            """;
-
-        try (PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1, saveId);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                GameState.PlayerSkills skills = gs.getPlayerSkills();
-                skills.clear();
-
-                if (!rs.next()) return;
-
-                skills.setFarmingExp(rs.getInt("farming"));
-                skills.setGatheringExp(rs.getInt("gathering"));
-                skills.setCraftingExp(rs.getInt("crafting"));
-                skills.setFishingExp(rs.getInt("fishing"));
-                skills.setBattlingExp(rs.getInt("battling"));
-                skills.setCookingExp(rs.getInt("cooking"));
-            }
-        }
-    }
-    
     private void loadPlayerInventory(Connection con, GameState gs, int saveId) throws Exception {
         Inventory inv = gs.getPlayerState().getInventory();
         clearInventoryItems(inv);
@@ -282,7 +254,6 @@ public class LoadGameService {
             psState.clearHotbarItem(i);
         }
 
-        gs.getPlayerSkills().clear();
         clearInventoryItems(gs.getChestInventory());
         clearFarmState(gs.getFarmState("home_map"));
         clearFarmState(gs.getFarmState("Home_interior"));

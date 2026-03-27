@@ -200,13 +200,6 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     protected int pendingDexPoints = 0;
     protected int pendingAgiPoints = 0;
     
-    protected boolean skillAllocationMode = false;
-    protected int pendingFarmingSkillExp = 0;
-    protected int pendingGatheringSkillExp = 0;
-    protected int pendingCraftingSkillExp = 0;
-    protected int pendingFishingSkillExp = 0;
-    protected int pendingCookingSkillExp = 0;
-    
     protected enum MenuTab { INVENTORY, STATUS, SETTINGS }
     protected MenuTab activeMenuTab = MenuTab.INVENTORY;
     
@@ -358,87 +351,6 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         human.setLayoutX(human.getLayoutX() + dx);
         human.setLayoutY(human.getLayoutY() + dy);
     }
-    
-    protected final void bridgeSharedHotbarUi(
-            HBox hotbarNode,
-            Label hotbarGuideNode,
-            List<StackPane> slotNodes,
-            List<ImageView> slotImageNodes,
-            List<Label> slotLabelNodes,
-            List<Button> slotButtonNodes
-    ) {
-        this.hotbar = hotbarNode;
-        this.hotbarguide = hotbarGuideNode;
-
-        hotbarSlots.clear();
-        hotbarImages.clear();
-        hotbarLabels.clear();
-        hotbarSlotButtons.clear();
-
-        if (slotNodes != null) hotbarSlots.addAll(slotNodes);
-        if (slotImageNodes != null) hotbarImages.addAll(slotImageNodes);
-        if (slotLabelNodes != null) hotbarLabels.addAll(slotLabelNodes);
-        if (slotButtonNodes != null) hotbarSlotButtons.addAll(slotButtonNodes);
-    }
-
-    protected final void bridgeSharedInventoryOverlayUi(
-            Pane inventoryOverlayNode,
-            Group menuInventoryNode,
-            Group statusTabNode,
-            Group settingsTabNode,
-            Group statusGroupNode,
-            Group skillsGroupNode,
-            Group playerInventoryGroupNode,
-            Button openInventoryNode,
-            Button openStatusNode,
-            Button openSettingNode,
-            ImageView closeButtonNode,
-            ImageView btnSkillNode,
-            ImageView btnStatusNode,
-            List<ImageView> playerInventoryImageNodes,
-            List<Label> playerInventoryLabelNodes,
-            List<Button> playerInventoryButtonNodes
-    ) {
-        this.inventoryOverlay = inventoryOverlayNode;
-        this.menuInventory = menuInventoryNode;
-        this.statusTab = statusTabNode;
-        this.settingsTab = settingsTabNode;
-        this.statusgroup = statusGroupNode;
-        this.skillsgroup = skillsGroupNode;
-        this.player_inv_group = playerInventoryGroupNode;
-
-        this.openInventory = openInventoryNode;
-        this.openstatus = openStatusNode;
-        this.opensetting = openSettingNode;
-        this.btnclose = closeButtonNode;
-        this.btnskill = btnSkillNode;
-        this.btnstatus = btnStatusNode;
-
-        playerInventoryImages.clear();
-        playerInventoryLabels.clear();
-        playerInventoryButtons.clear();
-
-        if (playerInventoryImageNodes != null) playerInventoryImages.addAll(playerInventoryImageNodes);
-        if (playerInventoryLabelNodes != null) playerInventoryLabels.addAll(playerInventoryLabelNodes);
-        if (playerInventoryButtonNodes != null) playerInventoryButtons.addAll(playerInventoryButtonNodes);
-    }
-
-    protected final void rebuildSharedUiAfterBridge() {
-        setupInventoryUiIfPresent();
-        setupHotbarIfPresent();
-        setupMenuTabs();
-        refreshPlayerInventoryView();
-        refreshHotbarView();
-        refreshMenuState();
-
-        if (playerState != null) {
-            setHotbarVisible(playerState.isHotbarVisible());
-            int selected = playerState.getselectedHotbarIndex();
-            if (selected >= 0 && selected < hotbarSlots.size()) {
-                selectHotbarSlot(selected);
-            }
-        }
-    }
 
     protected void selectHotbarSlot(int idx) {
         if (idx < 0 || idx >= hotbarSlots.size()) return;
@@ -477,12 +389,10 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         hotbar.setManaged(visible);
         hotbar.setDisable(!visible);
 
-        if (hotbarguide != null) {
-            hotbarguide.setVisible(!visible);
-            hotbarguide.setManaged(!visible);
-            hotbarguide.setDisable(visible);
-        }
-
+        hotbarguide.setVisible(!visible);
+        hotbarguide.setManaged(!visible);
+        hotbarguide.setDisable(visible);
+        
         if(playerState != null){
             playerState.setHotbarVisible(visible);
         }
@@ -495,13 +405,6 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
     protected void setInventoryOpen(boolean open) {
         if (inventoryOverlay == null) return;
-
-        if (!open) {
-            statusAllocationMode = false;
-            skillAllocationMode = false;
-            resetPendingStatusChanges();
-            resetPendingSkillChanges();
-        }
 
         inventoryOverlay.setVisible(open);
         inventoryOverlay.setManaged(open);
@@ -814,129 +717,6 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         refreshStatusAllocationUi();
     }
 
-    // ---------- Shared skills allocation logic ----------
-    protected void resetPendingSkillChanges() {
-        pendingCookingSkillExp = 0;
-        pendingCraftingSkillExp = 0;
-        pendingFarmingSkillExp = 0;
-        pendingFishingSkillExp = 0;
-        pendingGatheringSkillExp = 0;
-    }
-
-    protected int getPendingSkillExp(String skillKey) {
-        return switch (Objects.requireNonNullElse(skillKey, "")) {
-            case "farming" -> pendingFarmingSkillExp;
-            case "gathering" -> pendingGatheringSkillExp;
-            case "crafting" -> pendingCraftingSkillExp;
-            case "fishing" -> pendingFishingSkillExp;
-            case "cooking" -> pendingCookingSkillExp;
-            default -> 0;
-        };
-    }
-
-    protected void setPendingSkillExp(String skillKey, int value) {
-        int nextValue = Math.max(0, value);
-        switch (Objects.requireNonNullElse(skillKey, "")) {
-            case "farming" -> pendingFarmingSkillExp = nextValue;
-            case "gathering" -> pendingGatheringSkillExp = nextValue;
-            case "crafting" -> pendingCraftingSkillExp = nextValue;
-            case "fishing" -> pendingFishingSkillExp = nextValue;
-            case "cooking" -> pendingCookingSkillExp = nextValue;
-            default -> {
-            }
-        }
-    }
-
-    protected int getPendingSkillExpTotal() {
-        return pendingFarmingSkillExp
-            + pendingGatheringSkillExp
-            + pendingCraftingSkillExp
-            + pendingFishingSkillExp
-            + pendingCookingSkillExp;
-    }
-
-    protected boolean isSkillsScreenVisible() {
-        return skillsgroup != null && skillsgroup.isVisible();
-    }
-
-    protected boolean canIncreaseSkill(String skillKey) {
-        if (playerState == null || gameState == null || !skillAllocationMode) return false;
-
-        GameState.PlayerSkills skills = gameState.getPlayerSkills();
-        int currentTotalExp = switch (Objects.requireNonNullElse(skillKey, "")) {
-            case "farming" -> skills.getFarmingExp();
-            case "gathering" -> skills.getGatheringExp();
-            case "crafting" -> skills.getCraftingExp();
-            case "fishing" -> skills.getFishingExp();
-            case "cooking" -> skills.getCookingExp();
-            default -> -1;
-        };
-
-        if (currentTotalExp < 0) return false;
-        if (playerState.getExp() < getPendingSkillExpTotal() + 1) return false;
-
-        int previewTotal = currentTotalExp + getPendingSkillExp(skillKey);
-        int previewLevel = skills.getLevelFromTotalExp(previewTotal);
-        return previewLevel < GameState.PlayerSkills.MAX_LEVEL;
-    }
-
-    protected void changePendingSkill(String skillKey, int delta) {
-        if (playerState == null || delta == 0 || !skillAllocationMode) return;
-
-        int currentPending = getPendingSkillExp(skillKey);
-
-        if (delta < 0) {
-            if (currentPending <= 0) return;
-            setPendingSkillExp(skillKey, currentPending - 1);
-            refreshStatusAllocationUi();
-            return;
-        }
-
-        if (!canIncreaseSkill(skillKey)) return;
-
-        setPendingSkillExp(skillKey, currentPending + 1);
-        refreshStatusAllocationUi();
-    }
-
-    protected void applyPendingSkillChanges() {
-        if (playerState == null || gameState == null) return;
-
-        int spentExp = getPendingSkillExpTotal();
-        if (spentExp <= 0) return;
-        if (playerState.getExp() < spentExp) {
-            refreshStatusAllocationUi();
-            return;
-        }
-
-        playerState.setExp(playerState.getExp() - spentExp);
-
-        if (pendingFarmingSkillExp > 0) gameState.getPlayerSkills().addFarmingExp(pendingFarmingSkillExp);
-        if (pendingGatheringSkillExp > 0) gameState.getPlayerSkills().addGatheringExp(pendingGatheringSkillExp);
-        if (pendingCraftingSkillExp > 0) gameState.getPlayerSkills().addCraftingExp(pendingCraftingSkillExp);
-        if (pendingFishingSkillExp > 0) gameState.getPlayerSkills().addFishingExp(pendingFishingSkillExp);
-        if (pendingCookingSkillExp > 0) gameState.getPlayerSkills().addCookingExp(pendingCookingSkillExp);
-
-        skillAllocationMode = false;
-        resetPendingSkillChanges();
-        refreshStatusAllocationUi();
-    }
-
-    protected void toggleSkillAllocationMode() {
-        if (playerState == null || playerState.getExp() <= 0) {
-            refreshStatusAllocationUi();
-            return;
-        }
-
-        if (skillAllocationMode) {
-            skillAllocationMode = false;
-            resetPendingSkillChanges();
-        } else {
-            skillAllocationMode = true;
-        }
-
-        refreshStatusAllocationUi();
-    }
-
     // ---------- Shared status action delegates ----------
     protected void onStatusHpMinus() { changePendingStat("hp", -1); }
     protected void onStatusHpPlus() { changePendingStat("hp", 1); }
@@ -952,35 +732,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     protected void onStatusAgiPlus() { changePendingStat("agi", 1); }
     protected void onStatusUsePoint() { toggleStatusAllocationMode(); }
     protected void onStatusConfirm() { applyPendingStatusChanges(); }
-
-    // ---------- Shared skill action delegates ----------
-    protected void onSkillFarmingMinus() { changePendingSkill("farming", -1); }
-    protected void onSkillFarmingPlus() { changePendingSkill("farming", 1); }
-    protected void onSkillGatheringMinus() { changePendingSkill("gathering", -1); }
-    protected void onSkillGatheringPlus() { changePendingSkill("gathering", 1); }
-    protected void onSkillCraftingMinus() { changePendingSkill("crafting", -1); }
-    protected void onSkillCraftingPlus() { changePendingSkill("crafting", 1); }
-    protected void onSkillFishingMinus() { changePendingSkill("fishing", -1); }
-    protected void onSkillFishingPlus() { changePendingSkill("fishing", 1); }
-    protected void onSkillCookingMinus() { changePendingSkill("cooking", -1); }
-    protected void onSkillCookingPlus() { changePendingSkill("cooking", 1); }
-
-    protected void onSharedUsePoint() {
-        if (isSkillsScreenVisible()) {
-            toggleSkillAllocationMode();
-        } else {
-            toggleStatusAllocationMode();
-        }
-    }
-
-    protected void onSharedConfirm() {
-        if (isSkillsScreenVisible()) {
-            applyPendingSkillChanges();
-        } else {
-            applyPendingStatusChanges();
-        }
-    }
-
+    
     protected void openInventory(){
         if (inventoryOverlay != null && !inventoryOverlay.isVisible()) {
             setInventoryOpen(true);

@@ -15,6 +15,7 @@ import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
+import model.ItemDatabase;
 import util.WorldScaler;
 
 /**
@@ -50,7 +51,7 @@ public class Main_menuController implements Initializable {
 
     @FXML
     private void handlebtnexitaction(ActionEvent event) {
-        util.SceneManager.switchScene("/view/login.fxml");
+        Platform.exit();
     }
 
     @FXML

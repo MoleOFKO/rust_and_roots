@@ -241,7 +241,6 @@ public class New_gameController implements Initializable, SceneController {
         playerState.setVit(NEW_GAME_BASE_VIT);
         playerState.setDex(NEW_GAME_BASE_DEX);
         playerState.setAgi(NEW_GAME_BASE_AGI);
-        GameState.get().getPlayerSkills().clear();
         playerState.setExp(NEW_GAME_STARTING_EXP);
 
         resetPendingStatusChanges();

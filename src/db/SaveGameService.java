@@ -34,7 +34,6 @@ public class SaveGameService {
 
             saveMainRow(con, gs);
             savePlayerStats(con, gs);
-            savePlayerSkills(con, gs);
             savePlayerInventory(con, gs);
             saveHotbar(con, gs);
             saveFarmPlots(con, gs);
@@ -110,44 +109,6 @@ public class SaveGameService {
         }
     }
 
-    private int createSkillRow(Connection con, GameState gs) throws Exception {
-        GameState.PlayerSkills skills = gs.getPlayerSkills();
-
-        String sql = """
-            INSERT INTO skill (farming, gathering, crafting, fishing, battling, cooking)
-            VALUES (?, ?, ?, ?, ?, ?)
-            """;
-
-        try (PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            ps.setInt(1, skills.getFarmingExp());
-            ps.setInt(2, skills.getGatheringExp());
-            ps.setInt(3, skills.getCraftingExp());
-            ps.setInt(4, skills.getFishingExp());
-            ps.setInt(5, skills.getBattlingExp());
-            ps.setInt(6, skills.getCookingExp());
-            ps.executeUpdate();
-
-            try (ResultSet rs = ps.getGeneratedKeys()) {
-                if (!rs.next()) throw new IllegalStateException("Failed to create skill row.");
-                return rs.getInt(1);
-            }
-        }
-    }
-    
-    private int getSkillIdForSave(Connection con, int saveId) throws Exception {
-        String sql = "SELECT skill_id FROM save_game WHERE saved_id = ?";
-        try (PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1, saveId);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    int skillId = rs.getInt("skill_id");
-                    if (!rs.wasNull()) return skillId;
-                }
-            }
-        }
-        return -1;
-    }
-    
     private void saveMainRow(Connection con, GameState gs) throws Exception {
         String sql = """
             UPDATE save_game
@@ -201,40 +162,6 @@ public class SaveGameService {
         }
     }
 
-    private void savePlayerSkills(Connection con, GameState gs) throws Exception {
-        int skillId = getSkillIdForSave(con, gs.getCurrentSaveId());
-
-        if (skillId <= 0) {
-            skillId = createSkillRow(con, gs);
-
-            try (PreparedStatement ps = con.prepareStatement(
-                    "UPDATE save_game SET skill_id = ? WHERE saved_id = ?")) {
-                ps.setInt(1, skillId);
-                ps.setInt(2, gs.getCurrentSaveId());
-                ps.executeUpdate();
-            }
-        }
-
-        GameState.PlayerSkills skills = gs.getPlayerSkills();
-
-        String sql = """
-            UPDATE skill
-            SET farming = ?, gathering = ?, crafting = ?, fishing = ?, battling = ?, cooking = ?
-            WHERE skill_id = ?
-            """;
-
-        try (PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1, skills.getFarmingExp());
-            ps.setInt(2, skills.getGatheringExp());
-            ps.setInt(3, skills.getCraftingExp());
-            ps.setInt(4, skills.getFishingExp());
-            ps.setInt(5, skills.getBattlingExp());
-            ps.setInt(6, skills.getCookingExp());
-            ps.setInt(7, skillId);
-            ps.executeUpdate();
-        }
-    }
-    
     private void savePlayerInventory(Connection con, GameState gs) throws Exception {
         int saveId = gs.getCurrentSaveId();
         Inventory inv = gs.getPlayerState().getInventory();
@@ -418,7 +345,6 @@ public class SaveGameService {
 
             saveMainRow(con, gs);
             savePlayerStats(con, gs);
-            savePlayerSkills(con, gs);
             savePlayerInventory(con, gs);
             saveHotbar(con, gs);
             saveFarmPlots(con, gs);
