@@ -251,13 +251,13 @@
                                     <children>
                                        <Pane layoutX="5.0" layoutY="2.0">
                                           <children>
-                                             <ImageView fx:id="Playerinvimg1" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
+                                             <ImageView fx:id="Playerinvimg112" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
                                                 <image>
                                                    <Image url="@../image/items/tomato.png" />
                                                 </image>
                                              </ImageView>
-                                             <Button fx:id="Playerinvbtn1" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
-                                             <Label fx:id="Playerinvlbl1" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
+                                             <Button fx:id="Playerinvbtn112" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
+                                             <Label fx:id="Playerinvlbl112" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                                 <font>
                                                    <Font name="System Bold" size="12.0" />
                                                 </font>
@@ -266,13 +266,13 @@
                                        </Pane>
                                        <Pane layoutX="99.0" layoutY="2.0">
                                           <children>
-                                             <ImageView fx:id="Playerinvimg11" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
+                                             <ImageView fx:id="Playerinvimg110" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
                                                 <image>
                                                    <Image url="@../image/items/tomato.png" />
                                                 </image>
                                              </ImageView>
-                                             <Button fx:id="Playerinvbtn11" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
-                                             <Label fx:id="Playerinvlbl11" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
+                                             <Button fx:id="Playerinvbtn110" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
+                                             <Label fx:id="Playerinvlbl110" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                                 <font>
                                                    <Font name="System Bold" size="12.0" />
                                                 </font>
