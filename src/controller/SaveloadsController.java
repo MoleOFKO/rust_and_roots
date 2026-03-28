@@ -103,7 +103,7 @@ public class SaveloadsController implements Initializable {
 
         try (Connection con = db.getConnection()) {
             String sql = """
-                SELECT saved_name, last_saved_date
+                SELECT saved_name
                 FROM save_game
                 WHERE character_id = ? AND saved_name = ?
                 LIMIT 1
@@ -115,7 +115,7 @@ public class SaveloadsController implements Initializable {
 
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
-                        return slotName + " - " + rs.getTimestamp("last_saved_date");
+                        return slotName;
                     }
                 }
             }

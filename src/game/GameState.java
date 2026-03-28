@@ -259,24 +259,62 @@ public final class GameState {
     public PlayerState getPlayerState() { return playerState; }
     public Inventory getChestInventory() { return chestInventory; }
 
-    public void setPendingSpawn(SpawnTag tag) { this.pendingSpawn = (tag == null) ? SpawnTag.DEFAULT : tag; }
-    public SpawnTag consumePendingSpawn() { SpawnTag t = pendingSpawn; pendingSpawn = SpawnTag.DEFAULT; return t; }
-    public FarmState getFarmState(String mapKey) { return farmByMap.computeIfAbsent(mapKey, k -> new FarmState()); }
-    public void setReturnScene(String fxml, SpawnTag spawn) { this.returnFxml = fxml; this.returnSpawn = (spawn == null) ? SpawnTag.DEFAULT : spawn; }
-    public String getReturnFxml() { return returnFxml; }
-    public SpawnTag getReturnSpawn() { return returnSpawn; }
-    public void setCurrentMerchantItems(List<model.Merchant.ShopItem> items) { this.currentMerchantItems = (items == null) ? List.of() : List.copyOf(items); }
-    public List<model.Merchant.ShopItem> getCurrentMerchantItems() { return currentMerchantItems; }
-    public int getShopRandomDay() { return shopRandomDay; }
-    public void setShopRandomDay(int day) { this.shopRandomDay = day; }
-    public List<Integer> getDailyRandomShopItemIds() { return List.copyOf(dailyRandomShopItemIds); }
-    public void setDailyRandomShopItemIds(List<Integer> ids) { this.dailyRandomShopItemIds = (ids == null) ? new ArrayList<>() : new ArrayList<>(ids); }
-    public int getShopStockDay() { return shopStockDay; }
-    public void setShopStockDay(int day) { this.shopStockDay = day; }
-    public boolean hasDailyRemainingShopStockForDay(int day) { return shopStockDay == day && !dailyRemainingShopStock.isEmpty(); }
-    public Map<Integer, Integer> getDailyRemainingShopStock() { return new LinkedHashMap<>(dailyRemainingShopStock); }
-    public int getRemainingShopStock(int itemId, int fallbackValue) { return dailyRemainingShopStock.getOrDefault(itemId, fallbackValue); }
-    public void setRemainingShopStock(int itemId, int remainingQty) { dailyRemainingShopStock.put(itemId, Math.max(0, remainingQty)); }
+    public void setPendingSpawn(SpawnTag tag) { 
+        this.pendingSpawn = (tag == null) ? SpawnTag.DEFAULT : tag; 
+    }
+    
+    public SpawnTag consumePendingSpawn() { 
+        SpawnTag t = pendingSpawn; pendingSpawn = SpawnTag.DEFAULT; return t; 
+    }
+    
+    public FarmState getFarmState(String mapKey) { 
+        return farmByMap.computeIfAbsent(mapKey, k -> new FarmState()); 
+    }
+    public void setReturnScene(String fxml, SpawnTag spawn) { 
+        this.returnFxml = fxml; this.returnSpawn = (spawn == null) ? SpawnTag.DEFAULT : spawn; 
+    }
+    public String getReturnFxml() { 
+        return returnFxml; 
+    }
+    public SpawnTag getReturnSpawn() { 
+        return returnSpawn; 
+    }
+    public void setCurrentMerchantItems(List<model.Merchant.ShopItem> items) { 
+        this.currentMerchantItems = (items == null) ? List.of() : List.copyOf(items); 
+    }
+    public List<model.Merchant.ShopItem> getCurrentMerchantItems() { 
+        return currentMerchantItems; 
+    }
+    public int getShopRandomDay() { 
+        return shopRandomDay; 
+    }
+    public void setShopRandomDay(int day) { 
+        this.shopRandomDay = day; 
+    }
+    public List<Integer> getDailyRandomShopItemIds() { 
+        return List.copyOf(dailyRandomShopItemIds); 
+    }
+    public void setDailyRandomShopItemIds(List<Integer> ids) { 
+        this.dailyRandomShopItemIds = (ids == null) ? new ArrayList<>() : new ArrayList<>(ids); 
+    }
+    public int getShopStockDay() { 
+        return shopStockDay; 
+    }
+    public void setShopStockDay(int day) { 
+        this.shopStockDay = day; 
+    }
+    public boolean hasDailyRemainingShopStockForDay(int day) { 
+        return shopStockDay == day && !dailyRemainingShopStock.isEmpty(); 
+    }
+    public Map<Integer, Integer> getDailyRemainingShopStock() { 
+        return new LinkedHashMap<>(dailyRemainingShopStock); 
+    }
+    public int getRemainingShopStock(int itemId, int fallbackValue) { 
+        return dailyRemainingShopStock.getOrDefault(itemId, fallbackValue); 
+    }
+    public void setRemainingShopStock(int itemId, int remainingQty) { 
+        dailyRemainingShopStock.put(itemId, Math.max(0, remainingQty)); 
+    }
     public void setDailyRemainingShopStock(Map<Integer, Integer> stockByItemId) {
         dailyRemainingShopStock.clear();
         if (stockByItemId == null) return;
