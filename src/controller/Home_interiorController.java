@@ -1084,13 +1084,16 @@ public class Home_interiorController extends BaseMapController {
         pinvButtons.add(Playerinvbtn17);
         pinvButtons.add(Playerinvbtn18);
         pinvButtons.add(Playerinvbtn19);
-        
 
+        wireInteriorPlayerButtons();
         refreshInteriorInventorySlots();
 
         Inventory inv = player.getInventory();
         inv.itemsProperty().addListener(
-            (MapChangeListener<Integer, IntegerProperty>) change -> refreshInteriorInventorySlots()
+            (MapChangeListener<Integer, IntegerProperty>) change -> refreshChestAndInventoryViews()
+        );
+        chestInventory.itemsProperty().addListener(
+            (MapChangeListener<Integer, IntegerProperty>) change -> refreshChestAndInventoryViews()
         );
     }
     
@@ -1152,43 +1155,58 @@ public class Home_interiorController extends BaseMapController {
         rebuildSharedUiAfterBridge();
     }
     
+    private void wireInteriorPlayerButtons() {
+        for (int i = 0; i < pinvButtons.size(); i++) {
+            final int index = i;
+            Button button = pinvButtons.get(i);
+            if (button != null) {
+                button.setOnAction(e -> selectInteriorPlayerSlot(index));
+            }
+        }
+    }
+
     private void refreshInteriorInventorySlots() {
         if (player == null || player.getInventory() == null) return;
 
-        Inventory inv = player.getInventory();
-        List<Integer> owned = new ArrayList<>(inv.itemsProperty().keySet());
-
-        owned.sort(Comparator.comparing(id -> {
-            item itm = ItemDatabase.getItemById(id);
-            return itm == null ? "" : itm.getItem_name();
-        }));
+        List<SlotData> slots = snapshotSlots(player.getInventory(), playerInventorySlotCapacity());
 
         for (int i = 0; i < pinvImages.size(); i++) {
             ImageView img = pinvImages.get(i);
             Label lbl = pinvLabels.get(i);
             Button btn = pinvButtons.get(i);
+            SlotData slot = (i < slots.size()) ? slots.get(i) : null;
 
-            if (i >= owned.size()) {
-                if (img != null) img.setImage(null);
+            if (slot == null) {
+                if (img != null) {
+                    img.setImage(null);
+                    img.setVisible(false);
+                    img.setOpacity(0.0);
+                    img.setScaleX(1.0);
+                    img.setScaleY(1.0);
+                    img.setStyle("");
+                }
                 if (lbl != null) lbl.setText("");
                 if (btn != null) {
                     btn.setText("");
                     btn.setDisable(true);
-                    btn.setOnAction(null);
                 }
                 continue;
             }
 
-            int itemId = owned.get(i);
-            int qty = inv.getCount(itemId);
+            int itemId = slot.itemId();
             item itm = ItemDatabase.getItemById(itemId);
 
             if (img != null) {
                 img.setImage(ItemDatabase.getImage(itemId));
+                img.setVisible(true);
+                img.setOpacity(0.9);
+                img.setScaleX(1.0);
+                img.setScaleY(1.0);
+                img.setStyle("");
             }
 
             if (lbl != null) {
-                lbl.setText("x" + qty);
+                lbl.setText("x" + slot.quantity());
             }
 
             if (btn != null) {
@@ -1196,8 +1214,54 @@ public class Home_interiorController extends BaseMapController {
                 btn.setText(itm == null ? "" : itm.getItem_name());
             }
         }
+
+        refreshInteriorPlayerSelectionHighlight();
     }
 
+    private void refreshInteriorPlayerSelectionHighlight() {
+        List<SlotData> slots = snapshotSlots(player.getInventory(), playerInventorySlotCapacity());
+
+        for (int i = 0; i < pinvImages.size(); i++) {
+            ImageView imageView = pinvImages.get(i);
+            if (imageView == null) continue;
+
+            SlotData slot = (i < slots.size()) ? slots.get(i) : null;
+            boolean selected =
+                slot != null &&
+                selectedSource == SelectionSource.PLAYER &&
+                selectedPlayerInventoryItemId != null &&
+                slot.itemId() == selectedPlayerInventoryItemId;
+
+            imageView.setStyle(selected
+                ? "-fx-effect: dropshadow(gaussian, yellow, 14, 0.7, 0, 0);"
+                : "");
+
+            if (slot == null) {
+                imageView.setOpacity(0.0);
+                imageView.setScaleX(1.0);
+                imageView.setScaleY(1.0);
+            } else {
+                imageView.setOpacity(selected ? 1.0 : 0.9);
+                imageView.setScaleX(selected ? 1.08 : 1.0);
+                imageView.setScaleY(selected ? 1.08 : 1.0);
+            }
+        }
+    }
+
+    private void selectInteriorPlayerSlot(int index) {
+        List<SlotData> slots = snapshotSlots(player.getInventory(), playerInventorySlotCapacity());
+        if (index < 0 || index >= slots.size()) return;
+
+        SlotData slot = slots.get(index);
+        if (slot == null) return;
+
+        selectedSource = SelectionSource.PLAYER;
+        selectedItemId = slot.itemId();
+        selectedPlayerInventoryItemId = slot.itemId();
+
+        refreshChestAndInventoryViews();
+    }
+    
     private void openCook() {
         if (btncook.isDisable()) return;
         gameState.setReturnScene("/view/home_interior.fxml", SpawnTag.FROM_COOK);
@@ -1458,7 +1522,7 @@ public class Home_interiorController extends BaseMapController {
 
     private void refreshChestAndInventoryViews() {
         refreshChestSlots();
-        refreshPlayerInventoryView();
+        refreshInteriorInventorySlots();
         refreshSelectionHighlight();
     }
 
@@ -1512,7 +1576,7 @@ public class Home_interiorController extends BaseMapController {
     
     private void refreshSelectionHighlight() {
         highlightChestSelection();
-        refreshPlayerInventorySelectionHighlight();
+        highlightInteriorPlayerSelection();
     }
 
     private void highlightChestSelection() {
@@ -1545,4 +1609,34 @@ public class Home_interiorController extends BaseMapController {
         }
     }
  
+    private void highlightInteriorPlayerSelection() {
+        List<SlotData> slots = snapshotSlots(player.getInventory(), playerInventorySlotCapacity());
+
+        for (int i = 0; i < pinvImages.size(); i++) {
+            ImageView imageView = pinvImages.get(i);
+            if (imageView == null) continue;
+
+            SlotData slot = (i < slots.size()) ? slots.get(i) : null;
+            boolean selected =
+                slot != null &&
+                selectedSource == SelectionSource.PLAYER &&
+                selectedItemId != null &&
+                slot.itemId() == selectedItemId;
+
+            imageView.setStyle(selected
+                ? "-fx-effect: dropshadow(gaussian, yellow, 14, 0.7, 0, 0);"
+                : "");
+
+            if (slot == null) {
+                imageView.setOpacity(0.0);
+                imageView.setScaleX(1.0);
+                imageView.setScaleY(1.0);
+            } else {
+                imageView.setOpacity(selected ? 1.0 : 0.9);
+                imageView.setScaleX(selected ? 1.08 : 1.0);
+                imageView.setScaleY(selected ? 1.08 : 1.0);
+            }
+        }
+    }
+    
 }
