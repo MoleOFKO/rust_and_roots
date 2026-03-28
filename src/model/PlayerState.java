@@ -4,6 +4,7 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import java.util.Arrays;
 
 
 /**
@@ -38,6 +39,7 @@ public final class PlayerState {
 
     private static final int HOTBAR_SIZE = 5;
     private final int[] hotbarItemIds = new int[HOTBAR_SIZE];
+    private final int[] hotbarItemCounts = new int[HOTBAR_SIZE];
 
     public int getHotbarSize() {
         return HOTBAR_SIZE;
@@ -48,14 +50,98 @@ public final class PlayerState {
         return hotbarItemIds[index];
     }
 
+    public int getHotbarItemCount(int index) {
+        if (index < 0 || index >= HOTBAR_SIZE) return 0;
+        return hotbarItemCounts[index];
+    }
+
+    public boolean isHotbarSlotEmpty(int index) {
+        return getHotbarItemId(index) <= 0 || getHotbarItemCount(index) <= 0;
+    }
+
     public void setHotbarItemId(int index, int itemId) {
         if (index < 0 || index >= HOTBAR_SIZE) return;
+
+        if (itemId <= 0) {
+            clearHotbarItem(index);
+            return;
+        }
+
         hotbarItemIds[index] = itemId;
+        if (hotbarItemCounts[index] <= 0) {
+            hotbarItemCounts[index] = 1;
+        }
+    }
+
+    public void setHotbarSlot(int index, int itemId, int count) {
+        if (index < 0 || index >= HOTBAR_SIZE) return;
+
+        if (itemId <= 0 || count <= 0) {
+            clearHotbarItem(index);
+            return;
+        }
+
+        hotbarItemIds[index] = itemId;
+        hotbarItemCounts[index] = count;
+    }
+
+    public boolean addHotbarItems(int index, int itemId, int amount) {
+        if (index < 0 || index >= HOTBAR_SIZE) return false;
+        if (itemId <= 0 || amount <= 0) return false;
+
+        if (isHotbarSlotEmpty(index)) {
+            setHotbarSlot(index, itemId, amount);
+            return true;
+        }
+
+        if (hotbarItemIds[index] != itemId) {
+            return false;
+        }
+
+        hotbarItemCounts[index] += amount;
+        return true;
+    }
+
+    public boolean removeHotbarItems(int index, int amount) {
+        if (index < 0 || index >= HOTBAR_SIZE) return false;
+        if (amount <= 0) return false;
+        if (hotbarItemCounts[index] < amount) return false;
+
+        hotbarItemCounts[index] -= amount;
+        if (hotbarItemCounts[index] <= 0) {
+            clearHotbarItem(index);
+        }
+        return true;
+    }
+
+    public int findHotbarSlotWithItem(int itemId) {
+        if (itemId <= 0) return -1;
+        for (int i = 0; i < HOTBAR_SIZE; i++) {
+            if (hotbarItemIds[i] == itemId && hotbarItemCounts[i] > 0) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public int findFirstEmptyHotbarSlot() {
+        for (int i = 0; i < HOTBAR_SIZE; i++) {
+            if (isHotbarSlotEmpty(i)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public void clearAllHotbarItems() {
+        Arrays.fill(hotbarItemIds, 0);
+        Arrays.fill(hotbarItemCounts, 0);
     }
 
     public void clearHotbarItem(int index) {
         if (index < 0 || index >= HOTBAR_SIZE) return;
         hotbarItemIds[index] = 0;
+        hotbarItemCounts[index] = 0;
     }
     
     public PlayerState(int startingCoins) {
