@@ -30,6 +30,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 import javafx.event.ActionEvent;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import model.CollisionRegistry;
@@ -1044,12 +1045,19 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
         for (int i = 0; i < hotbarSlotButtons.size(); i++) {
             final int idx = i;
-            hotbarSlotButtons.get(i).setOnAction(e -> {
+            Button button = hotbarSlotButtons.get(i);
+            button.setOnAction(e -> {
                 if (idx == selectedHotbarIndex && tryConsumeHotbarItem(idx)) {
                     return;
                 }
                 selectHotbarSlot(idx);
                 hotbarAssignmentIndex = idx;
+            });
+            button.setOnMouseClicked(e -> {
+                if (e.getButton() == MouseButton.SECONDARY) {
+                    moveHotbarSlotToInventory(idx);
+                    e.consume();
+                }
             });
         }
 
@@ -1090,8 +1098,9 @@ public abstract class BaseMapController implements Initializable, SceneControlle
             Label lbl = (i < hotbarLabels.size()) ? hotbarLabels.get(i) : null;
 
             int itemId = playerState.getHotbarItemId(i);
+            int quantity = playerState.getHotbarItemCount(i);
 
-            if (itemId <= 0 || player.getInventory().getCount(itemId) <= 0) {
+            if (itemId <= 0 || quantity <= 0) {
                 if (img != null) img.setImage(null);
                 if (lbl != null) lbl.setText("");
                 continue;
@@ -1102,7 +1111,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
             }
 
             if (lbl != null) {
-                lbl.setText("x" + player.getInventory().getCount(itemId));
+                lbl.setText("x" + quantity);
             }
         }
     }
@@ -1228,11 +1237,6 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     protected void onPlayerInventorySlotSelected(int index, SlotData slot) {
         selectedPlayerInventoryItemId = (slot == null) ? null : slot.itemId();
         refreshPlayerInventorySelectionHighlight();
-
-        if (slot != null && playerState != null) {
-            playerState.setHotbarItemId(hotbarAssignmentIndex, slot.itemId());
-            refreshHotbarView();
-        }
     }
 
     protected void setupPlayerInventoryGridIfPresent() {
@@ -1289,6 +1293,12 @@ public abstract class BaseMapController implements Initializable, SceneControlle
             Button button = playerInventoryButtons.get(i);
             if (button != null) {
                 button.setOnAction(e -> selectPlayerInventorySlot(index));
+                button.setOnMouseClicked(e -> {
+                    if (e.getButton() == MouseButton.SECONDARY) {
+                        moveInventorySlotToHotbar(index);
+                        e.consume();
+                    }
+                });
             }
         }
     }
@@ -1416,6 +1426,62 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         }
     }
 
+    protected boolean moveInventorySlotToHotbar(int index) {
+        if (playerState == null || player == null) return false;
+
+        List<SlotData> slots = snapshotSlots(player.getInventory(), playerInventorySlotCapacity());
+        if (index < 0 || index >= slots.size()) return false;
+
+        SlotData slot = slots.get(index);
+        if (slot == null || slot.itemId() <= 0 || slot.quantity() <= 0) return false;
+
+        int targetIndex = findHotbarTargetSlot(slot.itemId());
+        if (targetIndex < 0) {
+            return false;
+        }
+
+        if (!player.getInventory().removeItem(slot.itemId(), slot.quantity())) {
+            return false;
+        }
+
+        if (!playerState.addHotbarItems(targetIndex, slot.itemId(), slot.quantity())) {
+            player.getInventory().addItem(slot.itemId(), slot.quantity());
+            return false;
+        }
+
+        selectedPlayerInventoryItemId = null;
+        refreshPlayerInventoryView();
+        refreshHotbarView();
+        return true;
+    }
+
+    protected boolean moveHotbarSlotToInventory(int index) {
+        if (playerState == null || player == null) return false;
+        if (index < 0 || index >= playerState.getHotbarSize()) return false;
+
+        int itemId = playerState.getHotbarItemId(index);
+        int quantity = playerState.getHotbarItemCount(index);
+        if (itemId <= 0 || quantity <= 0) return false;
+
+        player.getInventory().addItem(itemId, quantity);
+        playerState.clearHotbarItem(index);
+
+        refreshPlayerInventoryView();
+        refreshHotbarView();
+        return true;
+    }
+
+    protected int findHotbarTargetSlot(int itemId) {
+        if (playerState == null || itemId <= 0) return -1;
+
+        int sameItemSlot = playerState.findHotbarSlotWithItem(itemId);
+        if (sameItemSlot >= 0) {
+            return sameItemSlot;
+        }
+
+        return playerState.findFirstEmptyHotbarSlot();
+    }
+
     protected void clearPlayerInventorySelection() {
         selectedPlayerInventoryItemId = null;
         refreshPlayerInventorySelectionHighlight();
@@ -1426,7 +1492,8 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         if (index < 0 || index >= playerState.getHotbarSize()) return false;
 
         int itemId = playerState.getHotbarItemId(index);
-        if (itemId <= 0 || player.getInventory().getCount(itemId) <= 0) return false;
+        int quantity = playerState.getHotbarItemCount(index);
+        if (itemId <= 0 || quantity <= 0) return false;
 
         GameState.FoodEffectOutcome cookedOutcome = gameState.pollCookedDishEffect(itemId);
 
@@ -1460,7 +1527,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
             }
         }
 
-        if (!player.getInventory().removeItem(itemId, 1)) {
+        if (!playerState.removeHotbarItems(index, 1)) {
             return false;
         }
 

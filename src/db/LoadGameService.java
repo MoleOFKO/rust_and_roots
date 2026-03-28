@@ -161,11 +161,9 @@ public class LoadGameService {
     private void loadHotbar(Connection con, GameState gs, int saveId) throws Exception {
         PlayerState psState = gs.getPlayerState();
 
-        for (int i = 0; i < psState.getHotbarSize(); i++) {
-            psState.clearHotbarItem(i);
-        }
+        psState.clearAllHotbarItems();
 
-        String sql = "SELECT slot_index, item_id FROM saved_hotbar WHERE saved_id = ?";
+        String sql = "SELECT slot_index, item_id, qty FROM saved_hotbar WHERE saved_id = ?";
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, saveId);
 
@@ -173,9 +171,10 @@ public class LoadGameService {
                 while (rs.next()) {
                     int slotIndex = rs.getInt("slot_index");
                     int itemId = rs.getInt("item_id");
+                    int qty = rs.getInt("qty");
 
                     if (!rs.wasNull()) {
-                        psState.setHotbarItemId(slotIndex, itemId);
+                        psState.setHotbarSlot(slotIndex, itemId, Math.max(1, qty));
                     }
                 }
             }

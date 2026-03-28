@@ -133,7 +133,7 @@ public class SaveGameService {
             }
         }
     }
-
+    
     private int getSkillIdForSave(Connection con, int saveId) throws Exception {
         String sql = "SELECT skill_id FROM save_game WHERE saved_id = ?";
         try (PreparedStatement ps = con.prepareStatement(sql)) {
@@ -265,17 +265,20 @@ public class SaveGameService {
             del.executeUpdate();
         }
 
-        String sql = "INSERT INTO saved_hotbar (saved_id, slot_index, item_id) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO saved_hotbar (saved_id, slot_index, item_id, qty) VALUES (?, ?, ?, ?)";
         try (PreparedStatement ins = con.prepareStatement(sql)) {
             for (int i = 0; i < ps.getHotbarSize(); i++) {
                 int itemId = ps.getHotbarItemId(i);
+                int qty = ps.getHotbarItemCount(i);
 
                 ins.setInt(1, saveId);
                 ins.setInt(2, i);
-                if (itemId <= 0) {
+                if (itemId <= 0 || qty <= 0) {
                     ins.setNull(3, java.sql.Types.INTEGER);
+                    ins.setInt(4, 0);
                 } else {
                     ins.setInt(3, itemId);
+                    ins.setInt(4, qty);
                 }
                 ins.addBatch();
             }
