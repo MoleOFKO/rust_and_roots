@@ -721,11 +721,9 @@ public class home_mapController extends BaseMapController {
     private void refreshStatusView() {
         if (playerState == null) return;
 
-        int pendingExpCost = getPendingExpCost();
-
         if (statusName != null) statusName.setText("Name : " + playerState.getPlayerName());
         if (statusEXP != null) {
-            statusEXP.setText("EXP : " + playerState.getExp() + (pendingExpCost > 0 ? "(-" + pendingExpCost + ")" : ""));
+            statusEXP.setText(formatVisibleExpLabel());
         }
         if (statusHP != null) {
             statusHP.setText("HP : " + playerState.getHp() + "/" + (playerState.getMaxHp() + pendingHpPoints) + formatPending(pendingHpPoints));
@@ -743,19 +741,15 @@ public class home_mapController extends BaseMapController {
         return points <= 0 ? "" : "(+" + points + ")";
     }
     
-    private String formatPendingSkill(int value) {
-        return value <= 0 ? "" : "(+" + value + ")";
-    }
-
     private void refreshSkillsView() {
         if (gameState == null) return;
         GameState.PlayerSkills skills = gameState.getPlayerSkills();
 
-        if (farming != null) farming.setText(skills.getFarmingDisplay() + formatPendingSkill(pendingFarmingSkillExp));
-        if (gathering != null) gathering.setText(skills.getGatheringDisplay() + formatPendingSkill(pendingGatheringSkillExp));
-        if (crafting != null) crafting.setText(skills.getCraftingDisplay() + formatPendingSkill(pendingCraftingSkillExp));
-        if (fishing != null) fishing.setText(skills.getFishingDisplay() + formatPendingSkill(pendingFishingSkillExp));
-        if (cooking != null) cooking.setText(skills.getCookingDisplay() + formatPendingSkill(pendingCookingSkillExp));
+        if (farming != null) farming.setText(appendPendingSkillCost(skills.getFarmingDisplay(), pendingFarmingSkillExp));
+        if (gathering != null) gathering.setText(appendPendingSkillCost(skills.getGatheringDisplay(), pendingGatheringSkillExp));
+        if (crafting != null) crafting.setText(appendPendingSkillCost(skills.getCraftingDisplay(), pendingCraftingSkillExp));
+        if (fishing != null) fishing.setText(appendPendingSkillCost(skills.getFishingDisplay(), pendingFishingSkillExp));
+        if (cooking != null) cooking.setText(appendPendingSkillCost(skills.getCookingDisplay(), pendingCookingSkillExp));
     }
 
     private void refreshStatusButtons() {
@@ -765,7 +759,7 @@ public class home_mapController extends BaseMapController {
         configureImageButton(btnUsePoint, canUsePoint, true, statusAllocationMode || skillAllocationMode ? 1.0 : 0.85);
 
         if (skillsVisible) {
-            configureImageButton(btnConfirm, skillAllocationMode && getPendingSkillExpTotal() > 0, true, 1.0);
+            configureImageButton(btnConfirm, skillAllocationMode && getPendingSkillExpTotal() > 0, skillAllocationMode, 1.0);
 
             configureImageButton(btnfarmingplus1, canIncreaseSkill("farming"), skillAllocationMode, 1.0);
             configureImageButton(btngatheringplus1, canIncreaseSkill("gathering"), skillAllocationMode, 1.0);
@@ -794,32 +788,34 @@ public class home_mapController extends BaseMapController {
             return;
         }
         
-        configureImageButton(btnConfirm, statusAllocationMode && getPendingExpCost() > 0, statusAllocationMode, 1.0);
+        if(isStatusScreenVisible()){
+            configureImageButton(btnConfirm, statusAllocationMode && getPendingExpCost() > 0, statusAllocationMode, 1.0);
 
-        configureImageButton(btnHPplus, canIncreaseStat("hp"), statusAllocationMode, 1.0);
-        configureImageButton(btnSPplus, canIncreaseStat("sp"), statusAllocationMode, 1.0);
-        configureImageButton(btnSTRplus, canIncreaseStat("str"), statusAllocationMode, 1.0);
-        configureImageButton(btnVITplus, canIncreaseStat("vit"), statusAllocationMode, 1.0);
-        configureImageButton(btnDEXplus, canIncreaseStat("dex"), statusAllocationMode, 1.0);
-        configureImageButton(btnAGIplus, canIncreaseStat("agi"), statusAllocationMode, 1.0);
+            configureImageButton(btnHPplus, canIncreaseStat("hp"), statusAllocationMode, 1.0);
+            configureImageButton(btnSPplus, canIncreaseStat("sp"), statusAllocationMode, 1.0);
+            configureImageButton(btnSTRplus, canIncreaseStat("str"), statusAllocationMode, 1.0);
+            configureImageButton(btnVITplus, canIncreaseStat("vit"), statusAllocationMode, 1.0);
+            configureImageButton(btnDEXplus, canIncreaseStat("dex"), statusAllocationMode, 1.0);
+            configureImageButton(btnAGIplus, canIncreaseStat("agi"), statusAllocationMode, 1.0);
 
-        configureImageButton(btnHPminus, statusAllocationMode && pendingHpPoints > 0, statusAllocationMode, 1.0);
-        configureImageButton(btnSPminus, statusAllocationMode && pendingSpPoints > 0, statusAllocationMode, 1.0);
-        configureImageButton(btnSTRminus, statusAllocationMode && pendingStrPoints > 0, statusAllocationMode, 1.0);
-        configureImageButton(btnVITminus, statusAllocationMode && pendingVitPoints > 0, statusAllocationMode, 1.0);
-        configureImageButton(btnDEXminus, statusAllocationMode && pendingDexPoints > 0, statusAllocationMode, 1.0);
-        configureImageButton(btnAGIminus, statusAllocationMode && pendingAgiPoints > 0, statusAllocationMode, 1.0);
-    
-        configureImageButton(btnfarmingplus1, false, false, 1.0);
-        configureImageButton(btngatheringplus1, false, false, 1.0);
-        configureImageButton(btncraftingplus1, false, false, 1.0);
-        configureImageButton(btnfishingplus1, false, false, 1.0);
-        configureImageButton(btncookingplus1, false, false, 1.0);
-        configureImageButton(btnfarmingminus1, false, false, 1.0);
-        configureImageButton(btngatheringminus1, false, false, 1.0);
-        configureImageButton(btncraftingminus1, false, false, 1.0);
-        configureImageButton(btnfishingminus1, false, false, 1.0);
-        configureImageButton(btncookingminus1, false, false, 1.0);
+            configureImageButton(btnHPminus, statusAllocationMode && pendingHpPoints > 0, statusAllocationMode, 1.0);
+            configureImageButton(btnSPminus, statusAllocationMode && pendingSpPoints > 0, statusAllocationMode, 1.0);
+            configureImageButton(btnSTRminus, statusAllocationMode && pendingStrPoints > 0, statusAllocationMode, 1.0);
+            configureImageButton(btnVITminus, statusAllocationMode && pendingVitPoints > 0, statusAllocationMode, 1.0);
+            configureImageButton(btnDEXminus, statusAllocationMode && pendingDexPoints > 0, statusAllocationMode, 1.0);
+            configureImageButton(btnAGIminus, statusAllocationMode && pendingAgiPoints > 0, statusAllocationMode, 1.0);
+
+            configureImageButton(btnfarmingplus1, false, false, 1.0);
+            configureImageButton(btngatheringplus1, false, false, 1.0);
+            configureImageButton(btncraftingplus1, false, false, 1.0);
+            configureImageButton(btnfishingplus1, false, false, 1.0);
+            configureImageButton(btncookingplus1, false, false, 1.0);
+            configureImageButton(btnfarmingminus1, false, false, 1.0);
+            configureImageButton(btngatheringminus1, false, false, 1.0);
+            configureImageButton(btncraftingminus1, false, false, 1.0);
+            configureImageButton(btnfishingminus1, false, false, 1.0);
+            configureImageButton(btncookingminus1, false, false, 1.0);
+        }
     }
 
     private void configureImageButton(ImageView imageView, boolean enabled, boolean visible, double activeOpacity) {
@@ -907,7 +903,6 @@ public class home_mapController extends BaseMapController {
     private void handlesave(ActionEvent event) {
         capturePlayerSnapshot();
         GameState.get().setSaveMenuMode(true);
-        GameState.get().setReturnScene("/view/home_map.fxml", SpawnTag.DEFAULT);
         SceneManager.switchScene("/view/saveloads.fxml");
     }
     
