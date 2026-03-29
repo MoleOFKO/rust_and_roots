@@ -30,6 +30,7 @@ import model.item;
 import util.SpawnTag;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;
@@ -1061,11 +1062,9 @@ public class Home_interiorController extends BaseMapController {
     private void refreshStatusView() {
         if (playerState == null) return;
 
-        int pendingExpCost = getPendingExpCost();
-
         if (statusName != null) statusName.setText("Name : " + playerState.getPlayerName());
         if (statusEXP != null) {
-            statusEXP.setText("EXP : " + playerState.getExp() + (pendingExpCost > 0 ? " (-" + pendingExpCost + ")" : ""));
+            statusEXP.setText(formatVisibleExpLabel());
         }
         if (statusHP != null) {
             statusHP.setText("HP : " + playerState.getHp() + "/" + (playerState.getMaxHp() + pendingHpPoints) + formatPending(pendingHpPoints));
@@ -1081,14 +1080,6 @@ public class Home_interiorController extends BaseMapController {
 
     private String formatPending(int points) {
         return points <= 0 ? "" : "(+" + points + ")";
-    }
-
-    private String formatPendingSkill(int value) {
-        return value <= 0 ? "" : " (-" + value + ")";
-    }
-
-    private String appendPendingSkillCost(String base, int pendingCost) {
-        return base + formatPendingSkill(pendingCost);
     }
 
     private void refreshSkillsView() {
@@ -1109,7 +1100,7 @@ public class Home_interiorController extends BaseMapController {
         configureImageButton(btnUsePoint, canUsePoint, true, statusAllocationMode || skillAllocationMode ? 1.0 : 0.85);
 
         if (skillsVisible) {
-            configureImageButton(btnConfirm, skillAllocationMode && getPendingSkillExpTotal() > 0, true, 1.0);
+            configureImageButton(btnConfirm, skillAllocationMode && getPendingSkillExpTotal() > 0, skillAllocationMode, 1.0);
 
             configureImageButton(btnfarmingplus1, canIncreaseSkill("farming"), skillAllocationMode, 1.0);
             configureImageButton(btngatheringplus1, canIncreaseSkill("gathering"), skillAllocationMode, 1.0);
@@ -1138,32 +1129,34 @@ public class Home_interiorController extends BaseMapController {
             return;
         }
 
-        configureImageButton(btnConfirm, statusAllocationMode && getPendingExpCost() > 0, statusAllocationMode, 1.0);
+        if(isStatusScreenVisible()){
+            configureImageButton(btnConfirm, statusAllocationMode && getPendingExpCost() > 0, statusAllocationMode, 1.0);
 
-        configureImageButton(btnHPplus, canIncreaseStat("hp"), statusAllocationMode, 1.0);
-        configureImageButton(btnSPplus, canIncreaseStat("sp"), statusAllocationMode, 1.0);
-        configureImageButton(btnSTRplus, canIncreaseStat("str"), statusAllocationMode, 1.0);
-        configureImageButton(btnVITplus, canIncreaseStat("vit"), statusAllocationMode, 1.0);
-        configureImageButton(btnDEXplus, canIncreaseStat("dex"), statusAllocationMode, 1.0);
-        configureImageButton(btnAGIplus, canIncreaseStat("agi"), statusAllocationMode, 1.0);
+            configureImageButton(btnHPplus, canIncreaseStat("hp"), statusAllocationMode, 1.0);
+            configureImageButton(btnSPplus, canIncreaseStat("sp"), statusAllocationMode, 1.0);
+            configureImageButton(btnSTRplus, canIncreaseStat("str"), statusAllocationMode, 1.0);
+            configureImageButton(btnVITplus, canIncreaseStat("vit"), statusAllocationMode, 1.0);
+            configureImageButton(btnDEXplus, canIncreaseStat("dex"), statusAllocationMode, 1.0);
+            configureImageButton(btnAGIplus, canIncreaseStat("agi"), statusAllocationMode, 1.0);
 
-        configureImageButton(btnHPminus, statusAllocationMode && pendingHpPoints > 0, statusAllocationMode, 1.0);
-        configureImageButton(btnSPminus, statusAllocationMode && pendingSpPoints > 0, statusAllocationMode, 1.0);
-        configureImageButton(btnSTRminus, statusAllocationMode && pendingStrPoints > 0, statusAllocationMode, 1.0);
-        configureImageButton(btnVITminus, statusAllocationMode && pendingVitPoints > 0, statusAllocationMode, 1.0);
-        configureImageButton(btnDEXminus, statusAllocationMode && pendingDexPoints > 0, statusAllocationMode, 1.0);
-        configureImageButton(btnAGIminus, statusAllocationMode && pendingAgiPoints > 0, statusAllocationMode, 1.0);
+            configureImageButton(btnHPminus, statusAllocationMode && pendingHpPoints > 0, statusAllocationMode, 1.0);
+            configureImageButton(btnSPminus, statusAllocationMode && pendingSpPoints > 0, statusAllocationMode, 1.0);
+            configureImageButton(btnSTRminus, statusAllocationMode && pendingStrPoints > 0, statusAllocationMode, 1.0);
+            configureImageButton(btnVITminus, statusAllocationMode && pendingVitPoints > 0, statusAllocationMode, 1.0);
+            configureImageButton(btnDEXminus, statusAllocationMode && pendingDexPoints > 0, statusAllocationMode, 1.0);
+            configureImageButton(btnAGIminus, statusAllocationMode && pendingAgiPoints > 0, statusAllocationMode, 1.0);
 
-        configureImageButton(btnfarmingplus1, false, false, 1.0);
-        configureImageButton(btngatheringplus1, false, false, 1.0);
-        configureImageButton(btncraftingplus1, false, false, 1.0);
-        configureImageButton(btnfishingplus1, false, false, 1.0);
-        configureImageButton(btncookingplus1, false, false, 1.0);
-        configureImageButton(btnfarmingminus1, false, false, 1.0);
-        configureImageButton(btngatheringminus1, false, false, 1.0);
-        configureImageButton(btncraftingminus1, false, false, 1.0);
-        configureImageButton(btnfishingminus1, false, false, 1.0);
-        configureImageButton(btncookingminus1, false, false, 1.0);
+            configureImageButton(btnfarmingplus1, false, false, 1.0);
+            configureImageButton(btngatheringplus1, false, false, 1.0);
+            configureImageButton(btncraftingplus1, false, false, 1.0);
+            configureImageButton(btnfishingplus1, false, false, 1.0);
+            configureImageButton(btncookingplus1, false, false, 1.0);
+            configureImageButton(btnfarmingminus1, false, false, 1.0);
+            configureImageButton(btngatheringminus1, false, false, 1.0);
+            configureImageButton(btncraftingminus1, false, false, 1.0);
+            configureImageButton(btnfishingminus1, false, false, 1.0);
+            configureImageButton(btncookingminus1, false, false, 1.0);
+        }
     }
 
     private void configureImageButton(ImageView imageView, boolean enabled, boolean visible, double activeOpacity) {
@@ -1175,15 +1168,13 @@ public class Home_interiorController extends BaseMapController {
         imageView.setOpacity(!visible ? 0.0 : (enabled ? activeOpacity : 0.45));
     }
 
-    private enum SelectionSource { NONE, PLAYER, CHEST }
-
     private final List<ImageView> chestImages = new ArrayList<>();
     private final List<Label> chestLabels = new ArrayList<>();
     private final List<Button> chestButtons = new ArrayList<>();
 
     private Inventory chestInventory;
-    private SelectionSource selectedSource = SelectionSource.NONE;
-    private Integer selectedItemId = null;
+    private final LinkedHashSet<Integer> selectedChestItemIds = new LinkedHashSet<>();
+    private final LinkedHashSet<Integer> selectedInteriorPlayerItemIds = new LinkedHashSet<>();
 
     @Override
     protected String mapKey() {
@@ -1430,9 +1421,7 @@ public class Home_interiorController extends BaseMapController {
             SlotData slot = (i < slots.size()) ? slots.get(i) : null;
             boolean selected =
                 slot != null &&
-                selectedSource == SelectionSource.PLAYER &&
-                selectedPlayerInventoryItemId != null &&
-                slot.itemId() == selectedPlayerInventoryItemId;
+                selectedInteriorPlayerItemIds.contains(slot.itemId());
 
             imageView.setStyle(selected
                 ? "-fx-effect: dropshadow(gaussian, yellow, 14, 0.7, 0, 0);"
@@ -1457,11 +1446,27 @@ public class Home_interiorController extends BaseMapController {
         SlotData slot = slots.get(index);
         if (slot == null) return;
 
-        selectedSource = SelectionSource.PLAYER;
-        selectedItemId = slot.itemId();
-        selectedPlayerInventoryItemId = slot.itemId();
-
+        toggleInteriorPlayerSelection(slot.itemId());
         refreshChestAndInventoryViews();
+    }
+
+    private void toggleInteriorPlayerSelection(int itemId) {
+        if (itemId <= 0) return;
+        if (selectedInteriorPlayerItemIds.contains(itemId)) {
+            selectedInteriorPlayerItemIds.remove(itemId);
+        } else {
+            selectedInteriorPlayerItemIds.add(itemId);
+        }
+        selectedPlayerInventoryItemId = selectedInteriorPlayerItemIds.isEmpty() ? null : selectedInteriorPlayerItemIds.iterator().next();
+    }
+
+    private void toggleChestSelection(int itemId) {
+        if (itemId <= 0) return;
+        if (selectedChestItemIds.contains(itemId)) {
+            selectedChestItemIds.remove(itemId);
+        } else {
+            selectedChestItemIds.add(itemId);
+        }
     }
     
     private void openCook() {
@@ -1534,10 +1539,7 @@ public class Home_interiorController extends BaseMapController {
     protected void onPlayerInventorySlotSelected(int index, SlotData slot) {
         if (slot == null) return;
 
-        selectedSource = SelectionSource.PLAYER;
-        selectedItemId = slot.itemId();
         selectedPlayerInventoryItemId = slot.itemId();
-
         refreshChestAndInventoryViews();
     }
     
@@ -1607,12 +1609,12 @@ public class Home_interiorController extends BaseMapController {
 
     @FXML
     private void sendToChestClick(MouseEvent event) {
-        moveSelectedItem(SelectionSource.PLAYER);
+        moveSelectedItemsToChest();
     }
 
     @FXML
     private void sendToInventoryClick(MouseEvent event) {
-        moveSelectedItem(SelectionSource.CHEST);
+        moveSelectedItemsToInventory();
     }
 
     @FXML
@@ -1675,51 +1677,53 @@ public class Home_interiorController extends BaseMapController {
         SlotData slot = slots.get(index);
         if (slot == null) return;
 
-        selectedSource = SelectionSource.CHEST;
-        selectedItemId = slot.itemId();
-        selectedPlayerInventoryItemId = null;
-
+        toggleChestSelection(slot.itemId());
         refreshChestAndInventoryViews();
     }
 
-    private void moveSelectedItem(SelectionSource expectedSource) {
-        if (selectedSource != expectedSource || selectedItemId == null) return;
-
-        Inventory from = (expectedSource == SelectionSource.PLAYER) ? player.getInventory() : chestInventory;
-        Inventory to = (expectedSource == SelectionSource.PLAYER) ? chestInventory : player.getInventory();
-
-        int targetCapacity = (expectedSource == SelectionSource.PLAYER) ? CHEST_SLOT_CAPACITY : playerInventorySlotCapacity();
-
-        int qty = from.getCount(selectedItemId);
-        if (qty <= 0) {
-            clearSelection();
+    private void moveSelectedItemsToChest() {
+        if (player == null || chestInventory == null) return;
+        if (!moveSelectedItemBatch(player.getInventory(), chestInventory, selectedInteriorPlayerItemIds, CHEST_SLOT_CAPACITY)) {
+            pruneMissingSelections();
             refreshChestAndInventoryViews();
             return;
         }
 
-        if (!canAcceptItemType(to, selectedItemId, targetCapacity)) {
-            return;
-        }
-
-        if (!from.removeItem(selectedItemId, qty)) {
-            return;
-        }
-
-        to.addItem(selectedItemId, qty);
-        clearSelection();
+        clearChestSelectionsOnly();
         refreshChestAndInventoryViews();
     }
 
-    private boolean canAcceptItemType(Inventory inventory, int itemId, int capacity) {
-        if (inventory.getCount(itemId) > 0) return true;
-        return inventory.itemsProperty().size() < capacity;
+    private void moveSelectedItemsToInventory() {
+        if (player == null || chestInventory == null) return;
+        if (!moveSelectedItemBatch(chestInventory, player.getInventory(), selectedChestItemIds, playerInventorySlotCapacity())) {
+            pruneMissingSelections();
+            refreshChestAndInventoryViews();
+            return;
+        }
+
+        clearChestSelectionsOnly();
+        refreshChestAndInventoryViews();
     }
 
     private void clearSelection() {
-        selectedSource = SelectionSource.NONE;
-        selectedItemId = null;
+        clearChestSelectionsOnly();
         clearPlayerInventorySelection();
         refreshChestAndInventoryViews();
+    }
+
+    private void clearChestSelectionsOnly() {
+        selectedChestItemIds.clear();
+        selectedInteriorPlayerItemIds.clear();
+    }
+
+    private void pruneMissingSelections() {
+        if (player != null) {
+            selectedInteriorPlayerItemIds.removeIf(itemId -> player.getInventory().getCount(itemId) <= 0);
+        }
+        if (chestInventory != null) {
+            selectedChestItemIds.removeIf(itemId -> chestInventory.getCount(itemId) <= 0);
+        }
+        selectedPlayerInventoryItemId = selectedInteriorPlayerItemIds.isEmpty() ? null : selectedInteriorPlayerItemIds.iterator().next();
     }
 
     private void refreshChestAndInventoryViews() {
@@ -1791,9 +1795,7 @@ public class Home_interiorController extends BaseMapController {
             SlotData slot = (i < slots.size()) ? slots.get(i) : null;
             boolean selected =
                 slot != null &&
-                selectedSource == SelectionSource.CHEST &&
-                selectedItemId != null &&
-                slot.itemId() == selectedItemId;
+                selectedChestItemIds.contains(slot.itemId());
 
             imageView.setStyle(selected
                 ? "-fx-effect: dropshadow(gaussian, yellow, 14, 0.7, 0, 0);"
@@ -1821,9 +1823,7 @@ public class Home_interiorController extends BaseMapController {
             SlotData slot = (i < slots.size()) ? slots.get(i) : null;
             boolean selected =
                 slot != null &&
-                selectedSource == SelectionSource.PLAYER &&
-                selectedItemId != null &&
-                slot.itemId() == selectedItemId;
+                selectedInteriorPlayerItemIds.contains(slot.itemId());
 
             imageView.setStyle(selected
                 ? "-fx-effect: dropshadow(gaussian, yellow, 14, 0.7, 0, 0);"

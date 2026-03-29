@@ -2,6 +2,8 @@ package controller;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Comparator;
@@ -860,6 +862,10 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     protected boolean isSkillsScreenVisible() {
         return skillsgroup != null && skillsgroup.isVisible();
     }
+    
+    protected boolean isStatusScreenVisible() {
+        return statusgroup != null && statusgroup.isVisible();
+    }
 
     protected boolean canIncreaseSkill(String skillKey) {
         if (playerState == null || gameState == null || !skillAllocationMode) return false;
@@ -980,6 +986,77 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         } else {
             applyPendingStatusChanges();
         }
+    }
+
+    protected int getVisiblePendingExpCost() {
+        return isSkillsScreenVisible() ? getPendingSkillExpTotal() : getPendingExpCost();
+    }
+
+    protected String formatVisibleExpLabel() {
+        if (playerState == null) return "EXP : 0";
+        int pendingExpCost = getVisiblePendingExpCost();
+        return "EXP : " + playerState.getExp() + (pendingExpCost > 0 ? " (-" + pendingExpCost + ")" : "");
+    }
+
+    protected String formatPendingSkillCost(int value) {
+        return value <= 0 ? "" : " (-" + value + ")";
+    }
+
+    protected String appendPendingSkillCost(String base, int pendingCost) {
+        return base + formatPendingSkillCost(pendingCost);
+    }
+
+    protected boolean canAcceptItemBatch(Inventory inventory, Collection<Integer> itemIds, int capacity) {
+        if (inventory == null || itemIds == null) return false;
+
+        LinkedHashSet<Integer> uniqueIds = new LinkedHashSet<>();
+        for (Integer itemId : itemIds) {
+            if (itemId == null || itemId <= 0) continue;
+            uniqueIds.add(itemId);
+        }
+
+        if (uniqueIds.isEmpty()) return false;
+
+        int neededNewTypes = 0;
+        for (Integer itemId : uniqueIds) {
+            if (inventory.getCount(itemId) <= 0) {
+                neededNewTypes++;
+            }
+        }
+
+        return inventory.itemsProperty().size() + neededNewTypes <= capacity;
+    }
+
+    protected boolean moveSelectedItemBatch(Inventory from, Inventory to, Collection<Integer> itemIds, int targetCapacity) {
+        if (from == null || to == null || itemIds == null) return false;
+
+        LinkedHashSet<Integer> uniqueIds = new LinkedHashSet<>();
+        for (Integer itemId : itemIds) {
+            if (itemId == null || itemId <= 0) continue;
+            if (from.getCount(itemId) > 0) {
+                uniqueIds.add(itemId);
+            }
+        }
+
+        if (uniqueIds.isEmpty()) return false;
+        if (!canAcceptItemBatch(to, uniqueIds, targetCapacity)) return false;
+
+        List<SlotData> moved = new ArrayList<>();
+        for (Integer itemId : uniqueIds) {
+            int qty = from.getCount(itemId);
+            if (qty <= 0) continue;
+            if (!from.removeItem(itemId, qty)) {
+                for (SlotData rollback : moved) {
+                    from.addItem(rollback.itemId(), rollback.quantity());
+                    to.removeItem(rollback.itemId(), rollback.quantity());
+                }
+                return false;
+            }
+            to.addItem(itemId, qty);
+            moved.add(new SlotData(itemId, qty));
+        }
+
+        return !moved.isEmpty();
     }
     
     protected void openInventory(){

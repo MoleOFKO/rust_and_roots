@@ -212,7 +212,7 @@ public class LoginController implements Initializable {
             return;
         }
         if (!email.matches(gmailRegex)) {
-            JOptionPane.showMessageDialog(null, "Gamil Not Regonized");
+            JOptionPane.showMessageDialog(null, "Gmail must be finished with : @gmail.com");
             return;
         }
         if (!pwd.matches(pwdRegex)) {
