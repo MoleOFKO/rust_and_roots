@@ -151,6 +151,18 @@ public class New_gameController implements Initializable, SceneController {
             return;
         }
 
+        int confirm = JOptionPane.showConfirmDialog(
+            null,
+            "World Name: \"" + worldName + "\"\nThis name will be shown as the Save Name.\nDo you want to continue?",
+            "Confirm New Game",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.WARNING_MESSAGE
+        );
+
+        if (confirm != JOptionPane.YES_OPTION) {
+            return;
+        }
+
         handleconfirmaction(null);
 
         GameState gs = GameState.get();

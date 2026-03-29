@@ -908,6 +908,7 @@ public class home_mapController extends BaseMapController {
     private void handlesave(ActionEvent event) {
         capturePlayerSnapshot();
         GameState.get().setSaveMenuMode(true);
+        GameState.get().setReturnScene("/view/home_map.fxml", SpawnTag.DEFAULT);
         SceneManager.switchScene("/view/saveloads.fxml");
     }
     
