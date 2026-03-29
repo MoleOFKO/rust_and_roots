@@ -43,6 +43,7 @@ import model.ItemDatabase;
 import model.item;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import model.PlayerState;
 import util.SceneManager;
 
 /**
@@ -1175,6 +1176,10 @@ public class Home_interiorController extends BaseMapController {
     private Inventory chestInventory;
     private final LinkedHashSet<Integer> selectedChestItemIds = new LinkedHashSet<>();
     private final LinkedHashSet<Integer> selectedInteriorPlayerItemIds = new LinkedHashSet<>();
+    private boolean insideBedZone = false;
+    private javafx.animation.AnimationTimer sleepTimer;
+    private double sleepPreviousTimeScale = 1.0;
+    private boolean sleepTimeScaleOverrideActive = false;
 
     @Override
     protected String mapKey() {
@@ -1209,6 +1214,7 @@ public class Home_interiorController extends BaseMapController {
 
         if (playerState != null) {
             playerState.expProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
+            playerState.staminaProperty().addListener((obs, o, n) -> refreshSleepInteractionState());
         }
 
         pinvImages.clear();
@@ -1488,7 +1494,8 @@ public class Home_interiorController extends BaseMapController {
     }
     
     private void setupInteriorZones() {
-        applyInteractionState(btntoSleep, false);
+        insideBedZone = false;
+        refreshSleepInteractionState();
         applyInteractionState(btnOpenInv, false);
         applyInteractionState(btncook, false);
         applyInteractionState(btnmelt, false);
@@ -1496,7 +1503,8 @@ public class Home_interiorController extends BaseMapController {
 
         if (bed_detect != null && btntoSleep != null) {
             interactionManager.addZone(new InteractionZone(bed_detect, inside -> {
-                applyInteractionState(btntoSleep, inside);
+                insideBedZone = inside;
+                refreshSleepInteractionState();
             }));
         }
 
@@ -1543,39 +1551,100 @@ public class Home_interiorController extends BaseMapController {
         refreshChestAndInventoryViews();
     }
     
-    @FXML
-    private void handleSleepAction(ActionEvent event) {
-        if (btntoSleep.isDisable()) return;
+    private boolean isSleepingActive() {
+        return sleepTimer != null;
+    }
 
-        sleepStackPane.setManaged(true);
-        sleepStackPane.setDisable(false);
-        sleepStackPane.setVisible(true);
-        
-        if (player != null) {
-        player.clearInputState();
+    private void refreshSleepInteractionState() {
+        boolean canUseSleep = insideBedZone
+            && playerState != null
+            && playerState.canSleep()
+            && !isSleepingActive();
+
+        applyInteractionState(btntoSleep, canUseSleep);
+    }
+
+    private void applySleepTimeScaleOverride(double multiplier) {
+        if (sleepTimeScaleOverrideActive) return;
+        GameTimeManager time = GameTimeManager.get();
+        sleepPreviousTimeScale = time.timeScaleProperty().get();
+        time.timeScaleProperty().set(Math.max(0.1, multiplier));
+        sleepTimeScaleOverrideActive = true;
+    }
+
+    private void restoreSleepTimeScaleOverride() {
+        if (!sleepTimeScaleOverrideActive) return;
+        GameTimeManager.get().timeScaleProperty().set(sleepPreviousTimeScale);
+        sleepTimeScaleOverrideActive = false;
+    }
+
+    private void stopSleepSequence() {
+        if (sleepTimer != null) {
+            sleepTimer.stop();
+            sleepTimer = null;
         }
 
-        javafx.animation.PauseTransition pause =
-            new javafx.animation.PauseTransition(javafx.util.Duration.seconds(2));
+        restoreSleepTimeScaleOverride();
 
-        pause.setOnFinished(e -> {
-            GameTimeManager time = GameTimeManager.get();
+        if (playerState != null) {
+            playerState.stopSleeping();
+        }
 
-            // move to next morning
-            time.setDay(time.dayNumberProperty().get() + 1);
-            time.setTimeOfDay(6, 0);
-            if(playerState.getHp() <= playerState.getMaxHp() * 0.8){
-                playerState.setHp((int) (playerState.getMaxHp() * 0.8));
-            }
-            if(playerState.getStamina() <= playerState.getMaxStamina() * 0.8){
-                playerState.setStamina((int) (playerState.getMaxStamina() * 0.8));
-            }
+        if (sleepStackPane != null) {
             sleepStackPane.setVisible(false);
             sleepStackPane.setDisable(true);
             sleepStackPane.setManaged(false);
-        });
+        }
 
-        pause.play();
+        refreshSleepInteractionState();
+    }
+
+    @FXML
+    private void handleSleepAction(ActionEvent event) {
+        if (btntoSleep == null || btntoSleep.isDisable() || playerState == null || !playerState.canSleep() || isSleepingActive()) {
+            return;
+        }
+
+        if (sleepStackPane != null) {
+            sleepStackPane.setManaged(true);
+            sleepStackPane.setDisable(false);
+            sleepStackPane.setVisible(true);
+        }
+
+        if (player != null) {
+            player.clearInputState();
+        }
+
+        playerState.startSleeping();
+        applySleepTimeScaleOverride(6.0);
+
+        sleepTimer = new javafx.animation.AnimationTimer() {
+            private long lastNow = 0L;
+
+            @Override
+            public void handle(long now) {
+                if (lastNow == 0L) {
+                    lastNow = now;
+                    return;
+                }
+
+                double dtSeconds = (now - lastNow) / 1_000_000_000.0;
+                lastNow = now;
+
+                if (dtSeconds <= 0.0 || playerState == null) {
+                    return;
+                }
+
+                // Sleep uses the same base regen rules as idle; it restores faster only because time flows faster.
+                playerState.updateStaminaOverTime(dtSeconds, PlayerState.StaminaMode.SLEEP, 6.0);
+
+                if (!playerState.canSleep()) {
+                    stopSleepSequence();
+                }
+            }
+        };
+        sleepTimer.start();
+        refreshSleepInteractionState();
     }
 
     @FXML
