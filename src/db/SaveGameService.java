@@ -82,9 +82,9 @@ public class SaveGameService {
         String insertSave = """
             INSERT INTO save_game
             (character_id, saved_name, world_name, current_map_id, stats_id, money,
-             saved_location_x, saved_location_y, exp,
+             saved_location_x, saved_location_y, exp, current_hp, current_stamina,
              selected_hotbar_index, hotbar_visible)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """;
 
         try (PreparedStatement psSave = con.prepareStatement(insertSave, Statement.RETURN_GENERATED_KEYS)) {
@@ -97,8 +97,10 @@ public class SaveGameService {
             psSave.setInt(7, (int) Math.round(gs.getPlayerX()));
             psSave.setInt(8, (int) Math.round(gs.getPlayerY()));
             psSave.setInt(9, ps.getExp());
-            psSave.setInt(10, ps.getselectedHotbarIndex());
-            psSave.setBoolean(11, ps.isHotbarVisible());
+            psSave.setInt(10, ps.getHp());
+            psSave.setInt(11, ps.getStamina());
+            psSave.setInt(12, ps.getselectedHotbarIndex());
+            psSave.setBoolean(13, ps.isHotbarVisible());
             psSave.executeUpdate();
 
             try (ResultSet rs = psSave.getGeneratedKeys()) {
@@ -157,6 +159,8 @@ public class SaveGameService {
                 saved_location_x = ?,
                 saved_location_y = ?,
                 exp = ?,
+                current_hp = ?,
+                current_stamina = ?,
                 selected_hotbar_index = ?,
                 hotbar_visible = ?,
                 last_saved_date = NOW()
@@ -172,9 +176,11 @@ public class SaveGameService {
             psmt.setInt(4, (int) Math.round(gs.getPlayerX()));
             psmt.setInt(5, (int) Math.round(gs.getPlayerY()));
             psmt.setInt(6, ps.getExp());
-            psmt.setInt(7, ps.getselectedHotbarIndex());
-            psmt.setBoolean(8, ps.isHotbarVisible());
-            psmt.setInt(9, gs.getCurrentSaveId());
+            psmt.setInt(7, ps.getHp());
+            psmt.setInt(8, ps.getStamina());
+            psmt.setInt(9, ps.getselectedHotbarIndex());
+            psmt.setBoolean(10, ps.isHotbarVisible());
+            psmt.setInt(11, gs.getCurrentSaveId());
             psmt.executeUpdate();
         }
     }

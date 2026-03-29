@@ -50,6 +50,7 @@ public class LoadGameService {
         String sql = """
             SELECT saved_id, character_id, world_name, current_map_id, money,
                    saved_location_x, saved_location_y, exp,
+                   current_hp, current_stamina,
                    selected_hotbar_index, hotbar_visible
             FROM save_game
             WHERE saved_id = ?
@@ -74,6 +75,8 @@ public class LoadGameService {
                 psState.setHotbarVisible(rs.getBoolean("hotbar_visible"));
                 psState.setExp(rs.getInt("exp"));
 
+                gs.setLoadedCurrentHp(rs.getInt("current_hp"));
+                gs.setLoadedCurrentStamina(rs.getInt("current_stamina"));
                 replaceCoins(psState.getInventory(), rs.getInt("money"));
                 return true;
             }
@@ -104,9 +107,9 @@ public class LoadGameService {
                 int maxStamina = rs.getInt("stamina");
 
                 psState.setMaxHp(maxHp);
-                psState.setHp(maxHp);
                 psState.setMaxStamina(maxStamina);
-                psState.setStamina(maxStamina);
+                psState.setHp(gs.getLoadedCurrentHp());
+                psState.setStamina(gs.getLoadedCurrentStamina());
             }
         }
     }

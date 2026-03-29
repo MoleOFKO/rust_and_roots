@@ -607,4 +607,13 @@ public final class GameState {
     public void setCurrentWorldName(String currentWorldName) {
         this.currentWorldName = currentWorldName == null ? "" : currentWorldName.trim();
     }
+    
+    private int loadedCurrentHp = 45;
+    private int loadedCurrentStamina = 50;
+
+    public int getLoadedCurrentHp() { return loadedCurrentHp; }
+    public void setLoadedCurrentHp(int v) { loadedCurrentHp = v; }
+
+    public int getLoadedCurrentStamina() { return loadedCurrentStamina; }
+    public void setLoadedCurrentStamina(int v) { loadedCurrentStamina = v; }
 }
