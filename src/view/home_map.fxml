@@ -645,7 +645,7 @@
                                     <DropShadow />
                                  </effect>
                               </ImageView>
-                              <Group fx:id="statusgroup" layoutX="90.0" layoutY="62.0">
+                              <Group fx:id="statusgroup" layoutX="90.0" layoutY="62.0" visible="false">
                                  <children>
                                     <Label fx:id="statusHP" layoutX="42.0" layoutY="63.0" prefHeight="17.0" prefWidth="203.0" text="HP : " textFill="WHITE">
                                        <font>
@@ -804,14 +804,14 @@
                                     </ImageView>
                                  </children>
                               </Group>
-                              <Group fx:id="skillsgroup" layoutX="429.0" layoutY="62.0" visible="false">
+                              <Group fx:id="skillsgroup" layoutX="429.0" layoutY="62.0">
                                  <children>
                                     <ImageView fx:id="btnstatus" fitHeight="19.0" fitWidth="78.0" onMouseClicked="#handlebtnstatusaction" pickOnBounds="true" preserveRatio="true">
                                        <image>
                                           <Image url="@../image/tools/btnstatus.png" />
                                        </image>
                                     </ImageView>
-                                    <Label fx:id="farming" layoutX="-297.0" layoutY="61.0" prefHeight="21.0" prefWidth="127.0" text="Farming :" textFill="WHITE">
+                                    <Label fx:id="farming" layoutX="-297.0" layoutY="61.0" prefHeight="21.0" prefWidth="273.0" text="Farming :" textFill="WHITE">
                                        <font>
                                           <Font name="System Bold" size="15.0" />
                                        </font>
@@ -820,7 +820,7 @@
                                        </effect>
                                     </Label>
                                     <Line endX="363.66668701171875" endY="7.62939453125E-6" layoutX="-307.0" layoutY="86.0" startX="-9.0" startY="7.62939453125E-6" stroke="WHITE" />
-                                    <Label fx:id="gathering" layoutX="-297.0" layoutY="88.0" prefHeight="21.0" prefWidth="127.0" text="Gathering :" textFill="WHITE">
+                                    <Label fx:id="gathering" layoutX="-297.0" layoutY="88.0" prefHeight="21.0" prefWidth="275.0" text="Gathering :" textFill="WHITE">
                                        <font>
                                           <Font name="System Bold" size="15.0" />
                                        </font>
@@ -828,7 +828,7 @@
                                           <DropShadow />
                                        </effect>
                                     </Label>
-                                    <Label fx:id="crafting" layoutX="-297.0" layoutY="116.0" prefHeight="21.0" prefWidth="127.0" text="Crafting" textFill="WHITE">
+                                    <Label fx:id="crafting" layoutX="-297.0" layoutY="116.0" prefHeight="21.0" prefWidth="274.0" text="Crafting" textFill="WHITE">
                                        <font>
                                           <Font name="System Bold" size="15.0" />
                                        </font>
@@ -836,7 +836,7 @@
                                           <DropShadow />
                                        </effect>
                                     </Label>
-                                    <Label fx:id="fishing" layoutX="-296.0" layoutY="143.0" prefHeight="21.0" prefWidth="127.0" text="Fishing :" textFill="WHITE">
+                                    <Label fx:id="fishing" layoutX="-296.0" layoutY="143.0" prefHeight="21.0" prefWidth="277.0" text="Fishing :" textFill="WHITE">
                                        <font>
                                           <Font name="System Bold" size="15.0" />
                                        </font>
@@ -844,7 +844,7 @@
                                           <DropShadow />
                                        </effect>
                                     </Label>
-                                    <Label fx:id="cooking" layoutX="-295.0" layoutY="170.0" prefHeight="21.0" prefWidth="127.0" text="Cooking :" textFill="WHITE">
+                                    <Label fx:id="cooking" layoutX="-295.0" layoutY="170.0" prefHeight="21.0" prefWidth="276.0" text="Cooking :" textFill="WHITE">
                                        <font>
                                           <Font name="System Bold" size="15.0" />
                                        </font>

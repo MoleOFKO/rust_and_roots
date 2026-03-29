@@ -41,6 +41,7 @@ import model.Inventory;
 import model.ItemDatabase;
 import model.item;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import util.SceneManager;
 
 /**
@@ -828,6 +829,8 @@ public class Home_interiorController extends BaseMapController {
     private Button Playerinvbtn110;
     @FXML
     private Label Playerinvlbl110;
+    @FXML
+    private Group skillsgroup;
 
     @FXML
     private void handleHPminusaction(MouseEvent event) { onStatusHpMinus(); }
@@ -866,10 +869,10 @@ public class Home_interiorController extends BaseMapController {
     private void handleAGIplusaction(MouseEvent event) { onStatusAgiPlus(); }
 
     @FXML
-    private void handleusepointaction(MouseEvent event) { onStatusUsePoint(); }
+    private void handleusepointaction(MouseEvent event) { onSharedUsePoint(); }
 
     @FXML
-    private void handleconfirmaction(MouseEvent event) { onStatusConfirm(); }
+    private void handleconfirmaction(MouseEvent event) { onSharedConfirm(); }
 
     @FXML
     private void handlesaveexitaction(ActionEvent event) {
@@ -899,6 +902,56 @@ public class Home_interiorController extends BaseMapController {
         SceneManager.switchScene("/view/saveloads.fxml");
     }
 
+    private void bindSettingControls() {
+        GameTimeManager time = GameTimeManager.get();
+
+        if (timescaleslider != null) {
+            timescaleslider.valueProperty().unbindBidirectional(time.timeScaleProperty());
+            timescaleslider.valueProperty().bindBidirectional(time.timeScaleProperty());
+        }
+
+        if (sliderscale != null) {
+            sliderscale.textProperty().unbind();
+            sliderscale.textProperty().bind(Bindings.createStringBinding(
+                () -> String.format("Current Time Speed : x%.1f", time.timeScaleProperty().get()),
+                time.timeScaleProperty()
+            ));
+        }
+
+        if (lbldays != null) {
+            lbldays.textProperty().unbind();
+            lbldays.textProperty().bind(Bindings.createStringBinding(
+                () -> "Days : " + time.dayNumberProperty().get(),
+                time.dayNumberProperty()
+            ));
+        }
+
+        if (lbltime != null) {
+            lbltime.textProperty().unbind();
+            lbltime.textProperty().bind(Bindings.createStringBinding(
+                () -> "Time : " + time.formattedProperty().get(),
+                time.formattedProperty()
+            ));
+        }
+
+        if (btnsetday != null) btnsetday.setOnAction(e -> time.setTimeOfDay(8, 0));
+        if (btnsetnight != null) btnsetnight.setOnAction(e -> time.setTimeOfDay(20, 0));
+        if (btnplus1h != null) btnplus1h.setOnAction(e -> time.addMinutes(60));
+        if (btnsaveandexit != null) {
+            btnsaveandexit.setOnAction(e -> {
+                try {
+                    capturePlayerSnapshot();
+                    new SaveGameService().saveGame(GameState.get());
+                    if (gameLoop != null) gameLoop.stop();
+                    if (player != null) player.stop();
+                    Platform.exit();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            });
+        }
+    }
+    
     @FXML
     private void handleopenInventoryaction(ActionEvent event) {
         super.openInventory();
@@ -923,12 +976,14 @@ public class Home_interiorController extends BaseMapController {
     private void handlebtnskillacion(MouseEvent event) {
         super.setSkillsOpen(true);
         super.setStatusOpen(false);
+        refreshStatusAllocationUi();
     }
 
     @FXML
     private void handlebtnstatusaction(MouseEvent event) {
         super.setStatusOpen(true);
         super.setSkillsOpen(false);
+        refreshStatusAllocationUi();
     }
 
     @FXML
@@ -981,6 +1036,145 @@ public class Home_interiorController extends BaseMapController {
         onSkillCookingPlus();
     }
 
+    private void bindStatusLabels() {
+        if (playerState == null) return;
+
+        playerState.playerNameProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
+        playerState.expProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
+        playerState.hpProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
+        playerState.maxHpProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
+        playerState.staminaProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
+        playerState.maxStaminaProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
+        playerState.strProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
+        playerState.vitProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
+        playerState.dexProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
+        playerState.agiProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
+    }
+
+    @Override
+    protected void refreshStatusAllocationUi() {
+        refreshStatusView();
+        refreshSkillsView();
+        refreshStatusButtons();
+    }
+
+    private void refreshStatusView() {
+        if (playerState == null) return;
+
+        int pendingExpCost = getPendingExpCost();
+
+        if (statusName != null) statusName.setText("Name : " + playerState.getPlayerName());
+        if (statusEXP != null) {
+            statusEXP.setText("EXP : " + playerState.getExp() + (pendingExpCost > 0 ? " (-" + pendingExpCost + ")" : ""));
+        }
+        if (statusHP != null) {
+            statusHP.setText("HP : " + playerState.getHp() + "/" + (playerState.getMaxHp() + pendingHpPoints) + formatPending(pendingHpPoints));
+        }
+        if (statusSP != null) {
+            statusSP.setText("SP : " + playerState.getStamina() + "/" + (playerState.getMaxStamina() + pendingSpPoints) + formatPending(pendingSpPoints));
+        }
+        if (statusSTR != null) statusSTR.setText("STR : " + playerState.getStr() + formatPending(pendingStrPoints));
+        if (statusVIT != null) statusVIT.setText("VIT : " + playerState.getVit() + formatPending(pendingVitPoints));
+        if (statusDEX != null) statusDEX.setText("DEX : " + playerState.getDex() + formatPending(pendingDexPoints));
+        if (statusAGI != null) statusAGI.setText("AGI : " + playerState.getAgi() + formatPending(pendingAgiPoints));
+    }
+
+    private String formatPending(int points) {
+        return points <= 0 ? "" : "(+" + points + ")";
+    }
+
+    private String formatPendingSkill(int value) {
+        return value <= 0 ? "" : " (-" + value + ")";
+    }
+
+    private String appendPendingSkillCost(String base, int pendingCost) {
+        return base + formatPendingSkill(pendingCost);
+    }
+
+    private void refreshSkillsView() {
+        if (gameState == null) return;
+        GameState.PlayerSkills skills = gameState.getPlayerSkills();
+
+        if (farming != null) farming.setText(appendPendingSkillCost(skills.getFarmingDisplay(), pendingFarmingSkillExp));
+        if (gathering != null) gathering.setText(appendPendingSkillCost(skills.getGatheringDisplay(), pendingGatheringSkillExp));
+        if (crafting != null) crafting.setText(appendPendingSkillCost(skills.getCraftingDisplay(), pendingCraftingSkillExp));
+        if (fishing != null) fishing.setText(appendPendingSkillCost(skills.getFishingDisplay(), pendingFishingSkillExp));
+        if (cooking != null) cooking.setText(appendPendingSkillCost(skills.getCookingDisplay(), pendingCookingSkillExp));
+    }
+
+    private void refreshStatusButtons() {
+        boolean canUsePoint = playerState != null && playerState.getExp() > 0;
+        boolean skillsVisible = isSkillsScreenVisible();
+
+        configureImageButton(btnUsePoint, canUsePoint, true, statusAllocationMode || skillAllocationMode ? 1.0 : 0.85);
+
+        if (skillsVisible) {
+            configureImageButton(btnConfirm, skillAllocationMode && getPendingSkillExpTotal() > 0, true, 1.0);
+
+            configureImageButton(btnfarmingplus1, canIncreaseSkill("farming"), skillAllocationMode, 1.0);
+            configureImageButton(btngatheringplus1, canIncreaseSkill("gathering"), skillAllocationMode, 1.0);
+            configureImageButton(btncraftingplus1, canIncreaseSkill("crafting"), skillAllocationMode, 1.0);
+            configureImageButton(btnfishingplus1, canIncreaseSkill("fishing"), skillAllocationMode, 1.0);
+            configureImageButton(btncookingplus1, canIncreaseSkill("cooking"), skillAllocationMode, 1.0);
+
+            configureImageButton(btnfarmingminus1, skillAllocationMode && pendingFarmingSkillExp > 0, skillAllocationMode, 1.0);
+            configureImageButton(btngatheringminus1, skillAllocationMode && pendingGatheringSkillExp > 0, skillAllocationMode, 1.0);
+            configureImageButton(btncraftingminus1, skillAllocationMode && pendingCraftingSkillExp > 0, skillAllocationMode, 1.0);
+            configureImageButton(btnfishingminus1, skillAllocationMode && pendingFishingSkillExp > 0, skillAllocationMode, 1.0);
+            configureImageButton(btncookingminus1, skillAllocationMode && pendingCookingSkillExp > 0, skillAllocationMode, 1.0);
+
+            configureImageButton(btnHPplus, false, false, 1.0);
+            configureImageButton(btnSPplus, false, false, 1.0);
+            configureImageButton(btnSTRplus, false, false, 1.0);
+            configureImageButton(btnVITplus, false, false, 1.0);
+            configureImageButton(btnDEXplus, false, false, 1.0);
+            configureImageButton(btnAGIplus, false, false, 1.0);
+            configureImageButton(btnHPminus, false, false, 1.0);
+            configureImageButton(btnSPminus, false, false, 1.0);
+            configureImageButton(btnSTRminus, false, false, 1.0);
+            configureImageButton(btnVITminus, false, false, 1.0);
+            configureImageButton(btnDEXminus, false, false, 1.0);
+            configureImageButton(btnAGIminus, false, false, 1.0);
+            return;
+        }
+
+        configureImageButton(btnConfirm, statusAllocationMode && getPendingExpCost() > 0, statusAllocationMode, 1.0);
+
+        configureImageButton(btnHPplus, canIncreaseStat("hp"), statusAllocationMode, 1.0);
+        configureImageButton(btnSPplus, canIncreaseStat("sp"), statusAllocationMode, 1.0);
+        configureImageButton(btnSTRplus, canIncreaseStat("str"), statusAllocationMode, 1.0);
+        configureImageButton(btnVITplus, canIncreaseStat("vit"), statusAllocationMode, 1.0);
+        configureImageButton(btnDEXplus, canIncreaseStat("dex"), statusAllocationMode, 1.0);
+        configureImageButton(btnAGIplus, canIncreaseStat("agi"), statusAllocationMode, 1.0);
+
+        configureImageButton(btnHPminus, statusAllocationMode && pendingHpPoints > 0, statusAllocationMode, 1.0);
+        configureImageButton(btnSPminus, statusAllocationMode && pendingSpPoints > 0, statusAllocationMode, 1.0);
+        configureImageButton(btnSTRminus, statusAllocationMode && pendingStrPoints > 0, statusAllocationMode, 1.0);
+        configureImageButton(btnVITminus, statusAllocationMode && pendingVitPoints > 0, statusAllocationMode, 1.0);
+        configureImageButton(btnDEXminus, statusAllocationMode && pendingDexPoints > 0, statusAllocationMode, 1.0);
+        configureImageButton(btnAGIminus, statusAllocationMode && pendingAgiPoints > 0, statusAllocationMode, 1.0);
+
+        configureImageButton(btnfarmingplus1, false, false, 1.0);
+        configureImageButton(btngatheringplus1, false, false, 1.0);
+        configureImageButton(btncraftingplus1, false, false, 1.0);
+        configureImageButton(btnfishingplus1, false, false, 1.0);
+        configureImageButton(btncookingplus1, false, false, 1.0);
+        configureImageButton(btnfarmingminus1, false, false, 1.0);
+        configureImageButton(btngatheringminus1, false, false, 1.0);
+        configureImageButton(btncraftingminus1, false, false, 1.0);
+        configureImageButton(btnfishingminus1, false, false, 1.0);
+        configureImageButton(btncookingminus1, false, false, 1.0);
+    }
+
+    private void configureImageButton(ImageView imageView, boolean enabled, boolean visible, double activeOpacity) {
+        if (imageView == null) return;
+        imageView.setVisible(visible);
+        imageView.setManaged(visible);
+        imageView.setDisable(!enabled);
+        imageView.setMouseTransparent(!visible || !enabled);
+        imageView.setOpacity(!visible ? 0.0 : (enabled ? activeOpacity : 0.45));
+    }
+
     private enum SelectionSource { NONE, PLAYER, CHEST }
 
     private final List<ImageView> chestImages = new ArrayList<>();
@@ -1013,10 +1207,18 @@ public class Home_interiorController extends BaseMapController {
         chestInventory = gameState.getChestInventory();
         setupChestUi();
         setupInteriorZones();
+//        setupMenuTabs();
+//        bindStatusLabels();
+        bindSettingControls();
 
         if (btncook != null) btncook.setOnAction(this::handlecookaction);
         if (btncraft != null) btncraft.setOnAction(this::handlecraftaction);
         if (btnmelt != null) btnmelt.setOnAction(e -> openMelt());
+        bindStatusLabels();
+
+        if (playerState != null) {
+            playerState.expProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
+        }
 
         pinvImages.clear();
         pinvLabels.clear();
