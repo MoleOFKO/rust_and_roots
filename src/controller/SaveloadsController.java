@@ -21,6 +21,7 @@ import javafx.scene.image.Image;
 import java.io.InputStream;
 import javafx.scene.control.Alert;
 import javafx.scene.input.MouseEvent;
+import javax.swing.JOptionPane;
 
 public class SaveloadsController implements Initializable {
 
@@ -67,6 +68,7 @@ public class SaveloadsController implements Initializable {
         refreshSlotLabels();
         refreshSelectionUi();
         refreshSelectedSlotPreview();
+        refreshDeleteButtonState();
         btnLoad.setText("");
     }
 
@@ -103,7 +105,7 @@ public class SaveloadsController implements Initializable {
 
         try (Connection con = db.getConnection()) {
             String sql = """
-                SELECT saved_name
+                SELECT world_name
                 FROM save_game
                 WHERE character_id = ? AND saved_name = ?
                 LIMIT 1
@@ -115,6 +117,10 @@ public class SaveloadsController implements Initializable {
 
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
+                        String worldName = rs.getString("world_name");
+                        if (worldName != null && !worldName.isBlank()) {
+                            return worldName;
+                        }
                         return slotName;
                     }
                 }
@@ -206,7 +212,12 @@ public class SaveloadsController implements Initializable {
         String returnFxml = GameState.get().getReturnFxml();
 
         if (returnFxml == null || returnFxml.isBlank()) {
-            returnFxml = "/view/main_menu.fxml";
+            String mapKey = GameState.get().getCurrentMapKey();
+            if (mapKey != null && !mapKey.isBlank()) {
+                returnFxml = "/view/" + mapKey + ".fxml";
+            } else {
+                returnFxml = "/view/main_menu.fxml";
+            }
         }
 
         GameState.get().setSaveMenuMode(false);
@@ -219,6 +230,7 @@ public class SaveloadsController implements Initializable {
         GameState.get().setSelectedSaveSlot(1);
         refreshSelectionUi();
         refreshSelectedSlotPreview();
+        refreshDeleteButtonState();
     }
 
     @FXML
@@ -227,6 +239,7 @@ public class SaveloadsController implements Initializable {
         GameState.get().setSelectedSaveSlot(2);
         refreshSelectionUi();
         refreshSelectedSlotPreview();
+        refreshDeleteButtonState();
     }
 
     @FXML
@@ -235,6 +248,7 @@ public class SaveloadsController implements Initializable {
         GameState.get().setSelectedSaveSlot(3);
         refreshSelectionUi();
         refreshSelectedSlotPreview();
+        refreshDeleteButtonState();
     }
 
     @FXML
@@ -243,6 +257,7 @@ public class SaveloadsController implements Initializable {
         GameState.get().setSelectedSaveSlot(4);
         refreshSelectionUi();
         refreshSelectedSlotPreview();
+        refreshDeleteButtonState();
     }
     
     private void refreshSelectedSlotPreview() {
@@ -274,10 +289,12 @@ public class SaveloadsController implements Initializable {
 
     @FXML
     private void handlesaveloaddeleteaction(MouseEvent event) {
+        confirmDeleteSelectedSave();
     }
 
     @FXML
     private void handledeleteaction(ActionEvent event) {
+        confirmDeleteSelectedSave();
     }
 
     private static class SlotPreview {
@@ -372,5 +389,126 @@ public class SaveloadsController implements Initializable {
         }
 
         return null;
+    }
+    
+    private void refreshDeleteButtonState() {
+        int characterId = GameState.get().getCurrentCharacterId();
+        boolean hasSave = findSaveIdForSlot(characterId, selectedSlot) > 0;
+
+        if (btndelete != null) {
+            btndelete.setDisable(!hasSave);
+            btndelete.setVisible(hasSave);
+            btndelete.setManaged(hasSave);
+        }
+
+        if (deletesaveload != null) {
+            deletesaveload.setDisable(!hasSave);
+            deletesaveload.setVisible(hasSave);
+            deletesaveload.setManaged(hasSave);
+            deletesaveload.setOpacity(hasSave ? 1.0 : 0.4);
+        }
+    }
+    
+    private void confirmDeleteSelectedSave() {
+        int characterId = GameState.get().getCurrentCharacterId();
+        int saveId = findSaveIdForSlot(characterId, selectedSlot);
+
+        if (saveId <= 0) {
+            if (day != null) {
+                day.setText("No save found in slot " + selectedSlot);
+            }
+            return;
+        }
+
+        String saveLabel = readSlotLabel(characterId, selectedSlot);
+
+        int result = JOptionPane.showConfirmDialog(
+            null,
+            "Are you sure you want to delete \"" + saveLabel + "\"?\nThis action cannot be undone.",
+            "Delete Save",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.WARNING_MESSAGE
+        );
+
+        if (result == JOptionPane.YES_OPTION) {
+            deleteSelectedSave();
+            refreshDeleteButtonState();
+        }
+    }
+    
+    private void deleteSelectedSave() {
+        int characterId = GameState.get().getCurrentCharacterId();
+        int saveId = findSaveIdForSlot(characterId, selectedSlot);
+
+        if (saveId <= 0) {
+            if (day != null) {
+                day.setText("No save found in slot " + selectedSlot);
+            }
+            return;
+        }
+
+        dbcon db = new dbcon();
+
+        try (Connection con = db.getConnection()) {
+            con.setAutoCommit(false);
+
+            try {
+                try (PreparedStatement ps = con.prepareStatement(
+                        "DELETE FROM saved_item WHERE saved_id = ?")) {
+                    ps.setInt(1, saveId);
+                    ps.executeUpdate();
+                }
+
+                try (PreparedStatement ps = con.prepareStatement(
+                        "DELETE FROM saved_hotbar WHERE saved_id = ?")) {
+                    ps.setInt(1, saveId);
+                    ps.executeUpdate();
+                }
+
+                try (PreparedStatement ps = con.prepareStatement(
+                        "DELETE FROM saved_time WHERE saved_id = ?")) {
+                    ps.setInt(1, saveId);
+                    ps.executeUpdate();
+                }
+
+                try (PreparedStatement ps = con.prepareStatement(
+                        "DELETE FROM saved_farm_plot WHERE saved_id = ?")) {
+                    ps.setInt(1, saveId);
+                    ps.executeUpdate();
+                }
+
+                try (PreparedStatement ps = con.prepareStatement(
+                        "DELETE FROM saved_chest_item WHERE saved_id = ?")) {
+                    ps.setInt(1, saveId);
+                    ps.executeUpdate();
+                }
+
+                try (PreparedStatement ps = con.prepareStatement(
+                        "DELETE FROM save_game WHERE saved_id = ?")) {
+                    ps.setInt(1, saveId);
+                    ps.executeUpdate();
+                }
+
+                con.commit();
+
+                refreshSlotLabels();
+                refreshSelectedSlotPreview();
+                refreshDeleteButtonState();
+
+                if (day != null) {
+                    day.setText("Deleted save successfully");
+                }
+
+            } catch (Exception ex) {
+                con.rollback();
+                throw ex;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (day != null) {
+                day.setText("Delete failed");
+            }
+        }
     }
 }
