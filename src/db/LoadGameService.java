@@ -50,7 +50,6 @@ public class LoadGameService {
         String sql = """
             SELECT saved_id, character_id, world_name, current_map_id, money,
                    saved_location_x, saved_location_y, exp,
-                   current_hp, current_stamina,
                    selected_hotbar_index, hotbar_visible
             FROM save_game
             WHERE saved_id = ?
@@ -75,8 +74,6 @@ public class LoadGameService {
                 psState.setHotbarVisible(rs.getBoolean("hotbar_visible"));
                 psState.setExp(rs.getInt("exp"));
 
-                gs.setLoadedCurrentHp(rs.getInt("current_hp"));
-                gs.setLoadedCurrentStamina(rs.getInt("current_stamina"));
                 replaceCoins(psState.getInventory(), rs.getInt("money"));
                 return true;
             }
@@ -107,9 +104,9 @@ public class LoadGameService {
                 int maxStamina = rs.getInt("stamina");
 
                 psState.setMaxHp(maxHp);
+                psState.setHp(maxHp);
                 psState.setMaxStamina(maxStamina);
-                psState.setHp(gs.getLoadedCurrentHp());
-                psState.setStamina(gs.getLoadedCurrentStamina());
+                psState.setStamina(maxStamina);
             }
         }
     }
@@ -228,9 +225,30 @@ public class LoadGameService {
                     FarmState farmState = gs.getFarmState(mapKey);
                     FarmState.PlotData plot = farmState.getPlot(plotId);
 
-                    plot.seed = (seedType == null || seedType.isBlank())
-                            ? null
-                            : Farm.SeedType.valueOf(seedType);
+                    plot.seed = null;
+                    plot.seedItemId = null;
+                    plot.seedItemName = null;
+                    plot.cropItemName = null;
+                    plot.cropSpriteKey = null;
+
+                    if (seedType != null && !seedType.isBlank()) {
+                        if (seedType.startsWith("ID:")) {
+                            try {
+                                int seedItemId = Integer.parseInt(seedType.substring(3).trim());
+                                plot.seedItemId = seedItemId > 0 ? seedItemId : null;
+                                plot.seedItemName = plot.seedItemId == null ? null : model.ItemDatabase.getItemName(seedItemId);
+                                plot.cropItemName = plot.seedItemId == null ? null : model.ItemDatabase.resolveCropNameForSeed(seedItemId);
+                                plot.cropSpriteKey = plot.seedItemId == null ? null : model.ItemDatabase.buildCropSpriteKeyForSeed(seedItemId);
+                            } catch (NumberFormatException ignored) {
+                            }
+                        } else {
+                            try {
+                                plot.seed = Farm.SeedType.valueOf(seedType);
+                            } catch (IllegalArgumentException ignored) {
+                                plot.seed = null;
+                            }
+                        }
+                    }
 
                     plot.plantedAt = rs.getDouble("planted_at");
                     plot.lastWateredAt = rs.getDouble("last_watered_at");
