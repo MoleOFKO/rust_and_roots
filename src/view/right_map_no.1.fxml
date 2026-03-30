@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.Group?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.shape.Rectangle?>
+
+<StackPane fx:id="view" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.RightMapController">
+
+    <Group fx:id="world">
+
+        <!-- Background -->
+        <ImageView fx:id="bg" fitHeight="400" fitWidth="600" pickOnBounds="true" preserveRatio="false">
+         <image>
+            <Image url="@../image/maps/rightmap_no.1(1).png" />
+         </image></ImageView>
+
+        <!-- Walls: prefix MUST be "wall" so CollisionRegistry.collectWalls(walls) finds them  -->
+        <Group fx:id="walls">
+            <!-- examples: -->
+            <Rectangle fx:id="wall" height="10" layoutX="0" layoutY="0" width="600" />
+            <Rectangle fx:id="wall1" height="10" layoutX="0" layoutY="390" width="600" />
+            <Rectangle fx:id="wall2" height="400" layoutX="0" layoutY="0" width="10" />
+            <Rectangle fx:id="wall3" height="400" layoutX="590" layoutY="0" width="10" />
+         <Rectangle fx:id="wall4" fill="TRANSPARENT" height="381.0" layoutX="510.0" layoutY="10.0" stroke="BLACK" width="80.0" />
+         <Rectangle fx:id="wall5" fill="TRANSPARENT" height="153.0" layoutX="500.0" layoutY="98.0" stroke="BLACK" width="8.0" />
+         <Rectangle fx:id="wall6" fill="TRANSPARENT" height="153.0" layoutX="493.0" layoutY="136.0" stroke="BLACK" width="8.0" />
+         <Rectangle fx:id="wall7" fill="TRANSPARENT" height="153.0" layoutX="484.0" layoutY="160.0" stroke="BLACK" width="8.0" />
+         <Rectangle fx:id="wall8" fill="TRANSPARENT" height="153.0" layoutX="475.0" layoutY="181.0" stroke="BLACK" width="8.0" />
+         <Rectangle fx:id="wall9" fill="TRANSPARENT" height="153.0" layoutX="465.0" layoutY="204.0" stroke="BLACK" width="8.0" />
+         <Rectangle fx:id="wall10" fill="TRANSPARENT" height="153.0" layoutX="455.0" layoutY="216.0" stroke="BLACK" width="8.0" />
+         <Rectangle fx:id="wall11" fill="TRANSPARENT" height="153.0" layoutX="445.0" layoutY="232.0" stroke="BLACK" width="8.0" />
+         <Rectangle fx:id="wall12" fill="TRANSPARENT" height="138.0" layoutX="433.0" layoutY="252.0" stroke="BLACK" width="10.0" />
+         <Rectangle fx:id="wall19" fill="TRANSPARENT" height="47.0" layoutX="305.0" layoutY="341.0" stroke="BLACK" width="125.0" />
+         <Rectangle fx:id="wall13" fill="TRANSPARENT" height="71.0" layoutX="420.0" layoutY="269.0" stroke="BLACK" width="11.0" />
+         <Rectangle fx:id="wall14" fill="TRANSPARENT" height="51.0" layoutX="407.0" layoutY="286.0" stroke="BLACK" width="12.0" />
+         <Rectangle fx:id="wall15" fill="TRANSPARENT" height="43.0" layoutX="392.0" layoutY="296.0" stroke="BLACK" width="13.0" />
+         <Rectangle fx:id="wall16" fill="TRANSPARENT" height="28.0" layoutX="376.0" layoutY="309.0" stroke="BLACK" width="15.0" />
+         <Rectangle fx:id="wall17" fill="TRANSPARENT" height="20.0" layoutX="356.0" layoutY="318.0" stroke="BLACK" width="16.0" />
+         <Rectangle fx:id="wall18" fill="TRANSPARENT" height="10.0" layoutX="336.0" layoutY="330.0" stroke="BLACK" width="17.0" />
+         <Rectangle fx:id="wall20" fill="TRANSPARENT" height="27.0" layoutX="258.0" layoutY="353.0" stroke="BLACK" width="45.0" />
+         <Rectangle fx:id="wall21" fill="TRANSPARENT" height="28.0" layoutX="189.0" layoutY="366.0" stroke="BLACK" width="67.0" />
+         <Rectangle fx:id="wall22" fill="TRANSPARENT" height="21.0" layoutX="148.0" layoutY="370.0" stroke="BLACK" width="39.0" />
+        </Group>
+
+        <!-- Player -->
+        <Group fx:id="human" layoutX="300" layoutY="200">
+            <ImageView fx:id="human_img" fitHeight="64" fitWidth="64" />
+            <Rectangle fx:id="human_hitbox" arcHeight="6" arcWidth="6" height="24" layoutX="18" layoutY="34" width="28" />
+        </Group>
+
+        <!-- Spawn points (invisible) -->
+        <Group>
+            <Rectangle fx:id="spawn_default" height="10" layoutX="300" layoutY="200" opacity="0" width="10" />
+            <Rectangle fx:id="spawn_from_left" height="10" layoutX="20" layoutY="200" opacity="0" width="10" />
+            <Rectangle fx:id="spawn_from_up" height="10" layoutX="250.0" layoutY="20" opacity="0" width="10" />
+        </Group>
+
+        <!-- Exit trigger zones (invisible). BaseMapController uses InteractionZone on these. :contentReference[oaicite:10]{index=10} -->
+        <Group>
+            <!-- stepping into these rectangles triggers scene switch -->
+            <Rectangle fx:id="exit_left" height="39.0" layoutY="183.0" opacity="0" width="15" />
+            <Rectangle fx:id="exit_up" height="15" layoutX="235.0" opacity="0" width="32.0" />
+        </Group>
+
+    </Group>
+</StackPane>

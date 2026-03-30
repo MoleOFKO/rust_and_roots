@@ -1,58 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.Group?>
+<?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.shape.Rectangle?>
 
-<StackPane fx:id="view"
-           xmlns="http://javafx.com/javafx/8.0.171"
-           xmlns:fx="http://javafx.com/fxml/1"
-           fx:controller="controller.RightMapController">
+<StackPane fx:id="view" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.RightMapController">
 
     <Group fx:id="world">
 
         <!-- Background -->
-        <ImageView fx:id="bg"
-                   fitWidth="600" fitHeight="400"
-                   preserveRatio="false"
-                   pickOnBounds="true" />
+        <ImageView fx:id="bg" fitHeight="400" fitWidth="600" pickOnBounds="true" preserveRatio="false">
+         <image>
+            <Image url="@../image/maps/rightmap.png" />
+         </image></ImageView>
 
         <!-- Walls: prefix MUST be "wall" so CollisionRegistry.collectWalls(walls) finds them  -->
         <Group fx:id="walls">
             <!-- examples: -->
-            <Rectangle fx:id="wall1" layoutX="0" layoutY="0" width="600" height="10" />
-            <Rectangle fx:id="wall2" layoutX="0" layoutY="390" width="600" height="10" />
-            <Rectangle fx:id="wall3" layoutX="0" layoutY="0" width="10" height="400" />
-            <Rectangle fx:id="wall4" layoutX="590" layoutY="0" width="10" height="400" />
+            <Rectangle fx:id="wall1" height="10" layoutX="0" layoutY="0" width="600" />
+            <Rectangle fx:id="wall2" height="10" layoutX="0" layoutY="390" width="600" />
+            <Rectangle fx:id="wall3" height="400" layoutX="0" layoutY="0" width="10" />
+            <Rectangle fx:id="wall4" height="400" layoutX="590" layoutY="0" width="10" />
         </Group>
 
         <!-- Player -->
         <Group fx:id="human" layoutX="300" layoutY="200">
-            <ImageView fx:id="human_img" fitWidth="64" fitHeight="64" />
-            <Rectangle fx:id="human_hitbox" layoutX="18" layoutY="34" width="28" height="24" arcWidth="6" arcHeight="6"/>
+            <ImageView fx:id="human_img" fitHeight="64" fitWidth="64" />
+            <Rectangle fx:id="human_hitbox" arcHeight="6" arcWidth="6" height="24" layoutX="18" layoutY="34" width="28" />
         </Group>
 
         <!-- Spawn points (invisible) -->
         <Group>
-            <Rectangle fx:id="spawn_default" layoutX="300" layoutY="200" width="10" height="10" opacity="0"/>
-            <Rectangle fx:id="spawn_from_left" layoutX="20" layoutY="200" width="10" height="10" opacity="0"/>
-            <Rectangle fx:id="spawn_from_right" layoutX="570" layoutY="200" width="10" height="10" opacity="0"/>
-            <Rectangle fx:id="spawn_from_up" layoutX="300" layoutY="20" width="10" height="10" opacity="0"/>
-            <Rectangle fx:id="spawn_from_down" layoutX="300" layoutY="370" width="10" height="10" opacity="0"/>
-            <Rectangle fx:id="spawn_from_door" layoutX="300" layoutY="240" width="10" height="10" opacity="0"/>
+            <Rectangle fx:id="spawn_default" height="10" layoutX="300" layoutY="200" opacity="0" width="10" />
+            <Rectangle fx:id="spawn_from_left" height="10" layoutX="20.0" layoutY="190.0" opacity="0" width="10" />
+            <Rectangle fx:id="spawn_from_up" height="10" layoutX="270.0" layoutY="20" opacity="0" width="10" />
         </Group>
 
         <!-- Exit trigger zones (invisible). BaseMapController uses InteractionZone on these. :contentReference[oaicite:10]{index=10} -->
         <Group>
             <!-- stepping into these rectangles triggers scene switch -->
-            <Rectangle fx:id="exit_left"  layoutX="0"   layoutY="150" width="15" height="100" opacity="0"/>
-            <Rectangle fx:id="exit_right" layoutX="585" layoutY="150" width="15" height="100" opacity="0"/>
-            <Rectangle fx:id="exit_up"    layoutX="250" layoutY="0"   width="100" height="15" opacity="0"/>
-            <Rectangle fx:id="exit_down"  layoutX="250" layoutY="385" width="100" height="15" opacity="0"/>
-
-            <!-- for doors / interior -->
-            <Rectangle fx:id="exit_door"  layoutX="290" layoutY="220" width="20" height="20" opacity="0"/>
+            <Rectangle fx:id="exit_left" height="39.0" layoutY="173.0" opacity="0" width="15" />
+            <Rectangle fx:id="exit_up" height="15" layoutX="252.0" opacity="0" width="51.0" />
         </Group>
 
     </Group>
