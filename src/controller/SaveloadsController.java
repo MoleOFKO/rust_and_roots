@@ -19,7 +19,10 @@ import javafx.scene.image.ImageView;
 import util.SceneManager;
 import javafx.scene.image.Image;
 import java.io.InputStream;
+import javafx.scene.Group;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.MouseEvent;
 
 public class SaveloadsController implements Initializable {
@@ -32,19 +35,19 @@ public class SaveloadsController implements Initializable {
     @FXML
     private Label save1;
     @FXML
-    private Button btnsave1;
+    private ToggleButton btnsave1;
     @FXML
     private Label save2;
     @FXML
-    private Button btnsave2;
+    private ToggleButton btnsave2;
     @FXML
     private Label save3;
     @FXML
-    private Button btnsave3;
+    private ToggleButton btnsave3;
     @FXML
     private Label save4;
     @FXML
-    private Button btnsave4;
+    private ToggleButton btnsave4;
     @FXML
     private ImageView cimg;
     @FXML
@@ -59,6 +62,10 @@ public class SaveloadsController implements Initializable {
     private ImageView deletesaveload;
     @FXML
     private Button btndelete;
+    @FXML
+    private ToggleGroup savebutton;
+    @FXML
+    private Group world;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -83,7 +90,7 @@ public class SaveloadsController implements Initializable {
         styleSlotButton(btnsave4, selectedSlot == 4);
     }
 
-    private void styleSlotButton(Button button, boolean selected) {
+    private void styleSlotButton(ToggleButton button, boolean selected) {
         if (button == null) return;
         button.setOpacity(selected ? 1.0 : 0.7);
     }

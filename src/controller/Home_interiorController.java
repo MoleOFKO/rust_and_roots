@@ -775,6 +775,42 @@ public class Home_interiorController extends BaseMapController {
     private Button opensetting;
     @FXML
     private Label hotbarguide;
+    @FXML
+    private Group statusgroup;
+    @FXML
+    private ImageView btnskill;
+    @FXML
+    private ImageView btnstatus;
+    @FXML
+    private Label farming;
+    @FXML
+    private Label gathering;
+    @FXML
+    private Label crafting;
+    @FXML
+    private Label fishing;
+    @FXML
+    private Label cooking;
+    @FXML
+    private ImageView btnfarmingminus1;
+    @FXML
+    private ImageView btnfarmingplus1;
+    @FXML
+    private ImageView btngatheringminus1;
+    @FXML
+    private ImageView btncraftingminus1;
+    @FXML
+    private ImageView btnfishingminus1;
+    @FXML
+    private ImageView btncookingminus1;
+    @FXML
+    private ImageView btngatheringplus1;
+    @FXML
+    private ImageView btncraftingplus1;
+    @FXML
+    private ImageView btnfishingplus1;
+    @FXML
+    private ImageView btncookingplus1;
 
     @FXML
     private void handleHPminusaction(MouseEvent event) { onStatusHpMinus(); }
@@ -848,6 +884,54 @@ public class Home_interiorController extends BaseMapController {
     @FXML
     private void handleopensettingaction(ActionEvent event) {
         super.openSetting();
+    }
+
+    @FXML
+    private void handlebtnskillacion(MouseEvent event) {
+    }
+
+    @FXML
+    private void handlebtnstatusaction(MouseEvent event) {
+    }
+
+    @FXML
+    private void handlefarmingminusaction(MouseEvent event) {
+    }
+
+    @FXML
+    private void handlefarmingplusaction(MouseEvent event) {
+    }
+
+    @FXML
+    private void handlegatheringminusaction(MouseEvent event) {
+    }
+
+    @FXML
+    private void handlecraftingminusaction(MouseEvent event) {
+    }
+
+    @FXML
+    private void handlefishingminusaction(MouseEvent event) {
+    }
+
+    @FXML
+    private void handlecookingminusaction(MouseEvent event) {
+    }
+
+    @FXML
+    private void handlegatheringplusaction(MouseEvent event) {
+    }
+
+    @FXML
+    private void handlecraftingplusaction(MouseEvent event) {
+    }
+
+    @FXML
+    private void handlefishingplusaction(MouseEvent event) {
+    }
+
+    @FXML
+    private void handlecookingplusaction(MouseEvent event) {
     }
 
     private enum SelectionSource { NONE, PLAYER, CHEST }
