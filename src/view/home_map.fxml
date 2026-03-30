@@ -43,8 +43,8 @@
             </Group>
       <Group fx:id="merchant" layoutX="477.0" layoutY="201.0">
          <children>
-            <ImageView fx:id="merchantImage" fitHeight="44.0" fitWidth="58.0" pickOnBounds="true" preserveRatio="true" />
-            <Rectangle fx:id="merchantdetect" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="44.0" stroke="TRANSPARENT" strokeType="INSIDE" width="57.0" />
+            <ImageView fx:id="merchantImage" fitHeight="44.0" fitWidth="58.0" mouseTransparent="true" pickOnBounds="true" preserveRatio="true" />
+            <Rectangle fx:id="merchantdetect" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="44.0" mouseTransparent="true" stroke="TRANSPARENT" strokeType="INSIDE" width="57.0" />
             <Button fx:id="btnmerchant" disable="true" mnemonicParsing="false" onAction="#onMerchantShopClick" prefHeight="41.0" prefWidth="58.0" styleClass="btn_transparent" stylesheets="@../css/style.css" />
          </children>
       </Group>
@@ -80,7 +80,7 @@
             <Rectangle fx:id="wall27" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="5.0" layoutX="430.0" layoutY="322.0" stroke="TRANSPARENT" strokeType="INSIDE" width="168.0" />
             <Rectangle fx:id="wall28" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="5.0" layoutX="473.0" layoutY="309.0" stroke="TRANSPARENT" strokeType="INSIDE" width="126.0" />
             <Rectangle fx:id="wall29" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="5.0" layoutX="551.0" layoutY="295.0" stroke="TRANSPARENT" strokeType="INSIDE" width="53.0" />
-                  <Rectangle fx:id="wall30" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="10.0" layoutX="497.0" layoutY="225.0" stroke="TRANSPARENT" strokeType="INSIDE" width="17.0" />
+                  <Rectangle fx:id="wall30" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="10.0" layoutX="497.0" layoutY="225.0" mouseTransparent="true" stroke="TRANSPARENT" strokeType="INSIDE" width="17.0" />
                   <Label fx:id="hotbarguide" layoutX="250.0" layoutY="373.0" text="press 'e' to open hotbar">
                      <font>
                         <Font name="System Bold" size="12.0" />
@@ -143,7 +143,7 @@
             <ImageView fx:id="farm_img43" fitHeight="16.0" fitWidth="10.0" layoutX="89.0" layoutY="63.0" pickOnBounds="true" preserveRatio="true" />
             <ImageView fx:id="farm_img44" fitHeight="16.0" fitWidth="10.0" layoutX="103.0" layoutY="63.0" pickOnBounds="true" preserveRatio="true" />
             <ImageView fx:id="farm_img45" fitHeight="16.0" fitWidth="10.0" layoutX="118.0" layoutY="63.0" pickOnBounds="true" preserveRatio="true" />
-            <Button fx:id="farm1_button" disable="true" layoutX="-2.0" layoutY="8.0" mnemonicParsing="false" prefHeight="75.0" prefWidth="135.0" styleClass="btn_transparent" stylesheets="@../css/style.css" />
+            <Button fx:id="farm1_button" disable="true" layoutX="-2.0" layoutY="8.0" mnemonicParsing="false" prefHeight="75.0" prefWidth="135.0" styleClass="invisible-button" stylesheets="@../css/style.css" />
          </children>
       </Group>
             <Group fx:id="human" layoutX="160.0" layoutY="135.0">
@@ -154,8 +154,8 @@
       </Group>
             <Group fx:id="home" layoutX="148.0" layoutY="81.0">
                <children>
-                  <Rectangle fx:id="homedetect" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="45.0" stroke="TRANSPARENT" strokeType="INSIDE" width="110.0" />
-                  <Button fx:id="doorbtn" disable="true" mnemonicParsing="false" onAction="#handledoorbtnaction" prefHeight="45.0" prefWidth="109.0" styleClass="btn_transparent" stylesheets="@../css/style.css" />
+                  <Rectangle fx:id="homedetect" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="29.0" layoutX="28.0" layoutY="13.0" stroke="TRANSPARENT" strokeType="INSIDE" width="28.0" />
+                  <Button fx:id="doorbtn" disable="true" layoutX="30.0" layoutY="13.0" mnemonicParsing="false" onAction="#handledoorbtnaction" prefHeight="31.0" prefWidth="24.0" styleClass="btn_transparent" stylesheets="@../css/style.css" />
                </children>
             </Group>
             <Group fx:id="leftMap" layoutX="-4.0" layoutY="260.0">
@@ -288,6 +288,12 @@
                            </children>
                         </StackPane>
                      </children>
+                  </StackPane>
+               </children>
+            </HBox>
+            <Pane fx:id="inventoryOverlay" prefHeight="400.0" prefWidth="600.0" visible="false">
+               <children>
+                  <Group fx:id="menuInventory" layoutX="45.0">
                   </HBox>
                   <Pane fx:id="inventoryOverlay" layoutY="1.0" prefHeight="400.0" prefWidth="600.0">
                      <children>
@@ -940,33 +946,342 @@
                               </Group>
                            </children>
                         </Group>
-                                          <Group fx:id="settingsTab" managed="false" visible="false">
+                     </children>
+                  </Group>
+                  <Group fx:id="statusTab" managed="false" visible="false">
+                     <children>
+                        <ImageView fitHeight="337.0" fitWidth="569.0" layoutX="44.0" layoutY="-1.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../image/menuStatus.png" />
+                           </image>
+                        </ImageView>
+                        <Label fx:id="statusName" layoutX="131.0" layoutY="61.0" prefHeight="17.0" prefWidth="203.0" text="Name : " textFill="WHITE">
+                           <font>
+                              <Font name="System Bold" size="15.0" />
+                           </font>
+                           <effect>
+                              <DropShadow />
+                           </effect>
+                        </Label>
+                        <Label fx:id="statusEXP" layoutX="131.0" layoutY="94.0" prefHeight="21.0" prefWidth="127.0" text="EXP : " textFill="WHITE">
+                           <font>
+                              <Font name="System Bold" size="15.0" />
+                           </font>
+                           <effect>
+                              <DropShadow />
+                           </effect>
+                        </Label>
+                        <Line endX="363.66668701171875" endY="7.62939453125E-6" layoutX="123.0" layoutY="87.0" startX="-9.0" startY="7.62939453125E-6" stroke="WHITE" />
+                        <Line endX="363.66668701171875" endY="7.62939453125E-6" layoutX="122.0" layoutY="118.0" startX="-9.0" startY="7.62939453125E-6" stroke="WHITE" />
+                        <StackPane layoutX="254.0" layoutY="90.0" styleClass="invisible-button" stylesheets="@../css/style.css">
                            <children>
-                              <ImageView fitHeight="352.0" fitWidth="492.0" layoutX="47.0" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fx:id="btnUsePoint" fitHeight="24.0" fitWidth="84.0" onMouseClicked="#handleusepointaction" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../image/tools/buttonMenu.png" />
+                                 </image>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </ImageView>
+                           </children>
+                        </StackPane>
+                        <StackPane layoutX="406.0" layoutY="90.0" prefHeight="22.0" prefWidth="69.0" styleClass="invisible-button" stylesheets="@../css/style.css">
+                           <children>
+                              <ImageView fx:id="btnConfirm" fitHeight="26.0" fitWidth="69.0" managed="false" onMouseClicked="#handleconfirmaction" pickOnBounds="true" preserveRatio="true" visible="false">
+                                 <image>
+                                    <Image url="@../image/tools/buttonMenuConfirm.png" />
+                                 </image>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </ImageView>
+                           </children>
+                        </StackPane>
+                        <Group fx:id="statusgroup" layoutX="90.0" layoutY="62.0">
+                           <children>
+                              <Label fx:id="statusHP" layoutX="42.0" layoutY="63.0" prefHeight="21.0" prefWidth="262.0" text="HP : " textFill="WHITE">
+                                 <font>
+                                    <Font name="System Bold" size="15.0" />
+                                 </font>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </Label>
+                              <Label fx:id="statusSP" layoutX="43.0" layoutY="94.0" prefHeight="21.0" prefWidth="252.0" text="SP : " textFill="WHITE">
+                                 <font>
+                                    <Font name="System Bold" size="15.0" />
+                                 </font>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </Label>
+                              <Label fx:id="statusSTR" layoutX="44.0" layoutY="124.0" prefHeight="21.0" prefWidth="236.0" text="STR : " textFill="WHITE">
+                                 <font>
+                                    <Font name="System Bold" size="15.0" />
+                                 </font>
+                                 <effect>
+                                    <DropShadow height="176.73" radius="73.75" spread="0.53" width="120.27" />
+                                 </effect>
+                              </Label>
+                              <Label fx:id="statusVIT" layoutX="45.0" layoutY="154.0" prefHeight="21.0" prefWidth="246.0" text="VIT : " textFill="WHITE">
+                                 <font>
+                                    <Font name="System Bold" size="15.0" />
+                                 </font>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </Label>
+                              <Label fx:id="statusDEX" layoutX="44.0" layoutY="184.0" prefHeight="21.0" prefWidth="250.0" text="DEX : " textFill="WHITE">
+                                 <font>
+                                    <Font name="System Bold" size="15.0" />
+                                 </font>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </Label>
+                              <Label fx:id="statusAGI" layoutX="46.0" layoutY="214.0" prefHeight="21.0" prefWidth="254.0" text="AGI : " textFill="WHITE">
+                                 <font>
+                                    <Font name="System Bold" size="15.0" />
+                                 </font>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </Label>
+                              <Line endX="363.66668701171875" endY="7.62939453125E-6" layoutX="31.0" layoutY="86.0" startX="-9.0" startY="7.62939453125E-6" stroke="WHITE" />
+                              <Line endX="363.66668701171875" endY="7.62939453125E-6" layoutX="32.0" layoutY="114.0" startX="-9.0" startY="7.62939453125E-6" stroke="WHITE" />
+                              <Line endX="363.66668701171875" endY="7.62939453125E-6" layoutX="31.0" layoutY="146.0" startX="-9.0" startY="7.62939453125E-6" stroke="WHITE" />
+                              <Line endX="363.66668701171875" endY="7.62939453125E-6" layoutX="30.0" layoutY="176.0" startX="-9.0" startY="7.62939453125E-6" stroke="WHITE" />
+                              <Line endX="363.66668701171875" endY="7.62939453125E-6" layoutX="29.0" layoutY="207.0" startX="-9.0" startY="7.62939453125E-6" stroke="WHITE" />
+                              <Line endX="363.66668701171875" endY="7.62939453125E-6" layoutX="28.0" layoutY="235.0" startX="-9.0" startY="7.62939453125E-6" stroke="WHITE" />
+                              <StackPane layoutX="339.0" styleClass="invisible-button" stylesheets="@../css/style.css">
+                                 <children>
+                                    <ImageView fx:id="btnskill" fitHeight="19.0" fitWidth="78.0" nodeOrientation="INHERIT" onMouseClicked="#handlebtnskillacion" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@../image/tools/btnskill.png" />
+                                       </image>
+                                    </ImageView>
+                                 </children>
+                              </StackPane>
+                              <ImageView fx:id="btnHPminus" fitHeight="22.0" fitWidth="23.0" layoutX="331.0" layoutY="59.0" managed="false" onMouseClicked="#handleHPminusaction" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../image/tools/-.png" />
+                                 </image>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </ImageView>
+                              <ImageView fx:id="btnHPplus" fitHeight="22.0" fitWidth="23.0" layoutX="371.0" layoutY="60.0" managed="false" onMouseClicked="#handleHPplusaction" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../image/tools/+.png" />
+                                 </image>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </ImageView>
+                              <ImageView fx:id="btnSPminus" fitHeight="22.0" fitWidth="23.0" layoutX="331.0" layoutY="90.0" managed="false" onMouseClicked="#handleSPminusaction" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../image/tools/-.png" />
+                                 </image>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </ImageView>
+                              <ImageView fx:id="btnSTRminus" fitHeight="22.0" fitWidth="23.0" layoutX="331.0" layoutY="122.0" managed="false" onMouseClicked="#handleSTRminusaction" pickOnBounds="true" preserveRatio="true">
                                  <image>
                                     <Image url="@../image/menuSetting.png" />
                                  </image>
                               </ImageView>
-                              <Slider fx:id="timescaleslider" layoutX="108.0" layoutY="64.0" prefHeight="87.0" prefWidth="371.0" />
-                              <Button fx:id="btnsetday" layoutX="199.0" layoutY="263.0" mnemonicParsing="false" text="Set Day" />
-                              <Button fx:id="btnsetnight" layoutX="108.0" layoutY="263.0" mnemonicParsing="false" text="Set Night" />
-                              <Button fx:id="btnplus1h" layoutX="277.0" layoutY="263.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="59.0" text="+1 h" />
-                              <Button fx:id="btnsaveandexit" layoutX="367.0" layoutY="263.0" mnemonicParsing="false" onAction="#handlesaveexitaction" text="Save &amp; Exit" />
-                              <Label fx:id="sliderscale" layoutX="108.0" layoutY="155.0" prefHeight="30.0" prefWidth="297.0" text="Current Time Speed :" textFill="WHITE">
+                              <ImageView fx:id="btnVITminus" fitHeight="22.0" fitWidth="23.0" layoutX="331.0" layoutY="152.0" managed="false" onMouseClicked="#handleVITminusaction" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../image/tools/-.png" />
+                                 </image>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </ImageView>
+                              <ImageView fx:id="btnDEXminus" fitHeight="22.0" fitWidth="23.0" layoutX="331.0" layoutY="181.0" managed="false" onMouseClicked="#handleDEXminusaction" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../image/tools/-.png" />
+                                 </image>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </ImageView>
+                              <ImageView fx:id="btnAGIminus" fitHeight="22.0" fitWidth="23.0" layoutX="331.0" layoutY="212.0" managed="false" onMouseClicked="#handleAGIminusaction" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../image/tools/-.png" />
+                                 </image>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </ImageView>
+                              <ImageView fx:id="btnSPplus" fitHeight="22.0" fitWidth="23.0" layoutX="371.0" layoutY="90.0" managed="false" onMouseClicked="#handleSPplusaction" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../image/tools/+.png" />
+                                 </image>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </ImageView>
+                              <ImageView fx:id="btnSTRplus" fitHeight="22.0" fitWidth="23.0" layoutX="371.0" layoutY="122.0" managed="false" onMouseClicked="#handleSTRplusaction" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../image/tools/+.png" />
+                                 </image>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </ImageView>
+                              <ImageView fx:id="btnVITplus" fitHeight="22.0" fitWidth="23.0" layoutX="371.0" layoutY="152.0" managed="false" onMouseClicked="#handleVITplusaction" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../image/tools/+.png" />
+                                 </image>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </ImageView>
+                              <ImageView fx:id="btnDEXplus" fitHeight="22.0" fitWidth="23.0" layoutX="371.0" layoutY="181.0" managed="false" onMouseClicked="#handleDEXplusaction" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../image/tools/+.png" />
+                                 </image>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </ImageView>
+                              <ImageView fx:id="btnAGIplus" fitHeight="22.0" fitWidth="23.0" layoutX="371.0" layoutY="211.0" managed="false" onMouseClicked="#handleAGIplusaction" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../image/tools/+.png" />
+                                 </image>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </ImageView>
+                           </children>
+                        </Group>
+                        <Group fx:id="skillsgroup" layoutX="429.0" layoutY="62.0" visible="false">
+                           <children>
+                              <ImageView fx:id="btnstatus" fitHeight="19.0" fitWidth="78.0" onMouseClicked="#handlebtnstatusaction" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../image/tools/btnstatus.png" />
+                                 </image>
+                              </ImageView>
+                              <Label fx:id="farming" layoutX="-297.0" layoutY="61.0" prefHeight="21.0" prefWidth="249.0" text="Farming :" textFill="WHITE">
                                  <font>
                                     <Font name="System Bold" size="15.0" />
                                  </font>
                               </Label>
+                              <Line endX="363.66668701171875" endY="7.62939453125E-6" layoutX="-307.0" layoutY="86.0" startX="-9.0" startY="7.62939453125E-6" stroke="WHITE" />
+                              <Label fx:id="gathering" layoutX="-297.0" layoutY="88.0" prefHeight="21.0" prefWidth="253.0" text="Gathering :" textFill="WHITE">
                               <Label fx:id="lbldays" layoutX="108.0" layoutY="185.0" prefHeight="30.0" prefWidth="297.0" text="Days :" textFill="WHITE">
                                  <font>
                                     <Font name="System Bold" size="15.0" />
                                  </font>
                               </Label>
+                              <Label fx:id="crafting" layoutX="-297.0" layoutY="116.0" prefHeight="21.0" prefWidth="266.0" text="Crafting" textFill="WHITE">
                               <Label fx:id="lbltime" layoutX="108.0" layoutY="215.0" prefHeight="30.0" prefWidth="297.0" text="Time : " textFill="WHITE">
                                  <font>
                                     <Font name="System Bold" size="15.0" />
                                  </font>
                               </Label>
+                              <Label fx:id="fishing" layoutX="-296.0" layoutY="143.0" prefHeight="21.0" prefWidth="257.0" text="Fishing :" textFill="WHITE">
+                                 <font>
+                                    <Font name="System Bold" size="15.0" />
+                                 </font>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </Label>
+                              <Label fx:id="cooking" layoutX="-295.0" layoutY="170.0" prefHeight="21.0" prefWidth="261.0" text="Cooking :" textFill="WHITE">
+                                 <font>
+                                    <Font name="System Bold" size="15.0" />
+                                 </font>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </Label>
+                              <Line endX="363.66668701171875" endY="7.62939453125E-6" layoutX="-306.0" layoutY="114.0" startX="-9.0" startY="7.62939453125E-6" stroke="WHITE" />
+                              <Line endX="363.66668701171875" endY="7.62939453125E-6" layoutX="-306.0" layoutY="141.0" startX="-9.0" startY="7.62939453125E-6" stroke="WHITE" />
+                              <Line endX="363.66668701171875" endY="7.62939453125E-6" layoutX="-306.0" layoutY="167.0" startX="-9.0" startY="7.62939453125E-6" stroke="WHITE" />
+                              <Line endX="363.66668701171875" endY="7.62939453125E-6" layoutX="-306.0" layoutY="196.0" startX="-9.0" startY="7.62939453125E-6" stroke="WHITE" />
+                              <ImageView fx:id="btnfarmingminus1" fitHeight="22.0" fitWidth="23.0" layoutX="-12.0" layoutY="59.0" managed="false" onMouseClicked="#handlefarmingminusaction" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../image/tools/-.png" />
+                                 </image>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </ImageView>
+                              <ImageView fx:id="btnfarmingplus1" fitHeight="22.0" fitWidth="23.0" layoutX="28.0" layoutY="60.0" managed="false" onMouseClicked="#handlefarmingplusaction" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../image/tools/+.png" />
+                                 </image>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </ImageView>
+                              <ImageView fx:id="btngatheringminus1" fitHeight="22.0" fitWidth="23.0" layoutX="-12.0" layoutY="88.0" managed="false" onMouseClicked="#handlegatheringminusaction" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../image/tools/-.png" />
+                                 </image>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </ImageView>
+                              <ImageView fx:id="btncraftingminus1" fitHeight="22.0" fitWidth="23.0" layoutX="-12.0" layoutY="116.0" managed="false" onMouseClicked="#handlecraftingminusaction" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../image/tools/-.png" />
+                                 </image>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </ImageView>
+                              <ImageView fx:id="btnfishingminus1" fitHeight="22.0" fitWidth="23.0" layoutX="-12.0" layoutY="143.0" managed="false" onMouseClicked="#handlefishingminusaction" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../image/tools/-.png" />
+                                 </image>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </ImageView>
+                              <ImageView fx:id="btncookingminus1" fitHeight="22.0" fitWidth="23.0" layoutX="-11.0" layoutY="170.0" managed="false" onMouseClicked="#handlecookingminusaction" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../image/tools/-.png" />
+                                 </image>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </ImageView>
+                              <ImageView fx:id="btngatheringplus1" fitHeight="22.0" fitWidth="23.0" layoutX="28.0" layoutY="90.0" managed="false" onMouseClicked="#handlegatheringplusaction" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../image/tools/+.png" />
+                                 </image>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </ImageView>
+                              <ImageView fx:id="btncraftingplus1" fitHeight="22.0" fitWidth="23.0" layoutX="28.0" layoutY="116.0" managed="false" onMouseClicked="#handlecraftingplusaction" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../image/tools/+.png" />
+                                 </image>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </ImageView>
+                              <ImageView fx:id="btnfishingplus1" fitHeight="22.0" fitWidth="23.0" layoutX="28.0" layoutY="143.0" managed="false" onMouseClicked="#handlefishingplusaction" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../image/tools/+.png" />
+                                 </image>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </ImageView>
+                              <ImageView fx:id="btncookingplus1" fitHeight="22.0" fitWidth="23.0" layoutX="28.0" layoutY="170.0" managed="false" onMouseClicked="#handlecookingplusaction" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../image/tools/+.png" />
+                                 </image>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </ImageView>
                               <Button fx:id="btnsave" layoutX="368.0" layoutY="226.0" mnemonicParsing="false" onAction="#handlesave" text="Save" />
                               <Button fx:id="btnload" layoutX="413.0" layoutY="226.0" mnemonicParsing="false" onAction="#handleload" text="Load" />
                            </children>

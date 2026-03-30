@@ -5,7 +5,6 @@
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.text.Font?>
 
 <StackPane fx:id="view" style="-fx-background-color: black;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Main_menuController">
     <children>
@@ -16,12 +15,9 @@
                      <Image url="@../image/mainMenu.png" />
                   </image>
                </ImageView>
-               <Button fx:id="btnloadg" layoutX="250.0" layoutY="343.0" mnemonicParsing="false" onAction="#handlebtnloadgaction" opacity="0.0" prefHeight="35.0" prefWidth="103.0" />
-               <Button fx:id="btnexit" layoutX="373.0" layoutY="343.0" mnemonicParsing="false" onAction="#handlebtnexitaction" opacity="0.0" prefHeight="35.0" prefWidth="83.0" text="Exit">
-               <font>
-                  <Font size="17.0" />
-               </font></Button>
-               <Button fx:id="btnnewg" layoutX="144.0" layoutY="337.0" mnemonicParsing="false" onAction="#handlebtnnewgaction" opacity="0.0" prefHeight="41.0" prefWidth="83.0" />
+               <Button fx:id="btnloadg" layoutX="250.0" layoutY="330.0" mnemonicParsing="false" onAction="#handlebtnloadgaction" prefHeight="27.0" prefWidth="103.0" styleClass="invisible-button" stylesheets="@../css/style.css" />
+               <Button fx:id="btnnewg" layoutX="144.0" layoutY="330.0" mnemonicParsing="false" onAction="#handlebtnnewgaction" prefHeight="27.0" prefWidth="83.0" styleClass="invisible-button" stylesheets="@../css/style.css" />
+            <Button fx:id="btnexit" layoutX="374.0" layoutY="331.0" mnemonicParsing="false" onAction="#handlebtnexitaction" prefHeight="26.0" prefWidth="86.0" styleClass="invisible-button" stylesheets="@../css/style.css" />
             </children>
         </Group>
     </children>
