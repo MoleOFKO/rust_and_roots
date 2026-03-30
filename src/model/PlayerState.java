@@ -432,12 +432,22 @@ public final class PlayerState {
             ? getRunDrainPerSecond() * safeTimeFlow * seconds
             : 0.0;
 
-        staminaPrecise = Math.max(0.0, staminaPrecise - drain);
-        staminaPrecise += regen;
+        double modeRegenLimit = getModeStaminaCap(effectiveMode);
 
-        double cap = getModeStaminaCap(effectiveMode);
-        if (staminaPrecise > cap) {
-            staminaPrecise = cap;
+        // Drain is always allowed.
+        if (drain > 0.0) {
+            staminaPrecise = Math.max(0.0, staminaPrecise - drain);
+        }
+
+        // Regen limit is not the same thing as the true stamina cap.
+        // If stamina is already above the current state's regen limit,
+        // keep it there and just stop regenerating higher in that state.
+        if (regen > 0.0 && staminaPrecise < modeRegenLimit) {
+            staminaPrecise = Math.min(modeRegenLimit, staminaPrecise + regen);
+        }
+
+        if (staminaPrecise > getMaxStamina()) {
+            staminaPrecise = getMaxStamina();
         }
 
         stamina.set(clamp((int) Math.floor(staminaPrecise + 1.0e-9), 0, getMaxStamina()));

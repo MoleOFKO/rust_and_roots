@@ -80,6 +80,8 @@ public class Farm_tableController implements Initializable, SceneController {
     @FXML private Label invlbl6; @FXML private Label invlbl7; @FXML private Label invlbl8; @FXML private Label invlbl9; @FXML private Label invlbl10;
     @FXML private Label invlbl11; @FXML private Label invlbl12; @FXML private Label invlbl13; @FXML private Label invlbl14; @FXML private Label invlbl15;
     @FXML private Label invlbl16; @FXML private Label invlbl17; @FXML private Label invlbl18; @FXML private Label invlbl19; @FXML private Label invlbl20;
+    @FXML
+    private ImageView closeseedList;
 
     @Override
     public void init(GameState gameState) {
@@ -117,7 +119,16 @@ public class Farm_tableController implements Initializable, SceneController {
         handlePlotClick("Plot " + n);
     }
 
-    @FXML private void handleBtnSeedsList(MouseEvent event) { setToolMode(ToolMode.SEED); }
+    @FXML
+    private void handleBtnSeedsList(MouseEvent event) {
+        if (activeMode == ToolMode.SEED && seedList != null && seedList.isVisible()) {
+            hideSeedList();
+            refreshToolHighlight();
+            refreshPlotHighlights();
+            return;
+        }
+        setToolMode(ToolMode.SEED);
+    }
     @FXML private void handlebtnWater(MouseEvent event) { setToolMode(ToolMode.WATER); }
     @FXML private void handleBtnReap(MouseEvent event) { setToolMode(ToolMode.SICKLE); }
 
@@ -127,8 +138,14 @@ public class Farm_tableController implements Initializable, SceneController {
         if (!(source instanceof ImageView clickedView)) return;
         Integer seedItemId = seedSlotMapping.get(clickedView.getId());
         if (seedItemId == null || seedItemId <= 0) return;
+
         selectedSeedItemId = seedItemId;
-        setToolMode(ToolMode.SEED);
+        activeMode = ToolMode.SEED;
+
+        hideSeedList();
+        refreshSelectedSeedPreview();
+        refreshToolHighlight();
+        refreshPlotHighlights();
         populateSeedList();
     }
 
@@ -141,7 +158,7 @@ public class Farm_tableController implements Initializable, SceneController {
         if (gameState.getPlayerState().getStamina() < staminaCost) return;
 
         for (Map.Entry<Integer, Integer> entry : seedsToRemove.entrySet()) {
-            if (!inv.removeItem(entry.getKey(), entry.getValue())) return;
+            if (!removeSeedFromPlayerStorage(entry.getKey(), entry.getValue())) return;
         }
         gameState.getPlayerState().consumeStamina(staminaCost);
 
@@ -247,9 +264,8 @@ public class Farm_tableController implements Initializable, SceneController {
             case SEED -> {
                 if (selectedSeedItemId == null || selectedSeedItemId <= 0) return;
                 if (!pd.isEmpty()) return;
-                int owned = gameState.getPlayerState().getInventory().getCount(selectedSeedItemId);
-                int alreadyReserved = reservedSeedUsage(selectedSeedItemId);
-                if (alreadyReserved >= owned) return;
+                int available = getAvailableSeedCount(selectedSeedItemId);
+                if (available <= 0) return;
 
                 pd.seedItemId = selectedSeedItemId;
                 pd.seedItemName = ItemDatabase.getItemName(selectedSeedItemId);
@@ -289,32 +305,82 @@ public class Farm_tableController implements Initializable, SceneController {
 
     private void populateSeedList() {
         seedSlotMapping.clear();
-        List<Integer> seeds = availableSeedsFromInventory();
-        Inventory inv = gameState.getPlayerState().getInventory();
+        List<Integer> seeds = availableSeedsFromInventoryAndHotbar();
 
-        if (!seeds.isEmpty() && (selectedSeedItemId == null || !seeds.contains(selectedSeedItemId))) selectedSeedItemId = seeds.get(0);
-        if (seeds.isEmpty()) selectedSeedItemId = null;
+        if (!seeds.isEmpty() && (selectedSeedItemId == null || !seeds.contains(selectedSeedItemId))) {
+            selectedSeedItemId = seeds.get(0);
+        }
+        if (seeds.isEmpty()) {
+            selectedSeedItemId = null;
+        }
 
         for (int i = 0; i < seedSlotImages.size(); i++) {
             ImageView img = seedSlotImages.get(i);
             Label lbl = (i < seedSlotLabels.size()) ? seedSlotLabels.get(i) : null;
             if (img == null) continue;
+
             if (i >= seeds.size()) {
-                img.setImage(null); img.setVisible(false); img.setOpacity(0.0); img.setStyle("");
+                img.setImage(null);
+                img.setVisible(false);
+                img.setOpacity(0.0);
+                img.setStyle("");
                 if (lbl != null) lbl.setText("");
                 continue;
             }
+
             int seedItemId = seeds.get(i);
-            int qty = inv.getCount(seedItemId) - reservedSeedUsage(seedItemId);
+            int qty = getAvailableSeedCount(seedItemId);
             if (qty < 0) qty = 0;
+
             img.setImage(ItemDatabase.getImage(seedItemId));
             img.setVisible(true);
             img.setOpacity(seedItemId == selectedSeedItemId ? 1.0 : 0.75);
-            img.setStyle(seedItemId == selectedSeedItemId ? "-fx-effect: dropshadow(gaussian, yellow, 12, 0.6, 0, 0);" : "");
+            img.setStyle(seedItemId == selectedSeedItemId
+                    ? "-fx-effect: dropshadow(gaussian, yellow, 12, 0.6, 0, 0);"
+                    : "");
             seedSlotMapping.put(img.getId(), seedItemId);
-            if (lbl != null) lbl.setText(ItemDatabase.getItemName(seedItemId) + " x" + qty);
+
+            if (lbl != null) {
+                String itemName = ItemDatabase.getItemName(seedItemId);
+                if (itemName == null || itemName.isBlank()) itemName = "Seed " + seedItemId;
+                lbl.setText(itemName + " x" + qty);
+            }
         }
+
         refreshSelectedSeedPreview();
+    }
+
+    private List<Integer> availableSeedsFromInventoryAndHotbar() {
+        List<Integer> result = new ArrayList<>();
+        if (gameState == null || gameState.getPlayerState() == null) return result;
+
+        for (Integer itemId : ItemDatabase.getAllSeedItemIds()) {
+            if (itemId == null || itemId <= 0) continue;
+            int cropItemId = ItemDatabase.resolveCropItemIdForSeed(itemId);
+            if (cropItemId <= 0) continue;
+
+            if (getAvailableSeedCount(itemId) > 0) {
+                result.add(itemId);
+            }
+        }
+        return result;
+    }
+
+    private int getCombinedOwnedSeedCount(int seedItemId) {
+        if (gameState == null || gameState.getPlayerState() == null || seedItemId <= 0) return 0;
+
+        int total = gameState.getPlayerState().getInventory().getCount(seedItemId);
+
+        for (int i = 0; i < gameState.getPlayerState().getHotbarSize(); i++) {
+            if (gameState.getPlayerState().getHotbarItemId(i) == seedItemId) {
+                total += gameState.getPlayerState().getHotbarItemCount(i);
+            }
+        }
+        return total;
+    }
+
+    private int getAvailableSeedCount(int seedItemId) {
+        return Math.max(0, getCombinedOwnedSeedCount(seedItemId) - reservedSeedUsage(seedItemId));
     }
 
     private void refreshSelectedSeedPreview() {
@@ -373,17 +439,6 @@ public class Farm_tableController implements Initializable, SceneController {
         }
     }
 
-    private List<Integer> availableSeedsFromInventory() {
-        Inventory inv = gameState.getPlayerState().getInventory();
-        List<Integer> result = new ArrayList<>();
-        for (Integer itemId : ItemDatabase.getAllSeedItemIds()) {
-            int cropItemId = ItemDatabase.resolveCropItemIdForSeed(itemId);
-            if (cropItemId <= 0) continue;
-            int freeCount = inv.getCount(itemId) - reservedSeedUsage(itemId);
-            if (freeCount > 0) result.add(itemId);
-        }
-        return result;
-    }
 
     private int reservedSeedUsage(int seedItemId) {
         int count = 0;
@@ -397,6 +452,7 @@ public class Farm_tableController implements Initializable, SceneController {
     private Map<Integer, Integer> computeSeedConsumption() {
         Map<Integer, Integer> used = new LinkedHashMap<>();
         FarmState realFarm = gameState.getFarmState("home_map");
+
         for (Map.Entry<String, TempPlotData> entry : tempPlots.entrySet()) {
             TempPlotData temp = entry.getValue();
             FarmState.PlotData real = realFarm.getPlot(entry.getKey());
@@ -404,7 +460,38 @@ public class Farm_tableController implements Initializable, SceneController {
             if (!newlyPlanted || temp.seedItemId == null || temp.seedItemId <= 0) continue;
             used.merge(temp.seedItemId, 1, Integer::sum);
         }
+
         return used;
+    }
+
+    private boolean removeSeedFromPlayerStorage(int seedItemId, int qty) {
+        if (gameState == null || gameState.getPlayerState() == null) return false;
+        if (seedItemId <= 0 || qty <= 0) return true;
+
+        Inventory inv = gameState.getPlayerState().getInventory();
+        int remaining = qty;
+
+        int invCount = inv.getCount(seedItemId);
+        int fromInventory = Math.min(invCount, remaining);
+        if (fromInventory > 0) {
+            if (!inv.removeItem(seedItemId, fromInventory)) return false;
+            remaining -= fromInventory;
+        }
+
+        if (remaining <= 0) return true;
+
+        for (int i = 0; i < gameState.getPlayerState().getHotbarSize() && remaining > 0; i++) {
+            if (gameState.getPlayerState().getHotbarItemId(i) != seedItemId) continue;
+
+            int slotCount = gameState.getPlayerState().getHotbarItemCount(i);
+            int fromSlot = Math.min(slotCount, remaining);
+            if (fromSlot > 0) {
+                if (!gameState.getPlayerState().removeHotbarItems(i, fromSlot)) return false;
+                remaining -= fromSlot;
+            }
+        }
+
+        return remaining <= 0;
     }
 
     private int computePendingFarmStaminaCost() {
@@ -421,6 +508,13 @@ public class Farm_tableController implements Initializable, SceneController {
     private int computeSuccessRate() {
         int dex = gameState == null ? 0 : gameState.getPlayerState().getDex();
         return Math.max(50, Math.min(MAX_SUCCESS_RATE, BASE_SUCCESS_RATE + Math.max(0, dex - 1)));
+    }
+
+    @FXML
+    private void handlecloseseedList(MouseEvent event) {
+        hideSeedList();
+        refreshToolHighlight();
+        refreshPlotHighlights();
     }
 
     private enum ToolMode { NONE, SEED, WATER, SICKLE }

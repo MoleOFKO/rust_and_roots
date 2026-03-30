@@ -1295,7 +1295,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         gameLoop.start();
     }
     
-        protected int playerInventorySlotCapacity() {
+    protected int playerInventorySlotCapacity() {
         return DEFAULT_PLAYER_SLOT_CAPACITY;
     }
 

@@ -516,36 +516,6 @@ public class home_mapController extends BaseMapController {
         registerExit(uppermapdetect, "/view/upper_map.fxml", SpawnTag.FROM_DOWN);
         registerExit(homedetect, "/view/home_interior.fxml", SpawnTag.FROM_DOOR);
     }
-
-    @Override
-    protected void configureFarm(Farm farm) {
-        farm.setAvailableSeeds(
-            Farm.SeedType.CARROT,
-            Farm.SeedType.GRAPE,
-            Farm.SeedType.CORN,
-            Farm.SeedType.TOMATO
-        );
-
-        farm.setOnHarvest((seedType, amount) -> {
-            String cropName = switch (seedType) {
-                case GRAPE -> "Grape";
-                case CARROT -> "Carrot";
-                case CORN -> "Corn";
-                case TOMATO -> "Tomato";
-            };
-
-            item crop = ItemDatabase.getItemByName(cropName);
-            if (crop == null) {
-                System.out.println("Unknown crop item in database: " + cropName);
-                return;
-            }
-
-            player.getInventory().addItem(crop.getItem_id(), amount);
-            gameState.getPlayerSkills().addFarmingExp(Math.max(1, amount));
-            refreshSkillsView();
-            System.out.println("Harvested: " + crop.getItem_name() + " x" + amount);
-        });
-    }
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -564,7 +534,7 @@ public class home_mapController extends BaseMapController {
         if (farm1_button != null) {
             farm1_button.setOnAction(e -> openFarmTable());
         }
-   
+        
         refreshStatusAllocationUi();
         refreshMenuState();
     }
