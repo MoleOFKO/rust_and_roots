@@ -21,7 +21,6 @@ public class Player {
     private static final double NANOS_PER_60FPS_FRAME = 16_666_666.0;
     private static final double NORMAL_AGI = 5.0;
     private static final double RUN_MULTIPLIER = 1.35;
-    private static final double STAMINA_DRAIN_PER_SECOND = 12.0;
     private static final double MIN_AGI_SPEED_MULTIPLIER = 0.80;
     private static final double MAX_AGI_SPEED_MULTIPLIER = 1.60;
 
@@ -146,7 +145,7 @@ public class Player {
         scene.setOnKeyPressed(e -> {
             KeyCode code = e.getCode();
 
-            if (deathStarted || deathFinished || state.isDead()) {
+            if (deathStarted || deathFinished || state.isDead() || state.isSleeping()) {
                 return;
             }
 
@@ -259,6 +258,7 @@ public class Player {
     public void clearInputState() {
         pressedKeys.clear();
         moving = false;
+        state.setStaminaMode(state.isSleeping() ? PlayerState.StaminaMode.SLEEP : PlayerState.StaminaMode.IDLE);
 
         if (!deathStarted && !deathFinished) {
             setAnimState(AnimState.IDLE, true);
@@ -288,6 +288,15 @@ public class Player {
             return;
         }
 
+        if (state.isSleeping()) {
+            moving = false;
+            pressedKeys.clear();
+            state.setStaminaMode(PlayerState.StaminaMode.SLEEP);
+            setAnimState(AnimState.IDLE, false);
+            return;
+        }
+
+        double dtSeconds = Math.max(0.0, dtNanos / 1_000_000_000.0);
         double inputX = 0.0;
         double inputY = 0.0;
 
@@ -306,11 +315,14 @@ public class Player {
 
         if (inputX == 0.0 && inputY == 0.0) {
             moving = false;
+            state.setStaminaMode(PlayerState.StaminaMode.IDLE);
+            state.updateStaminaOverTime(dtSeconds, PlayerState.StaminaMode.IDLE);
             setAnimState(AnimState.IDLE, false);
             return;
         }
 
-        boolean isRunning = pressedKeys.contains(KeyCode.SHIFT);
+        boolean wantsRun = pressedKeys.contains(KeyCode.SHIFT);
+        boolean isRunning = wantsRun && state.getStamina() > 0;
         double speed = getCurrentMovementSpeed(isRunning);
         double frameScale = Math.min(0.15, dtNanos / NANOS_PER_60FPS_FRAME);
 
@@ -325,12 +337,18 @@ public class Player {
         moving = move(dx, dy);
 
         if (moving) {
-            setAnimState(isRunning ? AnimState.RUN : AnimState.WALK, false);
-
             if (isRunning) {
-                applyRunCost(dtNanos / 1_000_000_000.0);
+                state.setStaminaMode(PlayerState.StaminaMode.RUN);
+                state.updateStaminaOverTime(dtSeconds, PlayerState.StaminaMode.RUN);
+                setAnimState(AnimState.RUN, false);
+            } else {
+                state.setStaminaMode(PlayerState.StaminaMode.WALK);
+                state.updateStaminaOverTime(dtSeconds, PlayerState.StaminaMode.WALK);
+                setAnimState(AnimState.WALK, false);
             }
         } else {
+            state.setStaminaMode(PlayerState.StaminaMode.IDLE);
+            state.updateStaminaOverTime(dtSeconds, PlayerState.StaminaMode.IDLE);
             setAnimState(AnimState.IDLE, false);
         }
     }
@@ -404,10 +422,6 @@ public class Player {
     }
 
     private double getCurrentMovementSpeed(boolean running) {
-        if (state.getStamina() <= 0) {
-            return 0.0;
-        }
-
         double agiRatio = state.getAgi() / NORMAL_AGI;
         double agiModifier = 0.6 + (0.4 * agiRatio);
         agiModifier = Math.max(MIN_AGI_SPEED_MULTIPLIER, Math.min(MAX_AGI_SPEED_MULTIPLIER, agiModifier));
@@ -429,19 +443,6 @@ public class Player {
         return currentSpeed;
     }
 
-    private void applyRunCost(double seconds) {
-        if (seconds <= 0.0 || state.isDead()) {
-            return;
-        }
-
-        staminaDrainRemainder += STAMINA_DRAIN_PER_SECOND * seconds;
-        int staminaCost = (int) staminaDrainRemainder;
-        staminaDrainRemainder -= staminaCost;
-
-        if (staminaCost > 0) {
-            state.consumeEnergyOrHp(staminaCost);
-        }
-    }
 
     private void updateViewport() {
         Image sheet = getSheet(animState);

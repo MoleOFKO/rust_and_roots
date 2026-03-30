@@ -1,7 +1,12 @@
 package model;
 
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import javafx.geometry.Bounds;
 import javafx.scene.Group;
 import javafx.scene.control.Button;
@@ -15,11 +20,7 @@ public class Farm {
     private final Group root;
     private final Rectangle detectionArea;
     private final Button actionButton;
-
-    // UI views only
     private final Map<String, ImageView> plotViews = new LinkedHashMap<>();
-
-    // persistent data
     private final FarmState state;
 
     private List<SeedType> availableSeeds = new ArrayList<>();
@@ -42,7 +43,7 @@ public class Farm {
         plotViews.put(plotId, plotImageView);
         plotImageView.setImage(null);
         plotImageView.setVisible(false);
-        state.getPlot(plotId); // ensure exists
+        state.getPlot(plotId);
     }
 
     public void setOnHarvest(java.util.function.BiConsumer<SeedType, Integer> onHarvest) {
@@ -68,25 +69,32 @@ public class Farm {
         actionButton.setDisable(!inside);
     }
 
-    /** Call every frame (or often) to refresh crop visuals based on GameTimeManager seconds */
     public void update(double nowSeconds) {
         for (Map.Entry<String, ImageView> e : plotViews.entrySet()) {
             String plotId = e.getKey();
             ImageView view = e.getValue();
             FarmState.PlotData pd = state.getPlot(plotId);
 
-            if (pd.seed == null) {
+            if (pd == null || pd.isEmpty()) {
                 view.setImage(null);
                 view.setVisible(false);
                 continue;
             }
 
             int stage = pd.getStage(nowSeconds, totalStages);
-            showStage(view, pd.seed.id, stage);
+            String spriteKey = resolveSpriteKey(pd);
+            showStage(view, spriteKey, stage);
         }
     }
 
-    // ---------------- HUD logic ----------------
+    private String resolveSpriteKey(FarmState.PlotData pd) {
+        if (pd == null) return null;
+        if (pd.cropSpriteKey != null && !pd.cropSpriteKey.isBlank()) return pd.cropSpriteKey;
+        if (pd.seedItemId != null && pd.seedItemId > 0) {
+            return ItemDatabase.buildCropSpriteKeyForSeed(pd.seedItemId);
+        }
+        return pd.seed == null ? null : pd.seed.id;
+    }
 
     private void openHud() {
         if (plotViews.isEmpty()) return;
@@ -95,10 +103,9 @@ public class Farm {
         if (plotId == null) return;
 
         FarmState.PlotData pd = state.getPlot(plotId);
-
         double now = game.GameTimeManager.get().totalSecondsProperty().get();
 
-        if (pd.seed == null) {
+        if (pd.isEmpty()) {
             plantOnPlot(plotId, pd, now);
         } else if (pd.isReady(now)) {
             reapPlot(plotId, pd);
@@ -126,14 +133,17 @@ public class Farm {
 
         dialog.showAndWait().ifPresent(seed -> {
             pd.seed = seed;
+            pd.seedItemId = ItemDatabase.resolveSeedItemIdByCropName(seed.displayName);
+            pd.seedItemName = pd.seedItemId != null && pd.seedItemId > 0 ? ItemDatabase.getItemName(pd.seedItemId) : (seed.displayName + " Seed");
+            pd.cropItemName = seed.displayName;
+            pd.cropSpriteKey = ItemDatabase.buildCropSpriteKeyForSeed(pd.seedItemId == null ? -1 : pd.seedItemId);
             pd.plantedAt = nowSeconds;
             pd.lastWateredAt = -1;
             pd.accumulatedWaterReduction = 0;
 
-            // show stage 1 immediately
             ImageView view = plotViews.get(plotId);
             if (view != null) {
-                showStage(view, seed.id, 1);
+                showStage(view, resolveSpriteKey(pd), 1);
             }
         });
     }
@@ -141,12 +151,10 @@ public class Farm {
     private void waterPlot(String plotId, FarmState.PlotData pd, double nowSeconds) {
         if (!pd.canWater(nowSeconds)) return;
         pd.water(nowSeconds);
-
-        // update immediate stage after watering
         ImageView view = plotViews.get(plotId);
         if (view != null) {
             int stage = pd.getStage(nowSeconds, totalStages);
-            showStage(view, pd.seed.id, stage);
+            showStage(view, resolveSpriteKey(pd), stage);
         }
     }
 
@@ -154,10 +162,7 @@ public class Farm {
         if (pd.seed != null && onHarvest != null) {
             onHarvest.accept(pd.seed, 1);
         }
-        pd.seed = null;
-        pd.plantedAt = -1;
-        pd.lastWateredAt = -1;
-        pd.accumulatedWaterReduction = 0;
+        pd.clearPlant();
 
         ImageView view = plotViews.get(plotId);
         if (view != null) {
@@ -166,21 +171,23 @@ public class Farm {
         }
     }
 
-    // ---------------- Image helper ----------------
-
-    private void showStage(ImageView view, String seedId, int stageNumber1Based) {
-        String path = String.format(resourcePattern, seedId, stageNumber1Based);
-        URL url = getClass().getResource(path);
-        if (url == null) {
-            System.out.println("Image not found: " + path);
+    private void showStage(ImageView view, String spriteKey, int stageNumber1Based) {
+        if (spriteKey == null || spriteKey.isBlank()) {
+            view.setImage(null);
+            view.setVisible(false);
             return;
         }
-        Image img = new Image(url.toExternalForm());
-        view.setImage(img);
+        String path = String.format(resourcePattern, spriteKey, stageNumber1Based);
+        URL url = getClass().getResource(path);
+        if (url == null) {
+            view.setImage(null);
+            view.setVisible(false);
+            return;
+        }
+        view.setImage(new Image(url.toExternalForm()));
         view.setVisible(true);
     }
 
-    // ---------------- Seeds ----------------
     public enum SeedType {
         GRAPE("grape", "Grape"),
         CARROT("carrot", "Carrot"),

@@ -4,6 +4,7 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import java.util.Arrays;
 
 
 /**
@@ -36,8 +37,33 @@ public final class PlayerState {
     private final IntegerProperty exp = new SimpleIntegerProperty(0);
     private final StringProperty playerName = new SimpleStringProperty(DEFAULT_NAME);
 
+    public enum StaminaMode {
+        SLEEP,
+        IDLE,
+        WALK,
+        RUN
+    }
+
+    private static final double DEFAULT_STAMINA_BASE_REGEN_PER_SECOND = 0.65;
+    private static final double STAMINA_REGEN_PER_VIT = 0.07;
+    private static final double WALK_REGEN_MULTIPLIER = 0.55;
+    private static final double RUN_REGEN_MULTIPLIER = 0.20;
+    private static final double RUN_BASE_DRAIN_PER_SECOND = 1.35;
+    private static final double RUN_DRAIN_SCALING_START = 0.75;
+    private static final double RUN_DRAIN_REDUCTION_PER_VIT = 0.05;
+
+    private static final double IDLE_STAMINA_CAP_RATIO = 0.90;
+    private static final double WALK_STAMINA_CAP_RATIO = 0.80;
+    private static final double RUN_STAMINA_CAP_RATIO = 0.70;
+    private static final double SLEEP_STAMINA_CAP_RATIO = 1.00;
+
+    private double staminaPrecise = DEFAULT_STAMINA;
+    private StaminaMode staminaMode = StaminaMode.IDLE;
+    private boolean sleeping = false;
+
     private static final int HOTBAR_SIZE = 5;
     private final int[] hotbarItemIds = new int[HOTBAR_SIZE];
+    private final int[] hotbarItemCounts = new int[HOTBAR_SIZE];
 
     public int getHotbarSize() {
         return HOTBAR_SIZE;
@@ -48,14 +74,98 @@ public final class PlayerState {
         return hotbarItemIds[index];
     }
 
+    public int getHotbarItemCount(int index) {
+        if (index < 0 || index >= HOTBAR_SIZE) return 0;
+        return hotbarItemCounts[index];
+    }
+
+    public boolean isHotbarSlotEmpty(int index) {
+        return getHotbarItemId(index) <= 0 || getHotbarItemCount(index) <= 0;
+    }
+
     public void setHotbarItemId(int index, int itemId) {
         if (index < 0 || index >= HOTBAR_SIZE) return;
+
+        if (itemId <= 0) {
+            clearHotbarItem(index);
+            return;
+        }
+
         hotbarItemIds[index] = itemId;
+        if (hotbarItemCounts[index] <= 0) {
+            hotbarItemCounts[index] = 1;
+        }
+    }
+
+    public void setHotbarSlot(int index, int itemId, int count) {
+        if (index < 0 || index >= HOTBAR_SIZE) return;
+
+        if (itemId <= 0 || count <= 0) {
+            clearHotbarItem(index);
+            return;
+        }
+
+        hotbarItemIds[index] = itemId;
+        hotbarItemCounts[index] = count;
+    }
+
+    public boolean addHotbarItems(int index, int itemId, int amount) {
+        if (index < 0 || index >= HOTBAR_SIZE) return false;
+        if (itemId <= 0 || amount <= 0) return false;
+
+        if (isHotbarSlotEmpty(index)) {
+            setHotbarSlot(index, itemId, amount);
+            return true;
+        }
+
+        if (hotbarItemIds[index] != itemId) {
+            return false;
+        }
+
+        hotbarItemCounts[index] += amount;
+        return true;
+    }
+
+    public boolean removeHotbarItems(int index, int amount) {
+        if (index < 0 || index >= HOTBAR_SIZE) return false;
+        if (amount <= 0) return false;
+        if (hotbarItemCounts[index] < amount) return false;
+
+        hotbarItemCounts[index] -= amount;
+        if (hotbarItemCounts[index] <= 0) {
+            clearHotbarItem(index);
+        }
+        return true;
+    }
+
+    public int findHotbarSlotWithItem(int itemId) {
+        if (itemId <= 0) return -1;
+        for (int i = 0; i < HOTBAR_SIZE; i++) {
+            if (hotbarItemIds[i] == itemId && hotbarItemCounts[i] > 0) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public int findFirstEmptyHotbarSlot() {
+        for (int i = 0; i < HOTBAR_SIZE; i++) {
+            if (isHotbarSlotEmpty(i)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public void clearAllHotbarItems() {
+        Arrays.fill(hotbarItemIds, 0);
+        Arrays.fill(hotbarItemCounts, 0);
     }
 
     public void clearHotbarItem(int index) {
         if (index < 0 || index >= HOTBAR_SIZE) return;
         hotbarItemIds[index] = 0;
+        hotbarItemCounts[index] = 0;
     }
     
     public PlayerState(int startingCoins) {
@@ -111,7 +221,9 @@ public final class PlayerState {
     }
 
     public void setStamina(int value) {
-        stamina.set(clamp(value, 0, getMaxStamina()));
+        int clamped = clamp(value, 0, getMaxStamina());
+        staminaPrecise = clamped;
+        stamina.set(clamped);
     }
 
     public IntegerProperty agiProperty() {
@@ -155,9 +267,10 @@ public final class PlayerState {
 
     public void setMaxStamina(int value) {
         maxStamina.set(Math.max(1, value));
-        if (getStamina() > getMaxStamina()) {
-            setStamina(getMaxStamina());
+        if (staminaPrecise > getMaxStamina()) {
+            staminaPrecise = getMaxStamina();
         }
+        setStamina((int) Math.floor(Math.max(0.0, staminaPrecise)));
     }
 
     public IntegerProperty strProperty() {
@@ -234,6 +347,100 @@ public final class PlayerState {
     public void restoreStamina(int amount) {
         if (amount <= 0 || isDead()) return;
         setStamina(getStamina() + amount);
+    }
+
+    public double getBaseStaminaRegenPerSecond() {
+        return DEFAULT_STAMINA_BASE_REGEN_PER_SECOND + (Math.max(0, getVit()) * STAMINA_REGEN_PER_VIT);
+    }
+
+    public double getModeRegenMultiplier(StaminaMode mode) {
+        if (mode == null) return 1.0;
+        return switch (mode) {
+            case SLEEP, IDLE -> 1.0;
+            case WALK -> WALK_REGEN_MULTIPLIER;
+            case RUN -> RUN_REGEN_MULTIPLIER;
+        };
+    }
+
+    public boolean doesModeDrainStamina(StaminaMode mode) {
+        return mode == StaminaMode.RUN;
+    }
+
+    public double getStaminaCapRatio(StaminaMode mode) {
+        if (mode == null) return IDLE_STAMINA_CAP_RATIO;
+        return switch (mode) {
+            case SLEEP -> SLEEP_STAMINA_CAP_RATIO;
+            case IDLE -> IDLE_STAMINA_CAP_RATIO;
+            case WALK -> WALK_STAMINA_CAP_RATIO;
+            case RUN -> RUN_STAMINA_CAP_RATIO;
+        };
+    }
+
+    public int getModeStaminaCap(StaminaMode mode) {
+        int cap = (int) Math.floor(getMaxStamina() * getStaminaCapRatio(mode));
+        if (mode == StaminaMode.SLEEP) {
+            return getMaxStamina();
+        }
+        return Math.max(0, Math.min(getMaxStamina(), cap));
+    }
+
+    public double getRunDrainPerSecond() {
+        double reduction = Math.max(0.0, RUN_DRAIN_SCALING_START - (Math.max(0, getVit()) * RUN_DRAIN_REDUCTION_PER_VIT));
+        return RUN_BASE_DRAIN_PER_SECOND + reduction;
+    }
+
+    public void setStaminaMode(StaminaMode mode) {
+        staminaMode = (mode == null) ? StaminaMode.IDLE : mode;
+    }
+
+    public StaminaMode getStaminaMode() {
+        return staminaMode;
+    }
+
+    public boolean canSleep() {
+        return !isDead() && getStamina() < getMaxStamina();
+    }
+
+    public boolean isSleeping() {
+        return sleeping;
+    }
+
+    public void startSleeping() {
+        sleeping = true;
+        setStaminaMode(StaminaMode.SLEEP);
+    }
+
+    public void stopSleeping() {
+        sleeping = false;
+        if (staminaMode == StaminaMode.SLEEP) {
+            setStaminaMode(StaminaMode.IDLE);
+        }
+    }
+
+    public void updateStaminaOverTime(double seconds, StaminaMode mode) {
+        updateStaminaOverTime(seconds, mode, 1.0);
+    }
+
+    public void updateStaminaOverTime(double seconds, StaminaMode mode, double timeFlowMultiplier) {
+        if (seconds <= 0.0 || isDead() || getMaxStamina() <= 0) return;
+
+        StaminaMode effectiveMode = (mode == null) ? StaminaMode.IDLE : mode;
+        double safeTimeFlow = Math.max(0.0, timeFlowMultiplier);
+
+        double regen = getBaseStaminaRegenPerSecond() * getModeRegenMultiplier(effectiveMode) * safeTimeFlow * seconds;
+        double drain = doesModeDrainStamina(effectiveMode)
+            ? getRunDrainPerSecond() * safeTimeFlow * seconds
+            : 0.0;
+
+        staminaPrecise = Math.max(0.0, staminaPrecise - drain);
+        staminaPrecise += regen;
+
+        double cap = getModeStaminaCap(effectiveMode);
+        if (staminaPrecise > cap) {
+            staminaPrecise = cap;
+        }
+
+        stamina.set(clamp((int) Math.floor(staminaPrecise + 1.0e-9), 0, getMaxStamina()));
     }
 
     public void applyFoodEffect(int hpDelta, int staminaDelta) {

@@ -151,6 +151,18 @@ public class New_gameController implements Initializable, SceneController {
             return;
         }
 
+        int confirm = JOptionPane.showConfirmDialog(
+            null,
+            "World Name: \"" + worldName + "\"\nThis name will be shown as the Save Name.\nDo you want to continue?",
+            "Confirm New Game",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.WARNING_MESSAGE
+        );
+
+        if (confirm != JOptionPane.YES_OPTION) {
+            return;
+        }
+
         handleconfirmaction(null);
 
         GameState gs = GameState.get();
@@ -241,6 +253,7 @@ public class New_gameController implements Initializable, SceneController {
         playerState.setVit(NEW_GAME_BASE_VIT);
         playerState.setDex(NEW_GAME_BASE_DEX);
         playerState.setAgi(NEW_GAME_BASE_AGI);
+        GameState.get().getPlayerSkills().clear();
         playerState.setExp(NEW_GAME_STARTING_EXP);
 
         resetPendingStatusChanges();

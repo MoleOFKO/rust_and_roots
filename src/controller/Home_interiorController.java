@@ -4,6 +4,8 @@
  */
 package controller;
 
+import db.SaveGameService;
+import game.GameState;
 import game.GameTimeManager;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -28,7 +30,9 @@ import model.item;
 import util.SpawnTag;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;
 import javafx.collections.MapChangeListener;
 import javafx.scene.control.Slider;
@@ -37,6 +41,10 @@ import javafx.scene.layout.Pane;
 import model.Inventory;
 import model.ItemDatabase;
 import model.item;
+import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import model.PlayerState;
+import util.SceneManager;
 
 /**
  * FXML Controller class
@@ -811,6 +819,20 @@ public class Home_interiorController extends BaseMapController {
     private ImageView btnfishingplus1;
     @FXML
     private ImageView btncookingplus1;
+    @FXML
+    private ImageView Playerinvimg112;
+    @FXML
+    private Button Playerinvbtn112;
+    @FXML
+    private Label Playerinvlbl112;
+    @FXML
+    private ImageView Playerinvimg110;
+    @FXML
+    private Button Playerinvbtn110;
+    @FXML
+    private Label Playerinvlbl110;
+    @FXML
+    private Group skillsgroup;
 
     @FXML
     private void handleHPminusaction(MouseEvent event) { onStatusHpMinus(); }
@@ -849,23 +871,89 @@ public class Home_interiorController extends BaseMapController {
     private void handleAGIplusaction(MouseEvent event) { onStatusAgiPlus(); }
 
     @FXML
-    private void handleusepointaction(MouseEvent event) { onStatusUsePoint(); }
+    private void handleusepointaction(MouseEvent event) { onSharedUsePoint(); }
 
     @FXML
-    private void handleconfirmaction(MouseEvent event) { onStatusConfirm(); }
+    private void handleconfirmaction(MouseEvent event) { onSharedConfirm(); }
 
     @FXML
     private void handlesaveexitaction(ActionEvent event) {
+        try {
+            capturePlayerSnapshot();
+            new SaveGameService().saveGameToSlot(GameState.get(), GameState.get().getSelectedSaveSlot());
+            if (gameLoop != null) gameLoop.stop();
+            if (player != null) player.stop();
+            Platform.exit();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML
     private void handlesave(ActionEvent event) {
+        capturePlayerSnapshot();
+        GameState.get().setSaveMenuMode(true);
+        SceneManager.switchScene("/view/saveloads.fxml");
     }
 
     @FXML
     private void handleload(ActionEvent event) {
+        capturePlayerSnapshot();
+        GameState.get().setSaveMenuMode(false);
+        GameState.get().setReturnScene("/view/home_map.fxml", SpawnTag.DEFAULT);
+        SceneManager.switchScene("/view/saveloads.fxml");
     }
 
+    private void bindSettingControls() {
+        GameTimeManager time = GameTimeManager.get();
+
+        if (timescaleslider != null) {
+            timescaleslider.valueProperty().unbindBidirectional(time.timeScaleProperty());
+            timescaleslider.valueProperty().bindBidirectional(time.timeScaleProperty());
+        }
+
+        if (sliderscale != null) {
+            sliderscale.textProperty().unbind();
+            sliderscale.textProperty().bind(Bindings.createStringBinding(
+                () -> String.format("Current Time Speed : x%.1f", time.timeScaleProperty().get()),
+                time.timeScaleProperty()
+            ));
+        }
+
+        if (lbldays != null) {
+            lbldays.textProperty().unbind();
+            lbldays.textProperty().bind(Bindings.createStringBinding(
+                () -> "Days : " + time.dayNumberProperty().get(),
+                time.dayNumberProperty()
+            ));
+        }
+
+        if (lbltime != null) {
+            lbltime.textProperty().unbind();
+            lbltime.textProperty().bind(Bindings.createStringBinding(
+                () -> "Time : " + time.formattedProperty().get(),
+                time.formattedProperty()
+            ));
+        }
+
+        if (btnsetday != null) btnsetday.setOnAction(e -> time.setTimeOfDay(8, 0));
+        if (btnsetnight != null) btnsetnight.setOnAction(e -> time.setTimeOfDay(20, 0));
+        if (btnplus1h != null) btnplus1h.setOnAction(e -> time.addMinutes(60));
+        if (btnsaveandexit != null) {
+            btnsaveandexit.setOnAction(e -> {
+                try {
+                    capturePlayerSnapshot();
+                    new SaveGameService().saveGame(GameState.get());
+                    if (gameLoop != null) gameLoop.stop();
+                    if (player != null) player.stop();
+                    Platform.exit();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            });
+        }
+    }
+    
     @FXML
     private void handleopenInventoryaction(ActionEvent event) {
         super.openInventory();
@@ -885,64 +973,213 @@ public class Home_interiorController extends BaseMapController {
     private void handleopensettingaction(ActionEvent event) {
         super.openSetting();
     }
-
+    
     @FXML
     private void handlebtnskillacion(MouseEvent event) {
+        super.setSkillsOpen(true);
+        super.setStatusOpen(false);
+        refreshStatusAllocationUi();
     }
 
     @FXML
     private void handlebtnstatusaction(MouseEvent event) {
+        super.setStatusOpen(true);
+        super.setSkillsOpen(false);
+        refreshStatusAllocationUi();
     }
 
     @FXML
     private void handlefarmingminusaction(MouseEvent event) {
+        onSkillFarmingMinus();
     }
 
     @FXML
     private void handlefarmingplusaction(MouseEvent event) {
+        onSkillFarmingPlus();
     }
 
     @FXML
     private void handlegatheringminusaction(MouseEvent event) {
+        onSkillGatheringMinus();
     }
 
     @FXML
     private void handlecraftingminusaction(MouseEvent event) {
+        onSkillCraftingMinus();
     }
 
     @FXML
     private void handlefishingminusaction(MouseEvent event) {
+        onSkillFishingMinus();
     }
 
     @FXML
     private void handlecookingminusaction(MouseEvent event) {
+        onSkillCookingMinus();
     }
 
     @FXML
     private void handlegatheringplusaction(MouseEvent event) {
+        onSkillGatheringPlus();
     }
 
     @FXML
     private void handlecraftingplusaction(MouseEvent event) {
+        onSkillCraftingPlus();
     }
 
     @FXML
     private void handlefishingplusaction(MouseEvent event) {
+        onSkillFishingPlus();
     }
 
     @FXML
     private void handlecookingplusaction(MouseEvent event) {
+        onSkillCookingPlus();
     }
 
-    private enum SelectionSource { NONE, PLAYER, CHEST }
+    private void bindStatusLabels() {
+        if (playerState == null) return;
+
+        playerState.playerNameProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
+        playerState.expProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
+        playerState.hpProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
+        playerState.maxHpProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
+        playerState.staminaProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
+        playerState.maxStaminaProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
+        playerState.strProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
+        playerState.vitProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
+        playerState.dexProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
+        playerState.agiProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
+    }
+
+    @Override
+    protected void refreshStatusAllocationUi() {
+        refreshStatusView();
+        refreshSkillsView();
+        refreshStatusButtons();
+    }
+
+    private void refreshStatusView() {
+        if (playerState == null) return;
+
+        if (statusName != null) statusName.setText("Name : " + playerState.getPlayerName());
+        if (statusEXP != null) {
+            statusEXP.setText(formatVisibleExpLabel());
+        }
+        if (statusHP != null) {
+            statusHP.setText("HP : " + playerState.getHp() + "/" + (playerState.getMaxHp() + pendingHpPoints) + formatPending(pendingHpPoints));
+        }
+        if (statusSP != null) {
+            statusSP.setText("SP : " + playerState.getStamina() + "/" + (playerState.getMaxStamina() + pendingSpPoints) + formatPending(pendingSpPoints));
+        }
+        if (statusSTR != null) statusSTR.setText("STR : " + playerState.getStr() + formatPending(pendingStrPoints));
+        if (statusVIT != null) statusVIT.setText("VIT : " + playerState.getVit() + formatPending(pendingVitPoints));
+        if (statusDEX != null) statusDEX.setText("DEX : " + playerState.getDex() + formatPending(pendingDexPoints));
+        if (statusAGI != null) statusAGI.setText("AGI : " + playerState.getAgi() + formatPending(pendingAgiPoints));
+    }
+
+    private String formatPending(int points) {
+        return points <= 0 ? "" : "(+" + points + ")";
+    }
+
+    private void refreshSkillsView() {
+        if (gameState == null) return;
+        GameState.PlayerSkills skills = gameState.getPlayerSkills();
+
+        if (farming != null) farming.setText(appendPendingSkillCost(skills.getFarmingDisplay(), pendingFarmingSkillExp));
+        if (gathering != null) gathering.setText(appendPendingSkillCost(skills.getGatheringDisplay(), pendingGatheringSkillExp));
+        if (crafting != null) crafting.setText(appendPendingSkillCost(skills.getCraftingDisplay(), pendingCraftingSkillExp));
+        if (fishing != null) fishing.setText(appendPendingSkillCost(skills.getFishingDisplay(), pendingFishingSkillExp));
+        if (cooking != null) cooking.setText(appendPendingSkillCost(skills.getCookingDisplay(), pendingCookingSkillExp));
+    }
+
+    private void refreshStatusButtons() {
+        boolean canUsePoint = playerState != null && playerState.getExp() > 0;
+        boolean skillsVisible = isSkillsScreenVisible();
+
+        configureImageButton(btnUsePoint, canUsePoint, true, statusAllocationMode || skillAllocationMode ? 1.0 : 0.85);
+
+        if (skillsVisible) {
+            configureImageButton(btnConfirm, skillAllocationMode && getPendingSkillExpTotal() > 0, skillAllocationMode, 1.0);
+
+            configureImageButton(btnfarmingplus1, canIncreaseSkill("farming"), skillAllocationMode, 1.0);
+            configureImageButton(btngatheringplus1, canIncreaseSkill("gathering"), skillAllocationMode, 1.0);
+            configureImageButton(btncraftingplus1, canIncreaseSkill("crafting"), skillAllocationMode, 1.0);
+            configureImageButton(btnfishingplus1, canIncreaseSkill("fishing"), skillAllocationMode, 1.0);
+            configureImageButton(btncookingplus1, canIncreaseSkill("cooking"), skillAllocationMode, 1.0);
+
+            configureImageButton(btnfarmingminus1, skillAllocationMode && pendingFarmingSkillExp > 0, skillAllocationMode, 1.0);
+            configureImageButton(btngatheringminus1, skillAllocationMode && pendingGatheringSkillExp > 0, skillAllocationMode, 1.0);
+            configureImageButton(btncraftingminus1, skillAllocationMode && pendingCraftingSkillExp > 0, skillAllocationMode, 1.0);
+            configureImageButton(btnfishingminus1, skillAllocationMode && pendingFishingSkillExp > 0, skillAllocationMode, 1.0);
+            configureImageButton(btncookingminus1, skillAllocationMode && pendingCookingSkillExp > 0, skillAllocationMode, 1.0);
+
+            configureImageButton(btnHPplus, false, false, 1.0);
+            configureImageButton(btnSPplus, false, false, 1.0);
+            configureImageButton(btnSTRplus, false, false, 1.0);
+            configureImageButton(btnVITplus, false, false, 1.0);
+            configureImageButton(btnDEXplus, false, false, 1.0);
+            configureImageButton(btnAGIplus, false, false, 1.0);
+            configureImageButton(btnHPminus, false, false, 1.0);
+            configureImageButton(btnSPminus, false, false, 1.0);
+            configureImageButton(btnSTRminus, false, false, 1.0);
+            configureImageButton(btnVITminus, false, false, 1.0);
+            configureImageButton(btnDEXminus, false, false, 1.0);
+            configureImageButton(btnAGIminus, false, false, 1.0);
+            return;
+        }
+
+        if(isStatusScreenVisible()){
+            configureImageButton(btnConfirm, statusAllocationMode && getPendingExpCost() > 0, statusAllocationMode, 1.0);
+
+            configureImageButton(btnHPplus, canIncreaseStat("hp"), statusAllocationMode, 1.0);
+            configureImageButton(btnSPplus, canIncreaseStat("sp"), statusAllocationMode, 1.0);
+            configureImageButton(btnSTRplus, canIncreaseStat("str"), statusAllocationMode, 1.0);
+            configureImageButton(btnVITplus, canIncreaseStat("vit"), statusAllocationMode, 1.0);
+            configureImageButton(btnDEXplus, canIncreaseStat("dex"), statusAllocationMode, 1.0);
+            configureImageButton(btnAGIplus, canIncreaseStat("agi"), statusAllocationMode, 1.0);
+
+            configureImageButton(btnHPminus, statusAllocationMode && pendingHpPoints > 0, statusAllocationMode, 1.0);
+            configureImageButton(btnSPminus, statusAllocationMode && pendingSpPoints > 0, statusAllocationMode, 1.0);
+            configureImageButton(btnSTRminus, statusAllocationMode && pendingStrPoints > 0, statusAllocationMode, 1.0);
+            configureImageButton(btnVITminus, statusAllocationMode && pendingVitPoints > 0, statusAllocationMode, 1.0);
+            configureImageButton(btnDEXminus, statusAllocationMode && pendingDexPoints > 0, statusAllocationMode, 1.0);
+            configureImageButton(btnAGIminus, statusAllocationMode && pendingAgiPoints > 0, statusAllocationMode, 1.0);
+
+            configureImageButton(btnfarmingplus1, false, false, 1.0);
+            configureImageButton(btngatheringplus1, false, false, 1.0);
+            configureImageButton(btncraftingplus1, false, false, 1.0);
+            configureImageButton(btnfishingplus1, false, false, 1.0);
+            configureImageButton(btncookingplus1, false, false, 1.0);
+            configureImageButton(btnfarmingminus1, false, false, 1.0);
+            configureImageButton(btngatheringminus1, false, false, 1.0);
+            configureImageButton(btncraftingminus1, false, false, 1.0);
+            configureImageButton(btnfishingminus1, false, false, 1.0);
+            configureImageButton(btncookingminus1, false, false, 1.0);
+        }
+    }
+
+    private void configureImageButton(ImageView imageView, boolean enabled, boolean visible, double activeOpacity) {
+        if (imageView == null) return;
+        imageView.setVisible(visible);
+        imageView.setManaged(visible);
+        imageView.setDisable(!enabled);
+        imageView.setMouseTransparent(!visible || !enabled);
+        imageView.setOpacity(!visible ? 0.0 : (enabled ? activeOpacity : 0.45));
+    }
 
     private final List<ImageView> chestImages = new ArrayList<>();
     private final List<Label> chestLabels = new ArrayList<>();
     private final List<Button> chestButtons = new ArrayList<>();
 
     private Inventory chestInventory;
-    private SelectionSource selectedSource = SelectionSource.NONE;
-    private Integer selectedItemId = null;
+    private final LinkedHashSet<Integer> selectedChestItemIds = new LinkedHashSet<>();
+    private final LinkedHashSet<Integer> selectedInteriorPlayerItemIds = new LinkedHashSet<>();
+    private boolean insideBedZone = false;
+    private javafx.animation.AnimationTimer sleepTimer;
+    private double sleepPreviousTimeScale = 1.0;
+    private boolean sleepTimeScaleOverrideActive = false;
 
     @Override
     protected String mapKey() {
@@ -961,15 +1198,24 @@ public class Home_interiorController extends BaseMapController {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         super.initialize(url, rb);
-
+        bridgeInteriorSharedUi();
         ItemDatabase.loadItems();
         chestInventory = gameState.getChestInventory();
         setupChestUi();
         setupInteriorZones();
+//        setupMenuTabs();
+//        bindStatusLabels();
+        bindSettingControls();
 
         if (btncook != null) btncook.setOnAction(this::handlecookaction);
         if (btncraft != null) btncraft.setOnAction(this::handlecraftaction);
         if (btnmelt != null) btnmelt.setOnAction(e -> openMelt());
+        bindStatusLabels();
+
+        if (playerState != null) {
+            playerState.expProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
+            playerState.staminaProperty().addListener((obs, o, n) -> refreshSleepInteractionState());
+        }
 
         pinvImages.clear();
         pinvLabels.clear();
@@ -1037,53 +1283,129 @@ public class Home_interiorController extends BaseMapController {
         pinvButtons.add(Playerinvbtn17);
         pinvButtons.add(Playerinvbtn18);
         pinvButtons.add(Playerinvbtn19);
-        
 
+        wireInteriorPlayerButtons();
         refreshInteriorInventorySlots();
 
         Inventory inv = player.getInventory();
         inv.itemsProperty().addListener(
-            (MapChangeListener<Integer, IntegerProperty>) change -> refreshInteriorInventorySlots()
+            (MapChangeListener<Integer, IntegerProperty>) change -> refreshChestAndInventoryViews()
+        );
+        chestInventory.itemsProperty().addListener(
+            (MapChangeListener<Integer, IntegerProperty>) change -> refreshChestAndInventoryViews()
         );
     }
     
+    private void bridgeInteriorSharedUi() {
+        List<StackPane> hotbarSlotNodes = List.of(Hslot, Hslot1, Hslot2, Hslot3, Hslot4);
+        List<ImageView> hotbarImageNodes = List.of(slotImg, slotImg1, slotImg2, slotImg3, slotImg4);
+        List<Label> hotbarLabelNodes = List.of(slotLb, slotLb1, slotLb2, slotLb3, slotLb4);
+        List<Button> hotbarButtonNodes = List.of(slotBtn, slotBtn1, slotBtn2, slotBtn3, slotBtn4);
+
+        bridgeSharedHotbarUi(
+            hotbar,
+            hotbarguide,
+            hotbarSlotNodes,
+            hotbarImageNodes,
+            hotbarLabelNodes,
+            hotbarButtonNodes
+        );
+
+        List<ImageView> playerInvImageNodes = List.of(
+            Playerinvimg112, Playerinvimg110, Playerinvimg21, Playerinvimg31, Playerinvimg41,
+            Playerinvimg51, Playerinvimg61, Playerinvimg71, Playerinvimg81, Playerinvimg91,
+            Playerinvimg101, Playerinvimg111, Playerinvimg121, Playerinvimg131, Playerinvimg141,
+            Playerinvimg151, Playerinvimg161, Playerinvimg171, Playerinvimg181, Playerinvimg191
+        );
+
+        List<Label> playerInvLabelNodes = List.of(
+            Playerinvlbl112, Playerinvlbl110, Playerinvlbl21, Playerinvlbl31, Playerinvlbl41,
+            Playerinvlbl51, Playerinvlbl61, Playerinvlbl71, Playerinvlbl81, Playerinvlbl91,
+            Playerinvlbl101, Playerinvlbl111, Playerinvlbl121, Playerinvlbl131, Playerinvlbl141,
+            Playerinvlbl151, Playerinvlbl161, Playerinvlbl171, Playerinvlbl181, Playerinvlbl191
+        );
+
+        List<Button> playerInvButtonNodes = List.of(
+            Playerinvbtn112, Playerinvbtn110, Playerinvbtn21, Playerinvbtn31, Playerinvbtn41,
+            Playerinvbtn51, Playerinvbtn61, Playerinvbtn71, Playerinvbtn81, Playerinvbtn91,
+            Playerinvbtn101, Playerinvbtn111, Playerinvbtn121, Playerinvbtn131, Playerinvbtn141,
+            Playerinvbtn151, Playerinvbtn161, Playerinvbtn171, Playerinvbtn181, Playerinvbtn191
+        );
+
+        bridgeSharedInventoryOverlayUi(
+            inventoryOverlay,
+            menuInventory,
+            statusTab,
+            settingsTab,
+            statusgroup,
+            skillsgroup,
+            player_inv_group1,
+            openInventory,
+            openstatus,
+            opensetting,
+            btnclose,
+            btnskill,
+            btnstatus,
+            playerInvImageNodes,
+            playerInvLabelNodes,
+            playerInvButtonNodes
+        );
+
+        rebuildSharedUiAfterBridge();
+    }
+    
+    private void wireInteriorPlayerButtons() {
+        for (int i = 0; i < pinvButtons.size(); i++) {
+            final int index = i;
+            Button button = pinvButtons.get(i);
+            if (button != null) {
+                button.setOnAction(e -> selectInteriorPlayerSlot(index));
+            }
+        }
+    }
+
     private void refreshInteriorInventorySlots() {
         if (player == null || player.getInventory() == null) return;
 
-        Inventory inv = player.getInventory();
-        List<Integer> owned = new ArrayList<>(inv.itemsProperty().keySet());
-
-        owned.sort(Comparator.comparing(id -> {
-            item itm = ItemDatabase.getItemById(id);
-            return itm == null ? "" : itm.getItem_name();
-        }));
+        List<SlotData> slots = snapshotSlots(player.getInventory(), playerInventorySlotCapacity());
 
         for (int i = 0; i < pinvImages.size(); i++) {
             ImageView img = pinvImages.get(i);
             Label lbl = pinvLabels.get(i);
             Button btn = pinvButtons.get(i);
+            SlotData slot = (i < slots.size()) ? slots.get(i) : null;
 
-            if (i >= owned.size()) {
-                if (img != null) img.setImage(null);
+            if (slot == null) {
+                if (img != null) {
+                    img.setImage(null);
+                    img.setVisible(false);
+                    img.setOpacity(0.0);
+                    img.setScaleX(1.0);
+                    img.setScaleY(1.0);
+                    img.setStyle("");
+                }
                 if (lbl != null) lbl.setText("");
                 if (btn != null) {
                     btn.setText("");
                     btn.setDisable(true);
-                    btn.setOnAction(null);
                 }
                 continue;
             }
 
-            int itemId = owned.get(i);
-            int qty = inv.getCount(itemId);
+            int itemId = slot.itemId();
             item itm = ItemDatabase.getItemById(itemId);
 
             if (img != null) {
                 img.setImage(ItemDatabase.getImage(itemId));
+                img.setVisible(true);
+                img.setOpacity(0.9);
+                img.setScaleX(1.0);
+                img.setScaleY(1.0);
+                img.setStyle("");
             }
 
             if (lbl != null) {
-                lbl.setText("x" + qty);
+                lbl.setText("x" + slot.quantity());
             }
 
             if (btn != null) {
@@ -1091,8 +1413,68 @@ public class Home_interiorController extends BaseMapController {
                 btn.setText(itm == null ? "" : itm.getItem_name());
             }
         }
+
+        refreshInteriorPlayerSelectionHighlight();
     }
 
+    private void refreshInteriorPlayerSelectionHighlight() {
+        List<SlotData> slots = snapshotSlots(player.getInventory(), playerInventorySlotCapacity());
+
+        for (int i = 0; i < pinvImages.size(); i++) {
+            ImageView imageView = pinvImages.get(i);
+            if (imageView == null) continue;
+
+            SlotData slot = (i < slots.size()) ? slots.get(i) : null;
+            boolean selected =
+                slot != null &&
+                selectedInteriorPlayerItemIds.contains(slot.itemId());
+
+            imageView.setStyle(selected
+                ? "-fx-effect: dropshadow(gaussian, yellow, 14, 0.7, 0, 0);"
+                : "");
+
+            if (slot == null) {
+                imageView.setOpacity(0.0);
+                imageView.setScaleX(1.0);
+                imageView.setScaleY(1.0);
+            } else {
+                imageView.setOpacity(selected ? 1.0 : 0.9);
+                imageView.setScaleX(selected ? 1.08 : 1.0);
+                imageView.setScaleY(selected ? 1.08 : 1.0);
+            }
+        }
+    }
+
+    private void selectInteriorPlayerSlot(int index) {
+        List<SlotData> slots = snapshotSlots(player.getInventory(), playerInventorySlotCapacity());
+        if (index < 0 || index >= slots.size()) return;
+
+        SlotData slot = slots.get(index);
+        if (slot == null) return;
+
+        toggleInteriorPlayerSelection(slot.itemId());
+        refreshChestAndInventoryViews();
+    }
+
+    private void toggleInteriorPlayerSelection(int itemId) {
+        if (itemId <= 0) return;
+        if (selectedInteriorPlayerItemIds.contains(itemId)) {
+            selectedInteriorPlayerItemIds.remove(itemId);
+        } else {
+            selectedInteriorPlayerItemIds.add(itemId);
+        }
+        selectedPlayerInventoryItemId = selectedInteriorPlayerItemIds.isEmpty() ? null : selectedInteriorPlayerItemIds.iterator().next();
+    }
+
+    private void toggleChestSelection(int itemId) {
+        if (itemId <= 0) return;
+        if (selectedChestItemIds.contains(itemId)) {
+            selectedChestItemIds.remove(itemId);
+        } else {
+            selectedChestItemIds.add(itemId);
+        }
+    }
+    
     private void openCook() {
         if (btncook.isDisable()) return;
         gameState.setReturnScene("/view/home_interior.fxml", SpawnTag.FROM_COOK);
@@ -1112,7 +1494,8 @@ public class Home_interiorController extends BaseMapController {
     }
     
     private void setupInteriorZones() {
-        applyInteractionState(btntoSleep, false);
+        insideBedZone = false;
+        refreshSleepInteractionState();
         applyInteractionState(btnOpenInv, false);
         applyInteractionState(btncook, false);
         applyInteractionState(btnmelt, false);
@@ -1120,7 +1503,8 @@ public class Home_interiorController extends BaseMapController {
 
         if (bed_detect != null && btntoSleep != null) {
             interactionManager.addZone(new InteractionZone(bed_detect, inside -> {
-                applyInteractionState(btntoSleep, inside);
+                insideBedZone = inside;
+                refreshSleepInteractionState();
             }));
         }
 
@@ -1163,46 +1547,104 @@ public class Home_interiorController extends BaseMapController {
     protected void onPlayerInventorySlotSelected(int index, SlotData slot) {
         if (slot == null) return;
 
-        selectedSource = SelectionSource.PLAYER;
-        selectedItemId = slot.itemId();
         selectedPlayerInventoryItemId = slot.itemId();
-
         refreshChestAndInventoryViews();
     }
     
-    @FXML
-    private void handleSleepAction(ActionEvent event) {
-        if (btntoSleep.isDisable()) return;
+    private boolean isSleepingActive() {
+        return sleepTimer != null;
+    }
 
-        sleepStackPane.setManaged(true);
-        sleepStackPane.setDisable(false);
-        sleepStackPane.setVisible(true);
-        
-        if (player != null) {
-        player.clearInputState();
+    private void refreshSleepInteractionState() {
+        boolean canUseSleep = insideBedZone
+            && playerState != null
+            && playerState.canSleep()
+            && !isSleepingActive();
+
+        applyInteractionState(btntoSleep, canUseSleep);
+    }
+
+    private void applySleepTimeScaleOverride(double multiplier) {
+        if (sleepTimeScaleOverrideActive) return;
+        GameTimeManager time = GameTimeManager.get();
+        sleepPreviousTimeScale = time.timeScaleProperty().get();
+        time.timeScaleProperty().set(Math.max(0.1, multiplier));
+        sleepTimeScaleOverrideActive = true;
+    }
+
+    private void restoreSleepTimeScaleOverride() {
+        if (!sleepTimeScaleOverrideActive) return;
+        GameTimeManager.get().timeScaleProperty().set(sleepPreviousTimeScale);
+        sleepTimeScaleOverrideActive = false;
+    }
+
+    private void stopSleepSequence() {
+        if (sleepTimer != null) {
+            sleepTimer.stop();
+            sleepTimer = null;
         }
 
-        javafx.animation.PauseTransition pause =
-            new javafx.animation.PauseTransition(javafx.util.Duration.seconds(2));
+        restoreSleepTimeScaleOverride();
 
-        pause.setOnFinished(e -> {
-            GameTimeManager time = GameTimeManager.get();
+        if (playerState != null) {
+            playerState.stopSleeping();
+        }
 
-            // move to next morning
-            time.setDay(time.dayNumberProperty().get() + 1);
-            time.setTimeOfDay(6, 0);
-            if(playerState.getHp() <= playerState.getMaxHp() * 0.8){
-                playerState.setHp((int) (playerState.getMaxHp() * 0.8));
-            }
-            if(playerState.getStamina() <= playerState.getMaxStamina() * 0.8){
-                playerState.setStamina((int) (playerState.getMaxStamina() * 0.8));
-            }
+        if (sleepStackPane != null) {
             sleepStackPane.setVisible(false);
             sleepStackPane.setDisable(true);
             sleepStackPane.setManaged(false);
-        });
+        }
 
-        pause.play();
+        refreshSleepInteractionState();
+    }
+
+    @FXML
+    private void handleSleepAction(ActionEvent event) {
+        if (btntoSleep == null || btntoSleep.isDisable() || playerState == null || !playerState.canSleep() || isSleepingActive()) {
+            return;
+        }
+
+        if (sleepStackPane != null) {
+            sleepStackPane.setManaged(true);
+            sleepStackPane.setDisable(false);
+            sleepStackPane.setVisible(true);
+        }
+
+        if (player != null) {
+            player.clearInputState();
+        }
+
+        playerState.startSleeping();
+        applySleepTimeScaleOverride(6.0);
+
+        sleepTimer = new javafx.animation.AnimationTimer() {
+            private long lastNow = 0L;
+
+            @Override
+            public void handle(long now) {
+                if (lastNow == 0L) {
+                    lastNow = now;
+                    return;
+                }
+
+                double dtSeconds = (now - lastNow) / 1_000_000_000.0;
+                lastNow = now;
+
+                if (dtSeconds <= 0.0 || playerState == null) {
+                    return;
+                }
+
+                // Sleep uses the same base regen rules as idle; it restores faster only because time flows faster.
+                playerState.updateStaminaOverTime(dtSeconds, PlayerState.StaminaMode.SLEEP, 6.0);
+
+                if (!playerState.canSleep()) {
+                    stopSleepSequence();
+                }
+            }
+        };
+        sleepTimer.start();
+        refreshSleepInteractionState();
     }
 
     @FXML
@@ -1236,12 +1678,12 @@ public class Home_interiorController extends BaseMapController {
 
     @FXML
     private void sendToChestClick(MouseEvent event) {
-        moveSelectedItem(SelectionSource.PLAYER);
+        moveSelectedItemsToChest();
     }
 
     @FXML
     private void sendToInventoryClick(MouseEvent event) {
-        moveSelectedItem(SelectionSource.CHEST);
+        moveSelectedItemsToInventory();
     }
 
     @FXML
@@ -1304,56 +1746,58 @@ public class Home_interiorController extends BaseMapController {
         SlotData slot = slots.get(index);
         if (slot == null) return;
 
-        selectedSource = SelectionSource.CHEST;
-        selectedItemId = slot.itemId();
-        selectedPlayerInventoryItemId = null;
-
+        toggleChestSelection(slot.itemId());
         refreshChestAndInventoryViews();
     }
 
-    private void moveSelectedItem(SelectionSource expectedSource) {
-        if (selectedSource != expectedSource || selectedItemId == null) return;
-
-        Inventory from = (expectedSource == SelectionSource.PLAYER) ? player.getInventory() : chestInventory;
-        Inventory to = (expectedSource == SelectionSource.PLAYER) ? chestInventory : player.getInventory();
-
-        int targetCapacity = (expectedSource == SelectionSource.PLAYER) ? CHEST_SLOT_CAPACITY : playerInventorySlotCapacity();
-
-        int qty = from.getCount(selectedItemId);
-        if (qty <= 0) {
-            clearSelection();
+    private void moveSelectedItemsToChest() {
+        if (player == null || chestInventory == null) return;
+        if (!moveSelectedItemBatch(player.getInventory(), chestInventory, selectedInteriorPlayerItemIds, CHEST_SLOT_CAPACITY)) {
+            pruneMissingSelections();
             refreshChestAndInventoryViews();
             return;
         }
 
-        if (!canAcceptItemType(to, selectedItemId, targetCapacity)) {
-            return;
-        }
-
-        if (!from.removeItem(selectedItemId, qty)) {
-            return;
-        }
-
-        to.addItem(selectedItemId, qty);
-        clearSelection();
+        clearChestSelectionsOnly();
         refreshChestAndInventoryViews();
     }
 
-    private boolean canAcceptItemType(Inventory inventory, int itemId, int capacity) {
-        if (inventory.getCount(itemId) > 0) return true;
-        return inventory.itemsProperty().size() < capacity;
+    private void moveSelectedItemsToInventory() {
+        if (player == null || chestInventory == null) return;
+        if (!moveSelectedItemBatch(chestInventory, player.getInventory(), selectedChestItemIds, playerInventorySlotCapacity())) {
+            pruneMissingSelections();
+            refreshChestAndInventoryViews();
+            return;
+        }
+
+        clearChestSelectionsOnly();
+        refreshChestAndInventoryViews();
     }
 
     private void clearSelection() {
-        selectedSource = SelectionSource.NONE;
-        selectedItemId = null;
+        clearChestSelectionsOnly();
         clearPlayerInventorySelection();
         refreshChestAndInventoryViews();
     }
 
+    private void clearChestSelectionsOnly() {
+        selectedChestItemIds.clear();
+        selectedInteriorPlayerItemIds.clear();
+    }
+
+    private void pruneMissingSelections() {
+        if (player != null) {
+            selectedInteriorPlayerItemIds.removeIf(itemId -> player.getInventory().getCount(itemId) <= 0);
+        }
+        if (chestInventory != null) {
+            selectedChestItemIds.removeIf(itemId -> chestInventory.getCount(itemId) <= 0);
+        }
+        selectedPlayerInventoryItemId = selectedInteriorPlayerItemIds.isEmpty() ? null : selectedInteriorPlayerItemIds.iterator().next();
+    }
+
     private void refreshChestAndInventoryViews() {
         refreshChestSlots();
-        refreshPlayerInventoryView();
+        refreshInteriorInventorySlots();
         refreshSelectionHighlight();
     }
 
@@ -1407,7 +1851,7 @@ public class Home_interiorController extends BaseMapController {
     
     private void refreshSelectionHighlight() {
         highlightChestSelection();
-        refreshPlayerInventorySelectionHighlight();
+        highlightInteriorPlayerSelection();
     }
 
     private void highlightChestSelection() {
@@ -1420,9 +1864,7 @@ public class Home_interiorController extends BaseMapController {
             SlotData slot = (i < slots.size()) ? slots.get(i) : null;
             boolean selected =
                 slot != null &&
-                selectedSource == SelectionSource.CHEST &&
-                selectedItemId != null &&
-                slot.itemId() == selectedItemId;
+                selectedChestItemIds.contains(slot.itemId());
 
             imageView.setStyle(selected
                 ? "-fx-effect: dropshadow(gaussian, yellow, 14, 0.7, 0, 0);"
@@ -1440,4 +1882,32 @@ public class Home_interiorController extends BaseMapController {
         }
     }
  
+    private void highlightInteriorPlayerSelection() {
+        List<SlotData> slots = snapshotSlots(player.getInventory(), playerInventorySlotCapacity());
+
+        for (int i = 0; i < pinvImages.size(); i++) {
+            ImageView imageView = pinvImages.get(i);
+            if (imageView == null) continue;
+
+            SlotData slot = (i < slots.size()) ? slots.get(i) : null;
+            boolean selected =
+                slot != null &&
+                selectedInteriorPlayerItemIds.contains(slot.itemId());
+
+            imageView.setStyle(selected
+                ? "-fx-effect: dropshadow(gaussian, yellow, 14, 0.7, 0, 0);"
+                : "");
+
+            if (slot == null) {
+                imageView.setOpacity(0.0);
+                imageView.setScaleX(1.0);
+                imageView.setScaleY(1.0);
+            } else {
+                imageView.setOpacity(selected ? 1.0 : 0.9);
+                imageView.setScaleX(selected ? 1.08 : 1.0);
+                imageView.setScaleY(selected ? 1.08 : 1.0);
+            }
+        }
+    }
+    
 }

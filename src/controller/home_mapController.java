@@ -1,14 +1,14 @@
 package controller;
 
-import java.io.IOException;
-import java.net.URL;
-import java.util.ResourceBundle;
-
+import db.SaveGameService;
 import game.GameState;
 import game.GameTimeManager;
-import java.util.ArrayList;
+import java.io.IOException;
+import java.net.URL;
 import java.util.List;
-import java.util.Objects;
+import java.util.ResourceBundle;
+import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
@@ -17,56 +17,92 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.shape.Rectangle;
 import model.Farm;
-import static model.Farm.SeedType.CARROT;
-import static model.Farm.SeedType.CORN;
-import static model.Farm.SeedType.GRAPE;
-import static model.Farm.SeedType.TOMATO;
-import model.ItemDatabase;
-import model.item;
-import model.Merchant;
 import model.InteractionZone;
+import model.ItemDatabase;
+import model.Merchant;
+import model.item;
 import util.SceneManager;
 import util.SpawnTag;
-import java.util.Comparator;
-import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
-import db.SaveGameService;
 
 public class home_mapController extends BaseMapController {
 
     private Merchant merChant;
-    private boolean shop = false;
     private InteractionZone merchantZone;
 
     private static final String DAY_BG_PATH = "/image/homemapuse.png";
     private static final String NIGHT_BG_PATH = "/image/homemapuse_night.png";
 
-    @FXML private Group merchant;
     @FXML private Rectangle merchantdetect;
     @FXML private ImageView merchantImage;
     @FXML private Button btnmerchant;
 
-    @FXML private Group home;
     @FXML private Rectangle homedetect;
     @FXML private Button doorbtn;
 
-    @FXML private Group leftMap;
     @FXML private Rectangle leftmapdetect;
     @FXML private Button leftmsp;
 
-    @FXML private Group rightMap;
     @FXML private Rectangle rightmapdetect;
     @FXML private Button rightmsp;
 
-    @FXML private Group upperMap;
     @FXML private Rectangle uppermapdetect;
     @FXML private Button uppermsp;
 
+    @FXML private Label statusName;
+    @FXML private Label statusEXP;
+    @FXML private Label statusHP;
+    @FXML private Label statusSP;
+    @FXML private Label statusSTR;
+    @FXML private Label statusVIT;
+    @FXML private Label statusDEX;
+    @FXML private Label statusAGI;
+
+    @FXML private ImageView btnHPminus;
+    @FXML private ImageView btnHPplus;
+    @FXML private ImageView btnSPminus;
+    @FXML private ImageView btnSTRminus;
+    @FXML private ImageView btnVITminus;
+    @FXML private ImageView btnDEXminus;
+    @FXML private ImageView btnAGIminus;
+    @FXML private ImageView btnSPplus;
+    @FXML private ImageView btnSTRplus;
+    @FXML private ImageView btnVITplus;
+    @FXML private ImageView btnDEXplus;
+    @FXML private ImageView btnAGIplus;
+    @FXML private ImageView btnUsePoint;
+    @FXML private ImageView btnConfirm;
+
+    @FXML private Slider timescaleslider;
+    @FXML private Button btnsetday;
+    @FXML private Button btnsetnight;
+    @FXML private Button btnplus1h;
+    @FXML private Button btnsaveandexit;
+    @FXML private Label sliderscale;
+    @FXML private Label lbldays;
+    @FXML private Label lbltime;
+    @FXML private Button btnsave;
+    @FXML private Button btnload;
+
+    @FXML private Label farming;
+    @FXML private Label gathering;
+    @FXML private Label crafting;
+    @FXML private Label fishing;
+    @FXML private Label cooking;
+    @FXML private ImageView btnfarmingminus1;
+    @FXML private ImageView btnfarmingplus1;
+    @FXML private ImageView btngatheringminus1;
+    @FXML private ImageView btncraftingminus1;
+    @FXML private ImageView btnfishingminus1;
+    @FXML private ImageView btncookingminus1;
+    @FXML private ImageView btngatheringplus1;
+    @FXML private ImageView btncraftingplus1;
+    @FXML private ImageView btnfishingplus1;
+    @FXML private ImageView btncookingplus1;
     @FXML
     private StackPane view;
     @FXML
@@ -74,11 +110,21 @@ public class home_mapController extends BaseMapController {
     @FXML
     private ImageView bg;
     @FXML
-    private Group human;
+    private Rectangle spawn_default;
     @FXML
-    private Rectangle human_hitbox;
+    private Rectangle spawn_from_left;
     @FXML
-    private ImageView human_img;
+    private Rectangle spawn_from_right;
+    @FXML
+    private Rectangle spawn_from_up;
+    @FXML
+    private Rectangle spawn_from_farm;
+    @FXML
+    private Rectangle spawn_from_door;
+    @FXML
+    private Rectangle spawn_from_shop;
+    @FXML
+    private Group merchant;
     @FXML
     private Group walls;
     @FXML
@@ -141,6 +187,10 @@ public class home_mapController extends BaseMapController {
     private Rectangle wall28;
     @FXML
     private Rectangle wall29;
+    @FXML
+     private Rectangle wall30;
+    @FXML
+    private Label hotbarguide;
     @FXML
     private Group farm1;
     @FXML
@@ -238,6 +288,20 @@ public class home_mapController extends BaseMapController {
     @FXML
     private Button farm1_button;
     @FXML
+    private Group human;
+    @FXML
+    private Rectangle human_hitbox;
+    @FXML
+    private ImageView human_img;
+    @FXML
+    private Group home;
+    @FXML
+    private Group leftMap;
+    @FXML
+    private Group rightMap;
+    @FXML
+    private Group upperMap;
+    @FXML
     private HBox hotbar;
     @FXML
     private StackPane Hslot;
@@ -285,20 +349,6 @@ public class home_mapController extends BaseMapController {
     private Button slotBtn5;
     @FXML
     private Pane inventoryOverlay;
-    @FXML
-    private Rectangle spawn_default;
-    @FXML
-    private Rectangle spawn_from_left;
-    @FXML
-    private Rectangle spawn_from_right;
-    @FXML
-    private Rectangle spawn_from_up;
-    @FXML
-    private Rectangle spawn_from_door;
-    @FXML
-    private Rectangle spawn_from_farm;
-    @FXML
-    private Rectangle spawn_from_shop;
     @FXML
     private Group menuInventory;
     @FXML
@@ -424,164 +474,25 @@ public class home_mapController extends BaseMapController {
     @FXML
     private Label Playerinvlbl19;
     @FXML
-    private Label statusName;
-    @FXML
-    private Label statusEXP;
-    @FXML
-    private Label statusHP;
-    @FXML
-    private Label statusSP;
-    @FXML
-    private Label statusSTR;
-    @FXML
-    private Label statusVIT;
-    @FXML
-    private Label statusDEX;
-    @FXML
-    private Label statusAGI;
-    @FXML
-    private ImageView btnHPminus;
-    @FXML
-    private ImageView btnHPplus;
-    @FXML
-    private ImageView btnSPminus;
-    @FXML
-    private ImageView btnSTRminus;
-    @FXML
-    private ImageView btnVITminus;
-    @FXML
-    private ImageView btnDEXminus;
-    @FXML
-    private ImageView btnAGIminus;
-    @FXML
-    private ImageView btnSPplus;
-    @FXML
-    private ImageView btnSTRplus;
-    @FXML
-    private ImageView btnVITplus;
-    @FXML
-    private ImageView btnDEXplus;
-    @FXML
-    private ImageView btnAGIplus;
-    @FXML
-    private ImageView btnUsePoint;
-    @FXML
-    private ImageView btnConfirm;
-    @FXML
-    private ImageView btnclose;
-    @FXML
-    private Button openInventory;
-    @FXML
-    private Button openstatus;
-    @FXML
-    private Button opensetting;
-    @FXML
     private Group statusTab;
-    @FXML
-    private Group settingsTab;
-    @FXML
-    private Slider timescaleslider;
-    @FXML
-    private Button btnsetday;
-    @FXML
-    private Button btnsetnight;
-    @FXML
-    private Button btnplus1h;
-    @FXML
-    private Button btnsaveandexit;
-    @FXML
-    private Label sliderscale;
-    @FXML
-    private Label lbldays;
-    @FXML
-    private Label lbltime;
-    @FXML
-    private Button btnsave;
-    @FXML
-    private Button btnload;
-    @FXML
-    private Label hotbarguide;
     @FXML
     private Group statusgroup;
     @FXML
     private ImageView btnskill;
     @FXML
-    private Label farming;
+    private Group skillsgroup;
     @FXML
     private ImageView btnstatus;
     @FXML
-    private Label gathering;
+    private Group settingsTab;
     @FXML
-    private Label crafting;
+    private Button openInventory;
     @FXML
-    private Label fishing;
+    private ImageView btnclose;
     @FXML
-    private Label cooking;
+    private Button openstatus;
     @FXML
-    private ImageView btnfarmingminus1;
-    @FXML
-    private ImageView btnfarmingplus1;
-    @FXML
-    private ImageView btngatheringminus1;
-    @FXML
-    private ImageView btncraftingminus1;
-    @FXML
-    private ImageView btnfishingminus1;
-    @FXML
-    private ImageView btncookingminus1;
-    @FXML
-    private ImageView btngatheringplus1;
-    @FXML
-    private ImageView btncraftingplus1;
-    @FXML
-    private ImageView btnfishingplus1;
-    @FXML
-    private ImageView btncookingplus1;
-    @FXML
-    private Rectangle wall30;
-    @FXML
-    private Group skillsgroup;
-
-
-    @FXML
-    private void handlefarmingminusaction(MouseEvent event) {
-    }
-
-    @FXML
-    private void handlefarmingplusaction(MouseEvent event) {
-    }
-
-    @FXML
-    private void handlegatheringminusaction(MouseEvent event) {
-    }
-
-    @FXML
-    private void handlecraftingminusaction(MouseEvent event) {
-    }
-
-    @FXML
-    private void handlefishingminusaction(MouseEvent event) {
-    }
-
-    @FXML
-    private void handlecookingminusaction(MouseEvent event) {
-    }
-
-    @FXML
-    private void handlegatheringplusaction(MouseEvent event) {
-    }
-
-    @FXML
-    private void handlecraftingplusaction(MouseEvent event) {
-    }
-
-    @FXML
-    private void handlefishingplusaction(MouseEvent event) {
-    }
-
-    @FXML
-    private void handlecookingplusaction(MouseEvent event) {
-    }
+    private Button opensetting;
 
     @Override
     protected String mapKey() {
@@ -624,181 +535,132 @@ public class home_mapController extends BaseMapController {
             };
 
             item crop = ItemDatabase.getItemByName(cropName);
-
             if (crop == null) {
                 System.out.println("Unknown crop item in database: " + cropName);
                 return;
             }
 
             player.getInventory().addItem(crop.getItem_id(), amount);
-
+            gameState.getPlayerSkills().addFarmingExp(Math.max(1, amount));
+            refreshSkillsView();
             System.out.println("Harvested: " + crop.getItem_name() + " x" + amount);
         });
     }
     
-    private final List<ImageView> playerInvImages = new ArrayList<>();
-    private final List<Label> playerInvLabels = new ArrayList<>();
-    private final List<Button> playerInvButtons = new ArrayList<>();
-    
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         super.initialize(url, rb);
-
+        bridgeHomeSharedUi();
         setupMerchant();
         setupMerchantZone();
+        setupMenuTabs();
         bindStatusLabels();
         bindSettingControls();
 
-        playerInvImages.clear();
-        playerInvLabels.clear();
-        playerInvButtons.clear();
-
-        playerInvImages.add(Playerinvimg);
-        playerInvImages.add(Playerinvimg1);
-        playerInvImages.add(Playerinvimg2);
-        playerInvImages.add(Playerinvimg3);
-        playerInvImages.add(Playerinvimg4);
-        playerInvImages.add(Playerinvimg5);
-        playerInvImages.add(Playerinvimg6);
-        playerInvImages.add(Playerinvimg7);
-        playerInvImages.add(Playerinvimg8);
-        playerInvImages.add(Playerinvimg9);
-        playerInvImages.add(Playerinvimg10);
-        playerInvImages.add(Playerinvimg11);
-        playerInvImages.add(Playerinvimg12);
-        playerInvImages.add(Playerinvimg13);
-        playerInvImages.add(Playerinvimg14);
-        playerInvImages.add(Playerinvimg15);
-        playerInvImages.add(Playerinvimg16);
-        playerInvImages.add(Playerinvimg17);
-        playerInvImages.add(Playerinvimg18);
-        playerInvImages.add(Playerinvimg19);
-
-        playerInvLabels.add(Playerinvlbl);
-        playerInvLabels.add(Playerinvlbl1);
-        playerInvLabels.add(Playerinvlbl2);
-        playerInvLabels.add(Playerinvlbl3);
-        playerInvLabels.add(Playerinvlbl4);
-        playerInvLabels.add(Playerinvlbl5);
-        playerInvLabels.add(Playerinvlbl6);
-        playerInvLabels.add(Playerinvlbl7);
-        playerInvLabels.add(Playerinvlbl8);
-        playerInvLabels.add(Playerinvlbl9);
-        playerInvLabels.add(Playerinvlbl10);
-        playerInvLabels.add(Playerinvlbl11);
-        playerInvLabels.add(Playerinvlbl12);
-        playerInvLabels.add(Playerinvlbl13);
-        playerInvLabels.add(Playerinvlbl14);
-        playerInvLabels.add(Playerinvlbl15);
-        playerInvLabels.add(Playerinvlbl16);
-        playerInvLabels.add(Playerinvlbl17);
-        playerInvLabels.add(Playerinvlbl18);
-        playerInvLabels.add(Playerinvlbl19);
-
-        playerInvButtons.add(Playerinvbtn);
-        playerInvButtons.add(Playerinvbtn1);
-        playerInvButtons.add(Playerinvbtn2);
-        playerInvButtons.add(Playerinvbtn3);
-        playerInvButtons.add(Playerinvbtn4);
-        playerInvButtons.add(Playerinvbtn5);
-        playerInvButtons.add(Playerinvbtn6);
-        playerInvButtons.add(Playerinvbtn7);
-        playerInvButtons.add(Playerinvbtn8);
-        playerInvButtons.add(Playerinvbtn9);
-        playerInvButtons.add(Playerinvbtn10);
-        playerInvButtons.add(Playerinvbtn11);
-        playerInvButtons.add(Playerinvbtn12);
-        playerInvButtons.add(Playerinvbtn13);
-        playerInvButtons.add(Playerinvbtn14);
-        playerInvButtons.add(Playerinvbtn15);
-        playerInvButtons.add(Playerinvbtn16);
-        playerInvButtons.add(Playerinvbtn17);
-        playerInvButtons.add(Playerinvbtn18);
-        playerInvButtons.add(Playerinvbtn19);
-
-        refreshPlayerInventorySlots();
-
-        player.getInventory().itemsProperty().addListener(
-            (javafx.collections.MapChangeListener<Integer, javafx.beans.property.IntegerProperty>) change -> {
-                refreshPlayerInventorySlots();
-            }
-        );
-
+        if (playerState != null) {
+            playerState.expProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
+        }
+        
         if (farm1_button != null) {
             farm1_button.setOnAction(e -> openFarmTable());
         }
-
+   
+        refreshStatusAllocationUi();
         refreshMenuState();
     }
-    
-    private void refreshPlayerInventorySlots() {
-        if (player == null || player.getInventory() == null) return;
-
-        List<Integer> owned = new ArrayList<>(player.getInventory().itemsProperty().keySet());
-        owned.sort(Comparator.comparing(id -> {
-            item itm = ItemDatabase.getItemById(id);
-            return itm == null ? "" : itm.getItem_name();
-        }));
-
-        for (int i = 0; i < playerInvImages.size(); i++) {
-            ImageView img = playerInvImages.get(i);
-            Label lbl = playerInvLabels.get(i);
-            Button btn = playerInvButtons.get(i);
-
-            if (i >= owned.size()) {
-                if (img != null) img.setImage(null);
-                if (lbl != null) lbl.setText("");
-                if (btn != null) {
-                    btn.setText("");
-                    btn.setDisable(true);
-                    btn.setOnAction(null);
-                }
-                continue;
-            }
-
-            int itemId = owned.get(i);
-            int qty = player.getInventory().getCount(itemId);
-            item itm = ItemDatabase.getItemById(itemId);
-
-            if (img != null) {
-                img.setImage(ItemDatabase.getImage(itemId));
-            }
-
-            if (lbl != null) {
-                lbl.setText("x" + qty);
-            }
-
-            if (btn != null) {
-                btn.setDisable(false);
-                btn.setText(itm == null ? "" : itm.getItem_name());
-            }
-        }
-    }
-
-    private void openFarmTable(){
-        if(farm1_button ==null || farm1_button.isDisable()) return;
-        
+  
+    private void openFarmTable() {
+        if (farm1_button == null || farm1_button.isDisable()) return;
         gameState.setReturnScene("/view/home_map.fxml", SpawnTag.FROM_FARM);
         stopAndSwitchScene("/view/farm_table.fxml", SpawnTag.FROM_FARM);
     }
 
-    private void bindStatusLabels() {
-        if (playerState == null) return;
-
-        playerState.playerNameProperty().addListener((obs, o, n) -> refreshStatusView());
-        playerState.expProperty().addListener((obs, o, n) -> refreshStatusView());
-        playerState.hpProperty().addListener((obs, o, n) -> refreshStatusView());
-        playerState.maxHpProperty().addListener((obs, o, n) -> refreshStatusView());
-        playerState.staminaProperty().addListener((obs, o, n) -> refreshStatusView());
-        playerState.maxStaminaProperty().addListener((obs, o, n) -> refreshStatusView());
-        playerState.strProperty().addListener((obs, o, n) -> refreshStatusView());
-        playerState.vitProperty().addListener((obs, o, n) -> refreshStatusView());
-        playerState.dexProperty().addListener((obs, o, n) -> refreshStatusView());
-        playerState.agiProperty().addListener((obs, o, n) -> refreshStatusView());
-
-        refreshStatusView();
+    private void setupMerchant() {
+        merChant = new Merchant(merchantImage, 32, 32, 4, 4, 1, "/image/human/merchant_new2.png");
+        if (merchantImage != null) merchantImage.toFront();
+        merChant.play();
     }
 
+    private void setupMerchantZone() {
+        merchantZone = new InteractionZone(merchantdetect, inside -> {
+            if (btnmerchant != null) btnmerchant.setDisable(!inside);
+        });
+        interactionManager.addZone(merchantZone);
+    }
+
+    private void bridgeHomeSharedUi() {
+        List<StackPane> hotbarSlotNodes = List.of(Hslot, Hslot1, Hslot2, Hslot3, Hslot4);
+        List<ImageView> hotbarImageNodes = List.of(slotImg, slotImg1, slotImg2, slotImg3, slotImg4);
+        List<Label> hotbarLabelNodes = List.of(slotLb, slotLb1, slotLb2, slotLb3, slotLb4);
+        List<Button> hotbarButtonNodes = List.of(slotBtn, slotBtn1, slotBtn2, slotBtn3, slotBtn4);
+
+        bridgeSharedHotbarUi(
+            hotbar,
+            hotbarguide,
+            hotbarSlotNodes,
+            hotbarImageNodes,
+            hotbarLabelNodes,
+            hotbarButtonNodes
+        );
+
+        List<ImageView> playerInvImageNodes = List.of(
+            Playerinvimg, Playerinvimg1, Playerinvimg2, Playerinvimg3, Playerinvimg4,
+            Playerinvimg5, Playerinvimg6, Playerinvimg7, Playerinvimg8, Playerinvimg9,
+            Playerinvimg10, Playerinvimg11, Playerinvimg12, Playerinvimg13, Playerinvimg14,
+            Playerinvimg15, Playerinvimg16, Playerinvimg17, Playerinvimg18, Playerinvimg19
+        );
+        
+        List<Label> playerInvLabelNodes = List.of(
+            Playerinvlbl, Playerinvlbl1, Playerinvlbl2, Playerinvlbl3, Playerinvlbl4,
+            Playerinvlbl5, Playerinvlbl6, Playerinvlbl7, Playerinvlbl8, Playerinvlbl9,
+            Playerinvlbl10, Playerinvlbl11, Playerinvlbl12, Playerinvlbl13, Playerinvlbl14,
+            Playerinvlbl15, Playerinvlbl16, Playerinvlbl17, Playerinvlbl18, Playerinvlbl19
+        );
+        
+        List<Button> playerInvButtonNodes = List.of(
+            Playerinvbtn, Playerinvbtn1, Playerinvbtn2, Playerinvbtn3, Playerinvbtn4,
+            Playerinvbtn5, Playerinvbtn6, Playerinvbtn7, Playerinvbtn8, Playerinvbtn9,
+            Playerinvbtn10, Playerinvbtn11, Playerinvbtn12, Playerinvbtn13, Playerinvbtn14,
+            Playerinvbtn15, Playerinvbtn16, Playerinvbtn17, Playerinvbtn18, Playerinvbtn19
+        );
+        
+        bridgeSharedInventoryOverlayUi(
+            inventoryOverlay,
+            menuInventory,
+            statusTab,
+            settingsTab,
+            statusgroup,
+            skillsgroup,
+            player_inv_group,
+            openInventory,
+            openstatus,
+            opensetting,
+            btnclose,
+            btnskill,
+            btnstatus,
+            playerInvImageNodes,
+            playerInvLabelNodes,
+            playerInvButtonNodes
+        );
+        
+        rebuildSharedUiAfterBridge();
+    }
+    
+     private void bindStatusLabels() {
+        if (playerState == null) return;
+
+        playerState.playerNameProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
+        playerState.expProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
+        playerState.hpProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
+        playerState.maxHpProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
+        playerState.staminaProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
+        playerState.maxStaminaProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
+        playerState.strProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
+        playerState.vitProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
+        playerState.dexProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
+        playerState.agiProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());      
+     }
+        
     private void bindSettingControls() {
         GameTimeManager time = GameTimeManager.get();
 
@@ -838,13 +700,9 @@ public class home_mapController extends BaseMapController {
             btnsaveandexit.setOnAction(e -> {
                 try {
                     capturePlayerSnapshot();
-
-                    SaveGameService saveService = new SaveGameService();
-                    saveService.saveGame(GameState.get());
-
+                    new SaveGameService().saveGame(GameState.get());
                     if (gameLoop != null) gameLoop.stop();
                     if (player != null) player.stop();
-
                     Platform.exit();
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -856,16 +714,16 @@ public class home_mapController extends BaseMapController {
     @Override
     protected void refreshStatusAllocationUi() {
         refreshStatusView();
+        refreshSkillsView();
+        refreshStatusButtons();
     }
     
     private void refreshStatusView() {
         if (playerState == null) return;
 
-        int pendingExpCost = getPendingExpCost();
-
         if (statusName != null) statusName.setText("Name : " + playerState.getPlayerName());
         if (statusEXP != null) {
-            statusEXP.setText("EXP : " + playerState.getExp() + (pendingExpCost > 0 ? "(-" + pendingExpCost + ")" : ""));
+            statusEXP.setText(formatVisibleExpLabel());
         }
         if (statusHP != null) {
             statusHP.setText("HP : " + playerState.getHp() + "/" + (playerState.getMaxHp() + pendingHpPoints) + formatPending(pendingHpPoints));
@@ -877,42 +735,87 @@ public class home_mapController extends BaseMapController {
         if (statusVIT != null) statusVIT.setText("VIT : " + playerState.getVit() + formatPending(pendingVitPoints));
         if (statusDEX != null) statusDEX.setText("DEX : " + playerState.getDex() + formatPending(pendingDexPoints));
         if (statusAGI != null) statusAGI.setText("AGI : " + playerState.getAgi() + formatPending(pendingAgiPoints));
-
-        refreshStatusButtons();
-    }
+         }
 
     private String formatPending(int points) {
-        if (points <= 0) return "";
-        return "(+" + points + ")";
+        return points <= 0 ? "" : "(+" + points + ")";
+    }
+    
+    private void refreshSkillsView() {
+        if (gameState == null) return;
+        GameState.PlayerSkills skills = gameState.getPlayerSkills();
+
+        if (farming != null) farming.setText(appendPendingSkillCost(skills.getFarmingDisplay(), pendingFarmingSkillExp));
+        if (gathering != null) gathering.setText(appendPendingSkillCost(skills.getGatheringDisplay(), pendingGatheringSkillExp));
+        if (crafting != null) crafting.setText(appendPendingSkillCost(skills.getCraftingDisplay(), pendingCraftingSkillExp));
+        if (fishing != null) fishing.setText(appendPendingSkillCost(skills.getFishingDisplay(), pendingFishingSkillExp));
+        if (cooking != null) cooking.setText(appendPendingSkillCost(skills.getCookingDisplay(), pendingCookingSkillExp));
     }
 
     private void refreshStatusButtons() {
         boolean canUsePoint = playerState != null && playerState.getExp() > 0;
+        boolean skillsVisible = isSkillsScreenVisible();
 
-        configureImageButton(btnUsePoint, canUsePoint, true, statusAllocationMode ? 1.0 : 0.85);
-        configureImageButton(btnConfirm, statusAllocationMode && getPendingExpCost() > 0, statusAllocationMode, 1.0);
+        configureImageButton(btnUsePoint, canUsePoint, true, statusAllocationMode || skillAllocationMode ? 1.0 : 0.85);
 
-        configureImageButton(btnHPplus, canIncreaseStat("hp"), statusAllocationMode, 1.0);
-        configureImageButton(btnSPplus, canIncreaseStat("sp"), statusAllocationMode, 1.0);
-        configureImageButton(btnSTRplus, canIncreaseStat("str"), statusAllocationMode, 1.0);
-        configureImageButton(btnVITplus, canIncreaseStat("vit"), statusAllocationMode, 1.0);
-        configureImageButton(btnDEXplus, canIncreaseStat("dex"), statusAllocationMode, 1.0);
-        configureImageButton(btnAGIplus, canIncreaseStat("agi"), statusAllocationMode, 1.0);
+        if (skillsVisible) {
+            configureImageButton(btnConfirm, skillAllocationMode && getPendingSkillExpTotal() > 0, skillAllocationMode, 1.0);
 
-        configureImageButton(btnHPminus, statusAllocationMode && pendingHpPoints > 0, statusAllocationMode, 1.0);
-        configureImageButton(btnSPminus, statusAllocationMode && pendingSpPoints > 0, statusAllocationMode, 1.0);
-        configureImageButton(btnSTRminus, statusAllocationMode && pendingStrPoints > 0, statusAllocationMode, 1.0);
-        configureImageButton(btnVITminus, statusAllocationMode && pendingVitPoints > 0, statusAllocationMode, 1.0);
-        configureImageButton(btnDEXminus, statusAllocationMode && pendingDexPoints > 0, statusAllocationMode, 1.0);
-        configureImageButton(btnAGIminus, statusAllocationMode && pendingAgiPoints > 0, statusAllocationMode, 1.0);
-    }
+            configureImageButton(btnfarmingplus1, canIncreaseSkill("farming"), skillAllocationMode, 1.0);
+            configureImageButton(btngatheringplus1, canIncreaseSkill("gathering"), skillAllocationMode, 1.0);
+            configureImageButton(btncraftingplus1, canIncreaseSkill("crafting"), skillAllocationMode, 1.0);
+            configureImageButton(btnfishingplus1, canIncreaseSkill("fishing"), skillAllocationMode, 1.0);
+            configureImageButton(btncookingplus1, canIncreaseSkill("cooking"), skillAllocationMode, 1.0);
 
-    private void configureImageButton(ImageView imageView, boolean enabled) {
-        configureImageButton(imageView, enabled, true, 1.0);
-    }
+            configureImageButton(btnfarmingminus1, skillAllocationMode && pendingFarmingSkillExp > 0, skillAllocationMode, 1.0);
+            configureImageButton(btngatheringminus1, skillAllocationMode && pendingGatheringSkillExp > 0, skillAllocationMode, 1.0);
+            configureImageButton(btncraftingminus1, skillAllocationMode && pendingCraftingSkillExp > 0, skillAllocationMode, 1.0);
+            configureImageButton(btnfishingminus1, skillAllocationMode && pendingFishingSkillExp > 0, skillAllocationMode, 1.0);
+            configureImageButton(btncookingminus1, skillAllocationMode && pendingCookingSkillExp > 0, skillAllocationMode, 1.0);
 
-    private void configureImageButton(ImageView imageView, boolean enabled, double activeOpacity) {
-        configureImageButton(imageView, enabled, true, activeOpacity);
+            configureImageButton(btnHPplus, false, false, 1.0);
+            configureImageButton(btnSPplus, false, false, 1.0);
+            configureImageButton(btnSTRplus, false, false, 1.0);
+            configureImageButton(btnVITplus, false, false, 1.0);
+            configureImageButton(btnDEXplus, false, false, 1.0);
+            configureImageButton(btnAGIplus, false, false, 1.0);
+            configureImageButton(btnHPminus, false, false, 1.0);
+            configureImageButton(btnSPminus, false, false, 1.0);
+            configureImageButton(btnSTRminus, false, false, 1.0);
+            configureImageButton(btnVITminus, false, false, 1.0);
+            configureImageButton(btnDEXminus, false, false, 1.0);
+            configureImageButton(btnAGIminus, false, false, 1.0);
+            return;
+        }
+        
+        if(isStatusScreenVisible()){
+            configureImageButton(btnConfirm, statusAllocationMode && getPendingExpCost() > 0, statusAllocationMode, 1.0);
+
+            configureImageButton(btnHPplus, canIncreaseStat("hp"), statusAllocationMode, 1.0);
+            configureImageButton(btnSPplus, canIncreaseStat("sp"), statusAllocationMode, 1.0);
+            configureImageButton(btnSTRplus, canIncreaseStat("str"), statusAllocationMode, 1.0);
+            configureImageButton(btnVITplus, canIncreaseStat("vit"), statusAllocationMode, 1.0);
+            configureImageButton(btnDEXplus, canIncreaseStat("dex"), statusAllocationMode, 1.0);
+            configureImageButton(btnAGIplus, canIncreaseStat("agi"), statusAllocationMode, 1.0);
+
+            configureImageButton(btnHPminus, statusAllocationMode && pendingHpPoints > 0, statusAllocationMode, 1.0);
+            configureImageButton(btnSPminus, statusAllocationMode && pendingSpPoints > 0, statusAllocationMode, 1.0);
+            configureImageButton(btnSTRminus, statusAllocationMode && pendingStrPoints > 0, statusAllocationMode, 1.0);
+            configureImageButton(btnVITminus, statusAllocationMode && pendingVitPoints > 0, statusAllocationMode, 1.0);
+            configureImageButton(btnDEXminus, statusAllocationMode && pendingDexPoints > 0, statusAllocationMode, 1.0);
+            configureImageButton(btnAGIminus, statusAllocationMode && pendingAgiPoints > 0, statusAllocationMode, 1.0);
+
+            configureImageButton(btnfarmingplus1, false, false, 1.0);
+            configureImageButton(btngatheringplus1, false, false, 1.0);
+            configureImageButton(btncraftingplus1, false, false, 1.0);
+            configureImageButton(btnfishingplus1, false, false, 1.0);
+            configureImageButton(btncookingplus1, false, false, 1.0);
+            configureImageButton(btnfarmingminus1, false, false, 1.0);
+            configureImageButton(btngatheringminus1, false, false, 1.0);
+            configureImageButton(btncraftingminus1, false, false, 1.0);
+            configureImageButton(btnfishingminus1, false, false, 1.0);
+            configureImageButton(btncookingminus1, false, false, 1.0);
+        }
     }
 
     private void configureImageButton(ImageView imageView, boolean enabled, boolean visible, double activeOpacity) {
@@ -923,62 +826,13 @@ public class home_mapController extends BaseMapController {
         imageView.setMouseTransparent(!visible || !enabled);
         imageView.setOpacity(!visible ? 0.0 : (enabled ? activeOpacity : 0.45));
     }
-    
-    private void setupMerchant() {
-        merChant = new Merchant(merchantImage, 32, 32, 4, 4, 1, "/image/human/merchant_new2.png");
-
-        merchantImage.toFront();
-        merChant.play();
-    }
-
-    private void setupMerchantZone() {
-        merchantZone = new InteractionZone(merchantdetect, inside -> {
-            shop = inside;
-            btnmerchant.setDisable(!inside);
-        });
-
-        interactionManager.addZone(merchantZone);
-    }
 
     @FXML
     private void onMerchantShopClick(ActionEvent event) {
         if (btnmerchant == null || btnmerchant.isDisable()) return;
-
         gameState.setReturnScene("/view/home_map.fxml", SpawnTag.FROM_SHOP);
         gameState.setCurrentMerchantItems(merChant.getItems());
         stopAndSwitchScene("/view/shop.fxml", SpawnTag.FROM_SHOP);
-    }
-
-    @Override
-    public void init(GameState gameState) {
-        super.init(gameState);
-    }
-
-    @Override
-    protected void toggleInventory() {
-        if (inventoryOverlay == null) return;
-        boolean open = !inventoryOverlay.isVisible();
-        setInventoryOpen(open);
-        if (open) {
-            setActiveMenuTab(MenuTab.INVENTORY);
-        }
-    }
-
-    @Override
-    protected void setInventoryOpen(boolean open) {
-        if (!open) {
-            statusAllocationMode = false;
-            resetPendingStatusChanges();
-            setActiveMenuTab(MenuTab.INVENTORY);
-        }
-
-        super.setInventoryOpen(open);
-
-        if (open) {
-            setActiveMenuTab(activeMenuTab == null ? MenuTab.INVENTORY : activeMenuTab);
-        }
-
-        refreshMenuState();
     }
     
     @FXML
@@ -1004,60 +858,41 @@ public class home_mapController extends BaseMapController {
         GameState.get().setReturnScene("/view/home_map.fxml", SpawnTag.FROM_UP);
         SceneManager.switchScene("/view/upper_map.fxml", SpawnTag.FROM_DOWN);
     }
+ 
+    @FXML private void handleHPminusaction(MouseEvent event) { onStatusHpMinus(); }
+    @FXML private void handleHPplusaction(MouseEvent event) { onStatusHpPlus(); }
+    @FXML private void handleSPminusaction(MouseEvent event) { onStatusSpMinus(); }
+    @FXML private void handleSTRminusaction(MouseEvent event) { onStatusStrMinus(); }
+    @FXML private void handleVITminusaction(MouseEvent event) { onStatusVitMinus(); }
+    @FXML private void handleDEXminusaction(MouseEvent event) { onStatusDexMinus(); }
+    @FXML private void handleAGIminusaction(MouseEvent event) { onStatusAgiMinus(); }
+    @FXML private void handleSPplusaction(MouseEvent event) { onStatusSpPlus(); }
+    @FXML private void handleSTRplusaction(MouseEvent event) { onStatusStrPlus(); }
+    @FXML private void handleVITplusaction(MouseEvent event) { onStatusVitPlus(); }
+    @FXML private void handleDEXplusaction(MouseEvent event) { onStatusDexPlus(); }
+    @FXML private void handleAGIplusaction(MouseEvent event) { onStatusAgiPlus(); }
 
-    @FXML
-    private void handleHPminusaction(MouseEvent event) { onStatusHpMinus(); }
+    @FXML private void handlefarmingminusaction(MouseEvent event) { onSkillFarmingMinus(); }
+    @FXML private void handlefarmingplusaction(MouseEvent event) { onSkillFarmingPlus(); }
+    @FXML private void handlegatheringminusaction(MouseEvent event) { onSkillGatheringMinus(); }
+    @FXML private void handlegatheringplusaction(MouseEvent event) { onSkillGatheringPlus(); }
+    @FXML private void handlecraftingminusaction(MouseEvent event) { onSkillCraftingMinus(); }
+    @FXML private void handlecraftingplusaction(MouseEvent event) { onSkillCraftingPlus(); }
+    @FXML private void handlefishingminusaction(MouseEvent event) { onSkillFishingMinus(); }
+    @FXML private void handlefishingplusaction(MouseEvent event) { onSkillFishingPlus(); }
+    @FXML private void handlecookingminusaction(MouseEvent event) { onSkillCookingMinus(); }
+    @FXML private void handlecookingplusaction(MouseEvent event) { onSkillCookingPlus(); }
 
-    @FXML
-    private void handleHPplusaction(MouseEvent event) { onStatusHpPlus(); }
-
-    @FXML
-    private void handleSPminusaction(MouseEvent event) { onStatusSpMinus(); }
-
-    @FXML
-    private void handleSTRminusaction(MouseEvent event) { onStatusStrMinus(); }
-
-    @FXML
-    private void handleVITminusaction(MouseEvent event) { onStatusVitMinus(); }
-
-    @FXML
-    private void handleDEXminusaction(MouseEvent event) { onStatusDexMinus(); }
-
-    @FXML
-    private void handleAGIminusaction(MouseEvent event) { onStatusAgiMinus(); }
-
-    @FXML
-    private void handleSPplusaction(MouseEvent event) { onStatusSpPlus(); }
-
-    @FXML
-    private void handleSTRplusaction(MouseEvent event) { onStatusStrPlus(); }
-
-    @FXML
-    private void handleVITplusaction(MouseEvent event) { onStatusVitPlus(); }
-
-    @FXML
-    private void handleDEXplusaction(MouseEvent event) { onStatusDexPlus(); }
-
-    @FXML
-    private void handleAGIplusaction(MouseEvent event) { onStatusAgiPlus(); }
-
-    @FXML
-    private void handleusepointaction(MouseEvent event) { onStatusUsePoint(); }
-
-    @FXML
-    private void handleconfirmaction(MouseEvent event) { onStatusConfirm(); }
-    
+    @FXML private void handleusepointaction(MouseEvent event) { onSharedUsePoint(); }
+    @FXML private void handleconfirmaction(MouseEvent event) { onSharedConfirm(); }
+      
     @FXML
     private void handlesaveexitaction(ActionEvent event) {
         try {
             capturePlayerSnapshot();
-
-            SaveGameService saveService = new SaveGameService();
-            saveService.saveGameToSlot(GameState.get(), GameState.get().getSelectedSaveSlot());
-
+            new SaveGameService().saveGameToSlot(GameState.get(), GameState.get().getSelectedSaveSlot());
             if (gameLoop != null) gameLoop.stop();
             if (player != null) player.stop();
-
             Platform.exit();
         } catch (Exception e) {
             e.printStackTrace();
@@ -1081,33 +916,21 @@ public class home_mapController extends BaseMapController {
 
     @FXML
     private void handlebtnskillacion(MouseEvent event) {
-        super.setSkillsOpen(true);
-        super.setStatusOpen(false);
+        setSkillsOpen(true);
+        setStatusOpen(false);
+        refreshStatusAllocationUi();
     }
 
     @FXML
     private void handlebtnstatusaction(MouseEvent event) {
-        super.setStatusOpen(true);
-        super.setSkillsOpen(false);
+        setStatusOpen(true);
+        setSkillsOpen(false);
+        refreshStatusAllocationUi();
     }
 
-    @FXML
-    private void handleopenInventoryaction(ActionEvent event) {
-        super.openInventory();
-    }
-
-    @FXML
-    private void handlecloseaction(MouseEvent event) {
-        super.closeMenuScreen();
-    }
-
-    @FXML
-    private void handleopenstatusaction(ActionEvent event) {
-        super.openStatus();
-    }
-
-    @FXML
-    private void handleopensettingaction(ActionEvent event) {
-        super.openSetting();
-    }
+    @FXML private void handleopenInventoryaction(ActionEvent event) { openInventory(); }
+    @FXML private void handlecloseaction(MouseEvent event) { closeMenuScreen(); }
+    @FXML private void handleopenstatusaction(ActionEvent event) { openStatus(); }
+    @FXML private void handleopensettingaction(ActionEvent event) { openSetting(); }
+    
 }

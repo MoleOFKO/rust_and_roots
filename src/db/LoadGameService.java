@@ -30,6 +30,7 @@ public class LoadGameService {
             }
 
             loadPlayerStats(con, gs, saveId);
+            loadPlayerSkills(con, gs, saveId);
             loadPlayerInventory(con, gs, saveId);
             loadHotbar(con, gs, saveId);
             loadChestItems(con, gs, saveId);
@@ -110,6 +111,33 @@ public class LoadGameService {
         }
     }
 
+    private void loadPlayerSkills(Connection con, GameState gs, int saveId) throws Exception {
+        String sql = """
+            SELECT sk.farming, sk.gathering, sk.crafting, sk.fishing, sk.battling, sk.cooking
+            FROM save_game sg
+            LEFT JOIN skill sk ON sg.skill_id = sk.skill_id
+            WHERE sg.saved_id = ?
+            """;
+
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, saveId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                GameState.PlayerSkills skills = gs.getPlayerSkills();
+                skills.clear();
+
+                if (!rs.next()) return;
+
+                skills.setFarmingExp(rs.getInt("farming"));
+                skills.setGatheringExp(rs.getInt("gathering"));
+                skills.setCraftingExp(rs.getInt("crafting"));
+                skills.setFishingExp(rs.getInt("fishing"));
+                skills.setBattlingExp(rs.getInt("battling"));
+                skills.setCookingExp(rs.getInt("cooking"));
+            }
+        }
+    }
+    
     private void loadPlayerInventory(Connection con, GameState gs, int saveId) throws Exception {
         Inventory inv = gs.getPlayerState().getInventory();
         clearInventoryItems(inv);
@@ -133,11 +161,9 @@ public class LoadGameService {
     private void loadHotbar(Connection con, GameState gs, int saveId) throws Exception {
         PlayerState psState = gs.getPlayerState();
 
-        for (int i = 0; i < psState.getHotbarSize(); i++) {
-            psState.clearHotbarItem(i);
-        }
+        psState.clearAllHotbarItems();
 
-        String sql = "SELECT slot_index, item_id FROM saved_hotbar WHERE saved_id = ?";
+        String sql = "SELECT slot_index, item_id, qty FROM saved_hotbar WHERE saved_id = ?";
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, saveId);
 
@@ -145,9 +171,10 @@ public class LoadGameService {
                 while (rs.next()) {
                     int slotIndex = rs.getInt("slot_index");
                     int itemId = rs.getInt("item_id");
+                    int qty = rs.getInt("qty");
 
                     if (!rs.wasNull()) {
-                        psState.setHotbarItemId(slotIndex, itemId);
+                        psState.setHotbarSlot(slotIndex, itemId, Math.max(1, qty));
                     }
                 }
             }
@@ -198,9 +225,30 @@ public class LoadGameService {
                     FarmState farmState = gs.getFarmState(mapKey);
                     FarmState.PlotData plot = farmState.getPlot(plotId);
 
-                    plot.seed = (seedType == null || seedType.isBlank())
-                            ? null
-                            : Farm.SeedType.valueOf(seedType);
+                    plot.seed = null;
+                    plot.seedItemId = null;
+                    plot.seedItemName = null;
+                    plot.cropItemName = null;
+                    plot.cropSpriteKey = null;
+
+                    if (seedType != null && !seedType.isBlank()) {
+                        if (seedType.startsWith("ID:")) {
+                            try {
+                                int seedItemId = Integer.parseInt(seedType.substring(3).trim());
+                                plot.seedItemId = seedItemId > 0 ? seedItemId : null;
+                                plot.seedItemName = plot.seedItemId == null ? null : model.ItemDatabase.getItemName(seedItemId);
+                                plot.cropItemName = plot.seedItemId == null ? null : model.ItemDatabase.resolveCropNameForSeed(seedItemId);
+                                plot.cropSpriteKey = plot.seedItemId == null ? null : model.ItemDatabase.buildCropSpriteKeyForSeed(seedItemId);
+                            } catch (NumberFormatException ignored) {
+                            }
+                        } else {
+                            try {
+                                plot.seed = Farm.SeedType.valueOf(seedType);
+                            } catch (IllegalArgumentException ignored) {
+                                plot.seed = null;
+                            }
+                        }
+                    }
 
                     plot.plantedAt = rs.getDouble("planted_at");
                     plot.lastWateredAt = rs.getDouble("last_watered_at");
@@ -254,6 +302,7 @@ public class LoadGameService {
             psState.clearHotbarItem(i);
         }
 
+        gs.getPlayerSkills().clear();
         clearInventoryItems(gs.getChestInventory());
         clearFarmState(gs.getFarmState("home_map"));
         clearFarmState(gs.getFarmState("Home_interior"));

@@ -896,7 +896,7 @@ public class ShopController implements Initializable, SceneController {
     private int sellPrice(int itemId) {
         item itm = ItemDatabase.getItemById(itemId);
         if (itm == null) return 1;
-        return Math.max(1, itm.getPrice() / 2);
+        return Math.max(1, (int) Math.round(itm.getPrice() * 0.9));         //Sell price here
     }
 
     private int computeBuyTotal() {

@@ -142,31 +142,40 @@ public class LoginController implements Initializable {
                 util.SceneManager.switchScene("/view/account_view.fxml");
             }
             case "user" -> {
-                String charSql = "SELECT character_id FROM characters WHERE account_id=? LIMIT 1";
+                GameState gs = GameState.get();
+                gs.setCurrentAccountId(accountId);
+                gs.setCurrentCharacterId(-1);
+                gs.setCurrentSaveId(-1);
+                gs.setCurrentPlayerName(txtname);
+
+                String charSql = "SELECT character_id, player_name FROM characters WHERE account_id=? ORDER BY character_id LIMIT 1";
                 try (PreparedStatement charPst = con.prepareStatement(charSql)) {
                     charPst.setInt(1, accountId);
 
                     try (ResultSet charRs = charPst.executeQuery()) {
-                        if (!charRs.next()) {
-                            JOptionPane.showMessageDialog(null, "No character found for this account.");
-                            return;
-                        }
-                        int characterId = charRs.getInt("character_id");
-                        GameState.get().setCurrentCharacterId(characterId);
-                        String saveSql = "SELECT saved_id FROM save_game WHERE character_id=? ORDER BY saved_id LIMIT 1";
-                        try (PreparedStatement savePst = con.prepareStatement(saveSql)) {
-                            savePst.setInt(1, characterId);
-                            try (ResultSet saveRs = savePst.executeQuery()) {
-                                if (saveRs.next()) {
-                                    GameState.get().setCurrentSaveId(saveRs.getInt("saved_id"));
-                                } else {
-                                    GameState.get().setCurrentSaveId(-1);
-                                }
-                                util.SceneManager.switchScene("/view/main_menu.fxml");
+                        if (charRs.next()) {
+                            int characterId = charRs.getInt("character_id");
+                            String playerName = charRs.getString("player_name");
+
+                            gs.setCurrentCharacterId(characterId);
+                            gs.setCurrentPlayerName(playerName);
+
+                            String saveSql = "SELECT saved_id FROM save_game WHERE character_id=? ORDER BY saved_id LIMIT 1";
+                            try (PreparedStatement savePst = con.prepareStatement(saveSql)) {
+                                savePst.setInt(1, characterId);
+                                try (ResultSet saveRs = savePst.executeQuery()) {
+                                    if (saveRs.next()) {
+                                        gs.setCurrentSaveId(saveRs.getInt("saved_id"));
+                                    } else {
+                                        gs.setCurrentSaveId(-1);
+                                    }
+                                }      
+                                
                             }
-                        }
-                        util.SceneManager.switchScene("/view/main_menu.fxml");
+                        }            
+                        
                     }
+                    util.SceneManager.switchScene("/view/main_menu.fxml");
                 }
             }
             case "owner" -> {
@@ -203,7 +212,7 @@ public class LoginController implements Initializable {
             return;
         }
         if (!email.matches(gmailRegex)) {
-            JOptionPane.showMessageDialog(null, "Gamil Not Regonized");
+            JOptionPane.showMessageDialog(null, "Gmail must be finished with : @gmail.com");
             return;
         }
         if (!pwd.matches(pwdRegex)) {
