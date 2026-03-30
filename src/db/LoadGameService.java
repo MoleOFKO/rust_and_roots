@@ -82,9 +82,10 @@ public class LoadGameService {
 
     private void loadPlayerStats(Connection con, GameState gs, int saveId) throws Exception {
         String sql = """
-            SELECT s.str, s.agi, s.dex, s.vit, s.hp, s.stamina
+            SELECT ps.str_stat, ps.agi_stat, ps.dex_stat, ps.vit_stat, ps.hp, ps.stamina,
+                   sg.current_hp, sg.current_stamina
             FROM save_game sg
-            JOIN stats s ON sg.stats_id = s.stats_id
+            JOIN player_stats ps ON sg.player_stats_id = ps.player_stats_id
             WHERE sg.saved_id = ?
             """;
 
@@ -95,28 +96,25 @@ public class LoadGameService {
                 if (!rs.next()) return;
 
                 PlayerState psState = gs.getPlayerState();
-                psState.setStr(rs.getInt("str"));
-                psState.setAgi(rs.getInt("agi"));
-                psState.setDex(rs.getInt("dex"));
-                psState.setVit(rs.getInt("vit"));
+                psState.setStr(rs.getInt("str_stat"));
+                psState.setAgi(rs.getInt("agi_stat"));
+                psState.setDex(rs.getInt("dex_stat"));
+                psState.setVit(rs.getInt("vit_stat"));
 
-                int maxHp = rs.getInt("hp");
-                int maxStamina = rs.getInt("stamina");
+                psState.setMaxHp(rs.getInt("hp"));
+                psState.setHp(rs.getInt("current_hp"));
 
-                psState.setMaxHp(maxHp);
-                psState.setHp(maxHp);
-                psState.setMaxStamina(maxStamina);
-                psState.setStamina(maxStamina);
+                psState.setMaxStamina(rs.getInt("stamina"));
+                psState.setStamina(rs.getInt("current_stamina"));
             }
         }
     }
 
     private void loadPlayerSkills(Connection con, GameState gs, int saveId) throws Exception {
         String sql = """
-            SELECT sk.farming, sk.gathering, sk.crafting, sk.fishing, sk.battling, sk.cooking
-            FROM save_game sg
-            LEFT JOIN skill sk ON sg.skill_id = sk.skill_id
-            WHERE sg.saved_id = ?
+            SELECT skill_type_id, skill_level
+            FROM player_skills
+            WHERE saved_id = ?
             """;
 
         try (PreparedStatement ps = con.prepareStatement(sql)) {
@@ -126,14 +124,19 @@ public class LoadGameService {
                 GameState.PlayerSkills skills = gs.getPlayerSkills();
                 skills.clear();
 
-                if (!rs.next()) return;
+                while (rs.next()) {
+                    int skillTypeId = rs.getInt("skill_type_id");
+                    int skillLevel = rs.getInt("skill_level");
 
-                skills.setFarmingExp(rs.getInt("farming"));
-                skills.setGatheringExp(rs.getInt("gathering"));
-                skills.setCraftingExp(rs.getInt("crafting"));
-                skills.setFishingExp(rs.getInt("fishing"));
-                skills.setBattlingExp(rs.getInt("battling"));
-                skills.setCookingExp(rs.getInt("cooking"));
+                    switch (skillTypeId) {
+                        case 1 -> skills.setFarmingExp(skillLevel);
+                        case 2 -> skills.setGatheringExp(skillLevel);
+                        case 3 -> skills.setCraftingExp(skillLevel);
+                        case 4 -> skills.setFishingExp(skillLevel);
+                        case 5 -> skills.setBattlingExp(skillLevel);
+                        case 6 -> skills.setCookingExp(skillLevel);
+                    }
+                }
             }
         }
     }
@@ -202,11 +205,8 @@ public class LoadGameService {
     }
 
     private void loadFarmPlots(Connection con, GameState gs, int saveId) throws Exception {
-        clearFarmState(gs.getFarmState("home_map"));
-        clearFarmState(gs.getFarmState("Home_interior"));
-
         String sql = """
-            SELECT map_key, plot_id, seed_type, planted_at, last_watered_at,
+            SELECT map_key, plot_id, seed_item_id, planted_at, last_watered_at,
                    accumulated_water_reduction, total_growth_seconds,
                    water_cooldown_seconds, water_reduction_seconds
             FROM saved_farm_plot
@@ -220,35 +220,15 @@ public class LoadGameService {
                 while (rs.next()) {
                     String mapKey = rs.getString("map_key");
                     String plotId = rs.getString("plot_id");
-                    String seedType = rs.getString("seed_type");
 
-                    FarmState farmState = gs.getFarmState(mapKey);
-                    FarmState.PlotData plot = farmState.getPlot(plotId);
+                    FarmState farm = gs.getFarmState(mapKey);
+                    if (farm == null) continue;
 
-                    plot.seed = null;
-                    plot.seedItemId = null;
-                    plot.seedItemName = null;
-                    plot.cropItemName = null;
-                    plot.cropSpriteKey = null;
+                    FarmState.PlotData plot = farm.getPlot(plotId);
+                    if (plot == null) continue;
 
-                    if (seedType != null && !seedType.isBlank()) {
-                        if (seedType.startsWith("ID:")) {
-                            try {
-                                int seedItemId = Integer.parseInt(seedType.substring(3).trim());
-                                plot.seedItemId = seedItemId > 0 ? seedItemId : null;
-                                plot.seedItemName = plot.seedItemId == null ? null : model.ItemDatabase.getItemName(seedItemId);
-                                plot.cropItemName = plot.seedItemId == null ? null : model.ItemDatabase.resolveCropNameForSeed(seedItemId);
-                                plot.cropSpriteKey = plot.seedItemId == null ? null : model.ItemDatabase.buildCropSpriteKeyForSeed(seedItemId);
-                            } catch (NumberFormatException ignored) {
-                            }
-                        } else {
-                            try {
-                                plot.seed = Farm.SeedType.valueOf(seedType);
-                            } catch (IllegalArgumentException ignored) {
-                                plot.seed = null;
-                            }
-                        }
-                    }
+                    Integer seedItemId = (Integer) rs.getObject("seed_item_id");
+                    plot.seedItemId = seedItemId;
 
                     plot.plantedAt = rs.getDouble("planted_at");
                     plot.lastWateredAt = rs.getDouble("last_watered_at");

@@ -40,17 +40,23 @@ public final class ItemDatabase {
         itemTypeById.clear();
         imageCache.clear();
 
-        String sql =
-            "SELECT i.item_id, i.item_name, i.price, i.image, i.item_type, " +
-            "       COALESCE(s.str, 0) AS str, " +
-            "       COALESCE(s.agi, 0) AS agi, " +
-            "       COALESCE(s.dex, 0) AS dex, " +
-            "       COALESCE(s.vit, 0) AS vit, " +
-            "       COALESCE(s.hp, 0) AS hp, " +
-            "       COALESCE(s.stamina, 0) AS stamina " +
-            "FROM items i " +
-            "LEFT JOIN stats s ON i.stats_id = s.stats_id " +
-            "ORDER BY i.item_id";
+        String sql = """
+            SELECT i.item_id,
+                   i.item_name,
+                   i.price,
+                   i.image,
+                   it.item_type_name AS item_type,
+                   COALESCE(s.str_stat, 0) AS str,
+                   COALESCE(s.agi_stat, 0) AS agi,
+                   COALESCE(s.dex_stat, 0) AS dex,
+                   COALESCE(s.vit_stat, 0) AS vit,
+                   COALESCE(s.hp, 0) AS hp,
+                   COALESCE(s.stamina, 0) AS stamina
+            FROM items i
+            LEFT JOIN item_stats s ON i.item_stats_id = s.item_stats_id
+            LEFT JOIN item_types it ON i.item_type_id = it.item_type_id
+            ORDER BY i.item_id
+            """;
 
         dbcon db = new dbcon();
 

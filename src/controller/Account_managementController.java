@@ -172,7 +172,12 @@ public class Account_managementController implements Initializable {
     private void initaccountList(   ) throws SQLException{       
     accountList = FXCollections.observableArrayList();
 
-    String sql = "select user_type from accounts where account_name=?";
+    String sql = """
+        SELECT r.role_name AS user_type
+        FROM accounts a
+        JOIN user_roles r ON a.role_id = r.role_id
+        WHERE a.account_name = ?
+        """;
     pst = con.prepareStatement(sql);
     pst.setString(1, LoginController.txtname);
     rs = pst.executeQuery();
@@ -182,7 +187,15 @@ public class Account_managementController implements Initializable {
 
         if(rs.getString("user_type").equals(owner)) {
 
-            String sql2="select account_name,email,user_type,account_stats,created_date from accounts";
+            String sql2 = """
+                SELECT a.account_name, a.email,
+                       r.role_name AS user_type,
+                       s.status_name AS account_stats,
+                       a.created_date
+                FROM accounts a
+                JOIN user_roles r ON a.role_id = r.role_id
+                JOIN account_statuses s ON a.status_id = s.status_id
+            """;
             st = con.createStatement();
             rs = st.executeQuery(sql2);
 
@@ -192,7 +205,16 @@ public class Account_managementController implements Initializable {
 
         } else {
 
-            String sql1="select account_name,email,user_type,account_stats,created_date from accounts where user_type='user'";
+            String sql1 = """
+                SELECT a.account_name, a.email,
+                       r.role_name AS user_type,
+                       s.status_name AS account_stats,
+                       a.created_date
+                FROM accounts a
+                JOIN user_roles r ON a.role_id = r.role_id
+                JOIN account_statuses s ON a.status_id = s.status_id
+                WHERE r.role_name = 'user'
+            """;
             st = con.createStatement();
             rs = st.executeQuery(sql1);
 
@@ -227,7 +249,14 @@ public class Account_managementController implements Initializable {
         else{
             accountList.clear();
             String sname=txtsearch.getText();
-            String sql = "select account_id,account_name,email,account_stats,created_date from accounts where account_name like ?;";
+            String sql = """
+                SELECT a.account_id, a.account_name, a.email,
+                       s.status_name AS account_stats,
+                       a.created_date
+                FROM accounts a
+                JOIN account_statuses s ON a.status_id = s.status_id
+                WHERE a.account_name LIKE ?
+            """;
             pst=con.prepareStatement(sql);
             pst.setString(1, txtsearch.getText()+"%");
             rs=pst.executeQuery();
@@ -256,7 +285,12 @@ public class Account_managementController implements Initializable {
 
     
     private void updateButtonsFromDb(int accountId) throws SQLException {
-        String sql = "SELECT account_stats FROM accounts WHERE account_id=?";
+        String sql = """
+            SELECT s.status_name
+            FROM accounts a
+            JOIN account_statuses s ON a.status_id = s.status_id
+            WHERE a.account_id = ?
+        """;
         try (PreparedStatement pst = con.prepareStatement(sql)) {
             pst.setInt(1, accountId);
             try (ResultSet rs = pst.executeQuery()) {
@@ -283,7 +317,7 @@ public class Account_managementController implements Initializable {
         Account a= account_view.getSelectionModel().getSelectedItem();
         int num = JOptionPane.showConfirmDialog(null, "Are you Sure?");
             if (num == JOptionPane.YES_OPTION) {
-                String sql1 = "Update accounts SET account_stats = 'ban' where account_name=?;";
+                String sql1 = "Update accounts SET status_id = 2 where account_name=?;  ";
                 pst = con.prepareStatement(sql1);
                 pst.setString(1, a.getAccount_name());  
                 pst.executeUpdate();
@@ -297,7 +331,7 @@ public class Account_managementController implements Initializable {
         Account a= account_view.getSelectionModel().getSelectedItem();
         int num = JOptionPane.showConfirmDialog(null, "Are you Sure?");
             if (num == JOptionPane.YES_OPTION) {
-                String sql1 = "Update accounts SET account_stats = 'active' where account_name =?;";
+                String sql1 = "Update accounts SET status_id = 1 where account_name=?;";
                 pst = con.prepareStatement(sql1);
                 pst.setString(1, a.getAccount_name());  
                 pst.executeUpdate();
