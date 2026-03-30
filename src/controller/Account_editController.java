@@ -99,7 +99,12 @@ public class Account_editController implements Initializable {
     
     private void initaccount() throws SQLException {
 
-    String sql = "SELECT account_name, user_type, email, passwords FROM accounts WHERE account_name = ?";
+    String sql = """
+        SELECT a.account_name, r.role_name AS user_type, a.email, a.passwords
+        FROM accounts a
+        JOIN user_roles r ON a.role_id = r.role_id
+        WHERE a.account_name = ?
+    """;
     pst = con.prepareStatement(sql);
     pst.setString(1, Account_managementController.accname);
     rs = pst.executeQuery();
