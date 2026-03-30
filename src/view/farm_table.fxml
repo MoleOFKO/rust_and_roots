@@ -146,7 +146,7 @@
                   </ImageView>
                </children>
             </Pane>
-            <Pane fx:id="seedList" disable="true" layoutX="88.0" prefHeight="314.0" prefWidth="409.0" style="-fx-background-color: gray;" visible="false">
+            <Pane fx:id="seedList" disable="true" layoutX="88.0" prefHeight="314.0" prefWidth="409.0" style="-fx-background-color: gray;">
                <children>
                   <ImageView fitHeight="314.0" fitWidth="408.0" pickOnBounds="true">
                      <image>
@@ -353,6 +353,11 @@
                         <Label fx:id="invlbl20" alignment="CENTER_RIGHT" layoutX="27.0" layoutY="34.0" prefHeight="17.0" prefWidth="27.0" text="x0" textFill="WHITE" />
                      </children>
                   </Pane>
+                  <ImageView fx:id="closeseedList" fitHeight="20.0" fitWidth="27.0" layoutX="360.0" layoutY="21.0" onMouseClicked="#handlecloseseedList" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../image/tools/x.png" />
+                     </image>
+                  </ImageView>
                </children>
             </Pane>
          </children>

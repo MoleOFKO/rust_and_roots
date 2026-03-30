@@ -6,6 +6,7 @@ package controller;
 
 import db.dbcon;
 import game.GameState;
+import game.GameTimeManager;
 import game.SceneController;
 import java.net.URL;
 import java.sql.Connection;
@@ -202,6 +203,8 @@ public class New_gameController implements Initializable, SceneController {
         hp = playerState.getMaxHp();
         stamina = playerState.getMaxStamina();
 
+        GameTimeManager time = GameTimeManager.get();
+        time.setTimeOfDay(6, 0);
         SceneManager.switchScene("/view/home_map.fxml");
     }
 
