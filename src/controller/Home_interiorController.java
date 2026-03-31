@@ -43,6 +43,8 @@ import model.ItemDatabase;
 import model.item;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
 import model.PlayerState;
 import util.SceneManager;
 
@@ -554,7 +556,7 @@ public class Home_interiorController extends BaseMapController {
     @FXML
     private Label slotLb;
     @FXML
-    private Button slotBtn;
+    private ToggleButton slotBtn;
     @FXML
     private StackPane Hslot1;
     @FXML
@@ -562,7 +564,7 @@ public class Home_interiorController extends BaseMapController {
     @FXML
     private Label slotLb1;
     @FXML
-    private Button slotBtn1;
+    private ToggleButton slotBtn1;
     @FXML
     private StackPane Hslot2;
     @FXML
@@ -570,7 +572,7 @@ public class Home_interiorController extends BaseMapController {
     @FXML
     private Label slotLb2;
     @FXML
-    private Button slotBtn2;
+    private ToggleButton slotBtn2;
     @FXML
     private StackPane Hslot3;
     @FXML
@@ -578,7 +580,7 @@ public class Home_interiorController extends BaseMapController {
     @FXML
     private Label slotLb3;
     @FXML
-    private Button slotBtn3;
+    private ToggleButton slotBtn3;
     @FXML
     private StackPane Hslot4;
     @FXML
@@ -586,7 +588,7 @@ public class Home_interiorController extends BaseMapController {
     @FXML
     private Label slotLb4;
     @FXML
-    private Button slotBtn4;
+    private ToggleButton slotBtn4;
     @FXML
     private StackPane Hslot5;
     @FXML
@@ -833,6 +835,8 @@ public class Home_interiorController extends BaseMapController {
     private Label Playerinvlbl110;
     @FXML
     private Group skillsgroup;
+    @FXML
+    private ToggleGroup selectedhotbar;
 
     @FXML
     private void handleHPminusaction(MouseEvent event) { onStatusHpMinus(); }
@@ -1300,7 +1304,7 @@ public class Home_interiorController extends BaseMapController {
         List<StackPane> hotbarSlotNodes = List.of(Hslot, Hslot1, Hslot2, Hslot3, Hslot4);
         List<ImageView> hotbarImageNodes = List.of(slotImg, slotImg1, slotImg2, slotImg3, slotImg4);
         List<Label> hotbarLabelNodes = List.of(slotLb, slotLb1, slotLb2, slotLb3, slotLb4);
-        List<Button> hotbarButtonNodes = List.of(slotBtn, slotBtn1, slotBtn2, slotBtn3, slotBtn4);
+        List<ToggleButton> hotbarButtonNodes = List.of(slotBtn, slotBtn1, slotBtn2, slotBtn3, slotBtn4);
 
         bridgeSharedHotbarUi(
             hotbar,

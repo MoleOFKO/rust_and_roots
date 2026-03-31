@@ -44,6 +44,7 @@ import model.PlayerState;
 import util.SceneManager;
 import util.SpawnTag;
 import util.WorldScaler;
+import javafx.scene.control.ToggleButton;
 
 /**
  * BaseMapController
@@ -106,23 +107,23 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     @FXML protected HBox hotbar;
     @FXML protected StackPane Hslot;
     @FXML protected ImageView slotImg;
-    @FXML protected Button slotBtn;
+    @FXML protected ToggleButton slotBtn;
     @FXML protected Label slotLb;
     @FXML protected StackPane Hslot1;
     @FXML protected ImageView slotImg1;
-    @FXML protected Button slotBtn1;
+    @FXML protected ToggleButton slotBtn1;
     @FXML protected Label slotLb1;
     @FXML protected StackPane Hslot2;
     @FXML protected ImageView slotImg2;
-    @FXML protected Button slotBtn2;
+    @FXML protected ToggleButton slotBtn2;
     @FXML protected Label slotLb2;
     @FXML protected StackPane Hslot3;
     @FXML protected ImageView slotImg3;
-    @FXML protected Button slotBtn3;
+    @FXML protected ToggleButton slotBtn3;
     @FXML protected Label slotLb3;
     @FXML protected StackPane Hslot4;
     @FXML protected ImageView slotImg4;
-    @FXML protected Button slotBtn4;
+    @FXML protected ToggleButton slotBtn4;
     @FXML protected Label slotLb4;
     @FXML protected StackPane Hslot5;
     @FXML protected Button slotBtn5;
@@ -178,7 +179,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     protected GameLoopManager gameLoop;
     
     protected final List<StackPane> hotbarSlots = new ArrayList<>();
-    protected final List<Button> hotbarSlotButtons = new ArrayList<>();
+    protected final List<ToggleButton> hotbarSlotButtons = new ArrayList<>();
     protected int selectedHotbarIndex = -1;
 
     protected Image dayBg;
@@ -363,12 +364,12 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     }
     
     protected final void bridgeSharedHotbarUi(
-            HBox hotbarNode,
-            Label hotbarGuideNode,
-            List<StackPane> slotNodes,
-            List<ImageView> slotImageNodes,
-            List<Label> slotLabelNodes,
-            List<Button> slotButtonNodes
+        HBox hotbarNode,
+        Label hotbarGuideNode,
+        List<StackPane> slotNodes,
+        List<ImageView> slotImageNodes,
+        List<Label> slotLabelNodes,
+        List<ToggleButton> slotButtonNodes
     ) {
         this.hotbar = hotbarNode;
         this.hotbarguide = hotbarGuideNode;
@@ -1122,7 +1123,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
         for (int i = 0; i < hotbarSlotButtons.size(); i++) {
             final int idx = i;
-            Button button = hotbarSlotButtons.get(i);
+            ToggleButton button = hotbarSlotButtons.get(i);
             button.setOnAction(e -> {
                 if (idx == selectedHotbarIndex && tryConsumeHotbarItem(idx)) {
                     return;
@@ -1158,7 +1159,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         refreshHotbarView();
     }
 
-    private void addHotbarSlot(StackPane slot, Button button, ImageView imageView, Label label) {
+    private void addHotbarSlot(StackPane slot, ToggleButton button, ImageView imageView, Label label) {
         if (slot != null && button != null) {
             hotbarSlots.add(slot);
             hotbarSlotButtons.add(button);
@@ -1193,7 +1194,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         }
     }
     
-    private void addHotbarSlot(StackPane slot, Button button) {
+    private void addHotbarSlot(StackPane slot, ToggleButton button) {
         if (slot != null && button != null) {
             hotbarSlots.add(slot);
             hotbarSlotButtons.add(button);
