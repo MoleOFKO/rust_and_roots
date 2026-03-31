@@ -56,11 +56,9 @@ public class SaveGameService {
 
         int statsId;
         String insertStats = """
-            INSERT INTO save_game
-                (character_id, saved_name, world_name, current_map_id, player_stats_id, money,
-                 saved_location_x, saved_location_y, exp,
-                 selected_hotbar_index, hotbar_visible, current_hp, current_stamina)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO player_stats
+                (str_stat, agi_stat, dex_stat, vit_stat, hp, stamina)
+                VALUES (?, ?, ?, ?, ?, ?)
             """;
 
         try (PreparedStatement psStats = con.prepareStatement(insertStats, Statement.RETURN_GENERATED_KEYS)) {
@@ -87,6 +85,7 @@ public class SaveGameService {
             (character_id, saved_name, world_name, current_map_id, player_stats_id, money,
              saved_location_x, saved_location_y, exp,
              selected_hotbar_index, hotbar_visible, current_hp, current_stamina)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """;
 
         try (PreparedStatement psSave = con.prepareStatement(insertSave, Statement.RETURN_GENERATED_KEYS)) {
@@ -96,11 +95,13 @@ public class SaveGameService {
             psSave.setInt(4, mapId);
             psSave.setInt(5, statsId);
             psSave.setInt(6, ps.getInventory().getCoins());
-            psSave.setInt(7, (int) Math.round(gs.getPlayerX()));
-            psSave.setInt(8, (int) Math.round(gs.getPlayerY()));
+            psSave.setDouble(7, gs.getPlayerX());
+            psSave.setDouble(8, gs.getPlayerY());
             psSave.setInt(9, ps.getExp());
             psSave.setInt(10, ps.getselectedHotbarIndex());
             psSave.setBoolean(11, ps.isHotbarVisible());
+            psSave.setInt(12, ps.getHp());
+            psSave.setInt(13, ps.getStamina());
             psSave.executeUpdate();
 
             try (ResultSet rs = psSave.getGeneratedKeys()) {
@@ -112,44 +113,6 @@ public class SaveGameService {
         }
     }
 
-    private int createSkillRow(Connection con, GameState gs) throws Exception {
-        GameState.PlayerSkills skills = gs.getPlayerSkills();
-
-        String sql = """
-            INSERT INTO skill (farming, gathering, crafting, fishing, battling, cooking)
-            VALUES (?, ?, ?, ?, ?, ?)
-            """;
-
-        try (PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            ps.setInt(1, skills.getFarmingExp());
-            ps.setInt(2, skills.getGatheringExp());
-            ps.setInt(3, skills.getCraftingExp());
-            ps.setInt(4, skills.getFishingExp());
-            ps.setInt(5, skills.getBattlingExp());
-            ps.setInt(6, skills.getCookingExp());
-            ps.executeUpdate();
-
-            try (ResultSet rs = ps.getGeneratedKeys()) {
-                if (!rs.next()) throw new IllegalStateException("Failed to create skill row.");
-                return rs.getInt(1);
-            }
-        }
-    }
-    
-    private int getSkillIdForSave(Connection con, int saveId) throws Exception {
-        String sql = "SELECT skill_id FROM save_game WHERE saved_id = ?";
-        try (PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1, saveId);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    int skillId = rs.getInt("skill_id");
-                    if (!rs.wasNull()) return skillId;
-                }
-            }
-        }
-        return -1;
-    }
-    
     private void saveMainRow(Connection con, GameState gs) throws Exception {
         String sql = """
             UPDATE save_game
@@ -173,8 +136,8 @@ public class SaveGameService {
             psmt.setString(1, gs.getCurrentWorldName());
             psmt.setInt(2, resolveMapId(con, gs.getCurrentMapKey()));
             psmt.setInt(3, ps.getInventory().getCoins());
-            psmt.setInt(4, (int) Math.round(gs.getPlayerX()));
-            psmt.setInt(5, (int) Math.round(gs.getPlayerY()));
+            psmt.setDouble(4, gs.getPlayerX());
+            psmt.setDouble(5, gs.getPlayerY());
             psmt.setInt(6, ps.getExp());
             psmt.setInt(7, ps.getselectedHotbarIndex());
             psmt.setBoolean(8, ps.isHotbarVisible());
@@ -463,8 +426,8 @@ public class SaveGameService {
 
         int statsId;
         String insertStats = """
-            INSERT INTO stats (stats_type, str, agi, dex, vit, hp, stamina)
-            VALUES ('player_save', ?, ?, ?, ?, ?, ?)
+            INSERT INTO player_stats (str_stat, agi_stat, dex_stat, vit_stat, hp, stamina)
+            VALUES (?, ?, ?, ?, ?, ?)
             """;
 
         try (PreparedStatement psStats = con.prepareStatement(insertStats, Statement.RETURN_GENERATED_KEYS)) {
@@ -488,10 +451,10 @@ public class SaveGameService {
 
         String insertSave = """
             INSERT INTO save_game
-            (character_id, saved_name, world_name, current_map_id, stats_id, money,
+            (character_id, saved_name, world_name, current_map_id, player_stats_id, money,
              saved_location_x, saved_location_y, exp,
-             selected_hotbar_index, hotbar_visible)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+             selected_hotbar_index, hotbar_visible, current_hp, current_stamina)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """;
 
         try (PreparedStatement psSave = con.prepareStatement(insertSave, Statement.RETURN_GENERATED_KEYS)) {
@@ -501,11 +464,13 @@ public class SaveGameService {
             psSave.setInt(4, mapId);
             psSave.setInt(5, statsId);
             psSave.setInt(6, ps.getInventory().getCoins());
-            psSave.setInt(7, (int) Math.round(gs.getPlayerX()));
-            psSave.setInt(8, (int) Math.round(gs.getPlayerY()));
+            psSave.setDouble(7, gs.getPlayerX());
+            psSave.setDouble(8, gs.getPlayerY());
             psSave.setInt(9, ps.getExp());
             psSave.setInt(10, ps.getselectedHotbarIndex());
             psSave.setBoolean(11, ps.isHotbarVisible());
+            psSave.setInt(12, ps.getHp());
+            psSave.setInt(13, ps.getStamina());
             psSave.executeUpdate();
 
             try (ResultSet rs = psSave.getGeneratedKeys()) {

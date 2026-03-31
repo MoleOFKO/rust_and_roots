@@ -300,8 +300,6 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         player.start();
 
         afterBaseInitialize();
-        capturePlayerSnapshot();
-        applyLoadedPositionIfCurrentMap();
     }
 
     protected final void stopAndSwitchScene(String targetFxml, SpawnTag targetSpawn) {
