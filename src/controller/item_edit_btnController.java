@@ -155,7 +155,18 @@ public class item_edit_btnController implements Initializable {
         } 
         else{
            
-        String sql = "UPDATE items i JOIN stats s ON i.stats_id = s.stats_id SET i.item_name = ?, i.price = ?, s.str = ?, s.agi = ?, s.dex = ?,  s.vit = ?, s.hp = ?, s.stamina = ?,i.image = ? WHERE i.item_name = ?;";
+        String sql = "UPDATE items i" +
+            "JOIN item_stats s ON i.item_stats_id = s.item_stats_id" +
+            "SET i.item_name = ?," +
+            "    i.price = ?," +
+            "    s.str_stat = ?," +
+            "    s.agi_stat = ?," +
+            "    s.dex_stat = ?," +
+            "    s.vit_stat = ?," +
+            "    s.hp = ?," +
+            "    s.stamina = ?," +
+            "    i.image = ?" +
+            "WHERE i.item_name = ?";
         pst = con.prepareStatement(sql);
         pst.setString(1, txtmname.getText());
         pst.setInt(2, Integer.parseInt((txtmobstype.getText())));
@@ -201,9 +212,19 @@ public class item_edit_btnController implements Initializable {
 
     private void inititem() throws SQLException {
 
-    String sql = "SELECT i.item_name,i.price,s.str,s.agi,s.vit,s.dex,s.hp,s.stamina,i.image " +
-             "FROM items i JOIN stats s ON i.stats_id = s.stats_id " +
-             "WHERE i.item_id = ?";
+    String sql = """
+        SELECT i.item_name, i.price,
+               s.str_stat AS str,
+               s.agi_stat AS agi,
+               s.vit_stat AS vit,
+               s.dex_stat AS dex,
+               s.hp,
+               s.stamina,
+               i.image
+        FROM items i
+        JOIN item_stats s ON i.item_stats_id = s.item_stats_id
+        WHERE i.item_id = ?
+        """;
     pst = con.prepareStatement(sql);
     pst.setInt(1, Edit_itemController.item_id); // whatever your selected item id variable is
     

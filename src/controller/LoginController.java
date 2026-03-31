@@ -111,8 +111,15 @@ public class LoginController implements Initializable {
             JOptionPane.showMessageDialog(null, "Enter password!");
             return;
         }
-        String sql = "SELECT account_id, account_name, passwords, user_type, account_stats " +
-                     "FROM accounts WHERE account_name = ?";
+        String sql = """
+    SELECT a.account_id, a.account_name, a.passwords,
+           r.role_name, s.status_name
+    FROM accounts a
+    JOIN user_roles r ON a.role_id = r.role_id
+    JOIN account_statuses s ON a.status_id = s.status_id
+    WHERE a.account_name = ?
+    """;
+               
         pst = con.prepareStatement(sql);
         pst.setString(1, username);
         rs = pst.executeQuery();
@@ -127,8 +134,8 @@ public class LoginController implements Initializable {
         }
         txtname = rs.getString("account_name");
         int accountId = rs.getInt("account_id");
-        String dbstatus = rs.getString("account_stats");
-        String temp = rs.getString("user_type");
+        String dbstatus = rs.getString("status_name");
+        String temp = rs.getString("role_name");
         if (!"active".equalsIgnoreCase(dbstatus)) {
             JOptionPane.showMessageDialog(null, "Account is Banned");
             return;
@@ -212,7 +219,7 @@ public class LoginController implements Initializable {
             return;
         }
         if (!email.matches(gmailRegex)) {
-            JOptionPane.showMessageDialog(null, "Gamil Not Regonized");
+            JOptionPane.showMessageDialog(null, "Gmail must be finished with : @gmail.com");
             return;
         }
         if (!pwd.matches(pwdRegex)) {
@@ -239,11 +246,13 @@ public class LoginController implements Initializable {
             JOptionPane.showMessageDialog(null, "User Already exist");
         } else {
 
-            String sql = "INSERT INTO accounts (email,account_name,passwords,account_stats,user_type) VALUES (?,?,?,'active','user')";
+            String sql = "INSERT INTO accounts (email, account_name, passwords, role_id, status_id) VALUES (?, ?, ?, ?, ?)";
             try (PreparedStatement accPst = con.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
                 accPst.setString(1, txtsgmail.getText().trim());
                 accPst.setString(2, txtsname.getText().trim());
                 accPst.setString(3, txtspassword.getText());
+                accPst.setInt(4, 3);
+                accPst.setInt(5, 1);
                 accPst.executeUpdate();
 
                 int accountId;

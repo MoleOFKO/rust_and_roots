@@ -161,7 +161,19 @@ public class Edit_itemController implements Initializable {
         else{
             itemList.clear();
             String sname=txtsearch.getText();
-            String sql = "select i.item_id,i.item_name,i.price,s.str,s.agi,s.vit,s.dex,s.hp,s.stamina,i.image from items i JOIN stats s ON i.stats_id = s.stats_id where item_name like ?;";
+            String sql = """
+                SELECT i.item_id, i.item_name, i.price,
+                       s.str_stat AS str,
+                       s.agi_stat AS agi,
+                       s.vit_stat AS vit,
+                       s.dex_stat AS dex,
+                       s.hp,
+                       s.stamina,
+                       i.image
+                FROM items i
+                JOIN item_stats s ON i.item_stats_id = s.item_stats_id
+                WHERE i.item_name LIKE ?
+            """;
             pst=con.prepareStatement(sql);
             pst.setString(1, txtsearch.getText()+"%");
             rs=pst.executeQuery();
@@ -183,7 +195,18 @@ public class Edit_itemController implements Initializable {
     
     private void inititemList(   ) throws SQLException{
         itemList = FXCollections.observableArrayList();
-        String sql="SELECT i.item_id,i.item_name,i.price,s.str,s.agi,s.vit,s.dex,s.hp,s.stamina,i.image FROM items i JOIN stats s ON i.stats_id = s.stats_id;";
+        String sql = """
+            SELECT i.item_id, i.item_name, i.price,
+                   s.str_stat AS str,
+                   s.agi_stat AS agi,
+                   s.vit_stat AS vit,
+                   s.dex_stat AS dex,
+                   s.hp,
+                   s.stamina,
+                   i.image
+            FROM items i
+            JOIN item_stats s ON i.item_stats_id = s.item_stats_id
+        """;
         st = con.createStatement();
         rs = st.executeQuery(sql);
         while(rs.next()){
@@ -234,7 +257,10 @@ public class Edit_itemController implements Initializable {
         int num = JOptionPane.showConfirmDialog(null, "Are you Sure?");
 
         if (num == JOptionPane.YES_OPTION) {
-            String sql = "DELETE i, s FROM items i JOIN stats s ON s.stats_id = i.stats_id WHERE i.item_id = ?;";
+            String sql = "DELETE i, s" +
+                "FROM items i" +
+                "JOIN item_stats s ON s.item_stats_id = i.item_stats_id" +
+                "WHERE i.item_id = ?;";
             pst = con.prepareStatement(sql);
             pst.setInt(1, i.getItem_id());   // use selected object
             pst.executeUpdate();

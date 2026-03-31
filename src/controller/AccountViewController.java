@@ -124,7 +124,16 @@ public class AccountViewController implements Initializable {
     
     private void initaccountList(   ) throws SQLException{
         accountList = FXCollections.observableArrayList();
-        String sql="select account_id,account_name,user_type,account_stats,created_date from accounts";
+        String sql = """
+        SELECT a.account_id,
+               a.account_name,
+               r.role_name AS user_type,
+               s.status_name AS account_stats,
+               a.created_date
+        FROM accounts a
+        JOIN user_roles r ON a.role_id = r.role_id
+        JOIN account_statuses s ON a.status_id = s.status_id
+        """;
         st = con.createStatement();
         rs = st.executeQuery(sql);
         while(rs.next()){

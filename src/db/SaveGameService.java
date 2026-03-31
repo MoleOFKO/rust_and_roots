@@ -56,8 +56,11 @@ public class SaveGameService {
 
         int statsId;
         String insertStats = """
-            INSERT INTO stats (stats_type, str, agi, dex, vit, hp, stamina)
-            VALUES ('player_save', ?, ?, ?, ?, ?, ?)
+            INSERT INTO save_game
+                (character_id, saved_name, world_name, current_map_id, player_stats_id, money,
+                 saved_location_x, saved_location_y, exp,
+                 selected_hotbar_index, hotbar_visible, current_hp, current_stamina)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """;
 
         try (PreparedStatement psStats = con.prepareStatement(insertStats, Statement.RETURN_GENERATED_KEYS)) {
@@ -81,10 +84,9 @@ public class SaveGameService {
 
         String insertSave = """
             INSERT INTO save_game
-            (character_id, saved_name, world_name, current_map_id, stats_id, money,
+            (character_id, saved_name, world_name, current_map_id, player_stats_id, money,
              saved_location_x, saved_location_y, exp,
-             selected_hotbar_index, hotbar_visible)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+             selected_hotbar_index, hotbar_visible, current_hp, current_stamina)
             """;
 
         try (PreparedStatement psSave = con.prepareStatement(insertSave, Statement.RETURN_GENERATED_KEYS)) {
@@ -133,7 +135,7 @@ public class SaveGameService {
             }
         }
     }
-
+    
     private int getSkillIdForSave(Connection con, int saveId) throws Exception {
         String sql = "SELECT skill_id FROM save_game WHERE saved_id = ?";
         try (PreparedStatement ps = con.prepareStatement(sql)) {
@@ -159,6 +161,8 @@ public class SaveGameService {
                 exp = ?,
                 selected_hotbar_index = ?,
                 hotbar_visible = ?,
+                current_hp = ?,
+                current_stamina = ?,
                 last_saved_date = NOW()
             WHERE saved_id = ?
             """;
@@ -174,7 +178,9 @@ public class SaveGameService {
             psmt.setInt(6, ps.getExp());
             psmt.setInt(7, ps.getselectedHotbarIndex());
             psmt.setBoolean(8, ps.isHotbarVisible());
-            psmt.setInt(9, gs.getCurrentSaveId());
+            psmt.setInt(9, ps.getHp());
+            psmt.setInt(10, ps.getStamina());
+            psmt.setInt(11, gs.getCurrentSaveId());
             psmt.executeUpdate();
         }
     }
@@ -184,9 +190,9 @@ public class SaveGameService {
         PlayerState ps = gs.getPlayerState();
 
         String sql = """
-            UPDATE stats
-            SET str = ?, agi = ?, dex = ?, vit = ?, hp = ?, stamina = ?
-            WHERE stats_id = ?
+            UPDATE player_stats
+            SET str_stat = ?, agi_stat = ?, dex_stat = ?, vit_stat = ?, hp = ?, stamina = ?
+            WHERE player_stats_id = ?
             """;
 
         try (PreparedStatement psmt = con.prepareStatement(sql)) {
@@ -202,37 +208,32 @@ public class SaveGameService {
     }
 
     private void savePlayerSkills(Connection con, GameState gs) throws Exception {
-        int skillId = getSkillIdForSave(con, gs.getCurrentSaveId());
-
-        if (skillId <= 0) {
-            skillId = createSkillRow(con, gs);
-
-            try (PreparedStatement ps = con.prepareStatement(
-                    "UPDATE save_game SET skill_id = ? WHERE saved_id = ?")) {
-                ps.setInt(1, skillId);
-                ps.setInt(2, gs.getCurrentSaveId());
-                ps.executeUpdate();
-            }
-        }
-
+        int saveId = gs.getCurrentSaveId();
         GameState.PlayerSkills skills = gs.getPlayerSkills();
 
-        String sql = """
-            UPDATE skill
-            SET farming = ?, gathering = ?, crafting = ?, fishing = ?, battling = ?, cooking = ?
-            WHERE skill_id = ?
-            """;
-
-        try (PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1, skills.getFarmingExp());
-            ps.setInt(2, skills.getGatheringExp());
-            ps.setInt(3, skills.getCraftingExp());
-            ps.setInt(4, skills.getFishingExp());
-            ps.setInt(5, skills.getBattlingExp());
-            ps.setInt(6, skills.getCookingExp());
-            ps.setInt(7, skillId);
-            ps.executeUpdate();
+        try (PreparedStatement del = con.prepareStatement(
+                "DELETE FROM player_skills WHERE saved_id = ?")) {
+            del.setInt(1, saveId);
+            del.executeUpdate();
         }
+
+        String sql = "INSERT INTO player_skills (saved_id, skill_type_id, skill_level) VALUES (?, ?, ?)";
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            insertSkill(ps, saveId, 1, skills.getFarmingExp());
+            insertSkill(ps, saveId, 2, skills.getGatheringExp());
+            insertSkill(ps, saveId, 3, skills.getCraftingExp());
+            insertSkill(ps, saveId, 4, skills.getFishingExp());
+            insertSkill(ps, saveId, 5, skills.getBattlingExp());
+            insertSkill(ps, saveId, 6, skills.getCookingExp());
+            ps.executeBatch();
+        }
+    }
+
+    private void insertSkill(PreparedStatement ps, int saveId, int skillTypeId, int skillLevel) throws Exception {
+        ps.setInt(1, saveId);
+        ps.setInt(2, skillTypeId);
+        ps.setInt(3, skillLevel);
+        ps.addBatch();
     }
     
     private void savePlayerInventory(Connection con, GameState gs) throws Exception {
@@ -265,17 +266,20 @@ public class SaveGameService {
             del.executeUpdate();
         }
 
-        String sql = "INSERT INTO saved_hotbar (saved_id, slot_index, item_id) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO saved_hotbar (saved_id, slot_index, item_id, qty) VALUES (?, ?, ?, ?)";
         try (PreparedStatement ins = con.prepareStatement(sql)) {
             for (int i = 0; i < ps.getHotbarSize(); i++) {
                 int itemId = ps.getHotbarItemId(i);
+                int qty = ps.getHotbarItemCount(i);
 
                 ins.setInt(1, saveId);
                 ins.setInt(2, i);
-                if (itemId <= 0) {
+                if (itemId <= 0 || qty <= 0) {
                     ins.setNull(3, java.sql.Types.INTEGER);
+                    ins.setInt(4, 0);
                 } else {
                     ins.setInt(3, itemId);
+                    ins.setInt(4, qty);
                 }
                 ins.addBatch();
             }
@@ -293,7 +297,7 @@ public class SaveGameService {
 
         String sql = """
             INSERT INTO saved_farm_plot
-            (saved_id, map_key, plot_id, seed_type, planted_at, last_watered_at,
+            (saved_id, map_key, plot_id, seed_item_id, planted_at, last_watered_at,
              accumulated_water_reduction, total_growth_seconds,
              water_cooldown_seconds, water_reduction_seconds)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -315,7 +319,14 @@ public class SaveGameService {
             ins.setInt(1, saveId);
             ins.setString(2, mapKey);
             ins.setString(3, e.getKey());
-            ins.setString(4, p.seed == null ? null : p.seed.name());
+
+            Integer seedItemId = p.seedItemId;
+            if (seedItemId == null || seedItemId <= 0) {
+                ins.setNull(4, java.sql.Types.INTEGER);
+            } else {
+                ins.setInt(4, seedItemId);
+            }
+
             ins.setDouble(5, p.plantedAt);
             ins.setDouble(6, p.lastWateredAt);
             ins.setDouble(7, p.accumulatedWaterReduction);
@@ -380,16 +391,16 @@ public class SaveGameService {
     }
 
     private int getStatsIdForSave(Connection con, int saveId) throws Exception {
-        String sql = "SELECT stats_id FROM save_game WHERE saved_id = ?";
+        String sql = "SELECT player_stats_id FROM save_game WHERE saved_id = ?";
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, saveId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return rs.getInt("stats_id");
+                    return rs.getInt("player_stats_id");
                 }
             }
         }
-        throw new IllegalStateException("stats_id not found for save_game.saved_id=" + saveId);
+        return -1;
     }
     
     public void saveGameToSlot(GameState gs, int slotNumber) {
