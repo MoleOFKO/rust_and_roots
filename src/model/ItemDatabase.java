@@ -181,6 +181,10 @@ public final class ItemDatabase {
         String cropName = normalizeSeedName(seedName);
         item direct = getItemByName(cropName);
         if (direct != null && !isSeedItem(direct.getItem_id())) return direct.getItem_id();
+        direct = getItemByName(cropName + " Fruit");
+        if (direct != null && !isSeedItem(direct.getItem_id())) return direct.getItem_id();
+        direct = getItemByName(toSpriteKey(cropName) + "_fruit");
+        if (direct != null && !isSeedItem(direct.getItem_id())) return direct.getItem_id();
 
         String normalizedTarget = normalizeLookupKey(cropName);
         for (item itm : allItems) {
@@ -199,19 +203,55 @@ public final class ItemDatabase {
         return seedName == null ? null : normalizeSeedName(seedName);
     }
 
+    public static int resolveHarvestItemIdForSeed(int seedItemId) {
+        int cropItemId = resolveCropItemIdForSeed(seedItemId);
+        if (cropItemId <= 0) return -1;
+
+        String cropName = getItemName(cropItemId);
+        if (cropName == null || cropName.isBlank()) return -1;
+
+        item fruitNamed = getItemByName(cropName + " Fruit");
+        if (fruitNamed != null && fruitNamed.getItem_id() > 0) return fruitNamed.getItem_id();
+
+        String spriteKey = toSpriteKey(cropName);
+        item underscoredFruit = getItemByName(spriteKey + "_fruit");
+        if (underscoredFruit != null && underscoredFruit.getItem_id() > 0) return underscoredFruit.getItem_id();
+
+        return cropItemId;
+    }
+
+    public static boolean hasCompleteFarmDataForSeed(int seedItemId) {
+        if (seedItemId <= 0 || !isSeedItem(seedItemId)) return false;
+        String seedName = getItemName(seedItemId);
+        if (seedName == null || seedName.isBlank()) return false;
+
+        int cropItemId = resolveCropItemIdForSeed(seedItemId);
+        if (cropItemId <= 0) return false;
+        String cropName = getItemName(cropItemId);
+        if (cropName == null || cropName.isBlank()) return false;
+
+        int harvestItemId = resolveHarvestItemIdForSeed(seedItemId);
+        return harvestItemId > 0 && getItemName(harvestItemId) != null && !getItemName(harvestItemId).isBlank();
+    }
+
     public static String buildCropSpriteKeyForSeed(int seedItemId) {
         int cropItemId = resolveCropItemIdForSeed(seedItemId);
         if (cropItemId > 0) {
             String imageFile = getImageFileName(cropItemId);
             if (imageFile != null && !imageFile.isBlank()) {
                 int dot = imageFile.lastIndexOf('.');
-                return dot > 0 ? imageFile.substring(0, dot) : imageFile;
+                String key = dot > 0 ? imageFile.substring(0, dot) : imageFile;
+                key = stripCropSuffixes(key);
+                if (key != null && !key.isBlank()) return key;
             }
             String cropName = getItemName(cropItemId);
-            if (cropName != null) return toSpriteKey(cropName);
+            if (cropName != null) {
+                String key = stripCropSuffixes(toSpriteKey(cropName));
+                if (key != null && !key.isBlank()) return key;
+            }
         }
         String seedName = getItemName(seedItemId);
-        return seedName == null ? null : toSpriteKey(normalizeSeedName(seedName));
+        return seedName == null ? null : stripCropSuffixes(toSpriteKey(normalizeSeedName(seedName)));
     }
 
     public static String normalizeSeedName(String itemName) {
@@ -229,6 +269,14 @@ public final class ItemDatabase {
     public static String toSpriteKey(String name) {
         if (name == null) return null;
         return normalizeLookupKey(name).replace(' ', '_').replace('-', '_');
+    }
+
+    private static String stripCropSuffixes(String key) {
+        if (key == null || key.isBlank()) return key;
+        String out = key.trim().toLowerCase(Locale.ROOT);
+        if (out.endsWith("_fruit")) out = out.substring(0, out.length() - 6);
+        if (out.endsWith("_seed")) out = out.substring(0, out.length() - 5);
+        return out;
     }
 
     private static String normalizeType(String type) {
