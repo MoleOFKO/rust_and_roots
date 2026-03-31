@@ -34,8 +34,6 @@ public class Farm_tableController implements Initializable, SceneController {
     private static final int TOTAL_GROWTH_STAGES = 3;
     private static final double DEFAULT_GROWTH_SECONDS = 60.0;
     private static final int DEFAULT_PLANT_STAMINA_COST = 2;
-    private static final int BASE_SUCCESS_RATE = 85;
-    private static final int MAX_SUCCESS_RATE = 97;
     private static final int SEED_RETURN_CHANCE = 15;
 
     private GameState gameState;
@@ -44,6 +42,7 @@ public class Farm_tableController implements Initializable, SceneController {
     private double previousTimeScale = 1.0;
     private boolean previousPaused = false;
     private boolean timeOverrideApplied = false;
+    private String activeFarmMapKey = "home_map";
 
     private final Map<String, ImageView> plotViews = new LinkedHashMap<>();
     private final Map<String, TempPlotData> tempPlots = new LinkedHashMap<>();
@@ -92,6 +91,7 @@ public class Farm_tableController implements Initializable, SceneController {
     public void initialize(URL url, ResourceBundle rb) {
         if (gameState == null) gameState = GameState.get();
         ItemDatabase.loadItems();
+        activeFarmMapKey = resolveActiveFarmMapKey();
         collectPlots();
         collectSeedSlots();
         loadTempFarmState();
@@ -152,7 +152,7 @@ public class Farm_tableController implements Initializable, SceneController {
     @FXML
     private void handleConfirm(ActionEvent event) {
         Inventory inv = gameState.getPlayerState().getInventory();
-        FarmState realFarm = gameState.getFarmState("home_map");
+        FarmState realFarm = gameState.getFarmState(activeFarmMapKey);
         Map<Integer, Integer> seedsToRemove = computeSeedConsumption();
         int staminaCost = computePendingFarmStaminaCost();
         if (gameState.getPlayerState().getStamina() < staminaCost) return;
@@ -176,6 +176,7 @@ public class Farm_tableController implements Initializable, SceneController {
 
     private void returnToPreviousScene() {
         restoreTimeOverride();
+        gameState.setActiveFarmMapKey(null);
         String returnFxml = gameState.getReturnFxml();
         SpawnTag returnSpawn = gameState.getReturnSpawn();
         if (returnFxml == null) {
@@ -249,7 +250,7 @@ public class Farm_tableController implements Initializable, SceneController {
 
     private void loadTempFarmState() {
         tempPlots.clear();
-        FarmState realFarm = gameState.getFarmState("home_map");
+        FarmState realFarm = gameState.getFarmState(activeFarmMapKey);
         for (String plotId : plotViews.keySet()) tempPlots.put(plotId, TempPlotData.from(realFarm.getPlot(plotId)));
         pendingHarvests.clear();
         pendingSeedReturns.clear();
@@ -271,7 +272,6 @@ public class Farm_tableController implements Initializable, SceneController {
                 pd.seedItemName = ItemDatabase.getItemName(selectedSeedItemId);
                 pd.cropItemName = ItemDatabase.resolveCropNameForSeed(selectedSeedItemId);
                 pd.cropSpriteKey = ItemDatabase.buildCropSpriteKeyForSeed(selectedSeedItemId);
-//                pd.seed = null;
                 pd.plantedAt = now;
                 pd.lastWateredAt = -1;
                 pd.accumulatedWaterReduction = 0;
@@ -283,16 +283,14 @@ public class Farm_tableController implements Initializable, SceneController {
             }
             case SICKLE -> {
                 if (pd.isEmpty() || !pd.isReady(now)) return;
-                int cropItemId = pd.cropItemId();
-                int successRate = computeSuccessRate();
-                boolean success = ThreadLocalRandom.current().nextInt(100) < successRate;
-                if (success && cropItemId > 0) {
-                    pendingHarvests.merge(cropItemId, 1, Integer::sum);
-                    if (ThreadLocalRandom.current().nextInt(100) < SEED_RETURN_CHANCE && pd.seedItemId != null && pd.seedItemId > 0) {
-                        pendingSeedReturns.merge(pd.seedItemId, 1, Integer::sum);
-                    }
-                    gameState.getPlayerSkills().addFarmingExp(1);
+                int harvestItemId = pd.harvestItemId();
+                if (harvestItemId > 0) {
+                    pendingHarvests.merge(harvestItemId, 1, Integer::sum);
                 }
+                if (ThreadLocalRandom.current().nextInt(100) < SEED_RETURN_CHANCE && pd.seedItemId != null && pd.seedItemId > 0) {
+                    pendingSeedReturns.merge(pd.seedItemId, 1, Integer::sum);
+                }
+                gameState.getPlayerSkills().addFarmingExp(1);
                 pd.clearPlant();
             }
             case NONE -> { return; }
@@ -356,8 +354,7 @@ public class Farm_tableController implements Initializable, SceneController {
 
         for (Integer itemId : ItemDatabase.getAllSeedItemIds()) {
             if (itemId == null || itemId <= 0) continue;
-            int cropItemId = ItemDatabase.resolveCropItemIdForSeed(itemId);
-            if (cropItemId <= 0) continue;
+            if (!ItemDatabase.hasCompleteFarmDataForSeed(itemId)) continue;
 
             if (getAvailableSeedCount(itemId) > 0) {
                 result.add(itemId);
@@ -380,7 +377,7 @@ public class Farm_tableController implements Initializable, SceneController {
     }
 
     private int getAvailableSeedCount(int seedItemId) {
-        return Math.max(0, getCombinedOwnedSeedCount(seedItemId) - reservedSeedUsage(seedItemId));
+        return Math.max(0, getCombinedOwnedSeedCount(seedItemId) - reservedNewSeedUsage(seedItemId));
     }
 
     private void refreshSelectedSeedPreview() {
@@ -440,18 +437,22 @@ public class Farm_tableController implements Initializable, SceneController {
     }
 
 
-    private int reservedSeedUsage(int seedItemId) {
+    private int reservedNewSeedUsage(int seedItemId) {
         int count = 0;
-        for (TempPlotData pd : tempPlots.values()) {
-            if (pd == null || pd.seedItemId == null) continue;
-            if (pd.seedItemId == seedItemId) count++;
+        FarmState realFarm = gameState.getFarmState(activeFarmMapKey);
+        for (Map.Entry<String, TempPlotData> entry : tempPlots.entrySet()) {
+            TempPlotData pd = entry.getValue();
+            if (pd == null || pd.seedItemId == null || pd.seedItemId != seedItemId) continue;
+            FarmState.PlotData real = realFarm.getPlot(entry.getKey());
+            boolean newlyPlanted = real.isEmpty() && !pd.isEmpty();
+            if (newlyPlanted) count++;
         }
         return count;
     }
 
     private Map<Integer, Integer> computeSeedConsumption() {
         Map<Integer, Integer> used = new LinkedHashMap<>();
-        FarmState realFarm = gameState.getFarmState("home_map");
+        FarmState realFarm = gameState.getFarmState(activeFarmMapKey);
 
         for (Map.Entry<String, TempPlotData> entry : tempPlots.entrySet()) {
             TempPlotData temp = entry.getValue();
@@ -496,7 +497,7 @@ public class Farm_tableController implements Initializable, SceneController {
 
     private int computePendingFarmStaminaCost() {
         int total = 0;
-        FarmState realFarm = gameState.getFarmState("home_map");
+        FarmState realFarm = gameState.getFarmState(activeFarmMapKey);
         for (Map.Entry<String, TempPlotData> entry : tempPlots.entrySet()) {
             FarmState.PlotData real = realFarm.getPlot(entry.getKey());
             TempPlotData temp = entry.getValue();
@@ -505,9 +506,11 @@ public class Farm_tableController implements Initializable, SceneController {
         return total;
     }
 
-    private int computeSuccessRate() {
-        int dex = gameState == null ? 0 : gameState.getPlayerState().getDex();
-        return Math.max(50, Math.min(MAX_SUCCESS_RATE, BASE_SUCCESS_RATE + Math.max(0, dex - 1)));
+    private String resolveActiveFarmMapKey() {
+        if (gameState == null) return "home_map";
+        String mapKey = gameState.getActiveFarmMapKey();
+        if (mapKey == null || mapKey.isBlank()) return "home_map";
+        return mapKey;
     }
 
     @FXML
@@ -547,7 +550,6 @@ public class Farm_tableController implements Initializable, SceneController {
         }
 
         void applyTo(FarmState.PlotData dst) {
-            dst.seed = null;
             dst.seedItemId = seedItemId;
             dst.seedItemName = seedItemName;
             dst.cropItemName = cropItemName;
@@ -591,6 +593,6 @@ public class Farm_tableController implements Initializable, SceneController {
             if (stage > totalStages) stage = totalStages;
             return stage;
         }
-        int cropItemId() { return seedItemId == null ? -1 : ItemDatabase.resolveCropItemIdForSeed(seedItemId); }
+        int harvestItemId() { return seedItemId == null ? -1 : ItemDatabase.resolveHarvestItemIdForSeed(seedItemId); }
     }
 }

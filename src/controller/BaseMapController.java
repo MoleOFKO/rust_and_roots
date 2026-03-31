@@ -218,6 +218,17 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         // default: do nothing
     }
 
+    protected String farmTableFxmlPath() {
+        return "/view/farm_table.fxml";
+    }
+
+    protected void openFarmTable() {
+        if (farm1_button == null || farm1_button.isDisable() || gameState == null) return;
+        gameState.setActiveFarmMapKey(mapKey());
+        gameState.setReturnScene("/view/" + mapKey() + ".fxml", SpawnTag.FROM_FARM);
+        stopAndSwitchScene(farmTableFxmlPath(), SpawnTag.FROM_FARM);
+    }
+
     /** Override to enable day/night background switching on this map. */
     protected String dayBackgroundPath() {
         return null;
@@ -1094,6 +1105,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         );
 
         FarmPlotRegistrar.registerPlots(farm, farm1);
+        farm.setOnInteract(this::openFarmTable);
         configureFarm(farm);
     }
 

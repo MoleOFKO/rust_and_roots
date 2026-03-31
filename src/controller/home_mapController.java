@@ -543,8 +543,10 @@ public class home_mapController extends BaseMapController {
         refreshMenuState();
     }
   
-    private void openFarmTable() {
+    @Override
+    protected void openFarmTable() {
         if (farm1_button == null || farm1_button.isDisable()) return;
+        gameState.setActiveFarmMapKey(mapKey());
         gameState.setReturnScene("/view/home_map.fxml", SpawnTag.FROM_FARM);
         stopAndSwitchScene("/view/farm_table.fxml", SpawnTag.FROM_FARM);
     }

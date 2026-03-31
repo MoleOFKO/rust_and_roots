@@ -6,9 +6,6 @@ import java.util.Map;
 public class FarmState {
 
     public static class PlotData {
-        /** Legacy field kept for backwards compatibility with older code/saves. */
-        public Farm.SeedType seed = null;
-
         /** DB-driven farm fields. */
         public Integer seedItemId = null;
         public String seedItemName = null;
@@ -23,7 +20,7 @@ public class FarmState {
         public double accumulatedWaterReduction = 0;
 
         public boolean isEmpty() {
-            return seed == null && (seedItemId == null || seedItemId <= 0);
+            return seedItemId == null || seedItemId <= 0;
         }
 
         public boolean isReady(double nowSeconds) {
@@ -62,7 +59,6 @@ public class FarmState {
         }
 
         public void clearPlant() {
-            seed = null;
             seedItemId = null;
             seedItemName = null;
             cropItemName = null;
