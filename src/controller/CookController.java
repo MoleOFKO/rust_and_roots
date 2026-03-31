@@ -6,11 +6,8 @@ import game.SceneController;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.concurrent.ThreadLocalRandom;
 import javafx.animation.AnimationTimer;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -164,78 +161,151 @@ public class CookController implements Initializable, SceneController {
 
     private void loadRecipes() {
         unlockedRecipes.clear();
+        List<RecipeTemplate> templates = buildPlannedRecipes();
+        List<String> missing = new ArrayList<>();
 
-        addRecipeIfValid("salad", "Salad", "Fresh veggie mix", 45, 85, 3, 2,
-            new IngredientSpec("Tomato", 1),
-            new IngredientSpec("Carrot", 1),
-            new IngredientSpec("Corn", 1));
-
-        addRecipeIfValid("grape_juice", "Grape Juice", "Restores energy quickly", 30, 92, 4, 1,
-            new IngredientSpec("Grape", 2));
-
-        addRecipeIfValid("tomato_soup", "Tomato Soup", "Warm and filling", 40, 88, 3, 2,
-            new IngredientSpec("Tomato", 2));
-
-        addRecipeIfValid("roasted_carrot", "Roasted Carrot", "Simple cooked vegetable", 25, 90, 4, 1,
-            new IngredientSpec("Carrot", 2));
-
-        addRecipeIfValid("corn_stew", "Corn Stew", "Hearty farm meal", 50, 84, 3, 3,
-            new IngredientSpec("Corn", 2),
-            new IngredientSpec("Tomato", 1));
-
-        if (unlockedRecipes.isEmpty()) {
-            addSelfCookFallback("Tomato", 20, 90, 4, 1);
-            addSelfCookFallback("Carrot", 20, 90, 4, 1);
-            addSelfCookFallback("Corn", 20, 90, 4, 1);
-            addSelfCookFallback("Grape", 20, 95, 4, 1);
+        for (RecipeTemplate template : templates) {
+            addRecipeIfValid(template, missing);
         }
 
-        unlockedRecipes.sort(Comparator.comparing(r -> r.name, String.CASE_INSENSITIVE_ORDER));
+        if (!missing.isEmpty()) {
+            System.out.println("[CookController] Missing recipe data/assets:");
+            for (String msg : missing) {
+                System.out.println("  - " + msg);
+            }
+        }
     }
 
-    private void addRecipeIfValid(String key, String outputItemName, String effectText, int waitSeconds, int baseSuccessRate, int dexScaling, int staminaCost, IngredientSpec... ingredientSpecs) {
-        item output = ItemDatabase.getItemByName(outputItemName);
-        if (output == null) return;
+    private void addRecipeIfValid(RecipeTemplate template, List<String> missingReport) {
+        item output = resolveItemByAliases(template.outputAliases);
+        if (output == null) {
+            missingReport.add("Output item not found for recipe `" + template.key + "` aliases=" + Arrays.toString(template.outputAliases));
+            return;
+        }
+        if (ItemDatabase.getImage(output.getItem_id()) == null) {
+            missingReport.add("Output image missing for item `" + output.getItem_name() + "` in recipe `" + template.key + "`");
+            return;
+        }
 
         List<IngredientRequirement> ingredients = new ArrayList<>();
-        for (IngredientSpec spec : ingredientSpecs) {
-            item ingItem = ItemDatabase.getItemByName(spec.itemName);
+        for (IngredientSpec spec : template.ingredients) {
+            item ingItem = resolveItemByAliases(spec.itemAliases);
             if (ingItem == null) {
+                missingReport.add("Ingredient not found for recipe `" + template.key + "` aliases=" + Arrays.toString(spec.itemAliases));
+                return;
+            }
+            if (ItemDatabase.getImage(ingItem.getItem_id()) == null) {
+                missingReport.add("Ingredient image missing for `" + ingItem.getItem_name() + "` in recipe `" + template.key + "`");
                 return;
             }
             ingredients.add(new IngredientRequirement(ingItem.getItem_id(), spec.amount));
         }
 
+        RecipeDifficulty difficulty = difficultyForIngredientCount(ingredients.size());
         unlockedRecipes.add(new Recipe(
-            key,
+            template.key,
             output.getItem_id(),
             output.getItem_name(),
-            effectText,
-            waitSeconds,
-            baseSuccessRate,
-            dexScaling,
-            staminaCost,
+            template.effectText == null || template.effectText.isBlank() ? difficulty.effectText : template.effectText,
+            difficulty.waitSeconds,
+            difficulty.baseSuccessRate,
+            difficulty.dexScaling,
+            difficulty.staminaCost,
             1,
             ingredients
         ));
     }
 
-    private void addSelfCookFallback(String itemName, int waitSeconds, int baseSuccessRate, int dexScaling, int staminaCost) {
-        item itm = ItemDatabase.getItemByName(itemName);
-        if (itm == null) return;
+    private RecipeDifficulty difficultyForIngredientCount(int ingredientCount) {
+        int count = Math.max(1, ingredientCount);
+        return switch (count) {
+            case 1 -> new RecipeDifficulty(12, 96, 1, 1, "Easy dish");
+            case 2 -> new RecipeDifficulty(24, 88, 2, 3, "Intermediate dish");
+            default -> new RecipeDifficulty(36, 78, 3, 5, "Advanced dish");
+        };
+    }
 
-        unlockedRecipes.add(new Recipe(
-            "fallback_" + itm.getItem_id(),
-            itm.getItem_id(),
-            itm.getItem_name(),
-            "Basic cooking",
-            waitSeconds,
-            baseSuccessRate,
-            dexScaling,
-            staminaCost,
-            1,
-            Collections.singletonList(new IngredientRequirement(itm.getItem_id(), 1))
-        ));
+    private item resolveItemByAliases(String... aliases) {
+        if (aliases == null) return null;
+        for (String alias : aliases) {
+            if (alias == null || alias.isBlank()) continue;
+            item itm = ItemDatabase.getItemByName(alias);
+            if (itm != null) return itm;
+        }
+        return null;
+    }
+
+    private List<RecipeTemplate> buildPlannedRecipes() {
+        List<RecipeTemplate> recipes = new ArrayList<>();
+
+        recipes.add(new RecipeTemplate("tomato_slices", new String[]{"tomato_slices"}, null,
+            new IngredientSpec(new String[]{"tomato"}, 1)));
+        recipes.add(new RecipeTemplate("baked_potato", new String[]{"baked_potato"}, null,
+            new IngredientSpec(new String[]{"potato"}, 1)));
+        recipes.add(new RecipeTemplate("grilled_steak", new String[]{"grilled_steak"}, null,
+            new IngredientSpec(new String[]{"steak"}, 1)));
+        recipes.add(new RecipeTemplate("salad_leaves", new String[]{"salad_leaves"}, null,
+            new IngredientSpec(new String[]{"lettuce"}, 1)));
+
+        recipes.add(new RecipeTemplate("fresh_salad", new String[]{"fresh_salad"}, null,
+            new IngredientSpec(new String[]{"tomato"}, 1),
+            new IngredientSpec(new String[]{"lettuce"}, 1)));
+        recipes.add(new RecipeTemplate("beef_potato_stew", new String[]{"beef_potato_stew"}, null,
+            new IngredientSpec(new String[]{"potato"}, 1),
+            new IngredientSpec(new String[]{"beef"}, 1)));
+        recipes.add(new RecipeTemplate("pepper_steak", new String[]{"pepper_steak"}, null,
+            new IngredientSpec(new String[]{"steak"}, 1),
+            new IngredientSpec(new String[]{"red_bell_pepper", "red bellpepper"}, 1)));
+        recipes.add(new RecipeTemplate("pork_cabbage_stir_fry", new String[]{"pork_cabbage_stir-fry"}, null,
+            new IngredientSpec(new String[]{"pork"}, 1),
+            new IngredientSpec(new String[]{"cabbage"}, 1)));
+        recipes.add(new RecipeTemplate("chicken_corn_soup", new String[]{"chicken_corn_soup"}, null,
+            new IngredientSpec(new String[]{"chicken_thigh"}, 1),
+            new IngredientSpec(new String[]{"corn"}, 1)));
+        recipes.add(new RecipeTemplate("roasted_pumpkin_mash", new String[]{"roasted_pumpkin_mash"}, null,
+            new IngredientSpec(new String[]{"pumpkin"}, 1),
+            new IngredientSpec(new String[]{"sweet_potato"}, 1)));
+        recipes.add(new RecipeTemplate("spicy_eggplant", new String[]{"spicy_eggplant"}, null,
+            new IngredientSpec(new String[]{"eggplant"}, 1),
+            new IngredientSpec(new String[]{"green_chilli", "green chili"}, 1)));
+        recipes.add(new RecipeTemplate("root_mix", new String[]{"root_vegetable_mix", "root_mix"}, null,
+            new IngredientSpec(new String[]{"daikon"}, 1),
+            new IngredientSpec(new String[]{"carrot"}, 1)));
+
+        recipes.add(new RecipeTemplate("garden_salad", new String[]{"garden_salad"}, null,
+            new IngredientSpec(new String[]{"tomato"}, 1),
+            new IngredientSpec(new String[]{"lettuce"}, 1),
+            new IngredientSpec(new String[]{"red_bell_pepper", "red bellpepper"}, 1)));
+        recipes.add(new RecipeTemplate("beef_stew", new String[]{"beef_stew"}, null,
+            new IngredientSpec(new String[]{"beef"}, 1),
+            new IngredientSpec(new String[]{"potato"}, 1),
+            new IngredientSpec(new String[]{"carrot"}, 1)));
+        recipes.add(new RecipeTemplate("steak_dinner", new String[]{"steak_dinner"}, null,
+            new IngredientSpec(new String[]{"steak"}, 1),
+            new IngredientSpec(new String[]{"potato"}, 1),
+            new IngredientSpec(new String[]{"broccoli"}, 1)));
+        recipes.add(new RecipeTemplate("spicy_pork_stir_fry", new String[]{"spicy_pork_stir-fry"}, null,
+            new IngredientSpec(new String[]{"pork"}, 1),
+            new IngredientSpec(new String[]{"cabbage"}, 1),
+            new IngredientSpec(new String[]{"green_chilli", "green chili"}, 1)));
+        recipes.add(new RecipeTemplate("chicken_corn_soup_deluxe", new String[]{"chicken_corn_soup_deluxe"}, "Hearty deluxe soup",
+            new IngredientSpec(new String[]{"chicken_thigh"}, 1),
+            new IngredientSpec(new String[]{"corn"}, 1),
+            new IngredientSpec(new String[]{"carrot"}, 1)));
+        recipes.add(new RecipeTemplate("roasted_harvest_plate", new String[]{"roasted_harvest_plate"}, null,
+            new IngredientSpec(new String[]{"pumpkin"}, 1),
+            new IngredientSpec(new String[]{"sweet_potato"}, 1),
+            new IngredientSpec(new String[]{"ham"}, 1)));
+        recipes.add(new RecipeTemplate("spicy_eggplant_tomato", new String[]{"spicy_eggplant_tomato"}, null,
+            new IngredientSpec(new String[]{"eggplant"}, 1),
+            new IngredientSpec(new String[]{"tomato"}, 1),
+            new IngredientSpec(new String[]{"green_chilli", "green chili"}, 1)));
+        recipes.add(new RecipeTemplate("root_vegetable_beef_soup", new String[]{"root_vegetable_beef_soup"}, null,
+            new IngredientSpec(new String[]{"daikon"}, 1),
+            new IngredientSpec(new String[]{"carrot"}, 1),
+            new IngredientSpec(new String[]{"beef"}, 1)));
+
+        return recipes;
     }
 
     private void refreshRecipeSlots() {
@@ -528,12 +598,42 @@ public class CookController implements Initializable, SceneController {
     }
 
     private static final class IngredientSpec {
-        private final String itemName;
+        private final String[] itemAliases;
         private final int amount;
 
-        private IngredientSpec(String itemName, int amount) {
-            this.itemName = itemName;
+        private IngredientSpec(String[] itemAliases, int amount) {
+            this.itemAliases = itemAliases;
             this.amount = amount;
+        }
+    }
+
+    private static final class RecipeDifficulty {
+        private final int waitSeconds;
+        private final int baseSuccessRate;
+        private final int dexScaling;
+        private final int staminaCost;
+        private final String effectText;
+
+        private RecipeDifficulty(int waitSeconds, int baseSuccessRate, int dexScaling, int staminaCost, String effectText) {
+            this.waitSeconds = waitSeconds;
+            this.baseSuccessRate = baseSuccessRate;
+            this.dexScaling = dexScaling;
+            this.staminaCost = staminaCost;
+            this.effectText = effectText;
+        }
+    }
+
+    private static final class RecipeTemplate {
+        private final String key;
+        private final String[] outputAliases;
+        private final String effectText;
+        private final IngredientSpec[] ingredients;
+
+        private RecipeTemplate(String key, String[] outputAliases, String effectText, IngredientSpec... ingredients) {
+            this.key = key;
+            this.outputAliases = outputAliases;
+            this.effectText = effectText;
+            this.ingredients = ingredients;
         }
     }
 
