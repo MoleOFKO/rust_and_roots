@@ -257,9 +257,9 @@ public class Edit_itemController implements Initializable {
         int num = JOptionPane.showConfirmDialog(null, "Are you Sure?");
 
         if (num == JOptionPane.YES_OPTION) {
-            String sql = "DELETE i, s" +
-                "FROM items i" +
-                "JOIN item_stats s ON s.item_stats_id = i.item_stats_id" +
+            String sql = "DELETE i, s " +
+                "FROM items i " +
+                "JOIN item_stats s ON s.item_stats_id = i.item_stats_id "  +
                 "WHERE i.item_id = ?;";
             pst = con.prepareStatement(sql);
             pst.setInt(1, i.getItem_id());   // use selected object

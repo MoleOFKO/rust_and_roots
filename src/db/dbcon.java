@@ -19,7 +19,7 @@ public class dbcon {
     
     public Connection getConnection() throws ClassNotFoundException{
         Connection con=null;
-        String url="jdbc:mysql://localhost:3306/rust_&_root";
+        String url="jdbc:mysql://localhost:3306/rust_and_root";
         Class.forName("com.mysql.cj.jdbc.Driver");
         System.out.println("load driver..........");
         try{

@@ -897,6 +897,7 @@ public class Home_interiorController extends BaseMapController {
     private void handlesave(ActionEvent event) {
         capturePlayerSnapshot();
         GameState.get().setSaveMenuMode(true);
+        GameState.get().setReturnScene("/view/home_interior.fxml", SpawnTag.DEFAULT);
         SceneManager.switchScene("/view/saveloads.fxml");
     }
 
@@ -904,7 +905,7 @@ public class Home_interiorController extends BaseMapController {
     private void handleload(ActionEvent event) {
         capturePlayerSnapshot();
         GameState.get().setSaveMenuMode(false);
-        GameState.get().setReturnScene("/view/home_map.fxml", SpawnTag.DEFAULT);
+        GameState.get().setReturnScene("/view/home_interior.fxml", SpawnTag.DEFAULT);
         SceneManager.switchScene("/view/saveloads.fxml");
     }
 

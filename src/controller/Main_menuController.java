@@ -45,6 +45,8 @@ public class Main_menuController implements Initializable {
 
     @FXML
     private void handlebtnloadgaction(ActionEvent event) {
+        game.GameState.get().setSaveMenuMode(false);
+        game.GameState.get().setReturnScene("/view/main_menu.fxml", util.SpawnTag.DEFAULT);
         util.SceneManager.switchScene("/view/saveloads.fxml");
     }
 

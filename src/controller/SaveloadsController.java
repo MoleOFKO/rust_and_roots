@@ -221,7 +221,7 @@ public class SaveloadsController implements Initializable {
 
         if (returnFxml == null || returnFxml.isBlank()) {
             String mapKey = GameState.get().getCurrentMapKey();
-            if (mapKey != null && !mapKey.isBlank()) {
+            if (GameState.get().hasActiveSave() && mapKey != null && !mapKey.isBlank()) {
                 returnFxml = "/view/" + mapKey + ".fxml";
             } else {
                 returnFxml = "/view/main_menu.fxml";
