@@ -8,24 +8,23 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+
 import javafx.scene.Group;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
-
 /**
  * FXML Controller class
  *
  * @author MITUSER-1
  */
-public class RightMapno1Controller implements Initializable {
+public class Left_map_noone_of_oneController implements Initializable {
+
 
     @FXML
     private StackPane view;
     @FXML
     private Group world;
-    @FXML
-    private ImageView bg;
     @FXML
     private Group walls;
     @FXML
@@ -37,60 +36,21 @@ public class RightMapno1Controller implements Initializable {
     @FXML
     private Rectangle wall3;
     @FXML
-    private Rectangle wall4;
+    private Rectangle exit_up;
     @FXML
-    private Rectangle wall5;
-    @FXML
-    private Rectangle wall6;
-    @FXML
-    private Rectangle wall7;
-    @FXML
-    private Rectangle wall8;
-    @FXML
-    private Rectangle wall9;
-    @FXML
-    private Rectangle wall10;
-    @FXML
-    private Rectangle wall11;
-    @FXML
-    private Rectangle wall12;
-    @FXML
-    private Rectangle wall19;
-    @FXML
-    private Rectangle wall13;
-    @FXML
-    private Rectangle wall14;
-    @FXML
-    private Rectangle wall15;
-    @FXML
-    private Rectangle wall16;
-    @FXML
-    private Rectangle wall17;
-    @FXML
-    private Rectangle wall18;
-    @FXML
-    private Rectangle wall20;
-    @FXML
-    private Rectangle wall21;
-    @FXML
-    private Rectangle wall22;
-    @FXML
-    private Group human;
-    @FXML
-    private ImageView human_img;
-    @FXML
-    private Rectangle human_hitbox;
+    private Rectangle exit_right;
     @FXML
     private Rectangle spawn_default;
     @FXML
-    private Rectangle spawn_from_left;
-    @FXML
     private Rectangle spawn_from_up;
     @FXML
-    private Rectangle exit_left;
+    private Rectangle spawn_from_right;
     @FXML
-    private Rectangle exit_up;
-
+    private Group human;
+    @FXML
+    private Rectangle human_hitbox;
+    @FXML
+    private ImageView human_img;
     /**
      * Initializes the controller class.
      */

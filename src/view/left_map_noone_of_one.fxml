@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.Group?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.shape.Rectangle?>
+
+
+<StackPane fx:id="view" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="view.Left_map_noone_of_oneController">
+   <children>
+      <Group fx:id="world">
+         <children>
+            <ImageView fitHeight="401.0" fitWidth="601.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../image/maps/leftmap_no.1(1).png" />
+               </image>
+            </ImageView>
+            <Group fx:id="walls">
+               <children>
+                  <Rectangle fx:id="wall" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="399.0" layoutY="1.0" stroke="BLACK" strokeType="INSIDE" width="4.0" />
+                  <Rectangle fx:id="wall1" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="399.0" layoutX="599.0" layoutY="1.0" stroke="BLACK" strokeType="INSIDE" width="4.0" />
+                  <Rectangle fx:id="wall2" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="4.0" layoutX="4.0" layoutY="-2.0" stroke="BLACK" strokeType="INSIDE" width="593.0" />
+                  <Rectangle fx:id="wall3" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="4.0" layoutX="2.0" layoutY="398.0" stroke="BLACK" strokeType="INSIDE" width="593.0" />
+               </children>
+            </Group>
+            <Group>
+               <children>
+                  <Rectangle fx:id="exit_up" height="15" layoutX="260.0" layoutY="-3.0" opacity="0" width="51.0" />
+                  <Rectangle fx:id="exit_right" height="38.0" layoutX="583.0" layoutY="138.0" opacity="0" width="17.0" />
+               </children>
+            </Group>
+            <Group autoSizeChildren="false">
+               <children>
+                  <Rectangle fx:id="spawn_default" height="10" layoutX="275.0" layoutY="222.0" opacity="0" width="10" />
+                  <Rectangle fx:id="spawn_from_up" height="10" layoutX="284.0" layoutY="23.0" opacity="0" width="10" />
+                  <Rectangle fx:id="spawn_from_right" height="10" layoutX="560.0" layoutY="152.0" opacity="0" width="10" />
+               </children>
+            </Group>
+            <Group fx:id="human">
+               <children>
+                  <Rectangle fx:id="human_hitbox" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="245.0" layoutY="244.0" stroke="#ff000000" strokeType="INSIDE" translateX="24" translateY="28" width="14.0" />
+                  <ImageView fx:id="human_img" fitHeight="64" fitWidth="64" layoutX="245.0" layoutY="251.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
+               </children>
+            </Group>
+         </children>
+      </Group>
+   </children>
+</StackPane>
