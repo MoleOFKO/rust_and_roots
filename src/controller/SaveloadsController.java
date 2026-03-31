@@ -19,33 +19,36 @@ import javafx.scene.image.ImageView;
 import util.SceneManager;
 import javafx.scene.image.Image;
 import java.io.InputStream;
+import javafx.scene.Group;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.MouseEvent;
 import javax.swing.JOptionPane;
 
 public class SaveloadsController implements Initializable {
 
     @FXML
-    private Button btnLoad;
+    private ImageView btnLoad;
     @FXML
     private Button btnback;
 
     @FXML
     private Label save1;
     @FXML
-    private Button btnsave1;
+    private ToggleButton btnsave1;
     @FXML
     private Label save2;
     @FXML
-    private Button btnsave2;
+    private ToggleButton btnsave2;
     @FXML
     private Label save3;
     @FXML
-    private Button btnsave3;
+    private ToggleButton btnsave3;
     @FXML
     private Label save4;
     @FXML
-    private Button btnsave4;
+    private ToggleButton btnsave4;
     @FXML
     private ImageView cimg;
     @FXML
@@ -60,23 +63,29 @@ public class SaveloadsController implements Initializable {
     private ImageView deletesaveload;
     @FXML
     private Button btndelete;
+    @FXML
+    private Group world;
+    @FXML
+    private ToggleGroup savebutton;
+    @FXML
+    private ImageView btnSave;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         selectedSlot = GameState.get().getSelectedSaveSlot();
-        refreshModeUi();
+//        refreshModeUi();
         refreshSlotLabels();
         refreshSelectionUi();
         refreshSelectedSlotPreview();
         refreshDeleteButtonState();
-        btnLoad.setText("");
+//        btnLoad.setText("");
     }
 
-    private void refreshModeUi() {
-        if (btnLoad != null) {
-            btnLoad.setText(GameState.get().isSaveMenuMode() ? "Save" : "Load");
-        }
-    }
+//    private void refreshModeUi() {
+//        if (btnLoad != null) {
+//            btnLoad.setText(GameState.get().isSaveMenuMode() ? "Save" : "Load");
+//        }
+//    }
 
     private void refreshSelectionUi() {
         styleSlotButton(btnsave1, selectedSlot == 1);
@@ -85,7 +94,7 @@ public class SaveloadsController implements Initializable {
         styleSlotButton(btnsave4, selectedSlot == 4);
     }
 
-    private void styleSlotButton(Button button, boolean selected) {
+    private void styleSlotButton(ToggleButton button, boolean selected) {
         if (button == null) return;
         button.setOpacity(selected ? 1.0 : 0.7);
     }
@@ -132,7 +141,6 @@ public class SaveloadsController implements Initializable {
         return slotName + " - Empty";
     }
 
-    @FXML
     private void handlebtnLoadaction(ActionEvent event) {
         try {
             GameState.get().setSelectedSaveSlot(selectedSlot);
@@ -295,6 +303,14 @@ public class SaveloadsController implements Initializable {
     @FXML
     private void handledeleteaction(ActionEvent event) {
         confirmDeleteSelectedSave();
+    }
+
+    @FXML
+    private void handlebtnLoadaction(MouseEvent event) {
+    }
+
+    @FXML
+    private void handlebtnsaveaction(MouseEvent event) {
     }
 
     private static class SlotPreview {

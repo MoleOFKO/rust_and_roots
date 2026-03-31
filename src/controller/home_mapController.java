@@ -15,6 +15,8 @@ import javafx.scene.Group;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
@@ -310,15 +312,11 @@ public class home_mapController extends BaseMapController {
     @FXML
     private Label slotLb;
     @FXML
-    private Button slotBtn;
-    @FXML
     private StackPane Hslot1;
     @FXML
     private ImageView slotImg1;
     @FXML
     private Label slotLb1;
-    @FXML
-    private Button slotBtn1;
     @FXML
     private StackPane Hslot2;
     @FXML
@@ -326,23 +324,17 @@ public class home_mapController extends BaseMapController {
     @FXML
     private Label slotLb2;
     @FXML
-    private Button slotBtn2;
-    @FXML
     private StackPane Hslot3;
     @FXML
     private ImageView slotImg3;
     @FXML
     private Label slotLb3;
     @FXML
-    private Button slotBtn3;
-    @FXML
     private StackPane Hslot4;
     @FXML
     private ImageView slotImg4;
     @FXML
     private Label slotLb4;
-    @FXML
-    private Button slotBtn4;
     @FXML
     private StackPane Hslot5;
     @FXML
@@ -493,6 +485,18 @@ public class home_mapController extends BaseMapController {
     private Button openstatus;
     @FXML
     private Button opensetting;
+    @FXML
+    private ToggleGroup selectedhotbar;
+    @FXML
+    private ToggleButton slotBtn;
+    @FXML
+    private ToggleButton slotBtn1;
+    @FXML
+    private ToggleButton slotBtn2;
+    @FXML
+    private ToggleButton slotBtn3;
+    @FXML
+    private ToggleButton slotBtn4;
 
     @Override
     protected String mapKey() {
@@ -592,7 +596,7 @@ public class home_mapController extends BaseMapController {
         List<StackPane> hotbarSlotNodes = List.of(Hslot, Hslot1, Hslot2, Hslot3, Hslot4);
         List<ImageView> hotbarImageNodes = List.of(slotImg, slotImg1, slotImg2, slotImg3, slotImg4);
         List<Label> hotbarLabelNodes = List.of(slotLb, slotLb1, slotLb2, slotLb3, slotLb4);
-        List<Button> hotbarButtonNodes = List.of(slotBtn, slotBtn1, slotBtn2, slotBtn3, slotBtn4);
+        List<ToggleButton> hotbarButtonNodes = List.of(slotBtn, slotBtn1, slotBtn2, slotBtn3, slotBtn4);
 
         bridgeSharedHotbarUi(
             hotbar,
