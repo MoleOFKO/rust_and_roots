@@ -31,6 +31,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javax.swing.JOptionPane;
+import util.AppDialogs;
 import model.AccMg;
 import static rust_and_roots.Rust_and_roots.stage;
 import util.WorldScaler;
@@ -100,15 +101,15 @@ public class LoginController implements Initializable {
         String password = txtlpassword.getText();
 
         if (username.isEmpty() && password.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Invalid input!");
+            AppDialogs.showMessageDialog(null, "Invalid input!");
             return;
         }
         if (username.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Enter Username!");
+            AppDialogs.showMessageDialog(null, "Enter Username!");
             return;
         }
         if (password.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Enter password!");
+            AppDialogs.showMessageDialog(null, "Enter password!");
             return;
         }
         String sql = """
@@ -124,12 +125,12 @@ public class LoginController implements Initializable {
         pst.setString(1, username);
         rs = pst.executeQuery();
         if (!rs.next()) {
-            JOptionPane.showMessageDialog(null, "Username does not exist!");
+            AppDialogs.showMessageDialog(null, "Username does not exist!");
             return;
         }
         String dbPassword = rs.getString("passwords");
         if (!dbPassword.equals(password)) {
-            JOptionPane.showMessageDialog(null, "Password is incorrect!");
+            AppDialogs.showMessageDialog(null, "Password is incorrect!");
             return;
         }
         txtname = rs.getString("account_name");
@@ -137,11 +138,11 @@ public class LoginController implements Initializable {
         String dbstatus = rs.getString("status_name");
         String temp = rs.getString("role_name");
         if (!"active".equalsIgnoreCase(dbstatus)) {
-            JOptionPane.showMessageDialog(null, "Account is Banned");
+            AppDialogs.showMessageDialog(null, "Account is Banned");
             return;
         }
         if (temp == null) {
-            JOptionPane.showMessageDialog(null, "Invalid input!");
+            AppDialogs.showMessageDialog(null, "Invalid input!");
             return;
         }
         switch (temp) {
@@ -188,7 +189,7 @@ public class LoginController implements Initializable {
             case "owner" -> {
                 util.SceneManager.switchScene("/view/account_view.fxml");
             }
-            default -> JOptionPane.showMessageDialog(null, "Invalid input!");
+            default -> AppDialogs.showMessageDialog(null, "Invalid input!");
         }
     }
         
@@ -203,27 +204,27 @@ public class LoginController implements Initializable {
         String pwdRegex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$";
 
         if (txtsgmail.getText().isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Enter email!");
+            AppDialogs.showMessageDialog(null, "Enter email!");
             return;
         }
         if (txtsname.getText().isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Enter Username");
+            AppDialogs.showMessageDialog(null, "Enter Username");
             return;
         }
         if (pwd.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Enter password!");
+            AppDialogs.showMessageDialog(null, "Enter password!");
             return;
         }
         if (txtscpassword.getText().isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Enter confirm password!");
+            AppDialogs.showMessageDialog(null, "Enter confirm password!");
             return;
         }
         if (!email.matches(gmailRegex)) {
-            JOptionPane.showMessageDialog(null, "Gmail must be finished with : @gmail.com");
+            AppDialogs.showMessageDialog(null, "Gmail must be finished with : @gmail.com");
             return;
         }
         if (!pwd.matches(pwdRegex)) {
-            JOptionPane.showMessageDialog(null, """
+            AppDialogs.showMessageDialog(null, """
                                                 Password must contain:
                                                 - At least 8 characters
                                                 - 1 uppercase letter
@@ -232,7 +233,7 @@ public class LoginController implements Initializable {
             return;
         }
         if (!txtspassword.getText().equals(txtscpassword.getText())) {
-            JOptionPane.showMessageDialog(null, "Password don't match!");
+            AppDialogs.showMessageDialog(null, "Password don't match!");
             return;
         }
 
@@ -243,7 +244,7 @@ public class LoginController implements Initializable {
         rs = pst.executeQuery();
 
         if (rs.next()) {
-            JOptionPane.showMessageDialog(null, "User Already exist");
+            AppDialogs.showMessageDialog(null, "User Already exist");
         } else {
 
             String sql = "INSERT INTO accounts (email, account_name, passwords, role_id, status_id) VALUES (?, ?, ?, ?, ?)";
@@ -258,7 +259,7 @@ public class LoginController implements Initializable {
                 int accountId;
                 try (ResultSet accKeys = accPst.getGeneratedKeys()) {
                     if (!accKeys.next()) {
-                        JOptionPane.showMessageDialog(null, "Failed to create account.");
+                        AppDialogs.showMessageDialog(null, "Failed to create account.");
                         return;
                     }
                     accountId = accKeys.getInt(1);
@@ -271,7 +272,7 @@ public class LoginController implements Initializable {
                 gs.setCurrentPlayerName(txtsname.getText().trim());
             }
 
-            JOptionPane.showMessageDialog(null, "Account created successfully");
+            AppDialogs.showMessageDialog(null, "Account created successfully");
 
             txtsname.setText("");
             txtspassword.setText("");

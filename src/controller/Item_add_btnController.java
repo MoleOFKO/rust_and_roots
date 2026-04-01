@@ -32,6 +32,7 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javax.swing.JOptionPane;
+import util.AppDialogs;
 import rust_and_roots.Rust_and_roots;
 import static rust_and_roots.Rust_and_roots.stage;
 import util.WorldScaler;
@@ -121,24 +122,24 @@ public class Item_add_btnController implements Initializable {
     @FXML
     private void handlebtnsaveaction(ActionEvent event) throws SQLException, IOException {
         if(txtmname.getText().isEmpty()){
-            JOptionPane.showMessageDialog(null, "Please Select Category");
+            AppDialogs.showMessageDialog(null, "Please Select Category");
         }else if(txtmobstype.getText().isEmpty()){
-            JOptionPane.showMessageDialog(null, "Please Enter Product Name");
+            AppDialogs.showMessageDialog(null, "Please Enter Product Name");
         } else if(txtstr.getText().isEmpty()){
-            JOptionPane.showMessageDialog(null, "Please Select Size");
+            AppDialogs.showMessageDialog(null, "Please Select Size");
         }else if(txtagi.getText().isEmpty()){
-            JOptionPane.showMessageDialog(null, "Please Enter Price");
+            AppDialogs.showMessageDialog(null, "Please Enter Price");
         }else if(txtdex.getText().isEmpty()){
-            JOptionPane.showMessageDialog(null, "Please Enter Stock Qty");
+            AppDialogs.showMessageDialog(null, "Please Enter Stock Qty");
         }
         else if(txtvid.getText().isEmpty()){
-            JOptionPane.showMessageDialog(null, "Please Enter Stock Qty");
+            AppDialogs.showMessageDialog(null, "Please Enter Stock Qty");
         }else if(txthp.getText().isEmpty()){
-            JOptionPane.showMessageDialog(null, "Please Enter Stock Qty");
+            AppDialogs.showMessageDialog(null, "Please Enter Stock Qty");
         }else if(txtstamina.getText().isEmpty()){
-            JOptionPane.showMessageDialog(null, "Please Enter Stock Qty");
+            AppDialogs.showMessageDialog(null, "Please Enter Stock Qty");
         }else if(itemimage.getImage()==null){
-            JOptionPane.showMessageDialog(null, "Please Upload Image");
+            AppDialogs.showMessageDialog(null, "Please Upload Image");
         } 
         else{
            try {
@@ -172,7 +173,7 @@ public class Item_add_btnController implements Initializable {
                 pst.executeUpdate();
 
                 con.commit();
-                JOptionPane.showMessageDialog(null, "Inserted Successfully!");
+                AppDialogs.showMessageDialog(null, "Inserted Successfully!");
                 util.SceneManager.switchScene("/view/edit_item.fxml");
             } catch (Exception e) {
                 con.rollback();

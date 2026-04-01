@@ -31,6 +31,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javax.swing.JOptionPane;
+import util.AppDialogs;
 import model.Account;
 import static rust_and_roots.Rust_and_roots.stage;
 import util.WorldScaler;
@@ -245,7 +246,7 @@ public class Account_managementController implements Initializable {
     @FXML
     private void handlesearchaction(ActionEvent event) throws SQLException {
         if(txtsearch.getText().isEmpty())
-            JOptionPane.showMessageDialog(null, "Please Enter search name");
+            AppDialogs.showMessageDialog(null, "Please Enter search name");
         else{
             accountList.clear();
             String sname=txtsearch.getText();
@@ -274,7 +275,7 @@ public class Account_managementController implements Initializable {
     void handlebtneditaction(ActionEvent event) throws IOException {
         Account a = account_view.getSelectionModel().getSelectedItem();
         if(a==null)
-            JOptionPane.showMessageDialog(null, "Please Select one Product You Want to Edit!");
+            AppDialogs.showMessageDialog(null, "Please Select one Product You Want to Edit!");
         else{
             accname = a.getAccount_name();
 //            Stage stage = Rust_and_roots.stage;
@@ -315,13 +316,13 @@ public class Account_managementController implements Initializable {
     @FXML
     private void handlebanaction(ActionEvent event) throws SQLException, IOException {
         Account a= account_view.getSelectionModel().getSelectedItem();
-        int num = JOptionPane.showConfirmDialog(null, "Are you Sure?");
+        int num = AppDialogs.showConfirmDialog(null, "Are you Sure?");
             if (num == JOptionPane.YES_OPTION) {
                 String sql1 = "Update accounts SET status_id = 2 where account_name=?;  ";
                 pst = con.prepareStatement(sql1);
                 pst.setString(1, a.getAccount_name());  
                 pst.executeUpdate();
-                JOptionPane.showMessageDialog(null, "Baned Successfully!");
+                AppDialogs.showMessageDialog(null, "Baned Successfully!");
                 util.SceneManager.switchScene("/view/account_management.fxml");
             }
     }
@@ -329,13 +330,13 @@ public class Account_managementController implements Initializable {
     @FXML
     private void handleactiveaction(ActionEvent event) throws SQLException, IOException {
         Account a= account_view.getSelectionModel().getSelectedItem();
-        int num = JOptionPane.showConfirmDialog(null, "Are you Sure?");
+        int num = AppDialogs.showConfirmDialog(null, "Are you Sure?");
             if (num == JOptionPane.YES_OPTION) {
                 String sql1 = "Update accounts SET status_id = 1 where account_name=?;";
                 pst = con.prepareStatement(sql1);
                 pst.setString(1, a.getAccount_name());  
                 pst.executeUpdate();
-                JOptionPane.showMessageDialog(null, "Actived Successfully!");
+                AppDialogs.showMessageDialog(null, "Actived Successfully!");
                 util.SceneManager.switchScene("/view/account_management.fxml");
             }
     }

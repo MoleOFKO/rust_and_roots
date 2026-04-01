@@ -27,6 +27,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javax.swing.JOptionPane;
+import util.AppDialogs;
 import model.PlayerState;
 import util.SceneManager;
 import util.WorldScaler;
@@ -143,16 +144,16 @@ public class New_gameController implements Initializable, SceneController {
         String worldName = txtworldname == null ? "" : txtworldname.getText().trim();
 
         if (characterName.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Please Enter Character Name!");
+            AppDialogs.showMessageDialog(null, "Please Enter Character Name!");
             return;
         }
 
         if (worldName.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Please Enter World Name!");
+            AppDialogs.showMessageDialog(null, "Please Enter World Name!");
             return;
         }
 
-        int confirm = JOptionPane.showConfirmDialog(
+        int confirm = AppDialogs.showConfirmDialog(
             null,
             "World Name: \"" + worldName + "\"\nThis name will be shown as the Save Name.\nDo you want to continue?",
             "Confirm New Game",
@@ -178,7 +179,7 @@ public class New_gameController implements Initializable, SceneController {
 
         int accountId = gs.getCurrentAccountId();
         if (accountId <= 0) {
-            JOptionPane.showMessageDialog(null, "No logged-in account found. Please log in first.");
+            AppDialogs.showMessageDialog(null, "No logged-in account found. Please log in first.");
             return;
         }
 
@@ -190,7 +191,7 @@ public class New_gameController implements Initializable, SceneController {
             gs.setSelectedSaveSlot(1);
         } catch (Exception e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Failed to create character.");
+            AppDialogs.showMessageDialog(null, "Failed to create character.");
             return;
         }
 

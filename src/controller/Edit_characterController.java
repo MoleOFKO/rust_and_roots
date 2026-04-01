@@ -37,6 +37,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javax.swing.JOptionPane;
+import util.AppDialogs;
 import model.mobs;
 import rust_and_roots.Rust_and_roots;
 import static rust_and_roots.Rust_and_roots.stage;
@@ -156,7 +157,7 @@ public class Edit_characterController implements Initializable {
    @FXML
    private void handlesearchaction(ActionEvent event) throws SQLException {
 //        if(txtsearch.getText().isEmpty())
-//            JOptionPane.showMessageDialog(null, "Please Enter search name");
+//            AppDialogs.showMessageDialog(null, "Please Enter search name");
 //        else{
 //            mobsList.clear();
 //            String sname=txtsearch.getText();
@@ -190,17 +191,17 @@ public class Edit_characterController implements Initializable {
   void handlebtndeleteaction(ActionEvent event) throws SQLException, IOException {
 //        mobs m = mob_view.getSelectionModel().getSelectedItem();
 //        if (m == null) {
-//            JOptionPane.showMessageDialog(null, "Please select a mob first!");
+//            AppDialogs.showMessageDialog(null, "Please select a mob first!");
 //            return;
 //        }
-//        int num = JOptionPane.showConfirmDialog(null, "Are you Sure?");
+//        int num = AppDialogs.showConfirmDialog(null, "Are you Sure?");
 //
 //        if (num == JOptionPane.YES_OPTION) {
 //            String sql = "DELETE m, s FROM mobs m JOIN stats s ON s.stats_id = m.stats WHERE m.mobs_id = ?;";
 //            pst = con.prepareStatement(sql);
 //            pst.setInt(1, m.getMobs_id());   // use selected object
 //            pst.executeUpdate();
-//            JOptionPane.showMessageDialog(null, "Deleted Successfully!");
+//            AppDialogs.showMessageDialog(null, "Deleted Successfully!");
 //            root = FXMLLoader.load(getClass().getResource("/view/edit_character.fxml"));
 //            Scene scene = new Scene(root);
 //            stage.setScene(scene);
@@ -211,7 +212,7 @@ public class Edit_characterController implements Initializable {
   void handlebtneditaction(ActionEvent event) throws IOException {
 //        mobs m = mob_view.getSelectionModel().getSelectedItem();
 //        if(m==null)
-//            JOptionPane.showMessageDialog(null, "Please Select one Mobs You Want to Edit!");
+//            AppDialogs.showMessageDialog(null, "Please Select one Mobs You Want to Edit!");
 //        else{
 //            mid = m.getMobs_id();
 //            Stage stage = Rust_and_roots.stage;
