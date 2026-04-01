@@ -25,6 +25,7 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.MouseEvent;
 import javax.swing.JOptionPane;
+import util.AppDialogs;
 
 public class SaveloadsController implements Initializable {
 
@@ -438,7 +439,7 @@ public class SaveloadsController implements Initializable {
 
         String saveLabel = readSlotLabel(characterId, selectedSlot);
 
-        int result = JOptionPane.showConfirmDialog(
+        int result = AppDialogs.showConfirmDialog(
             null,
             "Are you sure you want to delete \"" + saveLabel + "\"?\nThis action cannot be undone.",
             "Delete Save",

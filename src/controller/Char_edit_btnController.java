@@ -34,6 +34,7 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javax.swing.JOptionPane;
+import util.AppDialogs;
 import rust_and_roots.Rust_and_roots;
 import static rust_and_roots.Rust_and_roots.stage;
 import util.WorldScaler;
@@ -127,23 +128,23 @@ public class Char_edit_btnController implements Initializable {
     @FXML
     private void handlebtnsaveaction(ActionEvent event) throws SQLException, IOException {
 //        if(txtmname.getText().isEmpty()){
-//            JOptionPane.showMessageDialog(null, "Please Enter Mobs Name");
+//            AppDialogs.showMessageDialog(null, "Please Enter Mobs Name");
 //        }else if(txtmobstype.getText().isEmpty()){
-//            JOptionPane.showMessageDialog(null, "Please Enter Mobs Type");
+//            AppDialogs.showMessageDialog(null, "Please Enter Mobs Type");
 //        } else if(txtstr.getText().isEmpty()){
-//            JOptionPane.showMessageDialog(null, "Please Enter STR");
+//            AppDialogs.showMessageDialog(null, "Please Enter STR");
 //        }else if(txtagi.getText().isEmpty()){
-//            JOptionPane.showMessageDialog(null, "Please Enter AGI");
+//            AppDialogs.showMessageDialog(null, "Please Enter AGI");
 //        }else if(txtdex.getText().isEmpty()){
-//            JOptionPane.showMessageDialog(null, "Please Enter DEX");
+//            AppDialogs.showMessageDialog(null, "Please Enter DEX");
 //        }else if(txtvid.getText().isEmpty()){
-//            JOptionPane.showMessageDialog(null, "Please Enter VIT");
+//            AppDialogs.showMessageDialog(null, "Please Enter VIT");
 //        }else if(txthp.getText().isEmpty()){
-//            JOptionPane.showMessageDialog(null, "Please Enter HP");
+//            AppDialogs.showMessageDialog(null, "Please Enter HP");
 //        }else if(txtstamina.getText().isEmpty()){
-//            JOptionPane.showMessageDialog(null, "Please Enter Stamina");
+//            AppDialogs.showMessageDialog(null, "Please Enter Stamina");
 //        }else if(mobimg.getImage()==null){
-//            JOptionPane.showMessageDialog(null, "Please Upload Image");
+//            AppDialogs.showMessageDialog(null, "Please Upload Image");
 //        } 
 //        else{
 //           
@@ -160,7 +161,7 @@ public class Char_edit_btnController implements Initializable {
 //        pst.setString(9, img_name);
 //         pst.setInt(10, Edit_characterController.mid);
 //        pst.executeUpdate();
-//        JOptionPane.showMessageDialog(null, "Updated Successfully!");
+//        AppDialogs.showMessageDialog(null, "Updated Successfully!");
 //        Stage stage = Rust_and_roots.stage;
 //
 //        root = FXMLLoader.load(getClass().getResource("/view/edit_character.fxml"));

@@ -33,6 +33,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javax.swing.JOptionPane;
+import util.AppDialogs;
 import model.item;
 import rust_and_roots.Rust_and_roots;
 import util.WorldScaler;
@@ -157,7 +158,7 @@ public class Edit_itemController implements Initializable {
     @FXML
     private void handlesearchaction(ActionEvent event) throws SQLException {
         if(txtsearch.getText().isEmpty())
-            JOptionPane.showMessageDialog(null, "Please Enter search name");
+            AppDialogs.showMessageDialog(null, "Please Enter search name");
         else{
             itemList.clear();
             String sname=txtsearch.getText();
@@ -251,10 +252,10 @@ public class Edit_itemController implements Initializable {
     void handlebtnbanaction(ActionEvent event) throws SQLException, IOException {
        item i = item_view.getSelectionModel().getSelectedItem();
         if (i == null) {
-            JOptionPane.showMessageDialog(null, "Please select a item first!");
+            AppDialogs.showMessageDialog(null, "Please select a item first!");
             return;
         }
-        int num = JOptionPane.showConfirmDialog(null, "Are you Sure?");
+        int num = AppDialogs.showConfirmDialog(null, "Are you Sure?");
 
         if (num == JOptionPane.YES_OPTION) {
             String sql = "DELETE i, s " +
@@ -264,7 +265,7 @@ public class Edit_itemController implements Initializable {
             pst = con.prepareStatement(sql);
             pst.setInt(1, i.getItem_id());   // use selected object
             pst.executeUpdate();
-            JOptionPane.showMessageDialog(null, "Deleted Successfully!");
+            AppDialogs.showMessageDialog(null, "Deleted Successfully!");
             util.SceneManager.switchScene("/view/edit_item.fxml");
         }   
     }
@@ -272,7 +273,7 @@ public class Edit_itemController implements Initializable {
     void handlebtneditaction(ActionEvent event) throws IOException {
         item i= item_view.getSelectionModel().getSelectedItem();
         if(i==null)
-            JOptionPane.showMessageDialog(null, "Please Select one Product You Want to Edit!");
+            AppDialogs.showMessageDialog(null, "Please Select one Product You Want to Edit!");
         else{
             itemname = i.getItem_name();
             Stage stage = Rust_and_roots.stage;
