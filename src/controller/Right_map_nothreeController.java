@@ -12,13 +12,14 @@ import javafx.scene.Group;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
+import util.SpawnTag;
 
 /**
  * FXML Controller class
  *
  * @author MITUSER-1
  */
-public class Right_map_nothreeController implements Initializable {
+public class Right_map_nothreeController extends BaseMapController {
 
     @FXML
     private StackPane view;
@@ -79,12 +80,18 @@ public class Right_map_nothreeController implements Initializable {
     @FXML
     private Rectangle wall14;
 
-    /**
-     * Initializes the controller class.
-     */
     @Override
-    public void initialize(URL url, ResourceBundle rb) {
-        // TODO
-    }    
+    protected String mapKey() {
+        return "right_map_nothree";
+    }
+
+    @Override
+    protected void configureExits() {
+        registerExit(exit_left, "/view/upper_map_nothree.fxml", SpawnTag.FROM_RIGHT);
+        registerExit(exit_right, "/view/right_map_nothree_of_one.fxml", SpawnTag.FROM_LEFT);
+        registerExit(exit_up, "/view/right_map_nofour.fxml", SpawnTag.FROM_DOWN);
+        registerExit(exit_bottom, "/view/right_mapnotwo.fxml", SpawnTag.FROM_UP);
+    }
+   
     
 }

@@ -12,13 +12,14 @@ import javafx.scene.Group;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
+import util.SpawnTag;
 
 /**
  * FXML Controller class
  *
  * @author MITUSER-1
  */
-public class Right_map_nooneController implements Initializable {
+public class Right_map_nooneController extends BaseMapController {
 
     @FXML
     private StackPane view;
@@ -53,14 +54,23 @@ public class Right_map_nooneController implements Initializable {
     @FXML
     private Rectangle spawn_from_bottom;
     @FXML
-    private Rectangle spawn_from_right;
+    private Rectangle spawn_from_right;    
 
-    /**
-     * Initializes the controller class.
-     */
     @Override
-    public void initialize(URL url, ResourceBundle rb) {
-        // TODO
-    }    
+    protected String mapKey() {
+        return "right_map_noone";
+    }
+
+    @Override
+    protected void configureExits() {
+         // Coming from home_map into right_map should spawn FROM_LEFT on right_map,
+        // and going back to home_map should spawn FROM_RIGHT on home_map.
+        registerExit(exit_left, "/view/upper_map.fxml", SpawnTag.FROM_RIGHT);
+        registerExit(exit_right, "/view/right_map_noone_of_one.fxml", SpawnTag.FROM_LEFT);
+
+        // Example: right_map -> upper_map
+        registerExit(exit_down, "/view/right_map.fxml", SpawnTag.FROM_UP);
+        
+    }
     
 }

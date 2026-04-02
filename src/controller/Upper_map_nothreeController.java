@@ -12,13 +12,14 @@ import javafx.scene.Group;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
+import util.SpawnTag;
 
 /**
  * FXML Controller class
  *
  * @author Kaung Zin
  */
-public class Upper_map_nothreeController implements Initializable {
+public class Upper_map_nothreeController extends BaseMapController{
 
     @FXML
     private StackPane view;
@@ -51,12 +52,16 @@ public class Upper_map_nothreeController implements Initializable {
     @FXML
     private ImageView human_img;
 
-    /**
-     * Initializes the controller class.
-     */
+
     @Override
-    public void initialize(URL url, ResourceBundle rb) {
-        // TODO
-    }    
+    protected String mapKey() {
+        return "upper_map_nothree";
+    }
+
+    @Override
+    protected void configureExits() {
+        registerExit(exit_left, "/view/left_map_nothree.fxml", SpawnTag.FROM_RIGHT);
+        registerExit(exit_right, "/view/right_map_nothree.fxml", SpawnTag.FROM_LEFT);
+    }
     
 }

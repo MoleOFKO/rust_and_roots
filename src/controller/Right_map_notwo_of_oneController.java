@@ -12,13 +12,14 @@ import javafx.scene.Group;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
+import util.SpawnTag;
 
 /**
  * FXML Controller class
  *
  * @author MITUSER-1
  */
-public class Right_map_notwo_of_oneController implements Initializable {
+public class Right_map_notwo_of_oneController extends BaseMapController {
 
     @FXML
     private StackPane view;
@@ -60,13 +61,18 @@ public class Right_map_notwo_of_oneController implements Initializable {
     private Rectangle wall5;
     @FXML
     private Rectangle wall6;
+   
 
-    /**
-     * Initializes the controller class.
-     */
     @Override
-    public void initialize(URL url, ResourceBundle rb) {
-        // TODO
-    }    
+    protected String mapKey() {
+     return "right_map_ontwo_of_one";
+    }
+
+    @Override
+    protected void configureExits() {
+       registerExit(exit_left, "/view/right_map_notwo.fxml", SpawnTag.FROM_RIGHT);
+       registerExit(exit_right, "/view/right_map_notwo_of_two.fxml", SpawnTag.FROM_LEFT);
+       registerExit(exit_bottom, "/view/right_map_noone_of_one.fxml", SpawnTag.FROM_UP);
+    }
     
 }

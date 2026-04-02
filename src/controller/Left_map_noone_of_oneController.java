@@ -13,12 +13,13 @@ import javafx.scene.Group;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
+import util.SpawnTag;
 /**
  * FXML Controller class
  *
  * @author MITUSER-1
  */
-public class Left_map_noone_of_oneController implements Initializable {
+public class Left_map_noone_of_oneController extends BaseMapController {
 
 
     @FXML
@@ -51,12 +52,17 @@ public class Left_map_noone_of_oneController implements Initializable {
     private Rectangle human_hitbox;
     @FXML
     private ImageView human_img;
-    /**
-     * Initializes the controller class.
-     */
+
+
     @Override
-    public void initialize(URL url, ResourceBundle rb) {
-        // TODO
-    }    
+    protected String mapKey() {
+        return "left_map_noone_of_one";
+    }
+
+    @Override
+    protected void configureExits() {
+        registerExit(exit_right, "/view/left_map_noone.fxml", SpawnTag.FROM_LEFT);
+        registerExit(exit_up, "/view/left_map_notwo_of_one.fxml", SpawnTag.FROM_DOWN);
+    }
     
 }
