@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.Group?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.shape.Rectangle?>
+
+
+<StackPane fx:id="view" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Right_map_nooneController">
+   <children>
+      <Group fx:id="world">
+         <children>
+            <ImageView fitHeight="398.0" fitWidth="701.0" layoutX="2.0" layoutY="1.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../image/maps/rightmap_no.1.png" />
+               </image>
+            </ImageView>
+            <Group fx:id="walls">
+               <children>
+                  <Rectangle fx:id="wall" height="10" layoutX="0" layoutY="0" width="600" />
+                  <Rectangle fx:id="wall1" height="10" layoutX="0" layoutY="390" width="600" />
+                  <Rectangle fx:id="wall2" height="400" layoutX="0" layoutY="0" width="10" />
+                  <Rectangle fx:id="wall3" height="400" layoutX="590" layoutY="0" width="10" />
+               </children>
+            </Group>
+            <Group fx:id="human" layoutX="268.0" layoutY="168.0">
+               <children>
+                  <ImageView fx:id="human_img" fitHeight="64" fitWidth="64" />
+                  <Rectangle fx:id="human_hitbox" arcHeight="6" arcWidth="6" height="24" layoutX="18" layoutY="34" width="28" />
+               </children>
+            </Group>
+            <Group layoutX="167.0" layoutY="89.0">
+               <children>
+                  <Rectangle fx:id="exit_left" height="39.0" layoutX="-162.0" layoutY="44.0" opacity="0" width="15" />
+                  <Rectangle fx:id="exit_bottom" height="15" layoutX="147.0" layoutY="288.0" opacity="0" width="66.0" />
+                  <Rectangle fx:id="exit_right" height="39.0" layoutX="410.0" layoutY="80.0" opacity="0" width="15" />
+               </children>
+            </Group>
+            <Group layoutX="155.0" layoutY="105.0">
+               <children>
+                  <Rectangle fx:id="spawn_default" height="10" layoutX="200.0" layoutY="57.0" opacity="0" width="10" />
+                  <Rectangle fx:id="spawn_from_left" height="10" layoutX="-114.0" layoutY="43.0" opacity="0" width="10" />
+                  <Rectangle fx:id="spawn_from_bottom" height="10" layoutX="184.0" layoutY="253.0" opacity="0" width="10" />
+                  <Rectangle fx:id="spawn_from_right" height="10" layoutX="397.0" layoutY="79.0" opacity="0" width="10" />
+               </children>
+            </Group>
+         </children>
+      </Group>
+   </children>
+</StackPane>

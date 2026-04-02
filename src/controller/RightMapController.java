@@ -37,23 +37,11 @@ public class RightMapController extends BaseMapController {
     @FXML
     private Rectangle spawn_from_left;
     @FXML
-    private Rectangle spawn_from_right;
-    @FXML
     private Rectangle spawn_from_up;
-    @FXML
-    private Rectangle spawn_from_down;
-    @FXML
-    private Rectangle spawn_from_door;
     @FXML
     private Rectangle exit_left;
     @FXML
-    private Rectangle exit_right;
-    @FXML
     private Rectangle exit_up;
-    @FXML
-    private Rectangle exit_down;
-    @FXML
-    private Rectangle exit_door;
 
     @Override
     protected String mapKey() {
