@@ -47,6 +47,10 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import model.PlayerState;
 import util.SceneManager;
+import javafx.animation.Animation;
+import javafx.animation.Interpolator;
+import javafx.animation.TranslateTransition;
+import javafx.util.Duration;
 
 /**
  * FXML Controller class
@@ -837,6 +841,18 @@ public class Home_interiorController extends BaseMapController {
     private Group skillsgroup;
     @FXML
     private ToggleGroup selectedhotbar;
+    @FXML
+    private Group dialogboxes;
+    @FXML
+    private ImageView cookingdialogimg;
+    @FXML
+    private ImageView craftingdialogimg;
+    @FXML
+    private ImageView invdialogimg;
+    @FXML
+    private ImageView meltdialogimg;
+    @FXML
+    private ImageView sleepingdialogimg;
 
     @FXML
     private void handleHPminusaction(MouseEvent event) { onStatusHpMinus(); }
@@ -1204,6 +1220,7 @@ public class Home_interiorController extends BaseMapController {
     public void initialize(URL url, ResourceBundle rb) {
         super.initialize(url, rb);
         bridgeInteriorSharedUi();
+        setupFloatingDialogs();
         ItemDatabase.loadItems();
         chestInventory = gameState.getChestInventory();
         setupChestUi();
@@ -1915,4 +1932,27 @@ public class Home_interiorController extends BaseMapController {
         }
     }
     
+//    animation methods
+    private void setupFloatingDialogs() {
+    playFloating(cookingdialogimg, 0.0);
+    playFloating(craftingdialogimg, 0.2);
+    playFloating(invdialogimg, 0.4);
+    playFloating(meltdialogimg, 0.6);
+    playFloating(sleepingdialogimg, 0.8);
+    }
+    
+//    animation methods
+    private void playFloating(ImageView imageView, double delaySeconds) {
+        if (imageView == null) return;
+
+        TranslateTransition floatAnim = new TranslateTransition(Duration.seconds(1.2), imageView);
+        floatAnim.setFromY(0);
+        floatAnim.setToY(-8); // how high it floats
+        floatAnim.setAutoReverse(true);
+        floatAnim.setCycleCount(Animation.INDEFINITE);
+        floatAnim.setInterpolator(Interpolator.EASE_BOTH);
+        floatAnim.setDelay(Duration.seconds(delaySeconds));
+        floatAnim.play();
+    }
+
 }
