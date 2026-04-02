@@ -74,19 +74,29 @@ public class SaveloadsController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         selectedSlot = GameState.get().getSelectedSaveSlot();
-//        refreshModeUi();
+        refreshModeUi();
         refreshSlotLabels();
         refreshSelectionUi();
         refreshSelectedSlotPreview();
         refreshDeleteButtonState();
-//        btnLoad.setText("");
+        refreshLoadButtonState();
     }
 
-//    private void refreshModeUi() {
-//        if (btnLoad != null) {
-//            btnLoad.setText(GameState.get().isSaveMenuMode() ? "Save" : "Load");
-//        }
-//    }
+    private void refreshModeUi() {
+    boolean saveMode = GameState.get().isSaveMenuMode();
+
+    if (btnSave != null) {
+        btnSave.setVisible(saveMode);
+        btnSave.setManaged(saveMode);
+        btnSave.setDisable(!saveMode);
+    }
+
+    if (btnLoad != null) {
+        btnLoad.setVisible(!saveMode);
+        btnLoad.setManaged(!saveMode);
+        btnLoad.setDisable(saveMode);
+    }
+}
 
     private void refreshSelectionUi() {
         styleSlotButton(btnsave1, selectedSlot == 1);
@@ -142,58 +152,6 @@ public class SaveloadsController implements Initializable {
         return slotName + " - Empty";
     }
 
-    private void handlebtnLoadaction(ActionEvent event) {
-        try {
-            GameState.get().setSelectedSaveSlot(selectedSlot);
-
-            if (GameState.get().isSaveMenuMode()) {
-                SaveGameService saveService = new SaveGameService();
-                saveService.saveGameToSlot(GameState.get(), selectedSlot);
-
-                refreshSlotLabels();
-                refreshSelectedSlotPreview();
-
-                GameState.get().setSaveMenuMode(false);
-
-                String returnFxml = GameState.get().getReturnFxml();
-                if (returnFxml == null || returnFxml.isBlank()) {
-                    returnFxml = "/view/" + GameState.get().getCurrentMapKey() + ".fxml";
-                }
-                SceneManager.switchScene(returnFxml);
-                return;
-            }
-
-            int characterId = GameState.get().getCurrentCharacterId();
-            int saveId = findSaveIdForSlot(characterId, selectedSlot);
-
-            if (saveId <= 0) {
-                if (day != null) {
-                    day.setText("No save found in slot " + selectedSlot);
-                }
-                return;
-            }
-
-            LoadGameService loadService = new LoadGameService();
-            boolean ok = loadService.loadGame(saveId);
-
-            if (!ok) {
-                if (day != null) {
-                    day.setText("Load failed");
-                }
-                return;
-            }
-
-            GameState.get().setSelectedSaveSlot(selectedSlot);
-            SceneManager.switchScene("/view/" + GameState.get().getCurrentMapKey() + ".fxml");
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            if (day != null) {
-                day.setText("Error during save/load");
-            }
-        }
-    }
-
     private int findSaveIdForSlot(int characterId, int slotNumber) {
         String slotName = "Save " + slotNumber;
         dbcon db = new dbcon();
@@ -240,6 +198,7 @@ public class SaveloadsController implements Initializable {
         refreshSelectionUi();
         refreshSelectedSlotPreview();
         refreshDeleteButtonState();
+        refreshLoadButtonState();
     }
 
     @FXML
@@ -249,6 +208,7 @@ public class SaveloadsController implements Initializable {
         refreshSelectionUi();
         refreshSelectedSlotPreview();
         refreshDeleteButtonState();
+        refreshLoadButtonState();
     }
 
     @FXML
@@ -258,6 +218,7 @@ public class SaveloadsController implements Initializable {
         refreshSelectionUi();
         refreshSelectedSlotPreview();
         refreshDeleteButtonState();
+        refreshLoadButtonState();
     }
 
     @FXML
@@ -267,6 +228,7 @@ public class SaveloadsController implements Initializable {
         refreshSelectionUi();
         refreshSelectedSlotPreview();
         refreshDeleteButtonState();
+        refreshLoadButtonState();
     }
     
     private void refreshSelectedSlotPreview() {
@@ -308,10 +270,81 @@ public class SaveloadsController implements Initializable {
 
     @FXML
     private void handlebtnLoadaction(MouseEvent event) {
+        processSaveLoad();
     }
 
     @FXML
     private void handlebtnsaveaction(MouseEvent event) {
+        processSaveLoad();
+    }
+
+    private void processSaveLoad() {
+        try {
+            GameState.get().setSelectedSaveSlot(selectedSlot);
+
+            if (GameState.get().isSaveMenuMode()) {
+                SaveGameService saveService = new SaveGameService();
+                saveService.saveGameToSlot(GameState.get(), selectedSlot);
+
+                refreshSlotLabels();
+                refreshSelectedSlotPreview();
+                refreshDeleteButtonState();
+
+                GameState.get().setSaveMenuMode(false);
+
+                String returnFxml = GameState.get().getReturnFxml();
+                if (returnFxml == null || returnFxml.isBlank()) {
+                    returnFxml = "/view/" + GameState.get().getCurrentMapKey() + ".fxml";
+                }
+                SceneManager.switchScene(returnFxml);
+                return;
+            }
+
+            int characterId = GameState.get().getCurrentCharacterId();
+            int saveId = findSaveIdForSlot(characterId, selectedSlot);
+
+            if (saveId <= 0) {
+                if (day != null) {
+                    day.setText("No save found in slot " + selectedSlot);
+                }
+                return;
+            }
+
+            LoadGameService loadService = new LoadGameService();
+            boolean ok = loadService.loadGame(saveId);
+
+            if (!ok) {
+                if (day != null) {
+                    day.setText("Load failed");
+                }
+                return;
+            }
+
+            GameState.get().setSelectedSaveSlot(selectedSlot);
+            SceneManager.switchScene("/view/" + GameState.get().getCurrentMapKey() + ".fxml");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (day != null) {
+                day.setText("Error during save/load");
+            }
+        }
+    }
+    
+    private void refreshLoadButtonState() {
+        boolean enable = selectedSlot >= 1 && selectedSlot <= 4;
+
+        if (btnLoad != null) {
+            btnLoad.setDisable(!enable);
+            btnLoad.setOpacity(enable ? 1.0 : 0.4);
+            btnLoad.setMouseTransparent(!enable);
+        }
+
+        if (btnSave != null) {
+            btnSave.setDisable(!enable);
+            btnSave.setOpacity(enable ? 1.0 : 0.4);
+            btnSave.setMouseTransparent(!enable);
+        }
     }
 
     private static class SlotPreview {
