@@ -7,6 +7,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
@@ -53,6 +54,29 @@ public final class AppDialogs {
         Object value = pane.getValue();
         dialog.dispose();
         return mapConfirmValue(value);
+    }
+
+    public static String showInputDialog(Component parent, String message, String title) {
+        applyThemeOnce();
+        JTextField input = new JTextField(20);
+        input.setFont(BODY_FONT);
+
+        Object[] content = new Object[] { message, input };
+        JOptionPane pane = new JOptionPane(content, JOptionPane.QUESTION_MESSAGE, JOptionPane.OK_CANCEL_OPTION);
+        pane.setBorder(new EmptyBorder(14, 18, 10, 18));
+
+        JDialog dialog = pane.createDialog(parent, title == null ? "Input" : title);
+        dialog.setModal(true);
+        dialog.setResizable(false);
+        dialog.setVisible(true);
+
+        Object value = pane.getValue();
+        dialog.dispose();
+
+        if (!(value instanceof Integer i) || i != JOptionPane.OK_OPTION) {
+            return null;
+        }
+        return input.getText();
     }
 
     private static int mapConfirmValue(Object value) {
