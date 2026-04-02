@@ -70,7 +70,7 @@
                      </image>
                   </ImageView>
                   <Button fx:id="btndelete" layoutX="53.0" layoutY="307.0" mnemonicParsing="false" onAction="#handledeleteaction" prefHeight="30.0" prefWidth="105.0" styleClass="invisible-button" stylesheets="@../css/style.css" />
-                  <ImageView fx:id="btnLoad" fitHeight="54.0" fitWidth="133.0" layoutX="304.0" layoutY="296.0" onMouseClicked="#handlebtnLoadaction" pickOnBounds="true" preserveRatio="true" visible="false">
+                  <ImageView fx:id="btnLoad" fitHeight="54.0" fitWidth="133.0" layoutX="304.0" layoutY="296.0" onMouseClicked="#handlebtnLoadaction" pickOnBounds="true" preserveRatio="true">
                      <image>
                         <Image url="@../image/tools/load.png" />
                      </image>
