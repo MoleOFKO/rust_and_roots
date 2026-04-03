@@ -14,12 +14,14 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import model.FarmState;
 import model.Inventory;
@@ -36,6 +38,9 @@ public class Farm_tableController implements Initializable, SceneController {
     private static final int DEFAULT_PLANT_STAMINA_COST = 2;
     private static final int SEED_RETURN_CHANCE = 15;
 
+    private static final String PLOT_IDLE_STYLE = "-fx-background-color: transparent; -fx-background-radius: 6; -fx-border-color: transparent; -fx-border-radius: 6;";
+    private static final String PLOT_HIGHLIGHT_STYLE = "-fx-background-color: rgba(255,255,0,0.14); -fx-background-radius: 6; -fx-border-color: rgba(255,255,0,0.92); -fx-border-width: 2; -fx-border-radius: 6;";
+    
     private GameState gameState;
     private ToolMode activeMode = ToolMode.NONE;
     private Integer selectedSeedItemId;
@@ -45,15 +50,17 @@ public class Farm_tableController implements Initializable, SceneController {
     private String activeFarmMapKey = "home_map";
 
     private final Map<String, ImageView> plotViews = new LinkedHashMap<>();
+    private final Map<String, Region> plotTargets = new LinkedHashMap<>();
     private final Map<String, TempPlotData> tempPlots = new LinkedHashMap<>();
     private final Map<Integer, Integer> pendingHarvests = new LinkedHashMap<>();
     private final Map<Integer, Integer> pendingSeedReturns = new LinkedHashMap<>();
+    private int pendingFarmingExp = 0;
     private final List<ImageView> seedSlotImages = new ArrayList<>();
     private final List<Label> seedSlotLabels = new ArrayList<>();
     private final Map<String, Integer> seedSlotMapping = new LinkedHashMap<>();
 
     @FXML private StackPane view;
-    @FXML private Pane world;
+    @FXML private Group world;
     @FXML private ImageView SeedsImg;
     @FXML private ImageView WaterCanImg;
     @FXML private ImageView SickleImg;
@@ -111,12 +118,21 @@ public class Farm_tableController implements Initializable, SceneController {
     @FXML
     private void handleFarmPlot(MouseEvent event) {
         Object source = event.getSource();
-        if (!(source instanceof ImageView clickedView)) return;
-        String id = clickedView.getId();
-        if (id == null || !id.startsWith("farm_img")) return;
-        int n = NodeCollectors.extractNumber(id, "farm_img");
-        if (n < 0) return;
-        handlePlotClick("Plot " + n);
+        if (source instanceof ImageView clickedView) {
+            String id = clickedView.getId();
+            if (id == null || !id.startsWith("farm_img")) return;
+            int n = NodeCollectors.extractNumber(id, "farm_img");
+            if (n < 0) return;
+            handlePlotClick("Plot " + n);
+            return;
+        }
+
+        if (source instanceof Region region) {
+            Object plotId = region.getProperties().get("plotId");
+            if (plotId instanceof String s) {
+                handlePlotClick(s);
+            }
+        }
     }
 
     @FXML
@@ -162,8 +178,16 @@ public class Farm_tableController implements Initializable, SceneController {
         }
         gameState.getPlayerState().consumeStamina(staminaCost);
 
-        for (Map.Entry<Integer, Integer> entry : pendingHarvests.entrySet()) inv.addItem(entry.getKey(), entry.getValue());
-        for (Map.Entry<Integer, Integer> entry : pendingSeedReturns.entrySet()) inv.addItem(entry.getKey(), entry.getValue());
+        for (Map.Entry<Integer, Integer> entry : pendingHarvests.entrySet()) {
+            inv.addItem(entry.getKey(), entry.getValue());
+        }
+        for (Map.Entry<Integer, Integer> entry : pendingSeedReturns.entrySet()) {
+            inv.addItem(entry.getKey(), entry.getValue());
+        }
+
+        if (pendingFarmingExp > 0) {
+            gameState.getPlayerSkills().addFarmingExp(pendingFarmingExp);
+        }
 
         tempPlots.forEach((plotId, temp) -> temp.applyTo(realFarm.getPlot(plotId)));
         returnToPreviousScene();
@@ -232,11 +256,40 @@ public class Farm_tableController implements Initializable, SceneController {
 
     private void collectPlots() {
         plotViews.clear();
-        List<ImageView> plots = NodeCollectors.byTypeAndPrefix(farm, ImageView.class, "farm_img");
-        NodeCollectors.sortByIdNumber(plots, "farm_img");
-        for (ImageView img : plots) {
-            int n = NodeCollectors.extractNumber(img.getId(), "farm_img");
-            if (n >= 0) plotViews.put("Plot " + n, img);
+        plotTargets.clear();
+        collectPlotNodesRecursive(farm);
+    }
+
+    private void collectPlotNodesRecursive(Node node) {
+        if (node == null) return;
+
+        if (node instanceof ImageView img) {
+            String id = img.getId();
+            if (id != null && id.startsWith("farm_img")) {
+                int n = NodeCollectors.extractNumber(id, "farm_img");
+                if (n >= 0) {
+                    String plotId = "Plot " + n;
+                    plotViews.put(plotId, img);
+                    Region target = (img.getParent() instanceof Region region) ? region : null;
+                    if (target != null) {
+                        target.getProperties().put("plotId", plotId);
+                        target.setPickOnBounds(true);
+                        target.setMouseTransparent(false);
+                        target.setOnMouseClicked(this::handleFarmPlot);
+                        plotTargets.put(plotId, target);
+                    }
+                }
+            }
+        }
+
+        if (node instanceof Pane pane) {
+            for (Node child : pane.getChildren()) {
+                collectPlotNodesRecursive(child);
+            }
+        } else if (node instanceof Group group) {
+            for (Node child : group.getChildren()) {
+                collectPlotNodesRecursive(child);
+            }
         }
     }
 
@@ -251,9 +304,12 @@ public class Farm_tableController implements Initializable, SceneController {
     private void loadTempFarmState() {
         tempPlots.clear();
         FarmState realFarm = gameState.getFarmState(activeFarmMapKey);
-        for (String plotId : plotViews.keySet()) tempPlots.put(plotId, TempPlotData.from(realFarm.getPlot(plotId)));
+        for (String plotId : plotViews.keySet()) {
+            tempPlots.put(plotId, TempPlotData.from(realFarm.getPlot(plotId)));
+        }
         pendingHarvests.clear();
         pendingSeedReturns.clear();
+        pendingFarmingExp = 0;
     }
 
     private void handlePlotClick(String plotId) {
@@ -283,14 +339,19 @@ public class Farm_tableController implements Initializable, SceneController {
             }
             case SICKLE -> {
                 if (pd.isEmpty() || !pd.isReady(now)) return;
+
                 int harvestItemId = pd.harvestItemId();
                 if (harvestItemId > 0) {
                     pendingHarvests.merge(harvestItemId, 1, Integer::sum);
                 }
-                if (ThreadLocalRandom.current().nextInt(100) < SEED_RETURN_CHANCE && pd.seedItemId != null && pd.seedItemId > 0) {
+
+                if (ThreadLocalRandom.current().nextInt(100) < SEED_RETURN_CHANCE
+                        && pd.seedItemId != null
+                        && pd.seedItemId > 0) {
                     pendingSeedReturns.merge(pd.seedItemId, 1, Integer::sum);
                 }
-                gameState.getPlayerSkills().addFarmingExp(1);
+
+                pendingFarmingExp++;
                 pd.clearPlant();
             }
             case NONE -> { return; }
@@ -388,24 +449,44 @@ public class Farm_tableController implements Initializable, SceneController {
     private void refreshPlots() {
         double now = GameTimeManager.get().totalSecondsProperty().get();
         for (Map.Entry<String, ImageView> entry : plotViews.entrySet()) {
-            TempPlotData pd = tempPlots.get(entry.getKey());
+            String plotId = entry.getKey();
+            TempPlotData pd = tempPlots.get(plotId);
             ImageView view = entry.getValue();
+            Region target = plotTargets.get(plotId);
+            if (view == null) continue;
+
             if (pd == null || pd.isEmpty()) {
                 view.setImage(null);
                 view.setVisible(false);
+                view.setMouseTransparent(true);
+                if (target != null) {
+                    target.setVisible(true);
+                    target.setMouseTransparent(false);
+                    target.setPickOnBounds(true);
+                    target.toFront();
+                }
                 continue;
             }
+
             int stage = pd.getStage(now, TOTAL_GROWTH_STAGES);
-            String spriteKey = pd.cropSpriteKey == null ? ItemDatabase.buildCropSpriteKeyForSeed(pd.seedItemId == null ? -1 : pd.seedItemId) : pd.cropSpriteKey;
+            String spriteKey = pd.cropSpriteKey == null
+                    ? ItemDatabase.buildCropSpriteKeyForSeed(pd.seedItemId == null ? -1 : pd.seedItemId)
+                    : pd.cropSpriteKey;
+
             String path = String.format("/image/crops/%s_plant%d.png", spriteKey, stage);
             URL url = getClass().getResource(path);
+
             if (url == null) {
                 view.setImage(null);
                 view.setVisible(false);
+                view.setMouseTransparent(true);
                 continue;
             }
+
             view.setImage(new Image(url.toExternalForm()));
             view.setVisible(true);
+            view.setOpacity(1.0);
+            view.setMouseTransparent(false);
         }
     }
 
@@ -424,19 +505,32 @@ public class Farm_tableController implements Initializable, SceneController {
 
     private void refreshPlotHighlights() {
         double now = GameTimeManager.get().totalSecondsProperty().get();
-        for (Map.Entry<String, ImageView> entry : plotViews.entrySet()) {
-            TempPlotData pd = tempPlots.get(entry.getKey());
+        for (String plotId : plotViews.keySet()) {
+            ImageView view = plotViews.get(plotId);
+            Region target = plotTargets.get(plotId);
+            TempPlotData pd = tempPlots.get(plotId);
+            if (view == null) continue;
+
             boolean highlight = switch (activeMode) {
                 case SEED -> selectedSeedItemId != null && pd != null && pd.isEmpty();
                 case WATER -> pd != null && pd.canWater(now);
                 case SICKLE -> pd != null && pd.isReady(now);
                 case NONE -> false;
             };
-            entry.getValue().setStyle(highlight ? "-fx-effect: dropshadow(gaussian, yellow, 12, 0.6, 0, 0);" : "");
+
+            if (target != null) {
+                target.setVisible(true);
+                target.setMouseTransparent(false);
+                target.setPickOnBounds(true);
+                target.setStyle(highlight ? PLOT_HIGHLIGHT_STYLE : PLOT_IDLE_STYLE);
+            }
+
+            view.setStyle(highlight && pd != null && !pd.isEmpty()
+                    ? "-fx-effect: dropshadow(gaussian, yellow, 12, 0.6, 0, 0);"
+                    : "");
         }
     }
-
-
+    
     private int reservedNewSeedUsage(int seedItemId) {
         int count = 0;
         FarmState realFarm = gameState.getFarmState(activeFarmMapKey);
@@ -444,8 +538,7 @@ public class Farm_tableController implements Initializable, SceneController {
             TempPlotData pd = entry.getValue();
             if (pd == null || pd.seedItemId == null || pd.seedItemId != seedItemId) continue;
             FarmState.PlotData real = realFarm.getPlot(entry.getKey());
-            boolean newlyPlanted = real.isEmpty() && !pd.isEmpty();
-            if (newlyPlanted) count++;
+            if (real == null || real.seedItemId == null || real.seedItemId <= 0) count++;
         }
         return count;
     }
@@ -453,25 +546,21 @@ public class Farm_tableController implements Initializable, SceneController {
     private Map<Integer, Integer> computeSeedConsumption() {
         Map<Integer, Integer> used = new LinkedHashMap<>();
         FarmState realFarm = gameState.getFarmState(activeFarmMapKey);
-
         for (Map.Entry<String, TempPlotData> entry : tempPlots.entrySet()) {
-            TempPlotData temp = entry.getValue();
             FarmState.PlotData real = realFarm.getPlot(entry.getKey());
-            boolean newlyPlanted = real.isEmpty() && !temp.isEmpty();
+            TempPlotData temp = entry.getValue();
+            boolean newlyPlanted = (real == null || real.isEmpty()) && temp != null && !temp.isEmpty();
             if (!newlyPlanted || temp.seedItemId == null || temp.seedItemId <= 0) continue;
             used.merge(temp.seedItemId, 1, Integer::sum);
         }
-
         return used;
     }
 
     private boolean removeSeedFromPlayerStorage(int seedItemId, int qty) {
-        if (gameState == null || gameState.getPlayerState() == null) return false;
         if (seedItemId <= 0 || qty <= 0) return true;
 
-        Inventory inv = gameState.getPlayerState().getInventory();
         int remaining = qty;
-
+        Inventory inv = gameState.getPlayerState().getInventory();
         int invCount = inv.getCount(seedItemId);
         int fromInventory = Math.min(invCount, remaining);
         if (fromInventory > 0) {

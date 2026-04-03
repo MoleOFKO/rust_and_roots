@@ -33,9 +33,12 @@ import java.util.*;
 import javafx.scene.image.Image;
 import javafx.scene.Group;
 import ui.InventorySlotsUIManager;
+import util.AppDialogs;
 import util.SpawnTag;
 
 public class ShopController implements Initializable, SceneController {
+    private static final int MAX_STOCK_PER_ITEM = 20;
+    private static final int RESTOCK_PER_DAY = 10;
 
     private GameState gameState;
     private Inventory inv;
@@ -314,10 +317,9 @@ public class ShopController implements Initializable, SceneController {
 
         GameTimeManager.get().dayNumberProperty().addListener((obs, oldDay, newDay) -> {
             if (!Objects.equals(oldDay, newDay)) {
-                gameState.resetDailyShopStateForNewDay(newDay.intValue());
+                clearBuySelectionCommitted();
                 loadShopItemsForToday();
                 rebuildDailyShopAvailability();
-                clearBuySelection();
                 if (mode == Mode.BUY) {
                     refreshTableFromBuyCart();
                 }
@@ -423,7 +425,14 @@ public class ShopController implements Initializable, SceneController {
         if (mode != Mode.BUY) return;
 
         int total = computeBuyTotal();
+        int selectedCount = computeBuySelectedCount();
+        if (selectedCount <= 0 || total <= 0) {
+            AppDialogs.showMessageDialog(null, "No item selected to buy.");
+            return;
+        }
         if (!inv.canAfford(total)) return;
+
+        int coinsBefore = inv.getCoins();
         if (!inv.spendCoins(total)) return;
 
         for (var e : buyCart.entrySet()) {
@@ -434,16 +443,29 @@ public class ShopController implements Initializable, SceneController {
             }
         }
 
-        clearBuySelection();
+        clearBuySelectionCommitted();
         persistCurrentShopRemainingStock();
         rebuildSellAvailabilityFromInventory();
         refreshTableFromBuyCart();
         refreshAllPanels();
+
+        int coinsAfter = inv.getCoins();
+        AppDialogs.showMessageDialog(
+            null,
+            "Bought " + selectedCount + " item(s).\nMoney: -" + total + "g\nCoins: " + coinsBefore + "g -> " + coinsAfter + "g",
+            "Purchase Complete",
+            javax.swing.JOptionPane.INFORMATION_MESSAGE
+        );
     }
 
     @FXML
     private void handlesellaction(ActionEvent event) {
         if (mode != Mode.SELL) return;
+        int selectedCount = computeSellSelectedCount();
+        if (selectedCount <= 0) {
+            AppDialogs.showMessageDialog(null, "No item selected to sell.");
+            return;
+        }
 
         for (var e : sellCart.entrySet()) {
             int itemId = e.getKey();
@@ -452,6 +474,7 @@ public class ShopController implements Initializable, SceneController {
         }
 
         int totalGain = computeSellTotal();
+        int coinsBefore = inv.getCoins();
 
         for (var e : sellCart.entrySet()) {
             int itemId = e.getKey();
@@ -465,10 +488,20 @@ public class ShopController implements Initializable, SceneController {
         rebuildSellAvailabilityFromInventory();
         refreshTableFromSellCart();
         refreshAllPanels();
+
+        int coinsAfter = inv.getCoins();
+        AppDialogs.showMessageDialog(
+            null,
+            "Sold " + selectedCount + " item(s).\nMoney: +" + totalGain + "g\nCoins: " + coinsBefore + "g -> " + coinsAfter + "g",
+            "Sale Complete",
+            javax.swing.JOptionPane.INFORMATION_MESSAGE
+        );
     }
 
     @FXML
     private void handlebackaction(ActionEvent event) {
+        releaseBuySelectionReservations();
+        persistCurrentShopRemainingStock();
         String back = gameState.getReturnFxml();
         if (back == null) back = "/view/home_map.fxml";
         util.SceneManager.switchScene(back, SpawnTag.FROM_SHOP);
@@ -577,20 +610,6 @@ public class ShopController implements Initializable, SceneController {
         if (inventorySlotsUIManager != null) {
             inventorySlotsUIManager.refresh();
         }
-
-        // In SELL mode, visually subtract selected qty from inventory labels
-        if (mode == Mode.SELL) {
-            applySellAvailabilityToInventoryLabels(available);
-        }
-    }
-
-    private void applySellAvailabilityToInventoryLabels(List<Integer> visibleInventoryIds) {
-        for (int i = 0; i < visibleInventoryIds.size() && i < invLabels.size(); i++) {
-            int itemId = visibleInventoryIds.get(i);
-            IntegerProperty remainingProp = inventoryAvailableForSell.get(itemId);
-            int remaining = (remainingProp == null) ? inv.getCount(itemId) : remainingProp.get();
-            invLabels.get(i).setText("x" + remaining);
-        }
     }
 
     private void refreshBuyPane() {
@@ -601,8 +620,17 @@ public class ShopController implements Initializable, SceneController {
             Button btn = buyItemButtons.get(i);
 
             if (i >= shopItems.size()) {
-                if (img != null) img.setImage(null);
-                if (stockLbl != null) stockLbl.setText("");
+                if (img != null) {
+                    img.setImage(null);
+                    img.setStyle("");
+                    img.setOpacity(1.0);
+                    img.setScaleX(1.0);
+                    img.setScaleY(1.0);
+                }
+                if (stockLbl != null) {
+                    stockLbl.setText("");
+                    stockLbl.setStyle("");
+                }
                 if (nameLbl != null) nameLbl.setText("");
                 if (btn != null) {
                     btn.setDisable(true);
@@ -613,10 +641,20 @@ public class ShopController implements Initializable, SceneController {
 
             item itm = shopItems.get(i);
             int itemId = itm.getItem_id();
-            int available = shopAvailable.containsKey(itemId) ? shopAvailable.get(itemId).get() : 0;
+            int selected = buyCart.containsKey(itemId) ? buyCart.get(itemId).get() : 0;
 
             if (img != null) img.setImage(ItemDatabase.getImage(itemId));
-            if (stockLbl != null) stockLbl.setText("x" + available);
+            if (img != null) {
+                boolean isSelected = selected > 0;
+                img.setStyle(isSelected ? "-fx-effect: dropshadow(gaussian, yellow, 12, 0.8, 0, 0);" : "");
+                img.setOpacity(isSelected ? 1.0 : 0.9);
+                img.setScaleX(isSelected ? 1.06 : 1.0);
+                img.setScaleY(isSelected ? 1.06 : 1.0);
+            }
+            if (stockLbl != null) {
+                stockLbl.setText(selected > 0 ? ("x" + selected) : "");
+                stockLbl.setStyle(selected > 0 ? "-fx-text-fill: #f7f3b4; -fx-font-weight: bold;" : "");
+            }
             if (nameLbl != null) nameLbl.setText(itm.getItem_name());
 
             if (btn != null) {
@@ -647,8 +685,17 @@ public class ShopController implements Initializable, SceneController {
             Button btn = sellBtns.get(i);
 
             if (i >= selected.size()) {
-                if (img != null) img.setImage(null);
-                if (lbl != null) lbl.setText("");
+                if (img != null) {
+                    img.setImage(null);
+                    img.setStyle("");
+                    img.setOpacity(1.0);
+                    img.setScaleX(1.0);
+                    img.setScaleY(1.0);
+                }
+                if (lbl != null) {
+                    lbl.setText("");
+                    lbl.setStyle("");
+                }
                 if (btn != null) {
                     btn.setDisable(true);
                     btn.setOnAction(null);
@@ -661,10 +708,15 @@ public class ShopController implements Initializable, SceneController {
 
             if (img != null) {
                 img.setImage(ItemDatabase.getImage(itemId));
+                img.setStyle("-fx-effect: dropshadow(gaussian, #9cff6a, 12, 0.8, 0, 0);");
+                img.setOpacity(1.0);
+                img.setScaleX(1.06);
+                img.setScaleY(1.06);
             }
 
             if (lbl != null) {
                 lbl.setText("x" + qty);
+                lbl.setStyle("-fx-text-fill: #c6ffb0; -fx-font-weight: bold;");
             }
 
             if (btn != null) {
@@ -743,25 +795,25 @@ public class ShopController implements Initializable, SceneController {
 
     private void rebuildDailyShopAvailability() {
         int today = GameTimeManager.get().dayNumberProperty().get();
+        int savedDay = gameState.getShopStockDay();
+        int dayDelta = Math.max(0, today - savedDay);
+        Map<Integer, Integer> savedRemaining = gameState.getDailyRemainingShopStock();
+        boolean hasSavedStock = !savedRemaining.isEmpty();
 
         shopAvailable.clear();
         dailyTotalShopStock.clear();
 
-        boolean hasSavedStock = gameState.hasDailyRemainingShopStockForDay(today);
-
-        Map<Integer, Integer> savedRemaining = hasSavedStock
-            ? gameState.getDailyRemainingShopStock()
-            : Map.of();
-
         for (item itm : shopItems) {
             int itemId = itm.getItem_id();
-            int defaultStock = getDefaultShopStock(itemId);
-
-            dailyTotalShopStock.put(itemId, defaultStock);
-
             int remaining = hasSavedStock
-                ? savedRemaining.getOrDefault(itemId, defaultStock)
-                : defaultStock;
+                ? savedRemaining.getOrDefault(itemId, MAX_STOCK_PER_ITEM)
+                : MAX_STOCK_PER_ITEM;
+
+            if (dayDelta > 0) {
+                remaining = Math.min(MAX_STOCK_PER_ITEM, remaining + (RESTOCK_PER_DAY * dayDelta));
+            }
+
+            dailyTotalShopStock.put(itemId, MAX_STOCK_PER_ITEM);
 
             shopAvailable.put(itemId, new SimpleIntegerProperty(remaining));
         }
@@ -781,14 +833,7 @@ public class ShopController implements Initializable, SceneController {
     }
     
     private int getDefaultShopStock(int itemId) {
-        item itm = dbItemsById.get(itemId);
-        if (itm == null) return 10;
-
-        String name = itm.getItem_name().toLowerCase(Locale.ROOT);
-
-        if (name.contains("seed")) return 25;
-        if (name.contains("tool")) return 4;
-        return 10;
+        return MAX_STOCK_PER_ITEM;
     }
 
     private void rebuildSellAvailabilityFromInventory() {
@@ -805,9 +850,11 @@ public class ShopController implements Initializable, SceneController {
     // ---------- central synced quantity methods ----------
 
     private void setBuySelectionQty(int itemId, int newQty) {
-        int totalStock = dailyTotalShopStock.getOrDefault(itemId, 0);
-        int clamped = Math.max(0, Math.min(newQty, totalStock));
-        int available = totalStock - clamped;
+        int currentSelected = buyCart.containsKey(itemId) ? buyCart.get(itemId).get() : 0;
+        int currentAvailable = shopAvailable.containsKey(itemId) ? shopAvailable.get(itemId).get() : 0;
+        int maxSelectable = Math.max(0, currentSelected + currentAvailable);
+        int clamped = Math.max(0, Math.min(newQty, maxSelectable));
+        int available = Math.max(0, maxSelectable - clamped);
 
         if (clamped <= 0) {
             buyCart.remove(itemId);
@@ -819,7 +866,6 @@ public class ShopController implements Initializable, SceneController {
             .computeIfAbsent(itemId, k -> new SimpleIntegerProperty(0))
             .set(available);
 
-        persistCurrentShopRemainingStock();
         refreshTableFromBuyCart();
         refreshBuyPane();
         refreshTotalLabel();
@@ -846,13 +892,21 @@ public class ShopController implements Initializable, SceneController {
         refreshTotalLabel();
     }
 
-    private void clearBuySelection() {
-        buyCart.clear();
-        for (var e : dailyTotalShopStock.entrySet()) {
-            shopAvailable
-                .computeIfAbsent(e.getKey(), k -> new SimpleIntegerProperty(0))
-                .set(e.getValue());
+    private void releaseBuySelectionReservations() {
+        if (!buyCart.isEmpty()) {
+            for (var e : buyCart.entrySet()) {
+                int itemId = e.getKey();
+                int selectedQty = e.getValue().get();
+                int availableNow = shopAvailable.containsKey(itemId) ? shopAvailable.get(itemId).get() : 0;
+                shopAvailable.computeIfAbsent(itemId, k -> new SimpleIntegerProperty(0))
+                             .set(Math.min(MAX_STOCK_PER_ITEM, availableNow + selectedQty));
+            }
         }
+        buyCart.clear();
+    }
+
+    private void clearBuySelectionCommitted() {
+        buyCart.clear();
     }
 
     private void clearSellSelection() {
@@ -930,6 +984,18 @@ public class ShopController implements Initializable, SceneController {
     private void refreshTotalLabel() {
         int total = (mode == Mode.BUY) ? computeBuyTotal() : computeSellTotal();
         lbltotal.setText(total + "g");
+    }
+
+    private int computeBuySelectedCount() {
+        int sum = 0;
+        for (var e : buyCart.values()) sum += Math.max(0, e.get());
+        return sum;
+    }
+
+    private int computeSellSelectedCount() {
+        int sum = 0;
+        for (var e : sellCart.values()) sum += Math.max(0, e.get());
+        return sum;
     }
 
     private String itemNameSafe(int itemId) {
