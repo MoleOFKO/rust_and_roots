@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/javafx/FXMLController.java to edit this template
- */
 package controller;
 
 import java.net.URL;
@@ -20,7 +16,6 @@ import util.SpawnTag;
  * @author MITUSER-1
  */
 public class Left_map_noone_of_oneController extends BaseMapController {
-
 
     @FXML
     private StackPane view;

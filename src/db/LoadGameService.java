@@ -12,6 +12,7 @@ import java.sql.ResultSet;
 import model.Farm;
 import model.FarmState;
 import model.Inventory;
+import model.ItemDatabase;
 import model.PlayerState;
 
 public class LoadGameService {
@@ -236,6 +237,16 @@ public class LoadGameService {
                     plot.totalGrowthSeconds = rs.getDouble("total_growth_seconds");
                     plot.waterCooldownSeconds = rs.getDouble("water_cooldown_seconds");
                     plot.waterReductionSeconds = rs.getDouble("water_reduction_seconds");
+
+                    if (seedItemId != null && seedItemId > 0) {
+                        plot.seedItemName = ItemDatabase.getItemName(seedItemId);
+                        plot.cropItemName = ItemDatabase.resolveCropNameForSeed(seedItemId);
+                        plot.cropSpriteKey = ItemDatabase.buildCropSpriteKeyForSeed(seedItemId);
+                    } else {
+                        plot.seedItemName = null;
+                        plot.cropItemName = null;
+                        plot.cropSpriteKey = null;
+                    }
                 }
             }
         }

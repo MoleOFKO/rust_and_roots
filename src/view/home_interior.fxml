@@ -77,6 +77,70 @@
                   <ImageView fx:id="human_img" fitHeight="64.0" fitWidth="64.0" layoutX="176.0" layoutY="128.0" pickOnBounds="true" preserveRatio="true" />
                </children>
             </Group>
+               <Group fx:id="dialogboxes">
+                  <children>
+                     <ImageView fx:id="cookingdialogimg" fitHeight="21.0" fitWidth="50.0" layoutX="133.0" layoutY="180.0" mouseTransparent="true" pickOnBounds="true" preserveRatio="true">
+                        <image>
+                           <Image url="@../image/tools/dialog.png" />
+                        </image>
+                        <effect>
+                           <DropShadow spread="0.45">
+                              <color>
+                                 <Color red="1.0" green="1.0" blue="1.0" />
+                              </color>
+                           </DropShadow>
+                        </effect>
+                     </ImageView>
+                     <ImageView fx:id="craftingdialogimg" fitHeight="21.0" fitWidth="50.0" layoutX="499.0" layoutY="83.0" mouseTransparent="true" pickOnBounds="true" preserveRatio="true">
+                        <image>
+                           <Image url="@../image/tools/craftdialog.png" />
+                        </image>
+                        <effect>
+                           <DropShadow spread="0.45">
+                              <color>
+                                 <Color red="1.0" green="1.0" blue="1.0" />
+                              </color>
+                           </DropShadow>
+                        </effect>
+                     </ImageView>
+                     <ImageView fx:id="invdialogimg" fitHeight="21.0" fitWidth="50.0" layoutX="449.0" layoutY="224.0" mouseTransparent="true" pickOnBounds="true" preserveRatio="true">
+                        <image>
+                           <Image url="@../image/tools/invdialog.png" />
+                        </image>
+                        <effect>
+                           <DropShadow spread="0.45">
+                              <color>
+                                 <Color red="1.0" green="1.0" blue="1.0" />
+                              </color>
+                           </DropShadow>
+                        </effect>
+                     </ImageView>
+                     <ImageView fx:id="meltdialogimg" fitHeight="21.0" fitWidth="50.0" layoutX="113.0" layoutY="70.0" mouseTransparent="true" pickOnBounds="true" preserveRatio="true">
+                        <image>
+                           <Image url="@../image/tools/meltdialog.png" />
+                        </image>
+                        <effect>
+                           <DropShadow spread="0.45">
+                              <color>
+                                 <Color red="1.0" green="1.0" blue="1.0" />
+                              </color>
+                           </DropShadow>
+                        </effect>
+                     </ImageView>
+                     <ImageView fx:id="sleepingdialogimg" fitHeight="21.0" fitWidth="50.0" layoutX="355.0" layoutY="83.0" mouseTransparent="true" pickOnBounds="true" preserveRatio="true">
+                        <image>
+                           <Image url="@../image/tools/sleepdialog.png" />
+                        </image>
+                        <effect>
+                           <DropShadow spread="0.45">
+                              <color>
+                                 <Color red="1.0" green="1.0" blue="1.0" />
+                              </color>
+                           </DropShadow>
+                        </effect>
+                     </ImageView>
+                  </children>
+               </Group>
             <Group layoutX="89.0" layoutY="224.0">
                <children>
                   <ImageView fitHeight="29.0" fitWidth="77.0" layoutX="24.0" layoutY="-22.0" pickOnBounds="true" preserveRatio="true">
