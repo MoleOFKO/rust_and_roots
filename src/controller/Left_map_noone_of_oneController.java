@@ -17,11 +17,6 @@ import util.SpawnTag;
  */
 public class Left_map_noone_of_oneController extends BaseMapController {
 
-    @Override
-    protected String mapKey() {
-        return "left_map_noone_of_one";
-    }
-
     @FXML
     private StackPane view;
     @FXML

@@ -23,11 +23,6 @@ public class Upper_mapController extends BaseMapController {
     }
 
     @Override
-    protected String mapKey() {
-        return "upper_map";
-    }
-
-    @Override
     protected void configureExits() {
         registerExit(exit_up, "/view/upper_map_notwo.fxml", SpawnTag.FROM_DOWN);
         registerExit(exit_down, "/view/home_map.fxml", SpawnTag.FROM_UP);

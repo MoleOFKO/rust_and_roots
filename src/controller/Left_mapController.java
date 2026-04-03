@@ -1,5 +1,6 @@
 package controller;
 
+import javafx.fxml.FXML;
 import util.SpawnTag;
 
 import javafx.scene.Group;
@@ -13,11 +14,6 @@ import util.SpawnTag;
  * @author MITUSER-1
  */
 public class Left_mapController extends BaseMapController {
-
-    @Override
-    protected String mapKey() {
-        return "left_map";
-    }
 
     @FXML
     private StackPane view;
