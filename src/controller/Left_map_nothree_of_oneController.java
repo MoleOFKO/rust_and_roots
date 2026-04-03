@@ -50,21 +50,23 @@ public class Left_map_nothree_of_oneController extends BaseMapController {
     @FXML
     private Rectangle wall13;
     @FXML
-    private Rectangle exit_bottom;
-    @FXML
     private Rectangle exit_right;
     @FXML
     private Rectangle spawn_default;
     @FXML
     private Rectangle spawn_from_right;
     @FXML
-    private Rectangle spawn_from_bottom;
-    @FXML
     private Group human;
     @FXML
     private Rectangle human_hitbox;
     @FXML
     private ImageView human_img;
+    @FXML
+    private Group world;
+    @FXML
+    private Rectangle exit_down;
+    @FXML
+    private Rectangle spawn_from_down;
     
 
     @Override

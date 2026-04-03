@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.shape.Rectangle?>
 
-<StackPane fx:id="view" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.LeftMapNooneController">
+<StackPane fx:id="view" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.LeftMapNooneController">
    <children>
       <Group fx:id="world">
          <children>
@@ -25,7 +25,7 @@
             </Group>
             <Group layoutX="292.0" layoutY="187.0">
                <children>
-                  <Rectangle fx:id="exit_bottom" height="25.0" layoutX="-45.0" layoutY="188.0" opacity="0" width="63.0" />
+                  <Rectangle fx:id="exit_down" height="25.0" layoutX="-45.0" layoutY="188.0" opacity="0" width="63.0" />
                   <Rectangle fx:id="exit_up" height="15" layoutX="-40.0" layoutY="-183.0" opacity="0" width="51.0" />
                   <Rectangle fx:id="exit_left" height="38.0" layoutX="-250.0" layoutY="-71.0" opacity="0" width="17.0" />
                </children>
@@ -35,7 +35,7 @@
                   <Rectangle fx:id="spawn_default" height="10" layoutX="266.0" layoutY="146.0" opacity="0" width="10" />
                   <Rectangle fx:id="spawn_from_left" height="10" layoutX="25.0" layoutY="133.0" opacity="0" width="10" />
                   <Rectangle fx:id="spawn_from_up" height="10" layoutX="280.0" layoutY="21.0" opacity="0" width="10" />
-                  <Rectangle fx:id="spawn_from_bottom" height="10" layoutX="279.0" layoutY="362.0" opacity="0" width="10" />
+                  <Rectangle fx:id="spawn_from_down" height="10" layoutX="279.0" layoutY="362.0" opacity="0" width="10" />
                </children>
             </Group>
             <Group fx:id="human">

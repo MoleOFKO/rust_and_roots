@@ -52,13 +52,13 @@ public class Right_map_nofourController extends BaseMapController {
     @FXML
     private Rectangle exit_left;
     @FXML
-    private Rectangle exit_bottom;
-    @FXML
     private Rectangle spawn_default;
     @FXML
     private Rectangle spawn_from_left;
     @FXML
-    private Rectangle spawn_from_bottom;
+    private Rectangle exit_down;
+    @FXML
+    private Rectangle spawn_from_down;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {

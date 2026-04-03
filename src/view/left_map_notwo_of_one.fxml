@@ -28,7 +28,7 @@
             </Group>
             <Group layoutX="167.0" layoutY="3.0">
                <children>
-                  <Rectangle fx:id="exit_bottom" height="18.0" layoutX="45.0" layoutY="381.0" opacity="0" width="63.0" />
+                  <Rectangle fx:id="exit_down" height="18.0" layoutX="45.0" layoutY="381.0" opacity="0" width="63.0" />
                   <Rectangle fx:id="exit_right" height="33.0" layoutX="403.0" layoutY="123.0" opacity="0" width="27.0" />
                   <Rectangle fx:id="exit_left" height="38.0" layoutX="-165.0" layoutY="127.0" opacity="0" width="13.0" />
                </children>
@@ -38,7 +38,7 @@
                   <Rectangle fx:id="spawn_default" height="10" layoutX="132.0" layoutY="86.0" opacity="0" width="10" />
                   <Rectangle fx:id="spawn_from_left" height="10" layoutX="-150.0" layoutY="120.0" opacity="0" width="10" />
                   <Rectangle fx:id="spawn_from_right" height="10" layoutX="417.0" layoutY="108.0" opacity="0" width="10" />
-                  <Rectangle fx:id="spawn_from_bottom" height="10" layoutX="70.0" layoutY="346.0" opacity="0" width="10" />
+                  <Rectangle fx:id="spawn_from_down" height="10" layoutX="70.0" layoutY="346.0" opacity="0" width="10" />
                </children>
             </Group>
             <Group fx:id="human" layoutX="269.0" layoutY="169.0">
