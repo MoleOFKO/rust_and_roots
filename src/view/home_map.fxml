@@ -152,6 +152,7 @@
          <children>
             <Rectangle fx:id="human_hitbox" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" stroke="#ff000000" strokeType="INSIDE" translateX="24" translateY="28" width="14.0" />
             <ImageView fx:id="human_img" fitHeight="64" fitWidth="64" pickOnBounds="true" preserveRatio="false" smooth="false" />
+                  <ImageView fx:id="equip_img" fitHeight="64" fitWidth="64" pickOnBounds="true" preserveRatio="false" smooth="false" />
          </children>
       </Group>
             <Group fx:id="home" layoutX="148.0" layoutY="81.0">

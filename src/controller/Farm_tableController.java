@@ -49,6 +49,10 @@ public class Farm_tableController implements Initializable, SceneController {
     private boolean timeOverrideApplied = false;
     private String activeFarmMapKey = "home_map";
 
+    private Image defaultSeedsIcon;
+    private Image defaultWaterCanIcon;
+    private Image defaultSickleIcon;
+    
     private final Map<String, ImageView> plotViews = new LinkedHashMap<>();
     private final Map<String, Region> plotTargets = new LinkedHashMap<>();
     private final Map<String, TempPlotData> tempPlots = new LinkedHashMap<>();
@@ -98,6 +102,11 @@ public class Farm_tableController implements Initializable, SceneController {
     public void initialize(URL url, ResourceBundle rb) {
         if (gameState == null) gameState = GameState.get();
         ItemDatabase.loadItems();
+
+        defaultSeedsIcon = SeedsImg == null ? null : SeedsImg.getImage();
+        defaultWaterCanIcon = WaterCanImg == null ? null : WaterCanImg.getImage();
+        defaultSickleIcon = SickleImg == null ? null : SickleImg.getImage();
+
         activeFarmMapKey = resolveActiveFarmMapKey();
         collectPlots();
         collectSeedSlots();
@@ -105,9 +114,11 @@ public class Farm_tableController implements Initializable, SceneController {
         applyFarmTableTimeOverride();
         hideSeedList();
         populateSeedList();
+        refreshSelectedToolPreview();
         refreshPlots();
         refreshToolHighlight();
         refreshPlotHighlights();
+
         if (view != null) {
             view.sceneProperty().addListener((obs, oldScene, newScene) -> {
                 if (newScene == null) restoreTimeOverride();
@@ -145,21 +156,41 @@ public class Farm_tableController implements Initializable, SceneController {
         }
         setToolMode(ToolMode.SEED);
     }
-    @FXML private void handlebtnWater(MouseEvent event) { setToolMode(ToolMode.WATER); }
-    @FXML private void handleBtnReap(MouseEvent event) { setToolMode(ToolMode.SICKLE); }
+
+    @FXML
+    private void handlebtnWater(MouseEvent event) {
+        if (activeMode == ToolMode.WATER && seedList != null && seedList.isVisible()) {
+            hideSeedList();
+            refreshToolHighlight();
+            refreshPlotHighlights();
+            return;
+        }
+        setToolMode(ToolMode.WATER);
+    }
+
+    @FXML
+    private void handleBtnReap(MouseEvent event) {
+        if (activeMode == ToolMode.SICKLE && seedList != null && seedList.isVisible()) {
+            hideSeedList();
+            refreshToolHighlight();
+            refreshPlotHighlights();
+            return;
+        }
+        setToolMode(ToolMode.SICKLE);
+    }
 
     @FXML
     private void handleinybox(MouseEvent event) {
         Object source = event.getSource();
         if (!(source instanceof ImageView clickedView)) return;
-        Integer seedItemId = seedSlotMapping.get(clickedView.getId());
-        if (seedItemId == null || seedItemId <= 0) return;
 
-        selectedSeedItemId = seedItemId;
-        activeMode = ToolMode.SEED;
+        Integer selectedItemId = seedSlotMapping.get(clickedView.getId());
+        if (selectedItemId == null || selectedItemId <= 0) return;
+
+        selectedSeedItemId = selectedItemId;
 
         hideSeedList();
-        refreshSelectedSeedPreview();
+        refreshSelectedToolPreview();
         refreshToolHighlight();
         refreshPlotHighlights();
         populateSeedList();
@@ -230,12 +261,9 @@ public class Farm_tableController implements Initializable, SceneController {
 
     private void setToolMode(ToolMode mode) {
         activeMode = mode;
-        if (mode == ToolMode.SEED) {
-            populateSeedList();
-            showSeedList();
-        } else {
-            hideSeedList();
-        }
+        populateSeedList();
+        showSeedList();
+        refreshSelectedToolPreview();
         refreshToolHighlight();
         refreshPlotHighlights();
     }
@@ -315,13 +343,15 @@ public class Farm_tableController implements Initializable, SceneController {
     private void handlePlotClick(String plotId) {
         TempPlotData pd = tempPlots.get(plotId);
         if (pd == null) return;
+
         double now = GameTimeManager.get().totalSecondsProperty().get();
 
         switch (activeMode) {
             case SEED -> {
-                if (selectedSeedItemId == null || selectedSeedItemId <= 0) return;
+                if (!isSeedSelectionValid(selectedSeedItemId)) return;
                 if (!pd.isEmpty()) return;
-                int available = getAvailableSeedCount(selectedSeedItemId);
+
+                int available = getSelectableAvailableCount(selectedSeedItemId);
                 if (available <= 0) return;
 
                 pd.seedItemId = selectedSeedItemId;
@@ -333,11 +363,15 @@ public class Farm_tableController implements Initializable, SceneController {
                 pd.accumulatedWaterReduction = 0;
                 pd.totalGrowthSeconds = DEFAULT_GROWTH_SECONDS;
             }
+
             case WATER -> {
+                if (!isWateringCanSelectionValid(selectedSeedItemId)) return;
                 if (!pd.canWater(now)) return;
                 pd.water(now);
             }
+
             case SICKLE -> {
+                if (!isSickleSelectionValid(selectedSeedItemId)) return;
                 if (pd.isEmpty() || !pd.isReady(now)) return;
 
                 int harvestItemId = pd.harvestItemId();
@@ -354,7 +388,10 @@ public class Farm_tableController implements Initializable, SceneController {
                 pendingFarmingExp++;
                 pd.clearPlant();
             }
-            case NONE -> { return; }
+
+            case NONE -> {
+                return;
+            }
         }
 
         refreshPlots();
@@ -364,12 +401,12 @@ public class Farm_tableController implements Initializable, SceneController {
 
     private void populateSeedList() {
         seedSlotMapping.clear();
-        List<Integer> seeds = availableSeedsFromInventoryAndHotbar();
+        List<Integer> availableItems = availableItemsForActiveMode();
 
-        if (!seeds.isEmpty() && (selectedSeedItemId == null || !seeds.contains(selectedSeedItemId))) {
-            selectedSeedItemId = seeds.get(0);
+        if (!availableItems.isEmpty() && (selectedSeedItemId == null || !availableItems.contains(selectedSeedItemId))) {
+            selectedSeedItemId = availableItems.get(0);
         }
-        if (seeds.isEmpty()) {
+        if (availableItems.isEmpty()) {
             selectedSeedItemId = null;
         }
 
@@ -378,7 +415,7 @@ public class Farm_tableController implements Initializable, SceneController {
             Label lbl = (i < seedSlotLabels.size()) ? seedSlotLabels.get(i) : null;
             if (img == null) continue;
 
-            if (i >= seeds.size()) {
+            if (i >= availableItems.size()) {
                 img.setImage(null);
                 img.setVisible(false);
                 img.setOpacity(0.0);
@@ -387,41 +424,151 @@ public class Farm_tableController implements Initializable, SceneController {
                 continue;
             }
 
-            int seedItemId = seeds.get(i);
-            int qty = getAvailableSeedCount(seedItemId);
+            int itemId = availableItems.get(i);
+            int qty = getSelectableAvailableCount(itemId);
             if (qty < 0) qty = 0;
 
-            img.setImage(ItemDatabase.getImage(seedItemId));
+            img.setImage(ItemDatabase.getImage(itemId));
             img.setVisible(true);
-            img.setOpacity(seedItemId == selectedSeedItemId ? 1.0 : 0.75);
-            img.setStyle(seedItemId == selectedSeedItemId
+            img.setOpacity(itemId == selectedSeedItemId ? 1.0 : 0.75);
+            img.setStyle(itemId == selectedSeedItemId
                     ? "-fx-effect: dropshadow(gaussian, yellow, 12, 0.6, 0, 0);"
                     : "");
-            seedSlotMapping.put(img.getId(), seedItemId);
+            seedSlotMapping.put(img.getId(), itemId);
 
             if (lbl != null) {
-                String itemName = ItemDatabase.getItemName(seedItemId);
-                if (itemName == null || itemName.isBlank()) itemName = "Seed " + seedItemId;
+                String itemName = ItemDatabase.getItemName(itemId);
+                if (itemName == null || itemName.isBlank()) itemName = "Item " + itemId;
                 lbl.setText(itemName + " x" + qty);
             }
         }
 
-        refreshSelectedSeedPreview();
+        refreshSelectedToolPreview();
     }
 
-    private List<Integer> availableSeedsFromInventoryAndHotbar() {
+    private List<Integer> availableItemsForActiveMode() {
         List<Integer> result = new ArrayList<>();
         if (gameState == null || gameState.getPlayerState() == null) return result;
 
-        for (Integer itemId : ItemDatabase.getAllSeedItemIds()) {
-            if (itemId == null || itemId <= 0) continue;
-            if (!ItemDatabase.hasCompleteFarmDataForSeed(itemId)) continue;
-
-            if (getAvailableSeedCount(itemId) > 0) {
-                result.add(itemId);
+        switch (activeMode) {
+            case SEED -> {
+                for (Integer itemId : ItemDatabase.getAllSeedItemIds()) {
+                    if (!isSeedSelectionValid(itemId)) continue;
+                    if (getSelectableAvailableCount(itemId) > 0) {
+                        result.add(itemId);
+                    }
+                }
+            }
+            case WATER -> {
+                for (Integer itemId : ownedInventoryAndHotbarItemIds()) {
+                    if (!isWateringCanSelectionValid(itemId)) continue;
+                    if (getSelectableAvailableCount(itemId) > 0) {
+                        result.add(itemId);
+                    }
+                }
+            }
+            case SICKLE -> {
+                for (Integer itemId : ownedInventoryAndHotbarItemIds()) {
+                    if (!isSickleSelectionValid(itemId)) continue;
+                    if (getSelectableAvailableCount(itemId) > 0) {
+                        result.add(itemId);
+                    }
+                }
+            }
+            case NONE -> {
             }
         }
+
         return result;
+    }
+
+    private List<Integer> ownedInventoryAndHotbarItemIds() {
+        List<Integer> result = new ArrayList<>();
+        if (gameState == null || gameState.getPlayerState() == null) return result;
+
+        java.util.LinkedHashSet<Integer> ids = new java.util.LinkedHashSet<>();
+        ids.addAll(gameState.getPlayerState().getInventory().itemsProperty().keySet());
+
+        for (int i = 0; i < gameState.getPlayerState().getHotbarSize(); i++) {
+            int itemId = gameState.getPlayerState().getHotbarItemId(i);
+            int qty = gameState.getPlayerState().getHotbarItemCount(i);
+            if (itemId > 0 && qty > 0) {
+                ids.add(itemId);
+            }
+        }
+
+        result.addAll(ids);
+        return result;
+    }
+
+    private int getCombinedOwnedCount(int itemId) {
+        if (gameState == null || gameState.getPlayerState() == null || itemId <= 0) return 0;
+
+        int total = gameState.getPlayerState().getInventory().getCount(itemId);
+
+        for (int i = 0; i < gameState.getPlayerState().getHotbarSize(); i++) {
+            if (gameState.getPlayerState().getHotbarItemId(i) == itemId) {
+                total += gameState.getPlayerState().getHotbarItemCount(i);
+            }
+        }
+        return total;
+    }
+
+    private int getSelectableAvailableCount(int itemId) {
+        if (itemId <= 0) return 0;
+        if (ItemDatabase.isSeedItem(itemId)) {
+            return Math.max(0, getCombinedOwnedCount(itemId) - reservedNewSeedUsage(itemId));
+        }
+        return Math.max(0, getCombinedOwnedCount(itemId));
+    }
+
+    private boolean isSeedSelectionValid(Integer itemId) {
+        return itemId != null
+                && itemId > 0
+                && ItemDatabase.isSeedItem(itemId)
+                && ItemDatabase.hasCompleteFarmDataForSeed(itemId);
+    }
+
+    private boolean isWateringCanSelectionValid(Integer itemId) {
+        return hasItemName(itemId, "watering can", "watering_can");
+    }
+
+    private boolean isSickleSelectionValid(Integer itemId) {
+        return hasItemName(itemId, "sickle");
+    }
+
+    private boolean hasItemName(Integer itemId, String... tokens) {
+        if (itemId == null || itemId <= 0) return false;
+        String name = ItemDatabase.getItemName(itemId);
+        if (name == null || name.isBlank()) return false;
+
+        String normalized = name.trim().toLowerCase(java.util.Locale.ROOT).replace('_', ' ');
+        for (String token : tokens) {
+            if (token == null || token.isBlank()) continue;
+            String t = token.trim().toLowerCase(java.util.Locale.ROOT).replace('_', ' ');
+            if (normalized.contains(t)) return true;
+        }
+        return false;
+    }
+
+    private void refreshSelectedToolPreview() {
+        if (SeedsImg != null) {
+            SeedsImg.setImage(activeMode == ToolMode.SEED && isSeedSelectionValid(selectedSeedItemId)
+                    ? ItemDatabase.getImage(selectedSeedItemId)
+                    : defaultSeedsIcon);
+        }
+
+        if (WaterCanImg != null) {
+            WaterCanImg.setImage(activeMode == ToolMode.WATER && isWateringCanSelectionValid(selectedSeedItemId)
+                    ? ItemDatabase.getImage(selectedSeedItemId)
+                    : defaultWaterCanIcon);
+        }
+
+        if (SickleImg != null) {
+            SickleImg.setImage(activeMode == ToolMode.SICKLE && isSickleSelectionValid(selectedSeedItemId)
+                    ? ItemDatabase.getImage(selectedSeedItemId)
+                    : defaultSickleIcon);
+        }
     }
 
     private int getCombinedOwnedSeedCount(int seedItemId) {
@@ -505,27 +652,22 @@ public class Farm_tableController implements Initializable, SceneController {
 
     private void refreshPlotHighlights() {
         double now = GameTimeManager.get().totalSecondsProperty().get();
-        for (String plotId : plotViews.keySet()) {
-            ImageView view = plotViews.get(plotId);
-            Region target = plotTargets.get(plotId);
-            TempPlotData pd = tempPlots.get(plotId);
+        for (Map.Entry<String, ImageView> entry : plotViews.entrySet()) {
+            ImageView view = entry.getValue();
+            TempPlotData pd = tempPlots.get(entry.getKey());
             if (view == null) continue;
 
             boolean highlight = switch (activeMode) {
-                case SEED -> selectedSeedItemId != null && pd != null && pd.isEmpty();
-                case WATER -> pd != null && pd.canWater(now);
-                case SICKLE -> pd != null && pd.isReady(now);
+                case SEED -> isSeedSelectionValid(selectedSeedItemId) && pd != null && pd.isEmpty();
+                case WATER -> isWateringCanSelectionValid(selectedSeedItemId) && pd != null && pd.canWater(now);
+                case SICKLE -> isSickleSelectionValid(selectedSeedItemId) && pd != null && pd.isReady(now);
                 case NONE -> false;
             };
 
-            if (target != null) {
-                target.setVisible(true);
-                target.setMouseTransparent(false);
-                target.setPickOnBounds(true);
-                target.setStyle(highlight ? PLOT_HIGHLIGHT_STYLE : PLOT_IDLE_STYLE);
-            }
-
-            view.setStyle(highlight && pd != null && !pd.isEmpty()
+            view.setVisible(true);
+            view.setMouseTransparent(false);
+            view.setPickOnBounds(true);
+            view.setStyle(highlight
                     ? "-fx-effect: dropshadow(gaussian, yellow, 12, 0.6, 0, 0);"
                     : "");
         }

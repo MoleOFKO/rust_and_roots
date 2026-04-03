@@ -471,6 +471,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         if(playerState != null){
             playerState.setSelectedHotbarIndex(selectedHotbarIndex);
         }
+        refreshEquippedItemVisual();
     }
 
     @FXML
@@ -1093,6 +1094,26 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         }
         setActiveMenuTab(MenuTab.SETTINGS);
     }
+
+
+    protected void bindPlayerEquipmentView(ImageView equipView) {
+        if (player == null) return;
+        player.setEquipmentView(equipView);
+        refreshEquippedItemVisual();
+    }
+
+    protected void refreshEquippedItemVisual() {
+        if (player == null || playerState == null) return;
+
+        int itemId = -1;
+        if (selectedHotbarIndex >= 0 && selectedHotbarIndex < playerState.getHotbarSize()) {
+            itemId = playerState.getHotbarItemId(selectedHotbarIndex);
+            if (playerState.getHotbarItemCount(selectedHotbarIndex) <= 0) {
+                itemId = -1;
+            }
+        }
+        player.setEquippedItem(itemId);
+    }
     
     private void setupFarmIfPresent() {
         if (farm1 == null || farm1_detection == null || farm1_button == null) return;
@@ -1202,6 +1223,8 @@ public abstract class BaseMapController implements Initializable, SceneControlle
                 lbl.setText("x" + quantity);
             }
         }
+
+        refreshEquippedItemVisual();
     }
     
     private void addHotbarSlot(StackPane slot, ToggleButton button) {
@@ -1540,6 +1563,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         selectedPlayerInventoryItemId = null;
         refreshPlayerInventoryView();
         refreshHotbarView();
+        refreshEquippedItemVisual();
         return true;
     }
 
@@ -1556,6 +1580,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
         refreshPlayerInventoryView();
         refreshHotbarView();
+        refreshEquippedItemVisual();
         return true;
     }
 
@@ -1627,6 +1652,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
         refreshHotbarView();
         refreshPlayerInventoryView();
+        refreshEquippedItemVisual();
         return true;
     }
 

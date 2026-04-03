@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import model.FarmState;
 import model.Inventory;
+import model.ItemDatabase;
 import model.PlayerState;
 import util.SpawnTag;
 
@@ -255,7 +256,37 @@ public final class GameState {
     private final Map<Integer, Deque<FoodEffectOutcome>> cookedDishEffectsByItemId = new HashMap<>();
     private ActiveSmeltJob activeSmeltJob = null;
 
-    private GameState() {}
+    private GameState() {
+        seedStarterChestBonus();
+    }
+
+    private void seedStarterChestBonus() {
+        if (!chestInventory.itemsProperty().isEmpty()) return;
+
+        ItemDatabase.loadItems();
+
+        addStarterChestItem(resolveStarterItemId("watering_can", "watering can", "Watering Can"), 1);
+        addStarterChestItem(resolveStarterItemId("sickle", "Sickle"), 1);
+    }
+
+    private int resolveStarterItemId(String... candidateNames) {
+        if (candidateNames == null) return -1;
+
+        for (String name : candidateNames) {
+            if (name == null || name.isBlank()) continue;
+            model.item itm = ItemDatabase.getItemByName(name);
+            if (itm != null && itm.getItem_id() > 0) {
+                return itm.getItem_id();
+            }
+        }
+        return -1;
+    }
+
+    private void addStarterChestItem(int itemId, int qty) {
+        if (itemId > 0 && qty > 0 && chestInventory.getCount(itemId) <= 0) {
+            chestInventory.addItem(itemId, qty);
+        }
+    }
 
     public PlayerState getPlayerState() { return playerState; }
     public Inventory getChestInventory() { return chestInventory; }
