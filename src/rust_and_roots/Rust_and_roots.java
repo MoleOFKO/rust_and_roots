@@ -13,7 +13,7 @@ public class Rust_and_roots extends Application {
     public void start(Stage stage) throws Exception {
         Rust_and_roots.stage = stage;
         
-        util.SceneManager.switchScene("/view/login.fxml");
+        util.SceneManager.switchScene("/view/upper_map.fxml");
         stage.show();
     }
 

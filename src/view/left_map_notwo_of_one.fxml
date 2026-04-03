@@ -6,14 +6,13 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.shape.Rectangle?>
 
-
-<StackPane fx:id="view" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Left_map_notwo_of_oneController">
+<StackPane fx:id="view" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Left_map_notwo_of_oneController">
    <children>
       <Group fx:id="world">
          <children>
             <ImageView fitHeight="402.0" fitWidth="603.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@../image/maps/rightmap_no.2(1).png" />
+                  <Image url="@../image/maps/leftmap_no.2(1).png" />
                </image>
             </ImageView>
             <Group fx:id="walls" layoutX="1.0" layoutY="1.0">
@@ -22,10 +21,9 @@
                   <Rectangle fx:id="wall1" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="399.0" layoutX="597.0" layoutY="1.0" stroke="BLACK" strokeType="INSIDE" width="4.0" />
                   <Rectangle fx:id="wall2" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="4.0" layoutX="3.0" stroke="BLACK" strokeType="INSIDE" width="593.0" />
                   <Rectangle fx:id="wall3" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="4.0" layoutX="2.0" layoutY="397.0" stroke="BLACK" strokeType="INSIDE" width="593.0" />
-                  <Rectangle fx:id="wall4" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="83.0" layoutX="3.0" layoutY="4.0" stroke="BLACK" strokeType="INSIDE" width="106.0" />
-                  <Rectangle fx:id="wall5" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="35.0" layoutX="108.0" layoutY="4.0" stroke="BLACK" strokeType="INSIDE" width="45.0" />
-                  <Rectangle fx:id="wall6" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="35.0" layoutX="109.0" layoutY="39.0" stroke="BLACK" strokeType="INSIDE" width="21.0" />
-                  <Rectangle fx:id="wall7" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="15.0" layoutX="130.0" layoutY="39.0" stroke="BLACK" strokeType="INSIDE" width="17.0" />
+                  <Rectangle fx:id="wall4" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="83.0" layoutX="3.0" layoutY="4.0" stroke="BLACK" strokeType="INSIDE" width="17.0" />
+                  <Rectangle fx:id="wall5" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="35.0" layoutX="1.0" layoutY="94.0" stroke="BLACK" strokeType="INSIDE" width="45.0" />
+                  <Rectangle fx:id="wall6" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="35.0" layoutX="19.0" layoutY="56.0" stroke="BLACK" strokeType="INSIDE" width="21.0" />
                </children>
             </Group>
             <Group layoutX="167.0" layoutY="3.0">

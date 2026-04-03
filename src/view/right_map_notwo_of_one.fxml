@@ -6,7 +6,6 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.shape.Rectangle?>
 
-
 <StackPane fx:id="view" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Right_map_notwo_of_oneController">
    <children>
       <Group fx:id="world">
@@ -19,7 +18,7 @@
             <Group fx:id="human">
                <children>
                   <ImageView fx:id="human_img" fitHeight="64" fitWidth="64" layoutX="284.0" layoutY="78.0" />
-                  <Rectangle fx:id="human_hitbox" arcHeight="6" arcWidth="6" height="24" layoutX="299.0" layoutY="96.0" width="28" />
+                  <Rectangle fx:id="human_hitbox" arcHeight="6" arcWidth="6" fill="TRANSPARENT" height="24" layoutX="299.0" layoutY="96.0" width="28" />
                </children>
             </Group>
             <Group>
