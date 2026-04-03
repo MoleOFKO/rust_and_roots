@@ -12,13 +12,14 @@ import javafx.scene.Group;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
+import util.SpawnTag;
 
 /**
  * FXML Controller class
  *
  * @author Kaung Zin
  */
-public class Left_map_nofourController implements Initializable {
+public class Left_map_nofourController extends BaseMapController {
 
     @FXML
     private StackPane view;
@@ -73,12 +74,16 @@ public class Left_map_nofourController implements Initializable {
     @FXML
     private ImageView human_img;
 
-    /**
-     * Initializes the controller class.
-     */
     @Override
-    public void initialize(URL url, ResourceBundle rb) {
-        // TODO
-    }    
+    protected String mapKey() {
+        return "left_map_nofour";
+    }
+
+    @Override
+    protected void configureExits() {
+        registerExit(exit_right, "/view/upper_map_nofour.fxml", SpawnTag.FROM_LEFT);
+        registerExit(exit_down, "/view/left_map_nothree.fxml", SpawnTag.FROM_UP);
+    }
+    
     
 }
