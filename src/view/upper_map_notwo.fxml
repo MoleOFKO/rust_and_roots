@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.shape.Rectangle?>
 
-<StackPane fx:id="view" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Upper_map_notwoController">
+<StackPane fx:id="view" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Upper_map_notwoController">
    <children>
       <Group fx:id="world">
          <children>
@@ -25,7 +25,7 @@
             </Group>
             <Group layoutX="2.0" layoutY="60.0">
                <children>
-                  <Rectangle fx:id="exit_bottom" height="18.0" layoutX="265.0" layoutY="322.0" opacity="0" width="70.0" />
+                  <Rectangle fx:id="exit_down" height="18.0" layoutX="265.0" layoutY="322.0" opacity="0" width="70.0" />
                   <Rectangle fx:id="exit_right" height="59.0" layoutX="575.0" layoutY="80.0" opacity="0" width="20.0" />
                   <Rectangle fx:id="exit_left" height="62.0" layoutY="77.0" opacity="0" width="17.0" />
                </children>

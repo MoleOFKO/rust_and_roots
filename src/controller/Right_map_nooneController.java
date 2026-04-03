@@ -44,17 +44,17 @@ public class Right_map_nooneController extends BaseMapController {
     @FXML
     private Rectangle exit_left;
     @FXML
-    private Rectangle exit_bottom;
-    @FXML
     private Rectangle exit_right;
     @FXML
     private Rectangle spawn_default;
     @FXML
     private Rectangle spawn_from_left;
     @FXML
-    private Rectangle spawn_from_bottom;
-    @FXML
     private Rectangle spawn_from_right;    
+    @FXML
+    private Rectangle exit_down;
+    @FXML
+    private Rectangle spawn_from_down;
 
     @Override
     protected String mapKey() {

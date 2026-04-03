@@ -58,14 +58,11 @@ public class Right_map_nothreeController extends BaseMapController {
     @FXML
     private Rectangle spawn_from_left;
     @FXML
-    private Rectangle spawn_from_bottom;
-    @FXML
     private Rectangle spawn_from_right;
     @FXML
     private Rectangle spawn_from_up;
     @FXML
     private Rectangle exit_left;
-    @FXML
     private Rectangle exit_bottom;
     @FXML
     private Rectangle exit_right;
@@ -79,6 +76,12 @@ public class Right_map_nothreeController extends BaseMapController {
     private Rectangle wall13;
     @FXML
     private Rectangle wall14;
+    @FXML
+    private Group world;
+    @FXML
+    private Rectangle spawn_from_down;
+    @FXML
+    private Rectangle exit_down;
 
     @Override
     protected String mapKey() {

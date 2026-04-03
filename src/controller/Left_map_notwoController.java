@@ -36,8 +36,6 @@ public class Left_map_notwoController extends BaseMapController {
     @FXML
     private Rectangle wall3;
     @FXML
-    private Rectangle exit_bottom;
-    @FXML
     private Rectangle exit_right;
     @FXML
     private Rectangle exit_left;
@@ -48,13 +46,15 @@ public class Left_map_notwoController extends BaseMapController {
     @FXML
     private Rectangle spawn_from_right;
     @FXML
-    private Rectangle spawn_from_bottom;
-    @FXML
     private Group human;
     @FXML
     private Rectangle human_hitbox;
     @FXML
     private ImageView human_img;
+    @FXML
+    private Rectangle exit_down;
+    @FXML
+    private Rectangle spawn_from_down;
 
     /**
      * Initializes the controller class.

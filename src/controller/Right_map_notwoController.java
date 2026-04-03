@@ -59,6 +59,8 @@ public class Right_map_notwoController extends BaseMapController{
     private ImageView human_img;
     @FXML
     private Rectangle human_hitbox;
+    @FXML
+    private Group world;
 
     @Override
     protected String mapKey() {

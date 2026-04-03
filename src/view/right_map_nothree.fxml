@@ -8,7 +8,7 @@
 
 <StackPane fx:id="view" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Right_map_nothreeController">
    <children>
-      <Group>
+      <Group fx:id="world">
          <children>
             <ImageView fitHeight="400.0" fitWidth="601.0" pickOnBounds="true" preserveRatio="true">
                <image>
@@ -25,7 +25,7 @@
                <children>
                   <Rectangle fx:id="spawn_default" height="10" layoutX="200.0" layoutY="57.0" opacity="0" width="10" />
                   <Rectangle fx:id="spawn_from_left" height="10" layoutX="-9.0" layoutY="57.0" opacity="0" width="10" />
-                  <Rectangle fx:id="spawn_from_bottom" height="10" layoutX="269.0" layoutY="265.0" opacity="0" width="10" />
+                  <Rectangle fx:id="spawn_from_down" height="10" layoutX="269.0" layoutY="265.0" opacity="0" width="10" />
                   <Rectangle fx:id="spawn_from_right" height="10" layoutX="516.0" layoutY="72.0" opacity="0" width="10" />
                   <Rectangle fx:id="spawn_from_up" height="10" layoutX="378.0" layoutY="-55.0" opacity="0" width="10" />
                </children>
@@ -33,7 +33,7 @@
             <Group layoutX="7.0" layoutY="71.0">
                <children>
                   <Rectangle fx:id="exit_left" height="39.0" layoutX="-3.0" layoutY="66.0" opacity="0" width="15" />
-                  <Rectangle fx:id="exit_bottom" height="15" layoutX="257.0" layoutY="307.0" opacity="0" width="66.0" />
+                  <Rectangle fx:id="exit_down" height="15" layoutX="257.0" layoutY="307.0" opacity="0" width="66.0" />
                   <Rectangle fx:id="exit_right" height="39.0" layoutX="571.0" layoutY="76.0" opacity="0" width="15" />
                   <Rectangle fx:id="exit_up" height="15" layoutX="382.0" layoutY="-64.0" opacity="0" width="66.0" />
                </children>

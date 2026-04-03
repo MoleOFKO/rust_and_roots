@@ -36,8 +36,6 @@ public class Upper_map_notwoController extends BaseMapController {
     @FXML
     private Rectangle wall3;
     @FXML
-    private Rectangle exit_bottom;
-    @FXML
     private Rectangle exit_right;
     @FXML
     private Rectangle exit_left;
@@ -55,6 +53,8 @@ public class Upper_map_notwoController extends BaseMapController {
     private Rectangle human_hitbox;
     @FXML
     private ImageView human_img;
+    @FXML
+    private Rectangle exit_down;
  
 
     @Override

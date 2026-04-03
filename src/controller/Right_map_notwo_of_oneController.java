@@ -33,7 +33,6 @@ public class Right_map_notwo_of_oneController extends BaseMapController {
     private Rectangle human_hitbox;
     @FXML
     private Rectangle exit_left;
-    @FXML
     private Rectangle exit_bottom;
     @FXML
     private Rectangle exit_right;
@@ -41,8 +40,6 @@ public class Right_map_notwo_of_oneController extends BaseMapController {
     private Rectangle spawn_default;
     @FXML
     private Rectangle spawn_from_left;
-    @FXML
-    private Rectangle spawn_from_bottom;
     @FXML
     private Rectangle spawn_from_right;
     @FXML
@@ -61,6 +58,10 @@ public class Right_map_notwo_of_oneController extends BaseMapController {
     private Rectangle wall5;
     @FXML
     private Rectangle wall6;
+    @FXML
+    private Rectangle exit_down;
+    @FXML
+    private Rectangle spawn_from_down;
    
 
     @Override
