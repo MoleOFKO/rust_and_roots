@@ -99,6 +99,8 @@ public class LoginController implements Initializable {
     private TextField otpcode;
     @FXML
     private Button btnotpsend;
+    @FXML
+    private Hyperlink forgotpwd;
     
     
     @Override
@@ -532,5 +534,9 @@ public class LoginController implements Initializable {
             null,
             "Verification code sent to " + email + ".\nEnter the code and press Sign Up."
         );
+    }
+
+    @FXML
+    private void handleforgetpwdaction(ActionEvent event) {
     }
 }
