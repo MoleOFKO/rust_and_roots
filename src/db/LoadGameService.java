@@ -189,6 +189,8 @@ public class LoadGameService {
         Inventory chest = gs.getChestInventory();
         clearInventoryItems(chest);
 
+        boolean loadedAnyChestRow = false;
+
         String sql = "SELECT item_id, qty FROM saved_chest_item WHERE saved_id = ?";
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, saveId);
@@ -199,8 +201,29 @@ public class LoadGameService {
                     int qty = rs.getInt("qty");
                     if (itemId > 0 && qty > 0) {
                         chest.addItem(itemId, qty);
+                        loadedAnyChestRow = true;
                     }
                 }
+            }
+        }
+
+        if (!loadedAnyChestRow) {
+            addStarterChestItem(chest, "watering_can", "watering can", "Watering Can");
+            addStarterChestItem(chest, "sickle", "Sickle");
+        }
+    }
+
+    private void addStarterChestItem(Inventory chest, String... candidateNames) {
+        if (chest == null || candidateNames == null) return;
+
+        for (String name : candidateNames) {
+            if (name == null || name.isBlank()) continue;
+            model.item itm = ItemDatabase.getItemByName(name);
+            if (itm != null && itm.getItem_id() > 0) {
+                if (chest.getCount(itm.getItem_id()) <= 0) {
+                    chest.addItem(itm.getItem_id(), 1);
+                }
+                return;
             }
         }
     }

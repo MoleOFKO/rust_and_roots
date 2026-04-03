@@ -497,6 +497,8 @@ public class home_mapController extends BaseMapController {
     private ToggleButton slotBtn3;
     @FXML
     private ToggleButton slotBtn4;
+    @FXML
+    private ImageView equip_img;
 
     @Override
     protected String mapKey() {
@@ -524,6 +526,7 @@ public class home_mapController extends BaseMapController {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         super.initialize(url, rb);
+        bindPlayerEquipmentView(equip_img);
         bridgeHomeSharedUi();
         setupMerchant();
         setupMerchantZone();
