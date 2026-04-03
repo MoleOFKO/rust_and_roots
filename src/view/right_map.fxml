@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.shape.Rectangle?>
 
-<StackPane fx:id="view" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.RightMapController">
+<StackPane fx:id="view" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.RightMapController">
 
     <Group fx:id="world">
 
@@ -28,7 +28,7 @@
         <!-- Player -->
         <Group fx:id="human" layoutX="300" layoutY="200">
             <ImageView fx:id="human_img" fitHeight="64" fitWidth="64" />
-            <Rectangle fx:id="human_hitbox" arcHeight="6" arcWidth="6" height="24" layoutX="18" layoutY="34" width="28" />
+            <Rectangle fx:id="human_hitbox" arcHeight="6" arcWidth="6" fill="#00000078" height="24" layoutX="18" layoutY="34" width="28" />
         </Group>
 
         <!-- Spawn points (invisible) -->
