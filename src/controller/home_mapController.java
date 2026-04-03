@@ -810,7 +810,6 @@ public class home_mapController extends BaseMapController {
     private void onMerchantShopClick(ActionEvent event) {
         if (btnmerchant == null || btnmerchant.isDisable()) return;
         gameState.setReturnScene("/view/home_map.fxml", SpawnTag.FROM_SHOP);
-        gameState.setCurrentMerchantItems(merChant.getItems());
         stopAndSwitchScene("/view/shop.fxml", SpawnTag.FROM_SHOP);
     }
     

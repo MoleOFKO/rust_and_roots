@@ -1,9 +1,6 @@
 
 package model;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.net.URL;
 
 import javafx.animation.KeyFrame;
@@ -26,26 +23,6 @@ public class Merchant {
     private int frameIndex = 0;
 
     private Timeline timeline;
-    
-    private final List<ShopItem> items = new ArrayList<>();
-    
-    public static class ShopItem {
-        private final String name;
-        private final int price;
-
-        public ShopItem(String name, int price) {
-            this.name = name;
-            this.price = price;
-        }
-
-        public String getName() { return name; }
-        public int getPrice() { return price; }
-
-        @Override
-        public String toString() {
-            return name + " - " + price + "g";
-        }
-    }
 
     public Merchant(ImageView view,
                     int frameW, int frameH,
@@ -102,9 +79,4 @@ public class Merchant {
     public void stop() {
         timeline.stop();
     }
-
-    public List<ShopItem> getItems() {
-        return Collections.unmodifiableList(items);
-    }
-
 }

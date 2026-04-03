@@ -233,7 +233,6 @@ public final class GameState {
     private String returnFxml = null;
     private SpawnTag returnSpawn = SpawnTag.DEFAULT;
     private String activeFarmMapKey = "home_map";
-    private List<model.Merchant.ShopItem> currentMerchantItems = List.of();
     private final Map<String, FarmState> farmByMap = new HashMap<>();
 
     private int shopRandomDay = -1;
@@ -320,12 +319,6 @@ public final class GameState {
     }
     public String getActiveFarmMapKey() {
         return activeFarmMapKey;
-    }
-    public void setCurrentMerchantItems(List<model.Merchant.ShopItem> items) { 
-        this.currentMerchantItems = (items == null) ? List.of() : List.copyOf(items); 
-    }
-    public List<model.Merchant.ShopItem> getCurrentMerchantItems() { 
-        return currentMerchantItems; 
     }
     public int getShopRandomDay() { 
         return shopRandomDay; 
