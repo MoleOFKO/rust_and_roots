@@ -18,6 +18,8 @@ public final class GameState {
 
     private static final int DEFAULT_SMELT_POINT_CAP = 10;
     private static final double DEFAULT_SMELT_POINT_REGEN_SECONDS = 15.0;
+    private static final int DEFAULT_RANDOM_SHOP_ITEM_COUNT = 4;
+    private static final int EARLY_WATERING_CAN_SHOP_DAY_LIMIT = 10;
 
     private int smeltPointCap = DEFAULT_SMELT_POINT_CAP;
     private double smeltPoints = DEFAULT_SMELT_POINT_CAP;
@@ -239,6 +241,9 @@ public final class GameState {
     private List<Integer> dailyRandomShopItemIds = new ArrayList<>();
     private int shopStockDay = -1;
     private final Map<Integer, Integer> dailyRemainingShopStock = new LinkedHashMap<>();
+    private final List<Integer> fixedShopItemIds = new ArrayList<>();
+    private int randomShopItemCount = DEFAULT_RANDOM_SHOP_ITEM_COUNT;
+    private int earlyGameWateringCanShopItemId = -1;
 
     private int activeCookingOutputItemId = -1;
     private int activeCookingOutputQuantity = 1;
@@ -257,6 +262,7 @@ public final class GameState {
 
     private GameState() {
         seedStarterChestBonus();
+        seedDefaultFixedShopItems();
     }
 
     private void seedStarterChestBonus() {
@@ -285,6 +291,31 @@ public final class GameState {
         if (itemId > 0 && qty > 0 && chestInventory.getCount(itemId) <= 0) {
             chestInventory.addItem(itemId, qty);
         }
+    }
+
+    private void seedDefaultFixedShopItems() {
+        if (!fixedShopItemIds.isEmpty()) return;
+
+        ItemDatabase.loadItems();
+        earlyGameWateringCanShopItemId = resolveShopItemId("watering_can", "watering can", "Watering Can");
+
+        addFixedShopItem(resolveShopItemId("Wheat Seed"), fixedShopItemIds);
+        addFixedShopItem(resolveShopItemId("Sunflower Seed"), fixedShopItemIds);
+        addFixedShopItem(resolveShopItemId("Pumpkin Seed"), fixedShopItemIds);
+        addFixedShopItem(resolveShopItemId("Pineapple Seed"), fixedShopItemIds);
+        addFixedShopItem(resolveShopItemId("Onion Seed"), fixedShopItemIds);
+        addFixedShopItem(resolveShopItemId("Green Eggplant Seed"), fixedShopItemIds);
+        addFixedShopItem(resolveShopItemId("Grape Seed"), fixedShopItemIds);
+        addFixedShopItem(resolveShopItemId("Cucumber Seed"), fixedShopItemIds);
+    }
+
+    private int resolveShopItemId(String... candidateNames) {
+        return resolveStarterItemId(candidateNames);
+    }
+
+    private void addFixedShopItem(int itemId, List<Integer> target) {
+        if (target == null || itemId <= 0 || target.contains(itemId)) return;
+        target.add(itemId);
     }
 
     public PlayerState getPlayerState() { return playerState; }
@@ -322,6 +353,44 @@ public final class GameState {
     }
     public int getShopRandomDay() { 
         return shopRandomDay; 
+    }
+    public List<Integer> getFixedShopItemIds() {
+        return List.copyOf(fixedShopItemIds);
+    }
+    public List<Integer> getFixedShopItemIdsForDay(int dayNumber) {
+        List<Integer> result = new ArrayList<>();
+        int targetCount = fixedShopItemIds.size();
+
+        if (dayNumber > 0 && dayNumber <= EARLY_WATERING_CAN_SHOP_DAY_LIMIT) {
+            addFixedShopItem(earlyGameWateringCanShopItemId, result);
+        }
+
+        for (Integer itemId : fixedShopItemIds) {
+            if (targetCount > 0 && result.size() >= targetCount) break;
+            if (itemId != null) {
+                addFixedShopItem(itemId, result);
+            }
+        }
+
+        return List.copyOf(result);
+    }
+    public void setFixedShopItemIds(List<Integer> itemIds) {
+        fixedShopItemIds.clear();
+        if (itemIds == null) return;
+        for (Integer itemId : itemIds) {
+            if (itemId != null) {
+                addFixedShopItem(itemId, fixedShopItemIds);
+            }
+        }
+    }
+    public int getRandomShopItemCount() {
+        return Math.max(0, randomShopItemCount);
+    }
+    public void setRandomShopItemCount(int count) {
+        this.randomShopItemCount = Math.max(0, count);
+    }
+    public int getTotalShopItemCount() {
+        return fixedShopItemIds.size() + getRandomShopItemCount();
     }
     public void setShopRandomDay(int day) { 
         this.shopRandomDay = day; 
