@@ -225,7 +225,7 @@
             </Group>
             <ImageView fx:id="Ing1" fitHeight="39.0" fitWidth="37.0" layoutX="480.0" layoutY="77.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@../image/items/Bitter%20melon.png" />
+                  <Image url="@../image/items/bitter_melon.png" />
                </image>
                <effect>
                   <DropShadow />

@@ -51,6 +51,8 @@ import javafx.animation.Animation;
 import javafx.animation.Interpolator;
 import javafx.animation.TranslateTransition;
 import javafx.util.Duration;
+import javafx.geometry.Bounds;
+import javafx.animation.FadeTransition;
 
 /**
  * FXML Controller class
@@ -550,6 +552,10 @@ public class Home_interiorController extends BaseMapController {
     @FXML
     private ImageView Back;
 
+    private javafx.animation.AnimationTimer dialogOpacityTimer;
+    private boolean cookingDialogDimmed = false;
+    private FadeTransition cookingDialogFade;
+    
     private static final int CHEST_SLOT_CAPACITY = 42;;
     @FXML
     private HBox hotbar;
@@ -1221,6 +1227,7 @@ public class Home_interiorController extends BaseMapController {
         super.initialize(url, rb);
         bridgeInteriorSharedUi();
         setupFloatingDialogs();
+        setupDialogOpacityCheck();
         ItemDatabase.loadItems();
         chestInventory = gameState.getChestInventory();
         setupChestUi();
@@ -1953,6 +1960,52 @@ public class Home_interiorController extends BaseMapController {
         floatAnim.setInterpolator(Interpolator.EASE_BOTH);
         floatAnim.setDelay(Duration.seconds(delaySeconds));
         floatAnim.play();
+    }
+    
+//    low opacity dialog
+    private void setupDialogOpacityCheck() {
+        if (human_hitbox == null || cookingdialogimg == null) return;
+
+        cookingdialogimg.setOpacity(1.0);
+        cookingDialogDimmed = false;
+
+        dialogOpacityTimer = new javafx.animation.AnimationTimer() {
+            @Override
+            public void handle(long now) {
+                updateCookingDialogOpacity();
+            }
+        };
+        dialogOpacityTimer.start();
+    }
+
+    private void updateCookingDialogOpacity() {
+        if (human_hitbox == null || cookingdialogimg == null) return;
+
+        Bounds humanBounds = human_hitbox.localToScene(human_hitbox.getBoundsInLocal());
+        Bounds dialogBounds = cookingdialogimg.localToScene(cookingdialogimg.getBoundsInLocal());
+
+        boolean overlaps = humanBounds.intersects(dialogBounds);
+
+        if (overlaps && !cookingDialogDimmed) {
+            cookingDialogDimmed = true;
+            fadeCookingDialogTo(0.35);
+        } else if (!overlaps && cookingDialogDimmed) {
+            cookingDialogDimmed = false;
+            fadeCookingDialogTo(1.0);
+        }
+    }
+
+    private void fadeCookingDialogTo(double targetOpacity) {
+        if (cookingdialogimg == null) return;
+
+        if (cookingDialogFade != null) {
+            cookingDialogFade.stop();
+        }
+
+        cookingDialogFade = new FadeTransition(Duration.millis(180), cookingdialogimg);
+        cookingDialogFade.setFromValue(cookingdialogimg.getOpacity());
+        cookingDialogFade.setToValue(targetOpacity);
+        cookingDialogFade.play();
     }
 
 }

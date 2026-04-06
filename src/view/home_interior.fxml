@@ -152,7 +152,7 @@
             </Group>
             <Group>
                <children>
-                  <ImageView fitHeight="43.0" fitWidth="71.0" layoutX="257.0" layoutY="183.0" pickOnBounds="true" preserveRatio="true">
+                  <ImageView fitHeight="43.0" fitWidth="69.0" layoutX="258.0" layoutY="185.0" pickOnBounds="true" preserveRatio="true">
                      <image>
                         <Image url="@../image/tablecandlebook.PNG" />
                      </image>
