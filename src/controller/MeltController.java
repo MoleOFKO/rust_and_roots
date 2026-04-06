@@ -503,23 +503,30 @@ public class MeltController implements Initializable, SceneController {
         item coalOre = ItemDatabase.getItemByName("Coal");
         item coalBrick = ItemDatabase.getItemByName("Coal Brick");
 
-        if (copperOre != null && copperIngot != null && sourceItemId == copperOre.getItem_id()) {
+        if (isValidSmeltPair(copperOre, copperIngot) && sourceItemId == copperOre.getItem_id()) {
             return new SmeltRule(copperOre.getItem_id(), copperIngot.getItem_id(), 3, 10, 90, 2, 2);
         }
-        if (ironOre != null && ironIngot != null && sourceItemId == ironOre.getItem_id()) {
+        if (isValidSmeltPair(ironOre, ironIngot) && sourceItemId == ironOre.getItem_id()) {
             return new SmeltRule(ironOre.getItem_id(), ironIngot.getItem_id(), 4, 12, 88, 3, 3);
         }
-        if (silverOre != null && silverIngot != null && sourceItemId == silverOre.getItem_id()) {
+        if (isValidSmeltPair(silverOre, silverIngot) && sourceItemId == silverOre.getItem_id()) {
             return new SmeltRule(silverOre.getItem_id(), silverIngot.getItem_id(), 6, 16, 82, 3, 4);
         }
-        if (goldOre != null && goldIngot != null && sourceItemId == goldOre.getItem_id()) {
+        if (isValidSmeltPair(goldOre, goldIngot) && sourceItemId == goldOre.getItem_id()) {
             return new SmeltRule(goldOre.getItem_id(), goldIngot.getItem_id(), 8, 20, 76, 4, 5);
         }
-        if (coalOre != null && coalBrick != null && sourceItemId == coalOre.getItem_id()) {
+        if (isValidSmeltPair(coalOre, coalBrick) && sourceItemId == coalOre.getItem_id()) {
             return new SmeltRule(coalOre.getItem_id(), coalBrick.getItem_id(), 1, 6, 96, 2, 1);
         }
 
         return null;
+    }
+
+    private boolean isValidSmeltPair(item sourceItem, item resultItem) {
+        return sourceItem != null
+                && resultItem != null
+                && ItemDatabase.isDisplayableItem(sourceItem.getItem_id())
+                && ItemDatabase.isDisplayableItem(resultItem.getItem_id());
     }
     
     private static final class SmeltRule {

@@ -16,6 +16,9 @@ import model.Inventory;
 import model.PlayerState;
 
 public class SaveGameService {
+    private static final String FARM_SLOT_WATERING_CAN = "__farm_slot_watering_can__";
+    private static final String FARM_SLOT_SICKLE = "__farm_slot_sickle__";
+
 
     public void saveGame(GameState gs) {
         if (gs == null) return;
@@ -298,6 +301,29 @@ public class SaveGameService {
             ins.setDouble(10, p.waterReductionSeconds);
             ins.addBatch();
         }
+
+        saveFarmToolSlot(ins, saveId, mapKey, FARM_SLOT_WATERING_CAN, farmState.getEquippedWateringCanItemId());
+        saveFarmToolSlot(ins, saveId, mapKey, FARM_SLOT_SICKLE, farmState.getEquippedSickleItemId());
+    }
+
+    private void saveFarmToolSlot(PreparedStatement ins, int saveId, String mapKey, String plotId, Integer itemId) throws Exception {
+        ins.setInt(1, saveId);
+        ins.setString(2, mapKey);
+        ins.setString(3, plotId);
+
+        if (itemId == null || itemId <= 0) {
+            ins.setNull(4, java.sql.Types.INTEGER);
+        } else {
+            ins.setInt(4, itemId);
+        }
+
+        ins.setDouble(5, -1);
+        ins.setDouble(6, -1);
+        ins.setDouble(7, 0);
+        ins.setDouble(8, 0);
+        ins.setDouble(9, 0);
+        ins.setDouble(10, 0);
+        ins.addBatch();
     }
 
     private void saveChestItems(Connection con, GameState gs) throws Exception {

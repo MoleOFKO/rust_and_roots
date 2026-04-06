@@ -168,6 +168,7 @@ public class New_gameController implements Initializable, SceneController {
         handleconfirmaction(null);
 
         GameState gs = GameState.get();
+        gs.resetForNewGame();
         gs.setCurrentPlayerName(characterName);
         gs.setCurrentWorldName(worldName);
 
@@ -205,6 +206,7 @@ public class New_gameController implements Initializable, SceneController {
         stamina = playerState.getMaxStamina();
 
         GameTimeManager time = GameTimeManager.get();
+        time.setDay(1);
         time.setTimeOfDay(6, 0);
         SceneManager.switchScene("/view/home_map.fxml");
     }
@@ -345,7 +347,66 @@ public class New_gameController implements Initializable, SceneController {
     }
 
     private boolean canIncreaseStat(String statKey) {
-        return playerState != null && getPreviewRemainingExp() >= getNextPointCost(statKey);
+        return playerState != null
+                && !isStatAtCurrentCap(statKey)
+                && getPreviewRemainingExp() >= getNextPointCost(statKey);
+    }
+
+    private int getCurrentCoreStatCap() {
+        return 5;
+    }
+
+    private int getCurrentStatValueWithPending(String statKey) {
+        if (playerState == null) return 0;
+
+        return switch (Objects.requireNonNullElse(statKey, "")) {
+            case "hp" -> playerState.getMaxHp() + pendingHpPoints;
+            case "sp" -> playerState.getMaxStamina() + pendingSpPoints;
+            case "str" -> playerState.getStr() + pendingStrPoints;
+            case "vit" -> playerState.getVit() + pendingVitPoints;
+            case "dex" -> playerState.getDex() + pendingDexPoints;
+            case "agi" -> playerState.getAgi() + pendingAgiPoints;
+            default -> 0;
+        };
+    }
+
+    private int getAverageCoreStatWithPending() {
+        if (playerState == null) return 0;
+        int total =
+            (playerState.getStr() + pendingStrPoints) +
+            (playerState.getVit() + pendingVitPoints) +
+            (playerState.getDex() + pendingDexPoints) +
+            (playerState.getAgi() + pendingAgiPoints);
+        return Math.max(0, total / 4);
+    }
+
+    private int getHpSpPointCap() {
+        return getAverageCoreStatWithPending() + getCurrentCoreStatCap();
+    }
+
+    private int getHpSpInvestedPointsWithPending(String statKey) {
+        if (playerState == null) return 0;
+
+        return switch (Objects.requireNonNullElse(statKey, "")) {
+            case "hp" -> Math.max(0, (playerState.getMaxHp() - NEW_GAME_BASE_HP) + pendingHpPoints);
+            case "sp" -> Math.max(0, (playerState.getMaxStamina() - NEW_GAME_BASE_STAMINA) + pendingSpPoints);
+            default -> 0;
+        };
+    }
+
+    private boolean isStatAtCurrentCap(String statKey) {
+        int coreCap = getCurrentCoreStatCap();
+        int hpSpCap = getHpSpPointCap();
+
+        return switch (Objects.requireNonNullElse(statKey, "")) {
+            case "hp" -> getHpSpInvestedPointsWithPending("hp") >= hpSpCap;
+            case "sp" -> getHpSpInvestedPointsWithPending("sp") >= hpSpCap;
+            case "str" -> getCurrentStatValueWithPending("str") >= coreCap;
+            case "vit" -> getCurrentStatValueWithPending("vit") >= coreCap;
+            case "dex" -> getCurrentStatValueWithPending("dex") >= coreCap;
+            case "agi" -> getCurrentStatValueWithPending("agi") >= coreCap;
+            default -> false;
+        };
     }
 
     private void changePendingStat(String statKey, int delta) {

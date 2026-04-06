@@ -16,6 +16,9 @@ import model.ItemDatabase;
 import model.PlayerState;
 
 public class LoadGameService {
+    private static final String FARM_SLOT_WATERING_CAN = "__farm_slot_watering_can__";
+    private static final String FARM_SLOT_SICKLE = "__farm_slot_sickle__";
+
 
     public boolean loadGame(int saveId) {
         if (saveId <= 0) return false;
@@ -37,6 +40,7 @@ public class LoadGameService {
             loadChestItems(con, gs, saveId);
             loadFarmPlots(con, gs, saveId);
             loadTime(con, saveId);
+            gs.setPreferredStatusPanelGroup(GameState.StatusPanelGroup.STATUS);
 
             gs.setCurrentSaveId(saveId);
             return true;
@@ -189,8 +193,6 @@ public class LoadGameService {
         Inventory chest = gs.getChestInventory();
         clearInventoryItems(chest);
 
-        boolean loadedAnyChestRow = false;
-
         String sql = "SELECT item_id, qty FROM saved_chest_item WHERE saved_id = ?";
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, saveId);
@@ -201,29 +203,8 @@ public class LoadGameService {
                     int qty = rs.getInt("qty");
                     if (itemId > 0 && qty > 0) {
                         chest.addItem(itemId, qty);
-                        loadedAnyChestRow = true;
                     }
                 }
-            }
-        }
-
-        if (!loadedAnyChestRow) {
-            addStarterChestItem(chest, "watering_can", "watering can", "Watering Can");
-            addStarterChestItem(chest, "sickle", "Sickle");
-        }
-    }
-
-    private void addStarterChestItem(Inventory chest, String... candidateNames) {
-        if (chest == null || candidateNames == null) return;
-
-        for (String name : candidateNames) {
-            if (name == null || name.isBlank()) continue;
-            model.item itm = ItemDatabase.getItemByName(name);
-            if (itm != null && itm.getItem_id() > 0) {
-                if (chest.getCount(itm.getItem_id()) <= 0) {
-                    chest.addItem(itm.getItem_id(), 1);
-                }
-                return;
             }
         }
     }
@@ -248,10 +229,21 @@ public class LoadGameService {
                     FarmState farm = gs.getFarmState(mapKey);
                     if (farm == null) continue;
 
+                    Integer seedItemId = (Integer) rs.getObject("seed_item_id");
+
+                    if (FARM_SLOT_WATERING_CAN.equals(plotId)) {
+                        farm.setEquippedWateringCanItemId(seedItemId);
+                        continue;
+                    }
+
+                    if (FARM_SLOT_SICKLE.equals(plotId)) {
+                        farm.setEquippedSickleItemId(seedItemId);
+                        continue;
+                    }
+
                     FarmState.PlotData plot = farm.getPlot(plotId);
                     if (plot == null) continue;
 
-                    Integer seedItemId = (Integer) rs.getObject("seed_item_id");
                     plot.seedItemId = seedItemId;
 
                     plot.plantedAt = rs.getDouble("planted_at");
@@ -344,5 +336,6 @@ public class LoadGameService {
 
     private void clearFarmState(FarmState farmState) {
         farmState.getAllPlots().clear();
+        farmState.clearEquippedTools();
     }
 }

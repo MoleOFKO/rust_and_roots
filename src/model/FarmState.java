@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class FarmState {
+    private Integer equippedWateringCanItemId = null;
+    private Integer equippedSickleItemId = null;
 
     public static class PlotData {
         /** DB-driven farm fields. */
@@ -77,5 +79,30 @@ public class FarmState {
 
     public Map<String, PlotData> getAllPlots() {
         return plots;
+    }
+
+    public Integer getEquippedWateringCanItemId() {
+        return equippedWateringCanItemId;
+    }
+
+    public void setEquippedWateringCanItemId(Integer equippedWateringCanItemId) {
+        this.equippedWateringCanItemId = normalizeEquippedItemId(equippedWateringCanItemId);
+    }
+
+    public Integer getEquippedSickleItemId() {
+        return equippedSickleItemId;
+    }
+
+    public void setEquippedSickleItemId(Integer equippedSickleItemId) {
+        this.equippedSickleItemId = normalizeEquippedItemId(equippedSickleItemId);
+    }
+
+    public void clearEquippedTools() {
+        equippedWateringCanItemId = null;
+        equippedSickleItemId = null;
+    }
+
+    private Integer normalizeEquippedItemId(Integer itemId) {
+        return (itemId == null || itemId <= 0) ? null : itemId;
     }
 }
