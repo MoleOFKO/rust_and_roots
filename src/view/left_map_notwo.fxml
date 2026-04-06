@@ -6,8 +6,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.shape.Rectangle?>
 
-
-<StackPane fx:id="view" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Left_map_notwoController">
+<StackPane fx:id="view" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Left_map_notwoController">
    <children>
       <Group fx:id="world">
          <children>
@@ -26,7 +25,7 @@
             </Group>
             <Group layoutX="166.0" layoutY="2.0">
                <children>
-                  <Rectangle fx:id="exit_bottom" height="18.0" layoutX="92.0" layoutY="379.0" opacity="0" width="70.0" />
+                  <Rectangle fx:id="exit_down" height="18.0" layoutX="92.0" layoutY="379.0" opacity="0" width="70.0" />
                   <Rectangle fx:id="exit_right" height="38.0" layoutX="412.0" layoutY="117.0" opacity="0" width="20.0" />
                   <Rectangle fx:id="exit_left" height="38.0" layoutX="-167.0" layoutY="126.0" opacity="0" width="17.0" />
                </children>
@@ -36,7 +35,7 @@
                   <Rectangle fx:id="spawn_default" height="10" layoutX="122.0" layoutY="143.0" opacity="0" width="10" />
                   <Rectangle fx:id="spawn_from_left" height="10" layoutX="-134.0" layoutY="125.0" opacity="0" width="10" />
                   <Rectangle fx:id="spawn_from_right" height="10" layoutX="393.0" layoutY="110.0" opacity="0" width="10" />
-                  <Rectangle fx:id="spawn_from_bottom" height="10" layoutX="120.0" layoutY="336.0" opacity="0" width="10" />
+                  <Rectangle fx:id="spawn_from_down" height="10" layoutX="120.0" layoutY="336.0" opacity="0" width="10" />
                </children>
             </Group>
             <Group fx:id="human" layoutX="268.0" layoutY="168.0">

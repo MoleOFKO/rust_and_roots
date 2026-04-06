@@ -1,7 +1,9 @@
 package model;
 
+import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.IntConsumer;
 import javafx.animation.AnimationTimer;
@@ -38,11 +40,13 @@ public class Player {
 
     private final Group node;
     private final ImageView sprite;
+    private ImageView equipmentView;
     private final Rectangle hitbox;
 
     private final double baseSpeed;
     private final PlayerState state;
     private final Set<KeyCode> pressedKeys = EnumSet.noneOf(KeyCode.class);
+    private final Map<EquipmentKind, EquipmentAnimationSet> equipmentAnimations = new EnumMap<>(EquipmentKind.class);
 
     private IntConsumer onHotbarSlotRequest;
     private Runnable onToggleHotbarRequest;
@@ -54,6 +58,9 @@ public class Player {
     private Rectangle detectionTarget;
     private Runnable onDetection;
     private Runnable onNoDetection;
+
+    private int equippedItemId = -1;
+    private EquipmentKind equippedKind = EquipmentKind.NONE;
 
     private final Image walkSpriteSheet = new Image(
         getClass().getResource("/image/human/human_Walk.png").toExternalForm()
@@ -73,6 +80,24 @@ public class Player {
 
     private enum AnimState {
         IDLE, WALK, RUN, DEATH
+    }
+
+    private enum EquipmentKind {
+        NONE,
+        AXE,
+        PICKAXE,
+        FISHING_ROD,
+        TOOL
+    }
+
+    private static final class EquipmentAnimationSet {
+        private final Image walkSheet;
+        private final int columns;
+
+        private EquipmentAnimationSet(Image walkSheet, int columns) {
+            this.walkSheet = walkSheet;
+            this.columns = Math.max(1, columns);
+        }
     }
 
     private AnimState animState = AnimState.IDLE;
@@ -106,6 +131,8 @@ public class Player {
         this.hitbox = hitbox;
         this.baseSpeed = speed;
 
+        registerDefaultEquipmentAnimations();
+
         this.sprite.setImage(idleSpriteSheet);
         this.sprite.setViewport(new Rectangle2D(0, 0, FRAME_SIZE, FRAME_SIZE));
         this.sprite.setPreserveRatio(false);
@@ -133,6 +160,31 @@ public class Player {
 
     public void setOnHotbarSlotRequest(IntConsumer onHotbarSlotRequest) {
         this.onHotbarSlotRequest = onHotbarSlotRequest;
+    }
+
+    public void setEquipmentView(ImageView equipmentView) {
+        this.equipmentView = equipmentView;
+        if (this.equipmentView == null) {
+            return;
+        }
+
+        this.equipmentView.setPreserveRatio(false);
+        this.equipmentView.setSmooth(false);
+        this.equipmentView.setMouseTransparent(true);
+        this.equipmentView.setViewport(new Rectangle2D(0, 0, FRAME_SIZE, FRAME_SIZE));
+        this.equipmentView.setVisible(false);
+        this.equipmentView.setManaged(false);
+        updateEquipmentViewport();
+    }
+
+    public void setEquippedItem(int itemId) {
+        this.equippedItemId = itemId;
+        this.equippedKind = resolveEquipmentKind(itemId);
+        updateEquipmentViewport();
+    }
+
+    public int getEquippedItemId() {
+        return equippedItemId;
     }
 
     public boolean isRemovedFromWorld() {
@@ -407,6 +459,9 @@ public class Player {
             node.setVisible(false);
             node.setDisable(true);
             hitbox.setVisible(false);
+            if (equipmentView != null) {
+                equipmentView.setVisible(false);
+            }
             return;
         }
 
@@ -443,7 +498,6 @@ public class Player {
         return currentSpeed;
     }
 
-
     private void updateViewport() {
         Image sheet = getSheet(animState);
         int frameCount = getFrameCount(animState);
@@ -454,6 +508,37 @@ public class Player {
 
         sprite.setImage(sheet);
         sprite.setViewport(new Rectangle2D(x, y, FRAME_SIZE, FRAME_SIZE));
+        updateEquipmentViewport();
+    }
+
+    private void updateEquipmentViewport() {
+        if (equipmentView == null) {
+            return;
+        }
+
+        EquipmentAnimationSet animationSet = equipmentAnimations.get(equippedKind);
+        if (animationSet == null || animationSet.walkSheet == null || animState == AnimState.DEATH) {
+            equipmentView.setImage(null);
+            equipmentView.setVisible(false);
+            equipmentView.setManaged(false);
+            return;
+        }
+
+        int equipFrame = switch (animState) {
+            case IDLE -> 0;
+            case WALK -> frameIndex % animationSet.columns;
+            case RUN -> frameIndex % animationSet.columns;
+            case DEATH -> 0;
+        };
+
+        int x = equipFrame * FRAME_SIZE;
+        int y = facingRow * FRAME_SIZE;
+
+        equipmentView.setImage(animationSet.walkSheet);
+        equipmentView.setViewport(new Rectangle2D(x, y, FRAME_SIZE, FRAME_SIZE));
+        equipmentView.setVisible(true);
+        equipmentView.setManaged(true);
+        equipmentView.toFront();
     }
 
     private Image getSheet(AnimState state) {
@@ -525,5 +610,46 @@ public class Player {
         Bounds playerBounds = hitbox.localToScene(hitbox.getBoundsInLocal());
         Bounds targetBounds = target.localToScene(target.getBoundsInLocal());
         return playerBounds.intersects(targetBounds);
+    }
+
+    private void registerDefaultEquipmentAnimations() {
+        registerEquipmentAnimation(EquipmentKind.AXE, "/image/human/axe_walk.png", WALK_COLUMNS);
+    }
+
+    private void registerEquipmentAnimation(EquipmentKind kind, String resourcePath, int columns) {
+        if (kind == null || kind == EquipmentKind.NONE || resourcePath == null || resourcePath.isBlank()) {
+            return;
+        }
+
+        var url = getClass().getResource(resourcePath);
+        if (url == null) {
+            return;
+        }
+
+        equipmentAnimations.put(kind, new EquipmentAnimationSet(new Image(url.toExternalForm()), columns));
+    }
+
+    private EquipmentKind resolveEquipmentKind(int itemId) {
+        if (itemId <= 0) {
+            return EquipmentKind.NONE;
+        }
+
+        String type = ItemDatabase.getItemType(itemId);
+        String name = ItemDatabase.getItemName(itemId);
+        String lookup = ((type == null ? "" : type) + " " + (name == null ? "" : name)).toLowerCase();
+
+        if (lookup.contains("axe")) {
+            return EquipmentKind.AXE;
+        }
+        if (lookup.contains("pickaxe") || lookup.contains("pick axe")) {
+            return EquipmentKind.PICKAXE;
+        }
+        if (lookup.contains("fishing rod") || lookup.contains("rod")) {
+            return EquipmentKind.FISHING_ROD;
+        }
+        if (lookup.contains("tool") || lookup.contains("weapon")) {
+            return EquipmentKind.TOOL;
+        }
+        return EquipmentKind.NONE;
     }
 }

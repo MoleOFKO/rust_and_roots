@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/javafx/FXMLController.java to edit this template
- */
 package controller;
 
 import java.net.URL;
@@ -12,13 +8,14 @@ import javafx.scene.Group;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
+import util.SpawnTag;
 
 /**
  * FXML Controller class
  *
  * @author MITUSER-1
  */
-public class RightMapnoone_of_oneController implements Initializable {
+public class RightMapnoone_of_oneController extends BaseMapController {
 
     @FXML
     private StackPane view;
@@ -91,12 +88,20 @@ public class RightMapnoone_of_oneController implements Initializable {
     @FXML
     private Rectangle exit_up;
 
-    /**
-     * Initializes the controller class.
-     */
     @Override
-    public void initialize(URL url, ResourceBundle rb) {
-        // TODO
-    }    
+    protected String mapKey() {
+     return "right_map_noone_of_one";
+    }
+
+    @Override
+    protected void configureExits() {
+         // Coming from home_map into right_map should spawn FROM_LEFT on right_map,
+        // and going back to home_map should spawn FROM_RIGHT on home_map.
+        registerExit(exit_left, "/view/right_map_noone.fxml", SpawnTag.FROM_RIGHT);
+
+        // Example: right_map -> upper_map
+        registerExit(exit_up, "/view/right_map_notwo_of_one.fxml", SpawnTag.FROM_DOWN);
+    }
+ 
     
 }

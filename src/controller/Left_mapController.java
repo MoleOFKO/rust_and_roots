@@ -1,25 +1,19 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/javafx/FXMLController.java to edit this template
- */
 package controller;
 
-import java.net.URL;
-import java.util.ResourceBundle;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
+import util.SpawnTag;
 
 import javafx.scene.Group;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
+import util.SpawnTag;
 /**
  * FXML Controller class
  *
  * @author MITUSER-1
  */
-public class Left_mapController implements Initializable {
-
+public class Left_mapController extends BaseMapController {
 
     @FXML
     private StackPane view;
@@ -79,12 +73,17 @@ public class Left_mapController implements Initializable {
     private Rectangle human_hitbox;
     @FXML
     private ImageView human_img;
-    /**
-     * Initializes the controller class.
-     */
+   
+
     @Override
-    public void initialize(URL url, ResourceBundle rb) {
-        // TODO
-    }    
+    protected String mapKey() {
+        return "left_map";
+    }
+
+    @Override
+    protected void configureExits() {
+       registerExit(exit_right, "/view/home_map.fxml", SpawnTag.FROM_LEFT);
+       registerExit(exit_up, "/view/left_map_noone.fxml", SpawnTag.FROM_DOWN);
+    }
     
 }

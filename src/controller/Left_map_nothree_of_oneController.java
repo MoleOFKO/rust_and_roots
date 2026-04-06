@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/javafx/FXMLController.java to edit this template
- */
 package controller;
 
 import java.net.URL;
@@ -12,13 +8,14 @@ import javafx.scene.Group;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
+import util.SpawnTag;
 
 /**
  * FXML Controller class
  *
  * @author Kaung Zin
  */
-public class Left_map_nothree_of_oneController implements Initializable {
+public class Left_map_nothree_of_oneController extends BaseMapController {
 
     @FXML
     private StackPane view;
@@ -53,28 +50,34 @@ public class Left_map_nothree_of_oneController implements Initializable {
     @FXML
     private Rectangle wall13;
     @FXML
-    private Rectangle exit_bottom;
-    @FXML
     private Rectangle exit_right;
     @FXML
     private Rectangle spawn_default;
     @FXML
     private Rectangle spawn_from_right;
     @FXML
-    private Rectangle spawn_from_bottom;
-    @FXML
     private Group human;
     @FXML
     private Rectangle human_hitbox;
     @FXML
     private ImageView human_img;
+    @FXML
+    private Group world;
+    @FXML
+    private Rectangle exit_down;
+    @FXML
+    private Rectangle spawn_from_down;
+    
 
-    /**
-     * Initializes the controller class.
-     */
     @Override
-    public void initialize(URL url, ResourceBundle rb) {
-        // TODO
-    }    
+    protected String mapKey() {
+        return "left_map_nothree_of_one";
+    }
+
+    @Override
+    protected void configureExits() {
+        registerExit(exit_right, "/view/left_map_nothree.fxml", SpawnTag.FROM_LEFT);
+        registerExit(exit_down, "/view/left_map_notwo_ofone.fxml", SpawnTag.FROM_UP);
+    }
     
 }

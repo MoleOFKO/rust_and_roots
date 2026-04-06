@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/javafx/FXMLController.java to edit this template
- */
 package controller;
 
 import java.net.URL;
@@ -12,13 +8,14 @@ import javafx.scene.Group;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
+import util.SpawnTag;
 
 /**
  * FXML Controller class
  *
  * @author MITUSER-1
  */
-public class Right_map_nothree_of_oneController implements Initializable {
+public class Right_map_nothree_of_oneController extends BaseMapController{
 
     @FXML
     private StackPane view;
@@ -83,12 +80,15 @@ public class Right_map_nothree_of_oneController implements Initializable {
     @FXML
     private Rectangle spawn_from_left;
 
-    /**
-     * Initializes the controller class.
-     */
     @Override
-    public void initialize(URL url, ResourceBundle rb) {
-        // TODO
-    }    
+    protected String mapKey() {
+        return "right_map_nothree_of_one";
+    }
+
+    @Override
+    protected void configureExits() {
+        registerExit(exit_left, "/view/right_map_nothree.fxml", SpawnTag.FROM_RIGHT);
+    }
+    
     
 }

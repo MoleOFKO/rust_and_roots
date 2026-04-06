@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/javafx/FXMLController.java to edit this template
- */
 package controller;
 
 import java.net.URL;
@@ -12,13 +8,14 @@ import javafx.scene.Group;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
+import util.SpawnTag;
 
 /**
  * FXML Controller class
  *
  * @author Kaung Zin
  */
-public class Upper_mapController implements Initializable {
+public class Upper_mapController extends BaseMapController {
 
     @FXML
     private StackPane view;
@@ -49,8 +46,6 @@ public class Upper_mapController implements Initializable {
     @FXML
     private Rectangle exit_up;
     @FXML
-    private Rectangle exit_bottom;
-    @FXML
     private Rectangle spawn_default;
     @FXML
     private Rectangle spawn_from_left;
@@ -64,13 +59,20 @@ public class Upper_mapController implements Initializable {
     private Rectangle human_hitbox;
     @FXML
     private ImageView human_img;
+    @FXML
+    private Rectangle exit_down;
 
-    /**
-     * Initializes the controller class.
-     */
     @Override
-    public void initialize(URL url, ResourceBundle rb) {
-        // TODO
-    }    
+    protected String mapKey() {
+        return "upper_map";
+    }
+
+    @Override
+    protected void configureExits() {
+        registerExit(exit_up, "/view/upper_map_notwo.fxml", SpawnTag.FROM_DOWN);
+        registerExit(exit_down, "/view/home_map.fxml", SpawnTag.FROM_UP);
+        registerExit(exit_right, "/view/right_map_noone.fxml", SpawnTag.FROM_LEFT);
+    }
+  
     
 }
