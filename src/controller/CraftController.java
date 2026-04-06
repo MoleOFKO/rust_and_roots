@@ -123,11 +123,11 @@ public class CraftController implements Initializable, SceneController {
 
     private void addRecipeIfValid(RecipeTemplate template) {
         item output = resolveItem(template.outputItemName);
-        if (output == null) return;
+        if (output == null || !ItemDatabase.isDisplayableItem(output.getItem_id())) return;
         List<IngredientRequirement> ingredients = new ArrayList<>();
         for (IngredientSpec spec : template.ingredients) {
             item ingItem = resolveItem(spec.itemName);
-            if (ingItem == null) return;
+            if (ingItem == null || !ItemDatabase.isDisplayableItem(ingItem.getItem_id())) return;
             ingredients.add(new IngredientRequirement(ingItem.getItem_id(), spec.amount));
         }
         unlockedRecipes.add(new Recipe(template.key, output.getItem_id(), output.getItem_name(), template.waitSeconds, template.baseSuccessRate, template.dexScaling, template.staminaCost, ingredients));
@@ -135,7 +135,7 @@ public class CraftController implements Initializable, SceneController {
 
     private void addSelfCraftFallback(String itemName, int baseSuccessRate, int staminaCost) {
         item itm = resolveItem(itemName);
-        if (itm == null) return;
+        if (itm == null || !ItemDatabase.isDisplayableItem(itm.getItem_id())) return;
         unlockedRecipes.add(new Recipe("fallback_" + itm.getItem_id(), itm.getItem_id(), itm.getItem_name(), DEFAULT_WAIT_SECONDS, baseSuccessRate, 2, staminaCost, Collections.singletonList(new IngredientRequirement(itm.getItem_id(), 1))));
     }
 

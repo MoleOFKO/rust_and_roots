@@ -871,7 +871,7 @@ public class home_mapController extends BaseMapController {
             new SaveGameService().saveGameToSlot(GameState.get(), GameState.get().getSelectedSaveSlot());
             if (gameLoop != null) gameLoop.stop();
             if (player != null) player.stop();
-            Platform.exit();
+            util.SceneManager.switchScene("/view/main_menu.fxml");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -895,6 +895,7 @@ public class home_mapController extends BaseMapController {
 
     @FXML
     private void handlebtnskillacion(MouseEvent event) {
+        if (gameState != null) gameState.setPreferredStatusPanelGroup(GameState.StatusPanelGroup.SKILLS);
         setSkillsOpen(true);
         setStatusOpen(false);
         refreshStatusAllocationUi();
@@ -902,6 +903,7 @@ public class home_mapController extends BaseMapController {
 
     @FXML
     private void handlebtnstatusaction(MouseEvent event) {
+        if (gameState != null) gameState.setPreferredStatusPanelGroup(GameState.StatusPanelGroup.STATUS);
         setStatusOpen(true);
         setSkillsOpen(false);
         refreshStatusAllocationUi();

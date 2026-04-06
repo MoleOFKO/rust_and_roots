@@ -1086,6 +1086,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
             setInventoryOpen(true);
         }
         setActiveMenuTab(MenuTab.STATUS);
+        applyPreferredStatusPanelGroup();
     }
 
     protected void openSetting(){
@@ -1093,6 +1094,21 @@ public abstract class BaseMapController implements Initializable, SceneControlle
             setInventoryOpen(true);
         }
         setActiveMenuTab(MenuTab.SETTINGS);
+    }
+
+    protected void applyPreferredStatusPanelGroup() {
+        if (gameState == null) return;
+        switch (gameState.getPreferredStatusPanelGroup()) {
+            case SKILLS -> {
+                setSkillsOpen(true);
+                setStatusOpen(false);
+            }
+            case STATUS -> {
+                setStatusOpen(true);
+                setSkillsOpen(false);
+            }
+        }
+        refreshStatusAllocationUi();
     }
 
 

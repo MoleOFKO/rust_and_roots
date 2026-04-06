@@ -324,9 +324,6 @@
                            </image>
                         </ImageView>
                         <ImageView fx:id="SeedsImg" fitHeight="57.0" fitWidth="84.0" layoutX="5.0" layoutY="16.0" onMouseClicked="#handleBtnSeedsList" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../image/items/Tintoberry.png" />
-                           </image>
                         </ImageView>
                      </children>
                   </Pane>
@@ -343,9 +340,6 @@
                            </image>
                         </ImageView>
                         <ImageView fx:id="WaterCanImg" fitHeight="57.0" fitWidth="84.0" layoutX="5.0" layoutY="16.0" onMouseClicked="#handlebtnWater" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../image/items/Tintoberry.png" />
-                           </image>
                         </ImageView>
                      </children>
                   </Pane>
@@ -362,9 +356,6 @@
                            </image>
                         </ImageView>
                         <ImageView fx:id="SickleImg" fitHeight="57.0" fitWidth="84.0" layoutX="7.0" layoutY="16.0" onMouseClicked="#handleBtnReap" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../image/items/sickle.png" />
-                           </image>
                         </ImageView>
                      </children>
                   </Pane>

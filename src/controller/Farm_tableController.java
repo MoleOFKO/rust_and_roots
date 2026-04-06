@@ -31,12 +31,12 @@ import util.SceneManager;
 import util.SpawnTag;
 
 public class Farm_tableController implements Initializable, SceneController {
+    private static final String TOOL_SLOT_STYLE = "-fx-effect: dropshadow(gaussian, rgba(255,215,0,0.85), 14, 0.55, 0, 0);";
 
     private static final double FARM_TABLE_TIME_SCALE = 0.25;
     private static final int TOTAL_GROWTH_STAGES = 3;
     private static final double DEFAULT_GROWTH_SECONDS = 60.0;
     private static final int DEFAULT_PLANT_STAMINA_COST = 2;
-    private static final int SEED_RETURN_CHANCE = 15;
 
     private static final String PLOT_IDLE_STYLE = "-fx-background-color: transparent; -fx-background-radius: 6; -fx-border-color: transparent; -fx-border-radius: 6;";
     private static final String PLOT_HIGHLIGHT_STYLE = "-fx-background-color: rgba(255,255,0,0.14); -fx-background-radius: 6; -fx-border-color: rgba(255,255,0,0.92); -fx-border-width: 2; -fx-border-radius: 6;";
@@ -44,6 +44,8 @@ public class Farm_tableController implements Initializable, SceneController {
     private GameState gameState;
     private ToolMode activeMode = ToolMode.NONE;
     private Integer selectedSeedItemId;
+    private Integer equippedWateringCanItemId;
+    private Integer equippedSickleItemId;
     private double previousTimeScale = 1.0;
     private boolean previousPaused = false;
     private boolean timeOverrideApplied = false;
@@ -188,6 +190,12 @@ public class Farm_tableController implements Initializable, SceneController {
         if (selectedItemId == null || selectedItemId <= 0) return;
 
         selectedSeedItemId = selectedItemId;
+        switch (activeMode) {
+            case WATER -> equippedWateringCanItemId = selectedItemId;
+            case SICKLE -> equippedSickleItemId = selectedItemId;
+            case SEED, NONE -> {
+            }
+        }
 
         hideSeedList();
         refreshSelectedToolPreview();
@@ -203,6 +211,7 @@ public class Farm_tableController implements Initializable, SceneController {
         Map<Integer, Integer> seedsToRemove = computeSeedConsumption();
         int staminaCost = computePendingFarmStaminaCost();
         if (gameState.getPlayerState().getStamina() < staminaCost) return;
+        if (!moveEquippedFarmToolsToStorage(realFarm)) return;
 
         for (Map.Entry<Integer, Integer> entry : seedsToRemove.entrySet()) {
             if (!removeSeedFromPlayerStorage(entry.getKey(), entry.getValue())) return;
@@ -335,6 +344,8 @@ public class Farm_tableController implements Initializable, SceneController {
         for (String plotId : plotViews.keySet()) {
             tempPlots.put(plotId, TempPlotData.from(realFarm.getPlot(plotId)));
         }
+        equippedWateringCanItemId = normalizeItemId(realFarm.getEquippedWateringCanItemId());
+        equippedSickleItemId = normalizeItemId(realFarm.getEquippedSickleItemId());
         pendingHarvests.clear();
         pendingSeedReturns.clear();
         pendingFarmingExp = 0;
@@ -365,13 +376,13 @@ public class Farm_tableController implements Initializable, SceneController {
             }
 
             case WATER -> {
-                if (!isWateringCanSelectionValid(selectedSeedItemId)) return;
+                if (!isWateringCanSelectionValid(equippedWateringCanItemId)) return;
                 if (!pd.canWater(now)) return;
                 pd.water(now);
             }
 
             case SICKLE -> {
-                if (!isSickleSelectionValid(selectedSeedItemId)) return;
+                if (!isSickleSelectionValid(equippedSickleItemId)) return;
                 if (pd.isEmpty() || !pd.isReady(now)) return;
 
                 int harvestItemId = pd.harvestItemId();
@@ -379,10 +390,9 @@ public class Farm_tableController implements Initializable, SceneController {
                     pendingHarvests.merge(harvestItemId, 1, Integer::sum);
                 }
 
-                if (ThreadLocalRandom.current().nextInt(100) < SEED_RETURN_CHANCE
-                        && pd.seedItemId != null
-                        && pd.seedItemId > 0) {
-                    pendingSeedReturns.merge(pd.seedItemId, 1, Integer::sum);
+                int seedReturnCount = computeSeedReturnCount(pd.seedItemId);
+                if (seedReturnCount > 0 && pd.seedItemId != null && pd.seedItemId > 0) {
+                    pendingSeedReturns.merge(pd.seedItemId, seedReturnCount, Integer::sum);
                 }
 
                 pendingFarmingExp++;
@@ -406,7 +416,7 @@ public class Farm_tableController implements Initializable, SceneController {
         if (!availableItems.isEmpty() && (selectedSeedItemId == null || !availableItems.contains(selectedSeedItemId))) {
             selectedSeedItemId = availableItems.get(0);
         }
-        if (availableItems.isEmpty()) {
+        if (availableItems.isEmpty() && activeMode == ToolMode.SEED) {
             selectedSeedItemId = null;
         }
 
@@ -519,7 +529,7 @@ public class Farm_tableController implements Initializable, SceneController {
         if (ItemDatabase.isSeedItem(itemId)) {
             return Math.max(0, getCombinedOwnedCount(itemId) - reservedNewSeedUsage(itemId));
         }
-        return Math.max(0, getCombinedOwnedCount(itemId));
+        return Math.max(0, getCombinedOwnedCount(itemId) - reservedToolUsage(itemId));
     }
 
     private boolean isSeedSelectionValid(Integer itemId) {
@@ -559,15 +569,23 @@ public class Farm_tableController implements Initializable, SceneController {
         }
 
         if (WaterCanImg != null) {
-            WaterCanImg.setImage(activeMode == ToolMode.WATER && isWateringCanSelectionValid(selectedSeedItemId)
-                    ? ItemDatabase.getImage(selectedSeedItemId)
+            Integer previewWaterCan = isWateringCanSelectionValid(equippedWateringCanItemId)
+                    ? equippedWateringCanItemId
+                    : (activeMode == ToolMode.WATER && isWateringCanSelectionValid(selectedSeedItemId) ? selectedSeedItemId : null);
+            WaterCanImg.setImage(previewWaterCan != null
+                    ? ItemDatabase.getImage(previewWaterCan)
                     : defaultWaterCanIcon);
+            WaterCanImg.setStyle(isWateringCanSelectionValid(equippedWateringCanItemId) ? TOOL_SLOT_STYLE : "");
         }
 
         if (SickleImg != null) {
-            SickleImg.setImage(activeMode == ToolMode.SICKLE && isSickleSelectionValid(selectedSeedItemId)
-                    ? ItemDatabase.getImage(selectedSeedItemId)
+            Integer previewSickle = isSickleSelectionValid(equippedSickleItemId)
+                    ? equippedSickleItemId
+                    : (activeMode == ToolMode.SICKLE && isSickleSelectionValid(selectedSeedItemId) ? selectedSeedItemId : null);
+            SickleImg.setImage(previewSickle != null
+                    ? ItemDatabase.getImage(previewSickle)
                     : defaultSickleIcon);
+            SickleImg.setStyle(isSickleSelectionValid(equippedSickleItemId) ? TOOL_SLOT_STYLE : "");
         }
     }
 
@@ -659,8 +677,8 @@ public class Farm_tableController implements Initializable, SceneController {
 
             boolean highlight = switch (activeMode) {
                 case SEED -> isSeedSelectionValid(selectedSeedItemId) && pd != null && pd.isEmpty();
-                case WATER -> isWateringCanSelectionValid(selectedSeedItemId) && pd != null && pd.canWater(now);
-                case SICKLE -> isSickleSelectionValid(selectedSeedItemId) && pd != null && pd.isReady(now);
+                case WATER -> isWateringCanSelectionValid(equippedWateringCanItemId) && pd != null && pd.canWater(now);
+                case SICKLE -> isSickleSelectionValid(equippedSickleItemId) && pd != null && pd.isReady(now);
                 case NONE -> false;
             };
 
@@ -683,6 +701,26 @@ public class Farm_tableController implements Initializable, SceneController {
             if (real == null || real.seedItemId == null || real.seedItemId <= 0) count++;
         }
         return count;
+    }
+
+    private int reservedToolUsage(int itemId) {
+        if (itemId <= 0) return 0;
+        int reserved = 0;
+
+        FarmState realFarm = gameState.getFarmState(activeFarmMapKey);
+        Integer realWateringCan = normalizeItemId(realFarm.getEquippedWateringCanItemId());
+        Integer realSickle = normalizeItemId(realFarm.getEquippedSickleItemId());
+
+        if (java.util.Objects.equals(itemId, normalizeItemId(equippedWateringCanItemId))
+                && !java.util.Objects.equals(itemId, realWateringCan)) {
+            reserved++;
+        }
+        if (java.util.Objects.equals(itemId, normalizeItemId(equippedSickleItemId))
+                && !java.util.Objects.equals(itemId, realSickle)) {
+            reserved++;
+        }
+
+        return reserved;
     }
 
     private Map<Integer, Integer> computeSeedConsumption() {
@@ -724,6 +762,91 @@ public class Farm_tableController implements Initializable, SceneController {
         }
 
         return remaining <= 0;
+    }
+
+    private boolean moveEquippedFarmToolsToStorage(FarmState realFarm) {
+        if (realFarm == null) return false;
+
+        Integer targetWateringCan = normalizeItemId(equippedWateringCanItemId);
+        Integer targetSickle = normalizeItemId(equippedSickleItemId);
+        Integer currentWateringCan = normalizeItemId(realFarm.getEquippedWateringCanItemId());
+        Integer currentSickle = normalizeItemId(realFarm.getEquippedSickleItemId());
+
+        if (!syncSingleEquippedTool(currentWateringCan, targetWateringCan)) return false;
+        if (!syncSingleEquippedTool(currentSickle, targetSickle)) return false;
+
+        realFarm.setEquippedWateringCanItemId(targetWateringCan);
+        realFarm.setEquippedSickleItemId(targetSickle);
+        return true;
+    }
+
+    private boolean syncSingleEquippedTool(Integer currentItemId, Integer targetItemId) {
+        Integer normalizedCurrent = normalizeItemId(currentItemId);
+        Integer normalizedTarget = normalizeItemId(targetItemId);
+
+        if (java.util.Objects.equals(normalizedCurrent, normalizedTarget)) {
+            return true;
+        }
+
+        if (normalizedTarget == null) {
+            if (normalizedCurrent != null) {
+                gameState.getPlayerState().getInventory().addItem(normalizedCurrent, 1);
+            }
+            return true;
+        }
+
+        if (!removeSingleItemFromPlayerStorage(normalizedTarget)) {
+            return false;
+        }
+
+        if (normalizedCurrent != null) {
+            gameState.getPlayerState().getInventory().addItem(normalizedCurrent, 1);
+        }
+        return true;
+    }
+
+    private boolean removeSingleItemFromPlayerStorage(int itemId) {
+        if (itemId <= 0) return true;
+
+        Inventory inv = gameState.getPlayerState().getInventory();
+        if (inv.getCount(itemId) > 0) {
+            return inv.removeItem(itemId, 1);
+        }
+
+        for (int i = 0; i < gameState.getPlayerState().getHotbarSize(); i++) {
+            if (gameState.getPlayerState().getHotbarItemId(i) == itemId
+                    && gameState.getPlayerState().getHotbarItemCount(i) > 0) {
+                return gameState.getPlayerState().removeHotbarItems(i, 1);
+            }
+        }
+
+        return false;
+    }
+
+    private Integer normalizeItemId(Integer itemId) {
+        return (itemId == null || itemId <= 0) ? null : itemId;
+    }
+
+    private int computeSeedReturnCount(Integer seedItemId) {
+        if (seedItemId == null || seedItemId <= 0 || gameState == null || gameState.getPlayerState() == null) {
+            return 0;
+        }
+
+        double chancePercent = computeSeedReturnChancePercent();
+        if (chancePercent >= 200.0) {
+            return 2;
+        }
+        if (chancePercent >= 100.0) {
+            return 1;
+        }
+
+        double roll = ThreadLocalRandom.current().nextDouble(100.0);
+        return roll < chancePercent ? 1 : 0;
+    }
+
+    private double computeSeedReturnChancePercent() {
+        int dex = Math.max(0, gameState.getPlayerState().getDex());
+        return dex * 0.01;
     }
 
     private int computePendingFarmStaminaCost() {

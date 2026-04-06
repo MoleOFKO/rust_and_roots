@@ -19,7 +19,12 @@ public final class GameState {
     private static final int DEFAULT_SMELT_POINT_CAP = 10;
     private static final double DEFAULT_SMELT_POINT_REGEN_SECONDS = 15.0;
     private static final int DEFAULT_RANDOM_SHOP_ITEM_COUNT = 4;
-    private static final int EARLY_WATERING_CAN_SHOP_DAY_LIMIT = 10;
+    private static final int NEW_GAME_STARTING_COINS = 100;
+
+    public enum StatusPanelGroup {
+        STATUS,
+        SKILLS
+    }
 
     private int smeltPointCap = DEFAULT_SMELT_POINT_CAP;
     private double smeltPoints = DEFAULT_SMELT_POINT_CAP;
@@ -243,7 +248,6 @@ public final class GameState {
     private final Map<Integer, Integer> dailyRemainingShopStock = new LinkedHashMap<>();
     private final List<Integer> fixedShopItemIds = new ArrayList<>();
     private int randomShopItemCount = DEFAULT_RANDOM_SHOP_ITEM_COUNT;
-    private int earlyGameWateringCanShopItemId = -1;
 
     private int activeCookingOutputItemId = -1;
     private int activeCookingOutputQuantity = 1;
@@ -261,17 +265,83 @@ public final class GameState {
     private ActiveSmeltJob activeSmeltJob = null;
 
     private GameState() {
-        seedStarterChestBonus();
         seedDefaultFixedShopItems();
     }
 
+    public void resetForNewGame() {
+        clearInventoryItems(playerState.getInventory());
+        replaceCoins(playerState.getInventory(), NEW_GAME_STARTING_COINS);
+        playerState.clearAllHotbarItems();
+
+        clearInventoryItems(chestInventory);
+        seedStarterChestBonus();
+
+        clearFarmState(getFarmState("home_map"));
+        clearFarmState(getFarmState("Home_interior"));
+
+        playerSkills.clear();
+        activeFarmMapKey = "home_map";
+        pendingSpawn = SpawnTag.DEFAULT;
+        returnFxml = null;
+        returnSpawn = SpawnTag.DEFAULT;
+        currentMapKey = "home_map";
+        playerX = 0;
+        playerY = 0;
+
+        activeCookingOutputItemId = -1;
+        activeCookingOutputQuantity = 1;
+        activeCookingCompleteAtSeconds = -1;
+        activeCookingOutcome = null;
+
+        activeCraftingOutputItemId = -1;
+        activeCraftingOutputQuantity = 1;
+        activeCraftingCompleteAtSeconds = -1;
+        activeCraftingHpDelta = 0;
+        activeCraftingStaminaDelta = 0;
+        activeCraftingSuccess = true;
+
+        cookedDishEffectsByItemId.clear();
+        activeSmeltJob = null;
+        dailyRandomShopItemIds = new ArrayList<>();
+        shopRandomDay = -1;
+        shopStockDay = -1;
+        dailyRemainingShopStock.clear();
+        saveMenuMode = false;
+        preferredStatusPanelGroup = StatusPanelGroup.STATUS;
+    }
+
     private void seedStarterChestBonus() {
-        if (!chestInventory.itemsProperty().isEmpty()) return;
-
         ItemDatabase.loadItems();
-
         addStarterChestItem(resolveStarterItemId("watering_can", "watering can", "Watering Can"), 1);
         addStarterChestItem(resolveStarterItemId("sickle", "Sickle"), 1);
+    }
+
+    private void clearInventoryItems(Inventory inventory) {
+        if (inventory == null) return;
+        var itemIds = new ArrayList<>(inventory.itemsProperty().keySet());
+        for (Integer itemId : itemIds) {
+            int qty = inventory.getCount(itemId);
+            if (qty > 0) {
+                inventory.removeItem(itemId, qty);
+            }
+        }
+    }
+
+    private void replaceCoins(Inventory inventory, int targetCoins) {
+        if (inventory == null) return;
+        int currentCoins = inventory.getCoins();
+        if (currentCoins > 0) {
+            inventory.spendCoins(currentCoins);
+        }
+        if (targetCoins > 0) {
+            inventory.addCoins(targetCoins);
+        }
+    }
+
+    private void clearFarmState(FarmState farmState) {
+        if (farmState == null) return;
+        farmState.getAllPlots().clear();
+        farmState.clearEquippedTools();
     }
 
     private int resolveStarterItemId(String... candidateNames) {
@@ -297,14 +367,13 @@ public final class GameState {
         if (!fixedShopItemIds.isEmpty()) return;
 
         ItemDatabase.loadItems();
-        earlyGameWateringCanShopItemId = resolveShopItemId("watering_can", "watering can", "Watering Can");
 
         addFixedShopItem(resolveShopItemId("Wheat Seed"), fixedShopItemIds);
-        addFixedShopItem(resolveShopItemId("Sunflower Seed"), fixedShopItemIds);
-        addFixedShopItem(resolveShopItemId("Pumpkin Seed"), fixedShopItemIds);
+        addFixedShopItem(resolveShopItemId("Fishing Rod"), fixedShopItemIds);
+        addFixedShopItem(resolveShopItemId("Pickaxe"), fixedShopItemIds);
         addFixedShopItem(resolveShopItemId("Pineapple Seed"), fixedShopItemIds);
         addFixedShopItem(resolveShopItemId("Onion Seed"), fixedShopItemIds);
-        addFixedShopItem(resolveShopItemId("Green Eggplant Seed"), fixedShopItemIds);
+        addFixedShopItem(resolveShopItemId("Axe"), fixedShopItemIds);
         addFixedShopItem(resolveShopItemId("Grape Seed"), fixedShopItemIds);
         addFixedShopItem(resolveShopItemId("Cucumber Seed"), fixedShopItemIds);
     }
@@ -360,11 +429,7 @@ public final class GameState {
     public List<Integer> getFixedShopItemIdsForDay(int dayNumber) {
         List<Integer> result = new ArrayList<>();
         int targetCount = fixedShopItemIds.size();
-
-        if (dayNumber > 0 && dayNumber <= EARLY_WATERING_CAN_SHOP_DAY_LIMIT) {
-            addFixedShopItem(earlyGameWateringCanShopItemId, result);
-        }
-
+        
         for (Integer itemId : fixedShopItemIds) {
             if (targetCount > 0 && result.size() >= targetCount) break;
             if (itemId != null) {
@@ -683,6 +748,7 @@ public final class GameState {
     }
     
     private boolean saveMenuMode = false;
+    private StatusPanelGroup preferredStatusPanelGroup = StatusPanelGroup.STATUS;
 
     public boolean isSaveMenuMode() {
         return saveMenuMode;
@@ -690,6 +756,14 @@ public final class GameState {
 
     public void setSaveMenuMode(boolean saveMenuMode) {
         this.saveMenuMode = saveMenuMode;
+    }
+
+    public StatusPanelGroup getPreferredStatusPanelGroup() {
+        return preferredStatusPanelGroup == null ? StatusPanelGroup.STATUS : preferredStatusPanelGroup;
+    }
+
+    public void setPreferredStatusPanelGroup(StatusPanelGroup preferredStatusPanelGroup) {
+        this.preferredStatusPanelGroup = preferredStatusPanelGroup == null ? StatusPanelGroup.STATUS : preferredStatusPanelGroup;
     }
     
     

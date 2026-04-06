@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
-import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;
 import javafx.collections.MapChangeListener;
 import javafx.scene.control.Slider;
@@ -41,7 +40,6 @@ import javafx.scene.layout.Pane;
 import model.Inventory;
 import model.ItemDatabase;
 import model.item;
-import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
@@ -903,7 +901,8 @@ public class Home_interiorController extends BaseMapController {
             new SaveGameService().saveGameToSlot(GameState.get(), GameState.get().getSelectedSaveSlot());
             if (gameLoop != null) gameLoop.stop();
             if (player != null) player.stop();
-            Platform.exit();
+            GameState.get().setSaveMenuMode(false);
+            util.SceneManager.switchScene("/view/main_menu.fxml");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -967,7 +966,8 @@ public class Home_interiorController extends BaseMapController {
                     new SaveGameService().saveGame(GameState.get());
                     if (gameLoop != null) gameLoop.stop();
                     if (player != null) player.stop();
-                    Platform.exit();
+                    GameState.get().setSaveMenuMode(false);
+                    util.SceneManager.switchScene("/view/main_menu.fxml");
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
@@ -997,6 +997,7 @@ public class Home_interiorController extends BaseMapController {
     
     @FXML
     private void handlebtnskillacion(MouseEvent event) {
+        if (gameState != null) gameState.setPreferredStatusPanelGroup(GameState.StatusPanelGroup.SKILLS);
         super.setSkillsOpen(true);
         super.setStatusOpen(false);
         refreshStatusAllocationUi();
@@ -1004,6 +1005,7 @@ public class Home_interiorController extends BaseMapController {
 
     @FXML
     private void handlebtnstatusaction(MouseEvent event) {
+        if (gameState != null) gameState.setPreferredStatusPanelGroup(GameState.StatusPanelGroup.STATUS);
         super.setStatusOpen(true);
         super.setSkillsOpen(false);
         refreshStatusAllocationUi();

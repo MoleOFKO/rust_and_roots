@@ -118,6 +118,18 @@ public final class ItemDatabase {
     public static String getImageFileName(int itemId) { return imageFileById.get(itemId); }
     public static String getItemType(int itemId) { return itemTypeById.getOrDefault(itemId, ""); }
 
+    public static boolean hasImageAsset(int itemId) {
+        return itemId > 0 && containsItem(itemId) && getImage(itemId) != null;
+    }
+
+    public static boolean isDisplayableItem(int itemId) {
+        return itemId > 0
+                && containsItem(itemId)
+                && getItemName(itemId) != null
+                && !getItemName(itemId).isBlank()
+                && hasImageAsset(itemId);
+    }
+
     public static String getItemName(int itemId) {
         item itm = getItemById(itemId);
         return itm == null ? null : itm.getItem_name();
@@ -224,14 +236,23 @@ public final class ItemDatabase {
         if (seedItemId <= 0 || !isSeedItem(seedItemId)) return false;
         String seedName = getItemName(seedItemId);
         if (seedName == null || seedName.isBlank()) return false;
+        if (!hasImageAsset(seedItemId)) return false;
 
         int cropItemId = resolveCropItemIdForSeed(seedItemId);
         if (cropItemId <= 0) return false;
         String cropName = getItemName(cropItemId);
         if (cropName == null || cropName.isBlank()) return false;
+        if (!hasImageAsset(cropItemId)) return false;
 
         int harvestItemId = resolveHarvestItemIdForSeed(seedItemId);
-        return harvestItemId > 0 && getItemName(harvestItemId) != null && !getItemName(harvestItemId).isBlank();
+        if (harvestItemId <= 0 || !isDisplayableItem(harvestItemId)) return false;
+
+        String spriteKey = buildCropSpriteKeyForSeed(seedItemId);
+        if (spriteKey == null || spriteKey.isBlank()) return false;
+
+        return hasCropStageAsset(spriteKey, 1)
+                && hasCropStageAsset(spriteKey, 2)
+                && hasCropStageAsset(spriteKey, 3);
     }
 
     public static String buildCropSpriteKeyForSeed(int seedItemId) {
@@ -277,6 +298,21 @@ public final class ItemDatabase {
         if (out.endsWith("_fruit")) out = out.substring(0, out.length() - 6);
         if (out.endsWith("_seed")) out = out.substring(0, out.length() - 5);
         return out;
+    }
+
+    public static boolean hasCropStageAsset(String spriteKey, int stageNumber) {
+        if (spriteKey == null || spriteKey.isBlank() || stageNumber <= 0) return false;
+        String path = String.format("/image/crops/%s_plant%d.png", spriteKey, stageNumber);
+        return resourceExists(path);
+    }
+
+    private static boolean resourceExists(String path) {
+        if (path == null || path.isBlank()) return false;
+        try (InputStream is = ItemDatabase.class.getResourceAsStream(path)) {
+            return is != null;
+        } catch (Exception ignored) {
+            return false;
+        }
     }
 
     private static String normalizeType(String type) {
