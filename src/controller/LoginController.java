@@ -5,6 +5,7 @@
 package controller;
 
 import db.dbcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import game.GameState;
 import java.io.IOException;
 import java.net.URL;
@@ -35,6 +36,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
@@ -99,6 +101,14 @@ public class LoginController implements Initializable {
     private TextField otpcode;
     @FXML
     private Button btnotpsend;
+    @FXML
+    private Hyperlink forgotpwd;
+    @FXML
+    private FontAwesomeIcon openlpassword;
+    @FXML
+    private FontAwesomeIcon closedlpassword;
+    @FXML
+    private TextField txtlpasswordvisible;
     
     
     @Override
@@ -113,19 +123,24 @@ public class LoginController implements Initializable {
         }
         WorldScaler scaler = new WorldScaler(view, uiRoot);
         Platform.runLater(scaler::scale);
+
+        if (txtlpasswordvisible != null && txtlpassword != null) {
+            txtlpasswordvisible.textProperty().bindBidirectional(txtlpassword.textProperty());
+            applyLoginPasswordMask(true);
+        }
     }   
  
     @FXML
     private void handlebtnloginaction(ActionEvent event) throws SQLException, IOException {
-        String username = txtlname.getText().trim();
+        String loginInput = txtlname.getText().trim();
         String password = txtlpassword.getText();
 
-        if (username.isEmpty() && password.isEmpty()) {
+        if (loginInput.isEmpty() && password.isEmpty()) {
             AppDialogs.showMessageDialog(null, "Please enter your username and password.");
             return;
         }
-        if (username.isEmpty()) {
-            AppDialogs.showMessageDialog(null, "Please enter a username.");
+        if (loginInput.isEmpty()) {
+            AppDialogs.showMessageDialog(null, "Please enter your username or email.");
             return;
         }
         if (password.isEmpty()) {
@@ -138,11 +153,13 @@ public class LoginController implements Initializable {
     FROM accounts a
     JOIN user_roles r ON a.role_id = r.role_id
     JOIN account_statuses s ON a.status_id = s.status_id
-    WHERE a.account_name = ?
+    WHERE a.account_name = ? OR a.email = ?
+    LIMIT 1
     """;
                
         pst = con.prepareStatement(sql);
-        pst.setString(1, username);
+        pst.setString(1, loginInput);
+        pst.setString(2, loginInput);
         rs = pst.executeQuery();
         if (!rs.next()) {
             AppDialogs.showMessageDialog(null, "No account found with that username.");
@@ -532,5 +549,29 @@ public class LoginController implements Initializable {
             null,
             "Verification code sent to " + email + ".\nEnter the code and press Sign Up."
         );
+    }
+
+    @FXML
+    private void handleforgetpwdaction(ActionEvent event) {
+        util.SceneManager.switchScene("/view/OTP.fxml");
+    }
+
+    @FXML
+    private void handleopenpasswordaction(MouseEvent event) {
+        applyLoginPasswordMask(false);
+    }
+
+    @FXML
+    private void handlecolsedpasswordaction(MouseEvent event) {
+        applyLoginPasswordMask(true);
+    }
+
+    private void applyLoginPasswordMask(boolean masked) {
+        txtlpassword.setVisible(masked);
+        txtlpassword.setManaged(masked);
+        txtlpasswordvisible.setVisible(!masked);
+        txtlpasswordvisible.setManaged(!masked);
+        openlpassword.setVisible(masked);
+        closedlpassword.setVisible(!masked);
     }
 }

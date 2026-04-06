@@ -27,6 +27,7 @@
                         <children>
                            <TextField fx:id="txtlname" layoutX="50.0" layoutY="68.0" promptText="Email or Username" style="-fx-font-weight: bold;" styleClass="inputbox" stylesheets="@../css/style.css" />
                            <PasswordField fx:id="txtlpassword" layoutX="50.0" layoutY="130.0" promptText="Password" style="-fx-font-weight: bold;" styleClass="inputbox" stylesheets="@../css/style.css" />
+                           <TextField fx:id="txtlpasswordvisible" layoutX="50.0" layoutY="130.0" managed="false" promptText="Password" style="-fx-font-weight: bold;" styleClass="inputbox" stylesheets="@../css/style.css" visible="false" />
                            <Hyperlink fx:id="sihl" layoutX="72.0" layoutY="218.0" onAction="#handlesihlaction" text="Create an account?" textFill="#9a5000">
                               <font>
                                  <Font name="System Bold" size="12.0" />
@@ -43,6 +44,8 @@
                               <Font name="System Bold" size="12.0" />
                            </font>
                         </Hyperlink>
+                        <FontAwesomeIcon fx:id="openlpassword" fill="WHITE" glyphName="EYE" layoutX="187.0" layoutY="150.0" onMouseClicked="#handleopenpasswordaction" size="1.5em" />
+                        <FontAwesomeIcon fx:id="closedlpassword" fill="WHITE" glyphName="EYE_SLASH" layoutX="187.0" layoutY="150.0" onMouseClicked="#handlecolsedpasswordaction" size="1.5em" visible="false" />
                         </children>
                      </Pane>
                   </children>
