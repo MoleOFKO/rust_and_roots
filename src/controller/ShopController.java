@@ -735,16 +735,14 @@ public class ShopController implements Initializable, SceneController {
             PreparedStatement ps = con.prepareStatement(sql);
             ResultSet rs = ps.executeQuery()
         ) {
-            List<item> allItems = new ArrayList<>();
             Map<Integer, item> allById = new LinkedHashMap<>();
 
             while (rs.next()) {
                 int itemId = rs.getInt("item_id");
-                String itemName = rs.getString("item_name");
-                int price = rs.getInt("price");
-
-                item itm = new item(itemId, itemName, price);
-                allItems.add(itm);
+                item itm = ItemDatabase.getItemById(itemId);
+                if (itm == null || !ItemDatabase.isShopDisplayableItem(itemId)) {
+                    continue;
+                }
                 allById.put(itemId, itm);
             }
 
@@ -754,7 +752,6 @@ public class ShopController implements Initializable, SceneController {
             int today = GameTimeManager.get().dayNumberProperty().get();
             List<Integer> fixedShopItemIds = gameState.getFixedShopItemIdsForDay(today);
             int randomShopItemCount = gameState.getRandomShopItemCount();
-            int totalShopItemCount = gameState.getTotalShopItemCount();
 
             for (Integer itemId : fixedShopItemIds) {
                 item itm = allById.get(itemId);
@@ -764,7 +761,12 @@ public class ShopController implements Initializable, SceneController {
                 }
             }
 
-            List<Integer> savedRandomIds = gameState.getDailyRandomShopItemIds();
+            List<Integer> savedRandomIds = new ArrayList<>();
+            for (Integer itemId : gameState.getDailyRandomShopItemIds()) {
+                if (itemId != null && allById.containsKey(itemId)) {
+                    savedRandomIds.add(itemId);
+                }
+            }
 
             boolean needNewRandom =
                 gameState.getShopRandomDay() != today ||
@@ -772,7 +774,7 @@ public class ShopController implements Initializable, SceneController {
                 savedRandomIds.size() < randomShopItemCount;
 
             if (needNewRandom) {
-                List<item> randomPool = new ArrayList<>(allItems);
+                List<item> randomPool = new ArrayList<>(allById.values());
                 randomPool.removeIf(itm -> dbItemsById.containsKey(itm.getItem_id()));
                 Collections.shuffle(randomPool);
 
@@ -786,11 +788,24 @@ public class ShopController implements Initializable, SceneController {
                 savedRandomIds = newRandomIds;
             }
 
+            int targetVisibleCount = Math.min(allById.size(), dbItemsById.size() + randomShopItemCount);
             for (Integer itemId : savedRandomIds) {
                 item itm = allById.get(itemId);
-                if (itm != null && !dbItemsById.containsKey(itemId) && shopItems.size() < totalShopItemCount) {
+                if (itm != null && !dbItemsById.containsKey(itemId) && shopItems.size() < targetVisibleCount) {
                     shopItems.add(itm);
                     dbItemsById.put(itemId, itm);
+                }
+            }
+
+            if (shopItems.size() < targetVisibleCount) {
+                List<item> fallbackPool = new ArrayList<>(allById.values());
+                fallbackPool.removeIf(itm -> dbItemsById.containsKey(itm.getItem_id()));
+                Collections.shuffle(fallbackPool);
+
+                for (item itm : fallbackPool) {
+                    if (shopItems.size() >= targetVisibleCount) break;
+                    shopItems.add(itm);
+                    dbItemsById.put(itm.getItem_id(), itm);
                 }
             }
 
