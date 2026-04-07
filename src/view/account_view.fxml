@@ -14,13 +14,13 @@
 
 <StackPane fx:id="view" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.AccountViewController">
     <children>
-      <ImageView fitHeight="511.0" fitWidth="811.0" pickOnBounds="true">
-         <image>
-            <Image url="@../image/Admin/dashboard.png" />
-         </image>
-      </ImageView>
         <Group fx:id="uiRoot">
             <children>
+            <ImageView fitHeight="511.0" fitWidth="811.0" pickOnBounds="true">
+               <image>
+                  <Image url="@../image/Admin/dashboard.png" />
+               </image>
+            </ImageView>
                <Pane layoutX="25.0" layoutY="110.0" prefHeight="43.0" prefWidth="164.0" style="-fx-background-color: black; -fx-background-radius: 10px;" />
             <ImageView fitHeight="33.0" fitWidth="167.0" layoutX="25.0" layoutY="17.0" pickOnBounds="true">
                <image>

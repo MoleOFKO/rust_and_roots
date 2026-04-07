@@ -16,30 +16,26 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Group;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javax.swing.JOptionPane;
 import util.AppDialogs;
-import rust_and_roots.Rust_and_roots;
-import static rust_and_roots.Rust_and_roots.stage;
 import util.WorldScaler;
 
 /**
@@ -91,6 +87,8 @@ public class item_edit_btnController implements Initializable {
     Statement st;
     Parent root;
     String img_name;
+    @FXML
+    private ComboBox<ItemTypeOption> cbitemtype;
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -99,6 +97,7 @@ public class item_edit_btnController implements Initializable {
             con = db.getConnection();
             System.out.println("Ready...");
             lblaname.setText(LoginController.txtname);
+            loadItemTypes();
             inititem();
         }catch (ClassNotFoundException e){
             System.out.println("Not Connected....");
@@ -125,6 +124,7 @@ public class item_edit_btnController implements Initializable {
             //show image in ImageView
             Image image = new Image(selectedFile.toURI().toString());
             itemimage.setImage(image);
+            fitImageToPreviewBox();
             
             //show image to project folder
             img_name = copyImageToFolder(selectedFile);
@@ -135,55 +135,71 @@ public class item_edit_btnController implements Initializable {
     @FXML
     private void handlebtnsaveaction(ActionEvent event) throws SQLException, IOException {
         if(txtmname.getText().isEmpty()){
-            AppDialogs.showMessageDialog(null, "Please Select Category");
+            AppDialogs.showMessageDialog(null, "Please Enter Item Name");
         }else if(txtmobstype.getText().isEmpty()){
-            AppDialogs.showMessageDialog(null, "Please Enter Product Name");
-        } else if(txtstr.getText().isEmpty()){
-            AppDialogs.showMessageDialog(null, "Please Select Size");
-        }else if(txtagi.getText().isEmpty()){
             AppDialogs.showMessageDialog(null, "Please Enter Price");
+        } else if(cbitemtype.getSelectionModel().getSelectedItem() == null){
+            AppDialogs.showMessageDialog(null, "Please Select Item Type");
+        } else if(txtstr.getText().isEmpty()){
+            AppDialogs.showMessageDialog(null, "Please Enter STR");
+        }else if(txtagi.getText().isEmpty()){
+            AppDialogs.showMessageDialog(null, "Please Enter AGI");
         }else if(txtdex.getText().isEmpty()){
-            AppDialogs.showMessageDialog(null, "Please Enter Stock Qty");
+            AppDialogs.showMessageDialog(null, "Please Enter DEX");
         }
         else if(txtvid.getText().isEmpty()){
-            AppDialogs.showMessageDialog(null, "Please Enter Stock Qty");
+            AppDialogs.showMessageDialog(null, "Please Enter VIT");
         }else if(txthp.getText().isEmpty()){
-            AppDialogs.showMessageDialog(null, "Please Enter Stock Qty");
+            AppDialogs.showMessageDialog(null, "Please Enter HP");
         }else if(txtstamina.getText().isEmpty()){
-            AppDialogs.showMessageDialog(null, "Please Enter Stock Qty");
+            AppDialogs.showMessageDialog(null, "Please Enter Stamina");
         }else if(itemimage.getImage()==null){
             AppDialogs.showMessageDialog(null, "Please Upload Image");
         } 
         else{
-           
-        String sql = "UPDATE items i" +
-            "JOIN item_stats s ON i.item_stats_id = s.item_stats_id" +
-            "SET i.item_name = ?," +
-            "    i.price = ?," +
-            "    s.str_stat = ?," +
-            "    s.agi_stat = ?," +
-            "    s.dex_stat = ?," +
-            "    s.vit_stat = ?," +
-            "    s.hp = ?," +
-            "    s.stamina = ?," +
-            "    i.image = ?" +
-            "WHERE i.item_name = ?";
-        pst = con.prepareStatement(sql);
-        pst.setString(1, txtmname.getText());
-        pst.setInt(2, Integer.parseInt((txtmobstype.getText())));
-        pst.setInt(3, Integer.parseInt((txtstr.getText())));
-        pst.setInt(4, Integer.parseInt((txtagi.getText())));
-        pst.setInt(5, Integer.parseInt(txtdex.getText()));
-        pst.setInt(6, Integer.parseInt((txtvid.getText())));
-        pst.setInt(7, Integer.parseInt((txthp.getText())));
-        pst.setInt(8, Integer.parseInt((txtstamina.getText())));
-        pst.setString(9, img_name);
-        pst.setString(10, Edit_itemController.itemname);
-        pst.executeUpdate();
-        AppDialogs.showMessageDialog(null, "Updated Successfully!");
-        Stage stage = Rust_and_roots.stage;
+            try {
+                int itemTypeId = cbitemtype.getSelectionModel().getSelectedItem().id;
+                int price = parseRequiredInt(txtmobstype, "Price");
+                int str = parseRequiredInt(txtstr, "STR");
+                int agi = parseRequiredInt(txtagi, "AGI");
+                int dex = parseRequiredInt(txtdex, "DEX");
+                int vit = parseRequiredInt(txtvid, "VIT");
+                int hp = parseRequiredInt(txthp, "HP");
+                int stamina = parseRequiredInt(txtstamina, "Stamina");
 
-        util.SceneManager.switchScene("/view/edit_item.fxml");
+                String sql = """
+                    UPDATE items i
+                    JOIN item_stats s ON i.item_stats_id = s.item_stats_id
+                    SET i.item_name = ?,
+                        i.price = ?,
+                        i.item_type_id = ?,
+                        s.str_stat = ?,
+                        s.agi_stat = ?,
+                        s.dex_stat = ?,
+                        s.vit_stat = ?,
+                        s.hp = ?,
+                        s.stamina = ?,
+                        i.image = ?
+                    WHERE i.item_id = ?
+                    """;
+                pst = con.prepareStatement(sql);
+                pst.setString(1, txtmname.getText().trim());
+                pst.setInt(2, price);
+                pst.setInt(3, itemTypeId);
+                pst.setInt(4, str);
+                pst.setInt(5, agi);
+                pst.setInt(6, dex);
+                pst.setInt(7, vit);
+                pst.setInt(8, hp);
+                pst.setInt(9, stamina);
+                pst.setString(10, img_name);
+                pst.setInt(11, Edit_itemController.item_id);
+                pst.executeUpdate();
+                AppDialogs.showMessageDialog(null, "Updated Successfully!");
+                util.SceneManager.switchScene("/view/edit_item.fxml");
+            } catch (NumberFormatException ex) {
+                AppDialogs.showMessageDialog(null, ex.getMessage());
+            }
         } 
     }
 
@@ -215,6 +231,7 @@ public class item_edit_btnController implements Initializable {
 
     String sql = """
         SELECT i.item_name, i.price,
+               i.item_type_id,
                s.str_stat AS str,
                s.agi_stat AS agi,
                s.vit_stat AS vit,
@@ -232,8 +249,8 @@ public class item_edit_btnController implements Initializable {
     rs = pst.executeQuery();
 
     if (rs.next()) {
-        String img_name = rs.getString("image");
-        File file= new File("E:\\PJ\\rust_and_roots\\src\\image\\items\\"+img_name );
+        this.img_name = rs.getString("image");
+        File file= new File("E:\\PJ\\rust_and_roots\\src\\image\\items\\" + this.img_name);
         Image image = new Image(file.toURI().toString());
         ImageView imgView = new ImageView(image);
         imgView.setFitHeight(50);
@@ -243,20 +260,20 @@ public class item_edit_btnController implements Initializable {
             txtmobstype.setText(rs.getString("price"));
             txtstr.setText(rs.getString("str"));
             txtagi.setText(rs.getString("agi"));
-            txtvid.setText(rs.getString("dex"));
-            txtdex.setText(rs.getString("vit"));
+            txtdex.setText(rs.getString("dex"));
+            txtvid.setText(rs.getString("vit"));
             txthp.setText(rs.getString("hp"));
             txtstamina.setText(rs.getString("stamina"));
-           img_name = rs.getString("image");
-            File afile= new File("E:\\PJ\\rust_and_roots\\src\\image\\items\\"+img_name );
+            File afile= new File("E:\\PJ\\rust_and_roots\\src\\image\\items\\" + this.img_name );
            Image iimage = new Image(afile.toURI().toString());
             
 //            ImageView imgView = new ImageView(image);
             Image img = new Image(afile.toURI().toString());
             itemimage.setImage(iimage);
-            itemimage.setFitHeight(300);
-            itemimage.setFitWidth(300);
-            itemimage.setPreserveRatio(true);
+            fitImageToPreviewBox();
+
+            int selectedTypeId = rs.getInt("item_type_id");
+            selectItemTypeById(selectedTypeId);
         
     }
 }
@@ -277,5 +294,66 @@ public class item_edit_btnController implements Initializable {
                 StandardCopyOption.REPLACE_EXISTING);
         
         return fileName;
+    }
+
+    @FXML
+    private void handlecbitemboxaction(ActionEvent event) {
+    }
+
+    private void loadItemTypes() throws SQLException {
+        List<ItemTypeOption> options = new ArrayList<>();
+        String sql = "SELECT item_type_id, item_type_name FROM item_types ORDER BY item_type_name";
+        try (PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet result = ps.executeQuery()) {
+            while (result.next()) {
+                options.add(new ItemTypeOption(
+                        result.getInt("item_type_id"),
+                        result.getString("item_type_name")
+                ));
+            }
+        }
+        cbitemtype.getItems().setAll(options);
+        if (!options.isEmpty()) {
+            cbitemtype.getSelectionModel().selectFirst();
+        }
+    }
+
+    private void selectItemTypeById(int itemTypeId) {
+        for (ItemTypeOption option : cbitemtype.getItems()) {
+            if (option.id == itemTypeId) {
+                cbitemtype.getSelectionModel().select(option);
+                return;
+            }
+        }
+    }
+
+    private int parseRequiredInt(TextField field, String name) {
+        try {
+            return Integer.parseInt(field.getText().trim());
+        } catch (Exception ex) {
+            throw new NumberFormatException(name + " must be a number.");
+        }
+    }
+
+    private static class ItemTypeOption {
+        private final int id;
+        private final String name;
+
+        private ItemTypeOption(int id, String name) {
+            this.id = id;
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
+
+    private void fitImageToPreviewBox() {
+        if (itemimage == null) return;
+        itemimage.setPreserveRatio(false);
+        itemimage.setFitWidth(itemimage.getBoundsInLocal().getWidth());
+        itemimage.setFitHeight(itemimage.getBoundsInLocal().getHeight());
     }
 }

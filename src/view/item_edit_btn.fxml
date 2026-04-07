@@ -3,6 +3,7 @@
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon?>
 <?import javafx.scene.Group?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
@@ -10,7 +11,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.text.Font?>
 
-<StackPane fx:id="view" prefHeight="569.0" prefWidth="596.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.item_edit_btnController">
+<StackPane fx:id="view" prefHeight="569.0" prefWidth="596.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.item_edit_btnController">
     <children>
       <ImageView fitHeight="575.0" fitWidth="597.0" pickOnBounds="true">
          <image>
@@ -38,12 +39,12 @@
                   <Font name="Serif Bold" size="12.0" />
                </font></Label>
                <TextField fx:id="txtmname" layoutX="236.0" layoutY="38.0" prefHeight="29.0" prefWidth="186.0" styleClass="textbox" stylesheets="@../css/style.css" />
-               <TextField fx:id="txtstr" layoutX="208.0" layoutY="137.0" prefHeight="35.0" prefWidth="68.0" styleClass="textbox" stylesheets="@../css/style.css" />
-               <TextField fx:id="txtagi" layoutX="381.0" layoutY="137.0" prefHeight="35.0" prefWidth="68.0" styleClass="textbox" stylesheets="@../css/style.css" />
-               <TextField fx:id="txtdex" layoutX="208.0" layoutY="216.0" prefHeight="35.0" prefWidth="68.0" styleClass="textbox" stylesheets="@../css/style.css" />
-               <TextField fx:id="txtvid" layoutX="381.0" layoutY="216.0" prefHeight="35.0" prefWidth="68.0" styleClass="textbox" stylesheets="@../css/style.css" />
-               <TextField fx:id="txthp" layoutX="208.0" layoutY="289.0" prefHeight="35.0" prefWidth="68.0" styleClass="textbox" stylesheets="@../css/style.css" />
-               <TextField fx:id="txtstamina" layoutX="381.0" layoutY="289.0" prefHeight="35.0" prefWidth="68.0" styleClass="textbox" stylesheets="@../css/style.css" />
+               <TextField fx:id="txtstr" layoutX="208.0" layoutY="193.0" prefHeight="35.0" prefWidth="68.0" styleClass="textbox" stylesheets="@../css/style.css" />
+               <TextField fx:id="txtagi" layoutX="381.0" layoutY="193.0" prefHeight="35.0" prefWidth="68.0" styleClass="textbox" stylesheets="@../css/style.css" />
+               <TextField fx:id="txtdex" layoutX="208.0" layoutY="252.0" prefHeight="35.0" prefWidth="68.0" styleClass="textbox" stylesheets="@../css/style.css" />
+               <TextField fx:id="txtvid" layoutX="381.0" layoutY="252.0" prefHeight="35.0" prefWidth="68.0" styleClass="textbox" stylesheets="@../css/style.css" />
+               <TextField fx:id="txthp" layoutX="208.0" layoutY="307.0" prefHeight="35.0" prefWidth="68.0" styleClass="textbox" stylesheets="@../css/style.css" />
+               <TextField fx:id="txtstamina" layoutX="381.0" layoutY="307.0" prefHeight="35.0" prefWidth="68.0" styleClass="textbox" stylesheets="@../css/style.css" />
             <ImageView fitHeight="34.0" fitWidth="86.0" layoutX="402.0" layoutY="405.0" pickOnBounds="true">
                <image>
                   <Image url="@../image/Admin/upload_btn.png" />
@@ -64,31 +65,31 @@
                <font>
                   <Font name="Serif Bold" size="12.0" />
                </font></Label>
-               <Label layoutX="165.0" layoutY="146.0" prefHeight="17.0" prefWidth="31.0" text="STR" textFill="#572a00">
+               <Label layoutX="165.0" layoutY="202.0" prefHeight="17.0" prefWidth="31.0" text="STR" textFill="#572a00">
                <font>
                   <Font name="Serif Bold" size="12.0" />
                </font></Label>
-            <Label layoutX="326.0" layoutY="147.0" prefHeight="17.0" prefWidth="31.0" text="AGI" textFill="#572a00">
+            <Label layoutX="326.0" layoutY="203.0" prefHeight="17.0" prefWidth="31.0" text="AGI" textFill="#572a00">
                <font>
                   <Font name="Serif Bold" size="12.0" />
                </font>
             </Label>
-            <Label layoutX="165.0" layoutY="225.0" prefHeight="17.0" prefWidth="31.0" text="DEX" textFill="#572a00">
+            <Label layoutX="165.0" layoutY="261.0" prefHeight="17.0" prefWidth="31.0" text="DEX" textFill="#572a00">
                <font>
                   <Font name="Serif Bold" size="12.0" />
                </font>
             </Label>
-            <Label layoutX="327.0" layoutY="226.0" prefHeight="17.0" prefWidth="31.0" text="VIT" textFill="#572a00">
+            <Label layoutX="327.0" layoutY="262.0" prefHeight="17.0" prefWidth="31.0" text="VIT" textFill="#572a00">
                <font>
                   <Font name="Serif Bold" size="12.0" />
                </font>
             </Label>
-            <Label layoutX="166.0" layoutY="297.0" prefHeight="17.0" prefWidth="31.0" text="HP" textFill="#572a00">
+            <Label layoutX="166.0" layoutY="315.0" prefHeight="17.0" prefWidth="31.0" text="HP" textFill="#572a00">
                <font>
                   <Font name="Serif Bold" size="12.0" />
                </font>
             </Label>
-            <Label layoutX="318.0" layoutY="298.0" prefHeight="17.0" prefWidth="45.0" text="Stamina" textFill="#572a00">
+            <Label layoutX="318.0" layoutY="316.0" prefHeight="17.0" prefWidth="45.0" text="Stamina" textFill="#572a00">
                <font>
                   <Font name="Serif Bold" size="12.0" />
                </font>
@@ -114,7 +115,13 @@
                   <Font name="Serif Bold" size="12.0" />
                </font>
             </Label>
-               <ImageView fx:id="itemimage" fitHeight="138.0" fitWidth="158.0" layoutX="234.0" layoutY="365.0" pickOnBounds="true" preserveRatio="true" />
+               <ImageView fx:id="itemimage" fitHeight="138.0" fitWidth="158.0" layoutX="234.0" layoutY="365.0" pickOnBounds="true" preserveRatio="false" />
+            <ComboBox fx:id="cbitemtype" layoutX="236.0" layoutY="131.0" onAction="#handlecbitemboxaction" prefHeight="34.0" prefWidth="187.0" styleClass="textbox" stylesheets="@../css/style.css" />
+            <Label layoutX="170.0" layoutY="139.0" prefHeight="21.0" prefWidth="57.0" text="Item Type" textFill="#572a00">
+               <font>
+                  <Font name="Serif Bold" size="12.0" />
+               </font>
+            </Label>
             </children>
         </Group>
     </children>

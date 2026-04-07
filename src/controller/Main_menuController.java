@@ -38,6 +38,9 @@ public class Main_menuController implements Initializable {
     Parent root;
     @FXML
     private ImageView bgImage;
+    @FXML
+    private Button btnlogout;
+    
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         new WorldScaler(view, uiRoot);
@@ -52,12 +55,17 @@ public class Main_menuController implements Initializable {
 
     @FXML
     private void handlebtnexitaction(ActionEvent event) {
-        util.SceneManager.switchScene("/view/login.fxml");
+        Platform.exit();
     }
 
     @FXML
     private void handlebtnnewgaction(ActionEvent event) {
         util.SceneManager.switchScene("/view/new_game.fxml");
+    }
+
+    @FXML
+    private void handlebtnlogoutaction(ActionEvent event) {
+        util.SceneManager.switchScene("/view/login.fxml");
     }
     
 }
