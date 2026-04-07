@@ -130,6 +130,14 @@ public final class ItemDatabase {
                 && hasImageAsset(itemId);
     }
 
+    public static boolean isShopDisplayableItem(int itemId) {
+        if (itemId <= 0) return false;
+        if (isSeedItem(itemId)) {
+            return hasCompleteFarmDataForSeed(itemId);
+        }
+        return isDisplayableItem(itemId);
+    }
+
     public static String getItemName(int itemId) {
         item itm = getItemById(itemId);
         return itm == null ? null : itm.getItem_name();
@@ -192,16 +200,28 @@ public final class ItemDatabase {
         if (seedName == null || seedName.isBlank()) return -1;
         String cropName = normalizeSeedName(seedName);
         item direct = getItemByName(cropName);
+        if (direct == null) {
+            direct = getItemByName(normalizeCropAlias(cropName));
+        }
         if (direct != null && !isSeedItem(direct.getItem_id())) return direct.getItem_id();
         direct = getItemByName(cropName + " Fruit");
+        if (direct == null) {
+            direct = getItemByName(normalizeCropAlias(cropName) + " Fruit");
+        }
         if (direct != null && !isSeedItem(direct.getItem_id())) return direct.getItem_id();
         direct = getItemByName(toSpriteKey(cropName) + "_fruit");
+        if (direct == null) {
+            direct = getItemByName(toSpriteKey(normalizeCropAlias(cropName)) + "_fruit");
+        }
         if (direct != null && !isSeedItem(direct.getItem_id())) return direct.getItem_id();
 
         String normalizedTarget = normalizeLookupKey(cropName);
         for (item itm : allItems) {
             if (itm == null || isSeedItem(itm.getItem_id())) continue;
             if (normalizedTarget.equals(normalizeLookupKey(itm.getItem_name()))) {
+                return itm.getItem_id();
+            }
+            if (normalizeLookupKey(normalizeCropAlias(cropName)).equals(normalizeLookupKey(itm.getItem_name()))) {
                 return itm.getItem_id();
             }
         }
@@ -223,13 +243,17 @@ public final class ItemDatabase {
         if (cropName == null || cropName.isBlank()) return -1;
 
         item fruitNamed = getItemByName(cropName + " Fruit");
-        if (fruitNamed != null && fruitNamed.getItem_id() > 0) return fruitNamed.getItem_id();
+        if (fruitNamed != null && fruitNamed.getItem_id() > 0 && !isSeedItem(fruitNamed.getItem_id())) {
+            return fruitNamed.getItem_id();
+        }
 
         String spriteKey = toSpriteKey(cropName);
         item underscoredFruit = getItemByName(spriteKey + "_fruit");
-        if (underscoredFruit != null && underscoredFruit.getItem_id() > 0) return underscoredFruit.getItem_id();
+        if (underscoredFruit != null && underscoredFruit.getItem_id() > 0 && !isSeedItem(underscoredFruit.getItem_id())) {
+            return underscoredFruit.getItem_id();
+        }
 
-        return cropItemId;
+        return isSeedItem(cropItemId) ? -1 : cropItemId;
     }
 
     public static boolean hasCompleteFarmDataForSeed(int seedItemId) {
@@ -250,9 +274,11 @@ public final class ItemDatabase {
         String spriteKey = buildCropSpriteKeyForSeed(seedItemId);
         if (spriteKey == null || spriteKey.isBlank()) return false;
 
+        // Stage 4 is the mature crop art, so unfinished crops should not be treated as valid seeds.
         return hasCropStageAsset(spriteKey, 1)
                 && hasCropStageAsset(spriteKey, 2)
-                && hasCropStageAsset(spriteKey, 3);
+                && hasCropStageAsset(spriteKey, 3)
+                && hasCropStageAsset(spriteKey, 4);
     }
 
     public static String buildCropSpriteKeyForSeed(int seedItemId) {
@@ -304,6 +330,14 @@ public final class ItemDatabase {
         if (spriteKey == null || spriteKey.isBlank() || stageNumber <= 0) return false;
         String path = String.format("/image/crops/%s_plant%d.png", spriteKey, stageNumber);
         return resourceExists(path);
+    }
+
+    private static String normalizeCropAlias(String cropName) {
+        if (cropName == null || cropName.isBlank()) return cropName;
+        String normalized = cropName.trim();
+        if (normalized.equalsIgnoreCase("chilli")) return "chili";
+        if (normalized.equalsIgnoreCase("chili")) return "chilli";
+        return normalized;
     }
 
     private static boolean resourceExists(String path) {

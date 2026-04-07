@@ -34,8 +34,10 @@ public class Farm_tableController implements Initializable, SceneController {
     private static final String TOOL_SLOT_STYLE = "-fx-effect: dropshadow(gaussian, rgba(255,215,0,0.85), 14, 0.55, 0, 0);";
 
     private static final double FARM_TABLE_TIME_SCALE = 0.25;
-    private static final int TOTAL_GROWTH_STAGES = 3;
-    private static final double DEFAULT_GROWTH_SECONDS = 60.0;
+    private static final int TOTAL_GROWTH_STAGES = 4;
+    private static final double DEFAULT_GROWTH_SECONDS = 8 * 60.0;
+    private static final double DEFAULT_WATER_COOLDOWN_SECONDS = 90.0;
+    private static final double DEFAULT_WATER_REDUCTION_RATIO = 0.12;
     private static final int DEFAULT_PLANT_STAMINA_COST = 2;
 
     private static final String PLOT_IDLE_STYLE = "-fx-background-color: transparent; -fx-background-radius: 6; -fx-border-color: transparent; -fx-border-radius: 6;";
@@ -150,35 +152,17 @@ public class Farm_tableController implements Initializable, SceneController {
 
     @FXML
     private void handleBtnSeedsList(MouseEvent event) {
-        if (activeMode == ToolMode.SEED && seedList != null && seedList.isVisible()) {
-            hideSeedList();
-            refreshToolHighlight();
-            refreshPlotHighlights();
-            return;
-        }
-        setToolMode(ToolMode.SEED);
+        handleToolSlotClick(ToolMode.SEED, hasSeedSlotSelection());
     }
 
     @FXML
     private void handlebtnWater(MouseEvent event) {
-        if (activeMode == ToolMode.WATER && seedList != null && seedList.isVisible()) {
-            hideSeedList();
-            refreshToolHighlight();
-            refreshPlotHighlights();
-            return;
-        }
-        setToolMode(ToolMode.WATER);
+        handleToolSlotClick(ToolMode.WATER, isWateringCanSelectionValid(equippedWateringCanItemId));
     }
 
     @FXML
     private void handleBtnReap(MouseEvent event) {
-        if (activeMode == ToolMode.SICKLE && seedList != null && seedList.isVisible()) {
-            hideSeedList();
-            refreshToolHighlight();
-            refreshPlotHighlights();
-            return;
-        }
-        setToolMode(ToolMode.SICKLE);
+        handleToolSlotClick(ToolMode.SICKLE, isSickleSelectionValid(equippedSickleItemId));
     }
 
     @FXML
@@ -268,15 +252,6 @@ public class Farm_tableController implements Initializable, SceneController {
         timeOverrideApplied = false;
     }
 
-    private void setToolMode(ToolMode mode) {
-        activeMode = mode;
-        populateSeedList();
-        showSeedList();
-        refreshSelectedToolPreview();
-        refreshToolHighlight();
-        refreshPlotHighlights();
-    }
-
     private void showSeedList() {
         if (seedList == null) return;
         seedList.setVisible(true);
@@ -342,7 +317,9 @@ public class Farm_tableController implements Initializable, SceneController {
         tempPlots.clear();
         FarmState realFarm = gameState.getFarmState(activeFarmMapKey);
         for (String plotId : plotViews.keySet()) {
-            tempPlots.put(plotId, TempPlotData.from(realFarm.getPlot(plotId)));
+            TempPlotData tempPlotData = TempPlotData.from(realFarm.getPlot(plotId));
+            normalizeCropTiming(tempPlotData);
+            tempPlots.put(plotId, tempPlotData);
         }
         equippedWateringCanItemId = normalizeItemId(realFarm.getEquippedWateringCanItemId());
         equippedSickleItemId = normalizeItemId(realFarm.getEquippedSickleItemId());
@@ -372,7 +349,7 @@ public class Farm_tableController implements Initializable, SceneController {
                 pd.plantedAt = now;
                 pd.lastWateredAt = -1;
                 pd.accumulatedWaterReduction = 0;
-                pd.totalGrowthSeconds = DEFAULT_GROWTH_SECONDS;
+                applySeedGrowthProfile(pd, selectedSeedItemId);
             }
 
             case WATER -> {
@@ -387,7 +364,7 @@ public class Farm_tableController implements Initializable, SceneController {
 
                 int harvestItemId = pd.harvestItemId();
                 if (harvestItemId > 0) {
-                    pendingHarvests.merge(harvestItemId, 1, Integer::sum);
+                    pendingHarvests.merge(harvestItemId, computeHarvestOutputCount(pd.seedItemId), Integer::sum);
                 }
 
                 int seedReturnCount = computeSeedReturnCount(pd.seedItemId);
@@ -832,6 +809,15 @@ public class Farm_tableController implements Initializable, SceneController {
             return 0;
         }
 
+        if (!ItemDatabase.hasCompleteFarmDataForSeed(seedItemId)) {
+            return 0;
+        }
+
+        int harvestItemId = ItemDatabase.resolveHarvestItemIdForSeed(seedItemId);
+        if (harvestItemId <= 0 || harvestItemId == seedItemId) {
+            return 0;
+        }
+
         double chancePercent = computeSeedReturnChancePercent();
         if (chancePercent >= 200.0) {
             return 2;
@@ -846,7 +832,70 @@ public class Farm_tableController implements Initializable, SceneController {
 
     private double computeSeedReturnChancePercent() {
         int dex = Math.max(0, gameState.getPlayerState().getDex());
-        return dex * 0.01;
+        return (dex * 0.01) + (getEffectiveFarmingLevel() * 1.0);
+    }
+
+    private int computeHarvestOutputCount(Integer seedItemId) {
+        if (seedItemId == null || seedItemId <= 0) return 0;
+        int farmingLevel = getEffectiveFarmingLevel();
+        return 1 + (farmingLevel / 5);
+    }
+
+    private int getEffectiveFarmingLevel() {
+        if (gameState == null) return 0;
+        GameState.PlayerSkills skills = gameState.getPlayerSkills();
+        return skills == null ? 0 : skills.getLevelFromTotalExp(skills.getFarmingExp() + pendingFarmingExp);
+    }
+
+    private void handleToolSlotClick(ToolMode mode, boolean hasAssignedItem) {
+        if (mode == ToolMode.NONE) return;
+
+        boolean currentlyActive = activeMode == mode;
+        boolean listVisible = seedList != null && seedList.isVisible();
+
+        activeMode = mode;
+
+        if (!hasAssignedItem) {
+            populateSeedList();
+            showSeedList();
+        } else if (!currentlyActive) {
+            hideSeedList();
+        } else if (!listVisible) {
+            populateSeedList();
+            showSeedList();
+        } else {
+            hideSeedList();
+        }
+
+        refreshSelectedToolPreview();
+        refreshToolHighlight();
+        refreshPlotHighlights();
+    }
+
+    private boolean hasSeedSlotSelection() {
+        return isSeedSelectionValid(selectedSeedItemId);
+    }
+
+    private void normalizeCropTiming(TempPlotData plotData) {
+        if (plotData == null || plotData.seedItemId == null || plotData.seedItemId <= 0) return;
+        applySeedGrowthProfile(plotData, plotData.seedItemId);
+    }
+
+    private void applySeedGrowthProfile(TempPlotData plotData, int seedItemId) {
+        if (plotData == null || seedItemId <= 0) return;
+
+        String key = ItemDatabase.buildCropSpriteKeyForSeed(seedItemId);
+        double growthSeconds = switch (key == null ? "" : key) {
+            case "grape", "pineapple", "pumpkin" -> 10 * 60.0;
+            case "bean", "broccoli", "cauliflower", "green_eggplant" -> 8 * 60.0;
+            case "cucumber", "beetroot" -> 7 * 60.0;
+            default -> DEFAULT_GROWTH_SECONDS;
+        };
+
+        plotData.totalGrowthSeconds = growthSeconds;
+        plotData.waterCooldownSeconds = Math.min(DEFAULT_WATER_COOLDOWN_SECONDS, growthSeconds / 3.0);
+        plotData.waterReductionSeconds = Math.max(20.0, growthSeconds * DEFAULT_WATER_REDUCTION_RATIO);
+        plotData.accumulatedWaterReduction = Math.min(plotData.accumulatedWaterReduction, plotData.totalGrowthSeconds - 1.0);
     }
 
     private int computePendingFarmStaminaCost() {

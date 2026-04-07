@@ -23,6 +23,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Bounds;
 import javafx.scene.Group;
+import javafx.scene.Node;
+import javafx.scene.control.ButtonBase;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
@@ -309,6 +311,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         startLoop();
 
         new WorldScaler(view, world);
+        disableKeyboardActivationRecursive(view);
         player.start();
 
         afterBaseInitialize();
@@ -472,6 +475,9 @@ public abstract class BaseMapController implements Initializable, SceneControlle
             playerState.setSelectedHotbarIndex(selectedHotbarIndex);
         }
         refreshEquippedItemVisual();
+        if (view != null) {
+            view.requestFocus();
+        }
     }
 
     @FXML
@@ -499,6 +505,10 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         
         if(playerState != null){
             playerState.setHotbarVisible(visible);
+        }
+
+        if (view != null) {
+            view.requestFocus();
         }
     }
     
@@ -699,7 +709,16 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
     protected int getCurrentCoreStatCap() {
         int dayNumber = GameTimeManager.get().dayNumberProperty().get();
-        return 5 + Math.max(0, (dayNumber - 1) / 2);
+        if (dayNumber <= 0) {
+            return 10;
+        }
+        if (dayNumber <= 5) {
+            return 10;
+        }
+        if (dayNumber <= 10) {
+            return 20;
+        }
+        return 30;
     }
 
     protected int getCurrentStatValueWithPending(String statKey) {
@@ -1171,6 +1190,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         for (int i = 0; i < hotbarSlotButtons.size(); i++) {
             final int idx = i;
             ToggleButton button = hotbarSlotButtons.get(i);
+            button.setFocusTraversable(false);
             button.setOnAction(e -> {
                 if (idx == selectedHotbarIndex && tryConsumeHotbarItem(idx)) {
                     return;
@@ -1187,6 +1207,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         }
 
         if (slotBtn5 != null) {
+            slotBtn5.setFocusTraversable(false);
             slotBtn5.setOnAction(e -> toggleInventory());
         }
 
@@ -1419,7 +1440,18 @@ public abstract class BaseMapController implements Initializable, SceneControlle
             final int index = i;
             Button button = playerInventoryButtons.get(i);
             if (button != null) {
-                button.setOnAction(e -> selectPlayerInventorySlot(index));
+                button.setFocusTraversable(false);
+                button.setOnAction(e -> {
+                    if (index < snapshotSlots(player.getInventory(), playerInventorySlotCapacity()).size()) {
+                        List<SlotData> slots = snapshotSlots(player.getInventory(), playerInventorySlotCapacity());
+                        SlotData slot = (index < slots.size()) ? slots.get(index) : null;
+                        if (slot != null && selectedPlayerInventoryItemId != null && slot.itemId() == selectedPlayerInventoryItemId
+                                && tryConsumeInventoryItem(index)) {
+                            return;
+                        }
+                    }
+                    selectPlayerInventorySlot(index);
+                });
                 button.setOnMouseClicked(e -> {
                     if (e.getButton() == MouseButton.SECONDARY) {
                         moveInventorySlotToHotbar(index);
@@ -1624,52 +1656,100 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         int quantity = playerState.getHotbarItemCount(index);
         if (itemId <= 0 || quantity <= 0) return false;
 
-        GameState.FoodEffectOutcome cookedOutcome = gameState.pollCookedDishEffect(itemId);
-
-        int hpDelta;
-        int staminaDelta;
-        int strDelta;
-        int vitDelta;
-        int dexDelta;
-        int agiDelta;
-
-        if (cookedOutcome != null) {
-            hpDelta = cookedOutcome.getHpDelta();
-            staminaDelta = cookedOutcome.getStaminaDelta();
-            strDelta = cookedOutcome.getStrDelta();
-            vitDelta = cookedOutcome.getVitDelta();
-            dexDelta = cookedOutcome.getDexDelta();
-            agiDelta = cookedOutcome.getAgiDelta();
-        } else {
-            Object itm = ItemDatabase.getItemById(itemId);
-            if (itm == null) return false;
-
-            hpDelta = extractItemStat(itm, "getHp");
-            staminaDelta = extractItemStat(itm, "getStamina", "getStamana", "getStimana", "getMp");
-            strDelta = extractItemStat(itm, "getStr");
-            vitDelta = extractItemStat(itm, "getVit", "getVid");
-            dexDelta = extractItemStat(itm, "getDex");
-            agiDelta = extractItemStat(itm, "getAgi");
-
-            if (hpDelta == 0 && staminaDelta == 0 && strDelta == 0 && vitDelta == 0 && dexDelta == 0 && agiDelta == 0) {
-                return false;
-            }
-        }
+        FoodEffectData effectData = resolveFoodEffectData(itemId);
+        if (effectData == null) return false;
 
         if (!playerState.removeHotbarItems(index, 1)) {
             return false;
         }
 
-        playerState.applyFoodEffect(hpDelta, staminaDelta);
-        applyPersistentStatDelta("getStr", new String[]{"setStr"}, strDelta);
-        applyPersistentStatDelta("getVit", new String[]{"setVit", "setVid"}, vitDelta);
-        applyPersistentStatDelta("getDex", new String[]{"setDex"}, dexDelta);
-        applyPersistentStatDelta("getAgi", new String[]{"setAgi"}, agiDelta);
+        applyFoodEffectData(effectData);
 
         refreshHotbarView();
         refreshPlayerInventoryView();
         refreshEquippedItemVisual();
         return true;
+    }
+
+    protected boolean tryConsumeInventoryItem(int index) {
+        if (playerState == null || player == null || gameState == null) return false;
+
+        List<SlotData> slots = snapshotSlots(player.getInventory(), playerInventorySlotCapacity());
+        if (index < 0 || index >= slots.size()) return false;
+
+        SlotData slot = slots.get(index);
+        if (slot == null || slot.itemId() <= 0 || slot.quantity() <= 0) return false;
+
+        FoodEffectData effectData = resolveFoodEffectData(slot.itemId());
+        if (effectData == null) return false;
+        if (!player.getInventory().removeItem(slot.itemId(), 1)) return false;
+
+        applyFoodEffectData(effectData);
+        selectedPlayerInventoryItemId = null;
+        refreshPlayerInventoryView();
+        refreshHotbarView();
+        refreshEquippedItemVisual();
+        return true;
+    }
+
+    protected static final class FoodEffectData {
+        private final int hpDelta;
+        private final int staminaDelta;
+        private final int strDelta;
+        private final int vitDelta;
+        private final int dexDelta;
+        private final int agiDelta;
+
+        protected FoodEffectData(int hpDelta, int staminaDelta, int strDelta, int vitDelta, int dexDelta, int agiDelta) {
+            this.hpDelta = hpDelta;
+            this.staminaDelta = staminaDelta;
+            this.strDelta = strDelta;
+            this.vitDelta = vitDelta;
+            this.dexDelta = dexDelta;
+            this.agiDelta = agiDelta;
+        }
+    }
+
+    protected FoodEffectData resolveFoodEffectData(int itemId) {
+        if (itemId <= 0 || gameState == null) return null;
+
+        GameState.FoodEffectOutcome cookedOutcome = gameState.pollCookedDishEffect(itemId);
+        if (cookedOutcome != null) {
+            return new FoodEffectData(
+                cookedOutcome.getHpDelta(),
+                cookedOutcome.getStaminaDelta(),
+                cookedOutcome.getStrDelta(),
+                cookedOutcome.getVitDelta(),
+                cookedOutcome.getDexDelta(),
+                cookedOutcome.getAgiDelta()
+            );
+        }
+
+        Object itm = ItemDatabase.getItemById(itemId);
+        if (itm == null) return null;
+
+        int hpDelta = extractItemStat(itm, "getHp");
+        int staminaDelta = extractItemStat(itm, "getStamina", "getStamana", "getStimana", "getMp");
+        int strDelta = extractItemStat(itm, "getStr");
+        int vitDelta = extractItemStat(itm, "getVit", "getVid");
+        int dexDelta = extractItemStat(itm, "getDex");
+        int agiDelta = extractItemStat(itm, "getAgi");
+
+        if (hpDelta == 0 && staminaDelta == 0 && strDelta == 0 && vitDelta == 0 && dexDelta == 0 && agiDelta == 0) {
+            return null;
+        }
+
+        return new FoodEffectData(hpDelta, staminaDelta, strDelta, vitDelta, dexDelta, agiDelta);
+    }
+
+    protected void applyFoodEffectData(FoodEffectData effectData) {
+        if (playerState == null || effectData == null) return;
+
+        playerState.applyFoodEffect(effectData.hpDelta, effectData.staminaDelta);
+        applyPersistentStatDelta("getStr", new String[]{"setStr"}, effectData.strDelta);
+        applyPersistentStatDelta("getVit", new String[]{"setVit", "setVid"}, effectData.vitDelta);
+        applyPersistentStatDelta("getDex", new String[]{"setDex"}, effectData.dexDelta);
+        applyPersistentStatDelta("getAgi", new String[]{"setAgi"}, effectData.agiDelta);
     }
 
 
@@ -1711,6 +1791,27 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     protected String itemName(int itemId) {
         var itm = ItemDatabase.getItemById(itemId);
         return (itm == null) ? ("item-" + itemId) : itm.getItem_name();
+    }
+
+    protected void disableKeyboardActivationRecursive(Node node) {
+        if (node == null) return;
+
+        if (node instanceof ButtonBase buttonBase) {
+            buttonBase.setFocusTraversable(false);
+        }
+
+        if (node instanceof Pane pane) {
+            for (Node child : pane.getChildren()) {
+                disableKeyboardActivationRecursive(child);
+            }
+            return;
+        }
+
+        if (node instanceof Group group) {
+            for (Node child : group.getChildren()) {
+                disableKeyboardActivationRecursive(child);
+            }
+        }
     }
     
     protected void capturePlayerSnapshot() {
