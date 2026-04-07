@@ -682,7 +682,7 @@ public class home_mapController extends BaseMapController {
                     new SaveGameService().saveGame(GameState.get());
                     if (gameLoop != null) gameLoop.stop();
                     if (player != null) player.stop();
-                    Platform.exit();
+                    util.SceneManager.switchScene("/view/main_menu.fxml");
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
