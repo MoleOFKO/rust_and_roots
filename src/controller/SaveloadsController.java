@@ -24,8 +24,10 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.StackPane;
 import javax.swing.JOptionPane;
 import util.AppDialogs;
+import util.WorldScaler;
 
 public class SaveloadsController implements Initializable {
 
@@ -67,12 +69,15 @@ public class SaveloadsController implements Initializable {
     @FXML
     private Group world;
     @FXML
+    private StackPane view;
+    @FXML
     private ToggleGroup savebutton;
     @FXML
     private ImageView btnSave;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        new WorldScaler(view, world);
         selectedSlot = GameState.get().getSelectedSaveSlot();
         refreshModeUi();
         refreshSlotLabels();

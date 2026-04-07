@@ -12,15 +12,15 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.text.Font?>
 
-<StackPane fx:id="view" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Account_editController">
+<StackPane fx:id="view" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Account_editController">
     <children>
-      <ImageView fitHeight="276.0" fitWidth="467.0" pickOnBounds="true">
-         <image>
-            <Image url="@../image/Admin/dashboard_with_cursed_paper.png" />
-         </image>
-      </ImageView>
         <Group fx:id="uiRoot">
             <children>
+            <ImageView fitHeight="276.0" fitWidth="467.0" pickOnBounds="true">
+               <image>
+                  <Image url="@../image/Admin/dashboard_with_cursed_paper.png" />
+               </image>
+            </ImageView>
             <ImageView fitHeight="28.0" fitWidth="147.0" layoutX="16.0" layoutY="24.0" pickOnBounds="true">
                <image>
                   <Image url="@../image/Admin/admin_bar.png" />

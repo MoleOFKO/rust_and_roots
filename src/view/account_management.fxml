@@ -15,13 +15,13 @@
 
 <StackPane fx:id="view" styleClass="rich-table" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Account_managementController">
     <children>
-      <ImageView fitHeight="519.0" fitWidth="840.0" pickOnBounds="true">
-         <image>
-            <Image url="@../image/Admin/dashboard.png" />
-         </image>
-      </ImageView>
         <Group fx:id="uiRoot">
             <children>
+            <ImageView fitHeight="519.0" fitWidth="840.0" pickOnBounds="true">
+               <image>
+                  <Image url="@../image/Admin/dashboard.png" />
+               </image>
+            </ImageView>
             <ImageView fitHeight="32.0" fitWidth="143.0" layoutX="42.0" layoutY="39.0" pickOnBounds="true">
                <image>
                   <Image url="@../image/Admin/admin_bar.png" />

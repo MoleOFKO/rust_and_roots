@@ -15,9 +15,10 @@
                      <Image url="@../image/mainMenu.png" />
                   </image>
                </ImageView>
-               <Button fx:id="btnloadg" layoutX="250.0" layoutY="347.0" mnemonicParsing="false" onAction="#handlebtnloadgaction" prefHeight="27.0" prefWidth="103.0" styleClass="invisible-button" stylesheets="@../css/style.css" />
-               <Button fx:id="btnnewg" layoutX="146.0" layoutY="347.0" mnemonicParsing="false" onAction="#handlebtnnewgaction" prefHeight="27.0" prefWidth="83.0" styleClass="invisible-button" stylesheets="@../css/style.css" />
-            <Button fx:id="btnexit" layoutX="374.0" layoutY="347.0" mnemonicParsing="false" onAction="#handlebtnexitaction" prefHeight="28.0" prefWidth="81.0" styleClass="invisible-button" stylesheets="@../css/style.css" />
+               <Button fx:id="btnloadg" layoutX="205.0" layoutY="347.0" mnemonicParsing="false" onAction="#handlebtnloadgaction" prefHeight="27.0" prefWidth="88.0" styleClass="invisible-button" stylesheets="@../css/style.css" />
+               <Button fx:id="btnnewg" layoutX="99.0" layoutY="347.0" mnemonicParsing="false" onAction="#handlebtnnewgaction" prefHeight="27.0" prefWidth="83.0" styleClass="invisible-button" stylesheets="@../css/style.css" />
+            <Button fx:id="btnexit" layoutX="319.0" layoutY="347.0" mnemonicParsing="false" onAction="#handlebtnexitaction" prefHeight="28.0" prefWidth="81.0" styleClass="invisible-button" stylesheets="@../css/style.css" />
+            <Button fx:id="btnlogout" layoutX="422.0" layoutY="347.0" mnemonicParsing="false" onAction="#handlebtnlogoutaction" prefHeight="28.0" prefWidth="81.0" styleClass="invisible-button" stylesheets="@../css/style.css" />
             </children>
         </Group>
     </children>

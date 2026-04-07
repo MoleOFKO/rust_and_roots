@@ -89,7 +89,7 @@ public class Account_editController implements Initializable {
 
     @FXML
     private void handlebtnbackaction(ActionEvent event) throws IOException {
-        util.SceneManager.switchScene("/view/account_edit_main.fxml");
+        util.SceneManager.switchScene("/view/account_management.fxml");
     }
 
     @FXML
