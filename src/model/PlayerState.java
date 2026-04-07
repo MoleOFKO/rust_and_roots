@@ -25,6 +25,8 @@ public final class PlayerState {
 
     private boolean hotbarVisible = true;
     private int selectedHotbarIndex = 0;
+    private boolean runToggled = false;
+    private boolean staminaExhaustedLock = false;
 
     private final IntegerProperty maxHp = new SimpleIntegerProperty(DEFAULT_HP);
     private final IntegerProperty hp = new SimpleIntegerProperty(DEFAULT_HP);
@@ -190,6 +192,22 @@ public final class PlayerState {
 
     public void setSelectedHotbarIndex(int selectedHotbarIndex) {
         this.selectedHotbarIndex = selectedHotbarIndex;
+    }
+
+    public boolean isRunToggled() {
+        return runToggled;
+    }
+
+    public void setRunToggled(boolean runToggled) {
+        this.runToggled = runToggled;
+    }
+
+    public boolean hasStaminaExhaustedLock() {
+        return staminaExhaustedLock;
+    }
+
+    public void setStaminaExhaustedLock(boolean staminaExhaustedLock) {
+        this.staminaExhaustedLock = staminaExhaustedLock;
     }
 
     public IntegerProperty hpProperty() {

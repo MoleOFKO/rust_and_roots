@@ -22,21 +22,24 @@ public class Player {
     private static final double INV_SQRT_2 = 1.0 / Math.sqrt(2.0);
     private static final double NANOS_PER_60FPS_FRAME = 16_666_666.0;
     private static final double NORMAL_AGI = 5.0;
-    private static final double RUN_MULTIPLIER = 1.35;
-    private static final double MIN_AGI_SPEED_MULTIPLIER = 0.80;
-    private static final double MAX_AGI_SPEED_MULTIPLIER = 1.60;
+    private static final double RUN_SPEED_BONUS_RATIO = 0.20;
+    private static final double MIN_RUN_SPEED_BONUS = 0.75;
+    private static final double MAX_RUN_SPEED_BONUS = 1.10;
 
     private static final int FRAME_SIZE = 64;
 
     private static final int WALK_COLUMNS = 6;
     private static final int RUN_COLUMNS = 8;
     private static final int IDLE_COLUMNS = 12;
+    private static final int ATTACK_COLUMNS = 4;
     private static final int DEATH_COLUMNS = 7;
 
     private static final long WALK_FRAME_DELAY_NANOS = 150_000_000L;
     private static final long RUN_FRAME_DELAY_NANOS = 90_000_000L;
     private static final long IDLE_FRAME_DELAY_NANOS = 120_000_000L;
+    private static final long BASE_ATTACK_FRAME_DELAY_NANOS = 110_000_000L;
     private static final long DEATH_FRAME_DELAY_NANOS = 90_000_000L;
+    private static final double ATTACK_SPEED_PER_AGI = 0.045;
 
     private final Group node;
     private final ImageView sprite;
@@ -79,7 +82,7 @@ public class Player {
     );
 
     private enum AnimState {
-        IDLE, WALK, RUN, DEATH
+        IDLE, WALK, RUN, ATTACK, DEATH
     }
 
     private enum EquipmentKind {
@@ -92,11 +95,30 @@ public class Player {
 
     private static final class EquipmentAnimationSet {
         private final Image walkSheet;
-        private final int columns;
+        private final int walkColumns;
+        private final Image attackSheet;
+        private final int attackColumns;
+        private final Image humanAttackSheet;
+        private final int humanAttackColumns;
 
-        private EquipmentAnimationSet(Image walkSheet, int columns) {
+        private EquipmentAnimationSet(
+            Image walkSheet,
+            int walkColumns,
+            Image attackSheet,
+            int attackColumns,
+            Image humanAttackSheet,
+            int humanAttackColumns
+        ) {
             this.walkSheet = walkSheet;
-            this.columns = Math.max(1, columns);
+            this.walkColumns = Math.max(1, walkColumns);
+            this.attackSheet = attackSheet;
+            this.attackColumns = Math.max(1, attackColumns);
+            this.humanAttackSheet = humanAttackSheet;
+            this.humanAttackColumns = Math.max(1, humanAttackColumns);
+        }
+
+        private boolean supportsAttack() {
+            return walkSheet != null || attackSheet != null || humanAttackSheet != null;
         }
     }
 
@@ -114,6 +136,8 @@ public class Player {
     private boolean moving = false;
     private boolean deathStarted = false;
     private boolean deathFinished = false;
+    private long attackEndsAtNanos = 0L;
+    private long nextAttackAvailableAtNanos = 0L;
 
     public Player(
             PlayerState state,
@@ -192,7 +216,7 @@ public class Player {
     }
 
     public void attachInput(Scene scene) {
-        clearInputState();
+        clearTransientInputState();
 
         scene.setOnKeyPressed(e -> {
             KeyCode code = e.getCode();
@@ -232,7 +256,25 @@ public class Player {
                 return;
             }
 
-            if (isMovementKey(code) || isRunKey(code)) {
+            if (isRunKey(code)) {
+                if (!pressedKeys.contains(code)) {
+                    pressedKeys.add(code);
+                    if (!state.hasStaminaExhaustedLock() && state.getStamina() > 0) {
+                        state.setRunToggled(!state.isRunToggled());
+                    }
+                }
+                return;
+            }
+
+            if (isAttackKey(code)) {
+                if (!pressedKeys.contains(code)) {
+                    pressedKeys.add(code);
+                    triggerAttack();
+                }
+                return;
+            }
+
+            if (isMovementKey(code)) {
                 pressedKeys.add(code);
             }
         });
@@ -245,7 +287,7 @@ public class Player {
                 return;
             }
 
-            if (!isMovementKey(code) && !isRunKey(code)) {
+            if (!isMovementKey(code) && !isRunKey(code) && !isAttackKey(code)) {
                 return;
             }
 
@@ -279,7 +321,7 @@ public class Player {
                     return;
                 }
 
-                updateMovement(dtNanos);
+                updateMovement(dtNanos, now);
                 updateAnimation(now);
 
                 if (detectionTarget != null) {
@@ -304,13 +346,25 @@ public class Player {
         lastAnimFrameTime = 0L;
         lastDeathFrameTime = 0L;
 
-        clearInputState();
+        clearTransientInputState();
     }
 
     public void clearInputState() {
+        clearTransientInputState();
+        state.setRunToggled(false);
+        state.setStaminaExhaustedLock(false);
+        state.setStaminaMode(state.isSleeping() ? PlayerState.StaminaMode.SLEEP : PlayerState.StaminaMode.IDLE);
+
+        if (!deathStarted && !deathFinished) {
+            setAnimState(AnimState.IDLE, true);
+        }
+    }
+
+    private void clearTransientInputState() {
         pressedKeys.clear();
         moving = false;
-        state.setStaminaMode(state.isSleeping() ? PlayerState.StaminaMode.SLEEP : PlayerState.StaminaMode.IDLE);
+        attackEndsAtNanos = 0L;
+        nextAttackAvailableAtNanos = 0L;
 
         if (!deathStarted && !deathFinished) {
             setAnimState(AnimState.IDLE, true);
@@ -333,7 +387,7 @@ public class Player {
         return moved;
     }
 
-    private void updateMovement(long dtNanos) {
+    private void updateMovement(long dtNanos, long now) {
         if (state.isDead()) {
             moving = false;
             pressedKeys.clear();
@@ -349,6 +403,33 @@ public class Player {
         }
 
         double dtSeconds = Math.max(0.0, dtNanos / 1_000_000_000.0);
+
+        if (isAttackActive(now)) {
+            moving = false;
+            state.setStaminaMode(PlayerState.StaminaMode.IDLE);
+            state.updateStaminaOverTime(dtSeconds, PlayerState.StaminaMode.IDLE);
+            setAnimState(AnimState.ATTACK, false);
+            return;
+        }
+
+        if (animState == AnimState.ATTACK) {
+            setAnimState(AnimState.IDLE, true);
+        }
+
+        if (state.hasStaminaExhaustedLock()) {
+            moving = false;
+            state.setStaminaMode(PlayerState.StaminaMode.IDLE);
+            state.updateStaminaOverTime(dtSeconds, PlayerState.StaminaMode.IDLE);
+            setAnimState(AnimState.IDLE, false);
+
+            if (state.getStamina() > 0) {
+                state.setStaminaExhaustedLock(false);
+                state.setRunToggled(false);
+            } else {
+                return;
+            }
+        }
+
         double inputX = 0.0;
         double inputY = 0.0;
 
@@ -373,7 +454,7 @@ public class Player {
             return;
         }
 
-        boolean wantsRun = pressedKeys.contains(KeyCode.SHIFT);
+        boolean wantsRun = state.isRunToggled();
         boolean isRunning = wantsRun && state.getStamina() > 0;
         double speed = getCurrentMovementSpeed(isRunning);
         double frameScale = Math.min(0.15, dtNanos / NANOS_PER_60FPS_FRAME);
@@ -392,7 +473,14 @@ public class Player {
             if (isRunning) {
                 state.setStaminaMode(PlayerState.StaminaMode.RUN);
                 state.updateStaminaOverTime(dtSeconds, PlayerState.StaminaMode.RUN);
-                setAnimState(AnimState.RUN, false);
+                if (state.getStamina() <= 0) {
+                    state.setStaminaExhaustedLock(true);
+                    state.setRunToggled(false);
+                    moving = false;
+                    setAnimState(AnimState.IDLE, true);
+                } else {
+                    setAnimState(AnimState.RUN, false);
+                }
             } else {
                 state.setStaminaMode(PlayerState.StaminaMode.WALK);
                 state.updateStaminaOverTime(dtSeconds, PlayerState.StaminaMode.WALK);
@@ -428,6 +516,7 @@ public class Player {
                     frameIndex = 0;
                 }
             }
+            case ATTACK -> frameIndex = (frameIndex + 1) % frameCount;
             case DEATH -> {
             }
         }
@@ -479,7 +568,6 @@ public class Player {
     private double getCurrentMovementSpeed(boolean running) {
         double agiRatio = state.getAgi() / NORMAL_AGI;
         double agiModifier = 0.6 + (0.4 * agiRatio);
-        agiModifier = Math.max(MIN_AGI_SPEED_MULTIPLIER, Math.min(MAX_AGI_SPEED_MULTIPLIER, agiModifier));
 
         double currentSpeed = baseSpeed * agiModifier;
 
@@ -492,7 +580,7 @@ public class Player {
         }
 
         if (running) {
-            currentSpeed *= RUN_MULTIPLIER;
+            currentSpeed += getRunSpeedBonus();
         }
 
         return currentSpeed;
@@ -517,24 +605,40 @@ public class Player {
         }
 
         EquipmentAnimationSet animationSet = equipmentAnimations.get(equippedKind);
-        if (animationSet == null || animationSet.walkSheet == null || animState == AnimState.DEATH) {
+        if (animationSet == null || animState == AnimState.DEATH) {
             equipmentView.setImage(null);
             equipmentView.setVisible(false);
             equipmentView.setManaged(false);
             return;
         }
 
-        int equipFrame = switch (animState) {
-            case IDLE -> 0;
-            case WALK -> frameIndex % animationSet.columns;
-            case RUN -> frameIndex % animationSet.columns;
-            case DEATH -> 0;
-        };
+        Image equipSheet;
+        int columns;
+        int equipFrame;
+
+        if (animState == AnimState.ATTACK && animationSet.attackSheet != null) {
+            equipSheet = animationSet.attackSheet;
+            columns = animationSet.attackColumns;
+            equipFrame = frameIndex % columns;
+        } else if (animationSet.walkSheet != null) {
+            equipSheet = animationSet.walkSheet;
+            columns = animationSet.walkColumns;
+            equipFrame = switch (animState) {
+                case IDLE -> 0;
+                case WALK, RUN, ATTACK -> frameIndex % columns;
+                case DEATH -> 0;
+            };
+        } else {
+            equipmentView.setImage(null);
+            equipmentView.setVisible(false);
+            equipmentView.setManaged(false);
+            return;
+        }
 
         int x = equipFrame * FRAME_SIZE;
         int y = facingRow * FRAME_SIZE;
 
-        equipmentView.setImage(animationSet.walkSheet);
+        equipmentView.setImage(equipSheet);
         equipmentView.setViewport(new Rectangle2D(x, y, FRAME_SIZE, FRAME_SIZE));
         equipmentView.setVisible(true);
         equipmentView.setManaged(true);
@@ -546,6 +650,7 @@ public class Player {
             case IDLE -> idleSpriteSheet;
             case WALK -> walkSpriteSheet;
             case RUN -> runSpriteSheet;
+            case ATTACK -> getHumanAttackSheet();
             case DEATH -> deathSpriteSheet;
         };
     }
@@ -555,6 +660,7 @@ public class Player {
             case IDLE -> IDLE_COLUMNS;
             case WALK -> WALK_COLUMNS;
             case RUN -> RUN_COLUMNS;
+            case ATTACK -> getHumanAttackColumns();
             case DEATH -> DEATH_COLUMNS;
         };
     }
@@ -564,6 +670,7 @@ public class Player {
             case IDLE -> IDLE_FRAME_DELAY_NANOS;
             case WALK -> WALK_FRAME_DELAY_NANOS;
             case RUN -> RUN_FRAME_DELAY_NANOS;
+            case ATTACK -> getAttackFrameDelayNanos();
             case DEATH -> DEATH_FRAME_DELAY_NANOS;
         };
     }
@@ -606,6 +713,10 @@ public class Player {
         return code == KeyCode.SHIFT;
     }
 
+    private boolean isAttackKey(KeyCode code) {
+        return code == KeyCode.SPACE;
+    }
+
     private boolean isOverlapping(Rectangle target) {
         Bounds playerBounds = hitbox.localToScene(hitbox.getBoundsInLocal());
         Bounds targetBounds = target.localToScene(target.getBoundsInLocal());
@@ -613,20 +724,129 @@ public class Player {
     }
 
     private void registerDefaultEquipmentAnimations() {
-        registerEquipmentAnimation(EquipmentKind.AXE, "/image/human/axe_walk.png", WALK_COLUMNS);
+        registerEquipmentAnimation(
+            EquipmentKind.AXE,
+            "/image/human/axe_walk.png",
+            WALK_COLUMNS,
+            "/image/human/wood_cutting_action.png",
+            ATTACK_COLUMNS,
+            "/image/human/human_wood_cutting_action.png",
+            ATTACK_COLUMNS
+        );
+        registerEquipmentAnimation(
+            EquipmentKind.PICKAXE,
+            "/image/human/pickaxe_walk.png",
+            WALK_COLUMNS,
+            null,
+            ATTACK_COLUMNS,
+            null,
+            ATTACK_COLUMNS
+        );
     }
 
-    private void registerEquipmentAnimation(EquipmentKind kind, String resourcePath, int columns) {
-        if (kind == null || kind == EquipmentKind.NONE || resourcePath == null || resourcePath.isBlank()) {
+    private void registerEquipmentAnimation(
+        EquipmentKind kind,
+        String walkResourcePath,
+        int walkColumns,
+        String attackResourcePath,
+        int attackColumns,
+        String humanAttackResourcePath,
+        int humanAttackColumns
+    ) {
+        if (kind == null || kind == EquipmentKind.NONE) {
             return;
+        }
+
+        Image walkSheet = loadOptionalImage(walkResourcePath);
+        Image attackSheet = loadOptionalImage(attackResourcePath);
+        Image humanAttackSheet = loadOptionalImage(humanAttackResourcePath);
+
+        if (walkSheet == null && attackSheet == null && humanAttackSheet == null) {
+            return;
+        }
+
+        equipmentAnimations.put(
+            kind,
+            new EquipmentAnimationSet(
+                walkSheet,
+                walkColumns,
+                attackSheet,
+                attackColumns,
+                humanAttackSheet,
+                humanAttackColumns
+            )
+        );
+    }
+
+    private Image loadOptionalImage(String resourcePath) {
+        if (resourcePath == null || resourcePath.isBlank()) {
+            return null;
         }
 
         var url = getClass().getResource(resourcePath);
-        if (url == null) {
+        return (url == null) ? null : new Image(url.toExternalForm());
+    }
+
+    private double getRunSpeedBonus() {
+        return Math.max(MIN_RUN_SPEED_BONUS, Math.min(MAX_RUN_SPEED_BONUS, baseSpeed * RUN_SPEED_BONUS_RATIO));
+    }
+
+    private void triggerAttack() {
+        EquipmentAnimationSet animationSet = equipmentAnimations.get(equippedKind);
+        long now = System.nanoTime();
+        if (animationSet == null || !animationSet.supportsAttack() || deathStarted || deathFinished) {
             return;
         }
 
-        equipmentAnimations.put(kind, new EquipmentAnimationSet(new Image(url.toExternalForm()), columns));
+        if (isAttackActive(now) || now < nextAttackAvailableAtNanos) {
+            return;
+        }
+
+        moving = false;
+        long attackDuration = getAttackDurationNanos(animationSet);
+        attackEndsAtNanos = now + attackDuration;
+        nextAttackAvailableAtNanos = attackEndsAtNanos;
+        setAnimState(AnimState.ATTACK, true);
+    }
+
+    private long getAttackDurationNanos(EquipmentAnimationSet animationSet) {
+        int columns = getHumanAttackColumns(animationSet);
+        return (long) columns * getAttackFrameDelayNanos();
+    }
+
+    private boolean isAttackActive(long now) {
+        return attackEndsAtNanos > 0L && now < attackEndsAtNanos;
+    }
+
+    private Image getHumanAttackSheet() {
+        EquipmentAnimationSet animationSet = equipmentAnimations.get(equippedKind);
+        if (animationSet != null && animationSet.humanAttackSheet != null) {
+            return animationSet.humanAttackSheet;
+        }
+        return idleSpriteSheet;
+    }
+
+    private int getHumanAttackColumns() {
+        return getHumanAttackColumns(equipmentAnimations.get(equippedKind));
+    }
+
+    private int getHumanAttackColumns(EquipmentAnimationSet animationSet) {
+        if (animationSet != null && animationSet.humanAttackSheet != null) {
+            return animationSet.humanAttackColumns;
+        }
+        if (animationSet != null && animationSet.attackSheet != null) {
+            return animationSet.attackColumns;
+        }
+        if (animationSet != null && animationSet.walkSheet != null) {
+            return animationSet.walkColumns;
+        }
+        return ATTACK_COLUMNS;
+    }
+
+    private long getAttackFrameDelayNanos() {
+        double agiBonusScale = 1.0 + (Math.max(0.0, state.getAgi() - NORMAL_AGI) * ATTACK_SPEED_PER_AGI);
+        double speedScale = 1.0 / agiBonusScale;
+        return Math.max(1L, (long) Math.floor(BASE_ATTACK_FRAME_DELAY_NANOS * speedScale));
     }
 
     private EquipmentKind resolveEquipmentKind(int itemId) {
@@ -638,11 +858,11 @@ public class Player {
         String name = ItemDatabase.getItemName(itemId);
         String lookup = ((type == null ? "" : type) + " " + (name == null ? "" : name)).toLowerCase();
 
-        if (lookup.contains("axe")) {
-            return EquipmentKind.AXE;
-        }
         if (lookup.contains("pickaxe") || lookup.contains("pick axe")) {
             return EquipmentKind.PICKAXE;
+        }
+        if (lookup.contains("axe")) {
+            return EquipmentKind.AXE;
         }
         if (lookup.contains("fishing rod") || lookup.contains("rod")) {
             return EquipmentKind.FISHING_ROD;
