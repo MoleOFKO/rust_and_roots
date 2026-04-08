@@ -850,7 +850,7 @@ public class Player {
     }
 
     private EquipmentKind resolveEquipmentKind(int itemId) {
-        if (itemId <= 0) {
+        if (itemId <= 0 || !ItemDatabase.isEquipmentItem(itemId)) {
             return EquipmentKind.NONE;
         }
 

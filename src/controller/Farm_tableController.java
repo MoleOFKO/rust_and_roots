@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.concurrent.ThreadLocalRandom;
+import javafx.beans.value.ChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -23,10 +24,12 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
+import model.FarmGrowthRules;
 import model.FarmState;
 import model.Inventory;
 import model.ItemDatabase;
 import model.NodeCollectors;
+import util.AppDialogs;
 import util.SceneManager;
 import util.SpawnTag;
 
@@ -34,10 +37,7 @@ public class Farm_tableController implements Initializable, SceneController {
     private static final String TOOL_SLOT_STYLE = "-fx-effect: dropshadow(gaussian, rgba(255,215,0,0.85), 14, 0.55, 0, 0);";
 
     private static final double FARM_TABLE_TIME_SCALE = 0.25;
-    private static final int TOTAL_GROWTH_STAGES = 4;
-    private static final double DEFAULT_GROWTH_SECONDS = 8 * 60.0;
-    private static final double DEFAULT_WATER_COOLDOWN_SECONDS = 90.0;
-    private static final double DEFAULT_WATER_REDUCTION_RATIO = 0.12;
+    private static final int TOTAL_GROWTH_STAGES = FarmGrowthRules.TOTAL_GROWTH_STAGES;
     private static final int DEFAULT_PLANT_STAMINA_COST = 2;
 
     private static final String PLOT_IDLE_STYLE = "-fx-background-color: transparent; -fx-background-radius: 6; -fx-border-color: transparent; -fx-border-radius: 6;";
@@ -52,6 +52,8 @@ public class Farm_tableController implements Initializable, SceneController {
     private boolean previousPaused = false;
     private boolean timeOverrideApplied = false;
     private String activeFarmMapKey = "home_map";
+    private ChangeListener<Number> timeRefreshListener;
+    private long lastRenderedMinuteTick = Long.MIN_VALUE;
 
     private Image defaultSeedsIcon;
     private Image defaultWaterCanIcon;
@@ -74,6 +76,7 @@ public class Farm_tableController implements Initializable, SceneController {
     @FXML private ImageView SickleImg;
     @FXML private Group farm;
     @FXML private Pane seedList;
+    @FXML private Pane confirmPane;
     @FXML private Button btnConfirm;
     @FXML private Button btnBack;
 
@@ -119,13 +122,18 @@ public class Farm_tableController implements Initializable, SceneController {
         hideSeedList();
         populateSeedList();
         refreshSelectedToolPreview();
-        refreshPlots();
+        refreshFarmVisualState();
         refreshToolHighlight();
-        refreshPlotHighlights();
+        bindTimeDrivenPlotRefresh();
 
         if (view != null) {
             view.sceneProperty().addListener((obs, oldScene, newScene) -> {
-                if (newScene == null) restoreTimeOverride();
+                if (newScene == null) {
+                    unbindTimeDrivenPlotRefresh();
+                    restoreTimeOverride();
+                } else {
+                    refreshFarmVisualState();
+                }
             });
         }
     }
@@ -139,6 +147,7 @@ public class Farm_tableController implements Initializable, SceneController {
             int n = NodeCollectors.extractNumber(id, "farm_img");
             if (n < 0) return;
             handlePlotClick("Plot " + n);
+            event.consume();
             return;
         }
 
@@ -146,6 +155,7 @@ public class Farm_tableController implements Initializable, SceneController {
             Object plotId = region.getProperties().get("plotId");
             if (plotId instanceof String s) {
                 handlePlotClick(s);
+                event.consume();
             }
         }
     }
@@ -190,15 +200,47 @@ public class Farm_tableController implements Initializable, SceneController {
 
     @FXML
     private void handleConfirm(ActionEvent event) {
+        commitFarmChanges();
+    }
+
+    @FXML
+    private void handleConfirmPane(MouseEvent event) {
+        if (event.getTarget() == btnConfirm) {
+            return;
+        }
+        commitFarmChanges();
+        event.consume();
+    }
+
+    private boolean commitFarmChanges() {
+        if (gameState == null || gameState.getPlayerState() == null) {
+            AppDialogs.showMessageDialog(null, "Farm changes could not be confirmed right now.");
+            return false;
+        }
+
         Inventory inv = gameState.getPlayerState().getInventory();
         FarmState realFarm = gameState.getFarmState(activeFarmMapKey);
+        if (realFarm == null) {
+            AppDialogs.showMessageDialog(null, "Farm data is unavailable right now.");
+            return false;
+        }
+
         Map<Integer, Integer> seedsToRemove = computeSeedConsumption();
         int staminaCost = computePendingFarmStaminaCost();
-        if (gameState.getPlayerState().getStamina() < staminaCost) return;
-        if (!moveEquippedFarmToolsToStorage(realFarm)) return;
+        if (gameState.getPlayerState().getStamina() < staminaCost) {
+            AppDialogs.showMessageDialog(null, "Not enough stamina to confirm these farm changes.");
+            return false;
+        }
+        if (!moveEquippedFarmToolsToStorage(realFarm)) {
+            AppDialogs.showMessageDialog(null, "The selected farm tools are no longer available in your inventory or hotbar.");
+            return false;
+        }
 
         for (Map.Entry<Integer, Integer> entry : seedsToRemove.entrySet()) {
-            if (!removeSeedFromPlayerStorage(entry.getKey(), entry.getValue())) return;
+            if (!removeSeedFromPlayerStorage(entry.getKey(), entry.getValue())) {
+                AppDialogs.showMessageDialog(null, "You do not have enough seeds left to confirm those plantings.");
+                return false;
+            }
         }
         gameState.getPlayerState().consumeStamina(staminaCost);
 
@@ -215,6 +257,7 @@ public class Farm_tableController implements Initializable, SceneController {
 
         tempPlots.forEach((plotId, temp) -> temp.applyTo(realFarm.getPlot(plotId)));
         returnToPreviousScene();
+        return true;
     }
 
     @FXML
@@ -223,6 +266,7 @@ public class Farm_tableController implements Initializable, SceneController {
     }
 
     private void returnToPreviousScene() {
+        unbindTimeDrivenPlotRefresh();
         restoreTimeOverride();
         gameState.setActiveFarmMapKey(null);
         String returnFxml = gameState.getReturnFxml();
@@ -242,6 +286,50 @@ public class Farm_tableController implements Initializable, SceneController {
         time.setPaused(false);
         time.timeScaleProperty().set(FARM_TABLE_TIME_SCALE);
         timeOverrideApplied = true;
+    }
+
+    private void bindTimeDrivenPlotRefresh() {
+        if (view == null) {
+            return;
+        }
+
+        unbindTimeDrivenPlotRefresh();
+
+        GameTimeManager time = GameTimeManager.get();
+        timeRefreshListener = (obs, oldValue, newValue) -> {
+            if (view.getScene() == null) {
+                return;
+            }
+
+            long currentMinuteTick = resolveMinuteTick(
+                (newValue == null) ? time.totalSecondsProperty().get() : newValue.doubleValue()
+            );
+            if (currentMinuteTick == lastRenderedMinuteTick) {
+                return;
+            }
+
+            refreshFarmVisualState();
+        };
+        time.totalSecondsProperty().addListener(timeRefreshListener);
+    }
+
+    private void unbindTimeDrivenPlotRefresh() {
+        if (timeRefreshListener == null) {
+            return;
+        }
+
+        GameTimeManager.get().totalSecondsProperty().removeListener(timeRefreshListener);
+        timeRefreshListener = null;
+    }
+
+    private void refreshFarmVisualState() {
+        refreshPlots();
+        refreshPlotHighlights();
+        lastRenderedMinuteTick = resolveMinuteTick(GameTimeManager.get().totalSecondsProperty().get());
+    }
+
+    private long resolveMinuteTick(double totalSeconds) {
+        return (long) Math.floor(Math.max(0.0, totalSeconds) / 60.0);
     }
 
     private void restoreTimeOverride() {
@@ -381,8 +469,7 @@ public class Farm_tableController implements Initializable, SceneController {
             }
         }
 
-        refreshPlots();
-        refreshPlotHighlights();
+        refreshFarmVisualState();
         populateSeedList();
     }
 
@@ -517,11 +604,13 @@ public class Farm_tableController implements Initializable, SceneController {
     }
 
     private boolean isWateringCanSelectionValid(Integer itemId) {
-        return hasItemName(itemId, "watering can", "watering_can");
+        return ItemDatabase.isEquipmentItem(itemId == null ? -1 : itemId)
+                && hasItemName(itemId, "watering can", "watering_can");
     }
 
     private boolean isSickleSelectionValid(Integer itemId) {
-        return hasItemName(itemId, "sickle");
+        return ItemDatabase.isEquipmentItem(itemId == null ? -1 : itemId)
+                && hasItemName(itemId, "sickle");
     }
 
     private boolean hasItemName(Integer itemId, String... tokens) {
@@ -883,19 +972,13 @@ public class Farm_tableController implements Initializable, SceneController {
 
     private void applySeedGrowthProfile(TempPlotData plotData, int seedItemId) {
         if (plotData == null || seedItemId <= 0) return;
-
-        String key = ItemDatabase.buildCropSpriteKeyForSeed(seedItemId);
-        double growthSeconds = switch (key == null ? "" : key) {
-            case "grape", "pineapple", "pumpkin" -> 10 * 60.0;
-            case "bean", "broccoli", "cauliflower", "green_eggplant" -> 8 * 60.0;
-            case "cucumber", "beetroot" -> 7 * 60.0;
-            default -> DEFAULT_GROWTH_SECONDS;
-        };
-
-        plotData.totalGrowthSeconds = growthSeconds;
-        plotData.waterCooldownSeconds = Math.min(DEFAULT_WATER_COOLDOWN_SECONDS, growthSeconds / 3.0);
-        plotData.waterReductionSeconds = Math.max(20.0, growthSeconds * DEFAULT_WATER_REDUCTION_RATIO);
-        plotData.accumulatedWaterReduction = Math.min(plotData.accumulatedWaterReduction, plotData.totalGrowthSeconds - 1.0);
+        plotData.totalGrowthSeconds = FarmGrowthRules.resolveTotalGrowthSeconds(seedItemId);
+        plotData.waterCooldownSeconds = FarmGrowthRules.resolveWaterCooldownSeconds(plotData.totalGrowthSeconds);
+        plotData.waterReductionSeconds = FarmGrowthRules.resolveWaterReductionSeconds(plotData.totalGrowthSeconds);
+        plotData.accumulatedWaterReduction = FarmGrowthRules.clampAccumulatedWaterReduction(
+            plotData.accumulatedWaterReduction,
+            plotData.totalGrowthSeconds
+        );
     }
 
     private int computePendingFarmStaminaCost() {
@@ -972,29 +1055,32 @@ public class Farm_tableController implements Initializable, SceneController {
         }
         boolean isReady(double nowSeconds) {
             if (isEmpty()) return false;
-            double effectiveElapsed = Math.max(0, (nowSeconds - plantedAt) + accumulatedWaterReduction);
-            return effectiveElapsed >= totalGrowthSeconds;
+            return FarmGrowthRules.isReady(plantedAt, accumulatedWaterReduction, totalGrowthSeconds, nowSeconds);
         }
         boolean canWater(double nowSeconds) {
             if (isEmpty()) return false;
-            if (isReady(nowSeconds)) return false;
-            if (lastWateredAt < 0) return true;
-            return (nowSeconds - lastWateredAt) >= waterCooldownSeconds;
+            return FarmGrowthRules.canWater(
+                plantedAt,
+                lastWateredAt,
+                accumulatedWaterReduction,
+                totalGrowthSeconds,
+                waterReductionSeconds,
+                nowSeconds
+            );
         }
         void water(double nowSeconds) {
             if (!canWater(nowSeconds)) return;
             lastWateredAt = nowSeconds;
-            accumulatedWaterReduction = Math.min(totalGrowthSeconds, accumulatedWaterReduction + waterReductionSeconds);
+            accumulatedWaterReduction = FarmGrowthRules.clampAccumulatedWaterReduction(
+                accumulatedWaterReduction + waterReductionSeconds,
+                totalGrowthSeconds
+            );
         }
         int getStage(double nowSeconds, int totalStages) {
             if (isEmpty()) return 0;
             if (totalStages <= 1) return 1;
-            double effectiveElapsed = Math.max(0, (nowSeconds - plantedAt) + accumulatedWaterReduction);
-            double p = totalGrowthSeconds <= 0 ? 1.0 : Math.min(1.0, effectiveElapsed / totalGrowthSeconds);
-            int stage = 1 + (int) Math.floor(p * (totalStages - 1));
-            if (stage < 1) stage = 1;
-            if (stage > totalStages) stage = totalStages;
-            return stage;
+            int stage = FarmGrowthRules.getStage(plantedAt, accumulatedWaterReduction, totalGrowthSeconds, nowSeconds);
+            return Math.min(totalStages, stage);
         }
         int harvestItemId() { return seedItemId == null ? -1 : ItemDatabase.resolveHarvestItemIdForSeed(seedItemId); }
     }

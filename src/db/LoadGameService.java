@@ -6,10 +6,12 @@ package db;
 
 import game.GameState;
 import game.GameTimeManager;
+import java.sql.DatabaseMetaData;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import model.Farm;
+import model.FarmGrowthRules;
 import model.FarmState;
 import model.Inventory;
 import model.ItemDatabase;
@@ -40,6 +42,7 @@ public class LoadGameService {
             loadChestItems(con, gs, saveId);
             loadFarmPlots(con, gs, saveId);
             loadTime(con, saveId);
+            loadUnlockedRecipes(con, gs, saveId);
             gs.setPreferredStatusPanelGroup(GameState.StatusPanelGroup.STATUS);
 
             gs.setCurrentSaveId(saveId);
@@ -257,6 +260,7 @@ public class LoadGameService {
                         plot.seedItemName = ItemDatabase.getItemName(seedItemId);
                         plot.cropItemName = ItemDatabase.resolveCropNameForSeed(seedItemId);
                         plot.cropSpriteKey = ItemDatabase.buildCropSpriteKeyForSeed(seedItemId);
+                        FarmGrowthRules.applyProfile(plot, seedItemId);
                     } else {
                         plot.seedItemName = null;
                         plot.cropItemName = null;
@@ -309,9 +313,44 @@ public class LoadGameService {
         }
 
         gs.getPlayerSkills().clear();
+        gs.clearUnlockedRecipes();
         clearInventoryItems(gs.getChestInventory());
         clearFarmState(gs.getFarmState("home_map"));
         clearFarmState(gs.getFarmState("Home_interior"));
+    }
+
+    private void loadUnlockedRecipes(Connection con, GameState gs, int saveId) throws Exception {
+        gs.clearUnlockedRecipes();
+        if (!hasTable(con, "saved_unlocked_recipe")) {
+            return;
+        }
+
+        String sql = "SELECT recipe_key FROM saved_unlocked_recipe WHERE saved_id = ?";
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, saveId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    gs.unlockRecipe(rs.getString("recipe_key"));
+                }
+            }
+        }
+    }
+
+    private boolean hasTable(Connection con, String tableName) throws Exception {
+        if (con == null || tableName == null || tableName.isBlank()) {
+            return false;
+        }
+
+        DatabaseMetaData metaData = con.getMetaData();
+        try (ResultSet rs = metaData.getTables(con.getCatalog(), null, tableName, new String[]{"TABLE"})) {
+            if (rs.next()) {
+                return true;
+            }
+        }
+        try (ResultSet rs = metaData.getTables(con.getCatalog(), null, tableName.toUpperCase(), new String[]{"TABLE"})) {
+            return rs.next();
+        }
     }
 
     private void clearInventoryItems(Inventory inv) {

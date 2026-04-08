@@ -22,6 +22,8 @@ public final class ItemDatabase {
     private static final Map<String, item> itemByName = new HashMap<>();
     private static final Map<Integer, String> imageFileById = new HashMap<>();
     private static final Map<Integer, String> itemTypeById = new HashMap<>();
+    private static final Map<Integer, ItemUseType> itemUseTypeById = new HashMap<>();
+    private static final Map<Integer, String> unusableReasonById = new LinkedHashMap<>();
     private static final Map<Integer, Image> imageCache = new HashMap<>();
 
     private static boolean loaded = false;
@@ -38,6 +40,8 @@ public final class ItemDatabase {
         itemByName.clear();
         imageFileById.clear();
         itemTypeById.clear();
+        itemUseTypeById.clear();
+        unusableReasonById.clear();
         imageCache.clear();
 
         String sql = """
@@ -86,6 +90,7 @@ public final class ItemDatabase {
                 imageFileById.put(itemId, rs.getString("image"));
                 itemTypeById.put(itemId, normalizeType(rs.getString("item_type")));
             }
+            rebuildValidationState();
             loaded = true;
             System.out.println("Loaded items: " + allItems.size());
         } catch (Exception e) {
@@ -119,6 +124,10 @@ public final class ItemDatabase {
     public static boolean containsItem(int itemId) { return itemById.containsKey(itemId); }
     public static String getImageFileName(int itemId) { return imageFileById.get(itemId); }
     public static String getItemType(int itemId) { return itemTypeById.getOrDefault(itemId, ""); }
+    public static ItemUseType getItemUseType(int itemId) { return itemUseTypeById.getOrDefault(itemId, ItemUseType.UNKNOWN); }
+    public static String getUnusableReason(int itemId) { return unusableReasonById.get(itemId); }
+    public static Map<Integer, String> getUnusableItemsWithReasons() { return Collections.unmodifiableMap(unusableReasonById); }
+    public static boolean hasAnyRecipeItems() { return itemUseTypeById.containsValue(ItemUseType.RECIPE); }
 
     public static boolean hasImageAsset(int itemId) {
         return itemId > 0 && containsItem(itemId) && getImage(itemId) != null;
@@ -132,12 +141,17 @@ public final class ItemDatabase {
                 && hasImageAsset(itemId);
     }
 
+    public static boolean isUsableItem(int itemId) {
+        return itemId > 0
+                && containsItem(itemId)
+                && !unusableReasonById.containsKey(itemId);
+    }
+
     public static boolean isShopDisplayableItem(int itemId) {
-        if (itemId <= 0) return false;
-        if (isSeedItem(itemId)) {
-            return hasCompleteFarmDataForSeed(itemId);
-        }
-        return isDisplayableItem(itemId);
+        return itemId > 0
+                && isUsableItem(itemId)
+                && getItemUseType(itemId) != ItemUseType.CROP
+                && isDisplayableItem(itemId);
     }
 
     public static String getItemName(int itemId) {
@@ -165,12 +179,39 @@ public final class ItemDatabase {
     }
 
     public static boolean isSeedItem(int itemId) {
+        if (getItemUseType(itemId) == ItemUseType.SEED) return true;
         String type = getItemType(itemId);
         if ("seed".equals(type)) return true;
         String name = getItemName(itemId);
         if (name == null) return false;
         String n = normalizeLookupKey(name);
         return n.endsWith(" seed") || n.endsWith(" seeds");
+    }
+
+    public static boolean isEquipmentItem(int itemId) {
+        if (itemId <= 0) return false;
+        if (getItemUseType(itemId) == ItemUseType.EQUIPMENT) return true;
+
+        String lookup = normalizeLookupKey(getItemName(itemId));
+        return lookup.contains("axe")
+            || lookup.contains("pickaxe")
+            || lookup.contains("pick axe")
+            || lookup.contains("sickle")
+            || lookup.contains("fishing rod")
+            || lookup.contains("watering can");
+    }
+
+    public static boolean isEdibleItem(int itemId) {
+        if (itemId <= 0) return false;
+        return getItemUseType(itemId) == ItemUseType.EDIBLE || RecipeCatalog.isCookingOutputItem(itemId);
+    }
+
+    public static boolean isRecipeItem(int itemId) {
+        return itemId > 0 && getItemUseType(itemId) == ItemUseType.RECIPE;
+    }
+
+    public static boolean isCropItem(int itemId) {
+        return itemId > 0 && getItemUseType(itemId) == ItemUseType.CROP;
     }
 
     public static List<Integer> getAllSeedItemIds() {
@@ -198,64 +239,42 @@ public final class ItemDatabase {
     }
 
     public static int resolveCropItemIdForSeed(int seedItemId) {
+        String spriteKey = guessCropSpriteKeyForSeed(seedItemId);
+        item cropStage = findCropStageItemBySpriteKey(spriteKey);
+        if (cropStage != null) {
+            return cropStage.getItem_id();
+        }
+
         String seedName = getItemName(seedItemId);
         if (seedName == null || seedName.isBlank()) return -1;
         String cropName = normalizeSeedName(seedName);
-        item direct = getItemByName(cropName);
-        if (direct == null) {
-            direct = getItemByName(normalizeCropAlias(cropName));
-        }
-        if (direct != null && !isSeedItem(direct.getItem_id())) return direct.getItem_id();
-        direct = getItemByName(cropName + " Fruit");
-        if (direct == null) {
-            direct = getItemByName(normalizeCropAlias(cropName) + " Fruit");
-        }
-        if (direct != null && !isSeedItem(direct.getItem_id())) return direct.getItem_id();
-        direct = getItemByName(toSpriteKey(cropName) + "_fruit");
-        if (direct == null) {
-            direct = getItemByName(toSpriteKey(normalizeCropAlias(cropName)) + "_fruit");
-        }
-        if (direct != null && !isSeedItem(direct.getItem_id())) return direct.getItem_id();
 
-        String normalizedTarget = normalizeLookupKey(cropName);
-        for (item itm : allItems) {
-            if (itm == null || isSeedItem(itm.getItem_id())) continue;
-            if (normalizedTarget.equals(normalizeLookupKey(itm.getItem_name()))) {
-                return itm.getItem_id();
-            }
-            if (normalizeLookupKey(normalizeCropAlias(cropName)).equals(normalizeLookupKey(itm.getItem_name()))) {
-                return itm.getItem_id();
-            }
+        item direct = findNonSeedItemByName(cropName);
+        if (direct == null) {
+            direct = findNonSeedItemByName(normalizeCropAlias(cropName));
         }
+        if (direct != null && !isFruitLikeItem(direct.getItem_id())) {
+            return direct.getItem_id();
+        }
+
         return -1;
     }
 
     public static String resolveCropNameForSeed(int seedItemId) {
-        int cropItemId = resolveCropItemIdForSeed(seedItemId);
-        if (cropItemId > 0) return getItemName(cropItemId);
         String seedName = getItemName(seedItemId);
         return seedName == null ? null : normalizeSeedName(seedName);
     }
 
     public static int resolveHarvestItemIdForSeed(int seedItemId) {
-        int cropItemId = resolveCropItemIdForSeed(seedItemId);
-        if (cropItemId <= 0) return -1;
+        String seedName = getItemName(seedItemId);
+        if (seedName == null || seedName.isBlank()) return -1;
 
-        String cropName = getItemName(cropItemId);
-        if (cropName == null || cropName.isBlank()) return -1;
+        String cropName = normalizeSeedName(seedName);
+        item harvest = findHarvestItem(cropName);
+        if (harvest != null) return harvest.getItem_id();
 
-        item fruitNamed = getItemByName(cropName + " Fruit");
-        if (fruitNamed != null && fruitNamed.getItem_id() > 0 && !isSeedItem(fruitNamed.getItem_id())) {
-            return fruitNamed.getItem_id();
-        }
-
-        String spriteKey = toSpriteKey(cropName);
-        item underscoredFruit = getItemByName(spriteKey + "_fruit");
-        if (underscoredFruit != null && underscoredFruit.getItem_id() > 0 && !isSeedItem(underscoredFruit.getItem_id())) {
-            return underscoredFruit.getItem_id();
-        }
-
-        return isSeedItem(cropItemId) ? -1 : cropItemId;
+        harvest = findHarvestItem(normalizeCropAlias(cropName));
+        return harvest == null ? -1 : harvest.getItem_id();
     }
 
     public static boolean hasCompleteFarmDataForSeed(int seedItemId) {
@@ -265,10 +284,7 @@ public final class ItemDatabase {
         if (!hasImageAsset(seedItemId)) return false;
 
         int cropItemId = resolveCropItemIdForSeed(seedItemId);
-        if (cropItemId <= 0) return false;
-        String cropName = getItemName(cropItemId);
-        if (cropName == null || cropName.isBlank()) return false;
-        if (!hasImageAsset(cropItemId)) return false;
+        if (cropItemId <= 0 || !hasImageAsset(cropItemId)) return false;
 
         int harvestItemId = resolveHarvestItemIdForSeed(seedItemId);
         if (harvestItemId <= 0 || !isDisplayableItem(harvestItemId)) return false;
@@ -276,7 +292,6 @@ public final class ItemDatabase {
         String spriteKey = buildCropSpriteKeyForSeed(seedItemId);
         if (spriteKey == null || spriteKey.isBlank()) return false;
 
-        // Stage 4 is the mature crop art, so unfinished crops should not be treated as valid seeds.
         return hasCropStageAsset(spriteKey, 1)
                 && hasCropStageAsset(spriteKey, 2)
                 && hasCropStageAsset(spriteKey, 3)
@@ -288,19 +303,12 @@ public final class ItemDatabase {
         if (cropItemId > 0) {
             String imageFile = getImageFileName(cropItemId);
             if (imageFile != null && !imageFile.isBlank()) {
-                int dot = imageFile.lastIndexOf('.');
-                String key = dot > 0 ? imageFile.substring(0, dot) : imageFile;
+                String key = stripFileExtension(imageFile);
                 key = stripCropSuffixes(key);
                 if (key != null && !key.isBlank()) return key;
             }
-            String cropName = getItemName(cropItemId);
-            if (cropName != null) {
-                String key = stripCropSuffixes(toSpriteKey(cropName));
-                if (key != null && !key.isBlank()) return key;
-            }
         }
-        String seedName = getItemName(seedItemId);
-        return seedName == null ? null : stripCropSuffixes(toSpriteKey(normalizeSeedName(seedName)));
+        return guessCropSpriteKeyForSeed(seedItemId);
     }
 
     public static String normalizeSeedName(String itemName) {
@@ -325,6 +333,7 @@ public final class ItemDatabase {
         String out = key.trim().toLowerCase(Locale.ROOT);
         if (out.endsWith("_fruit")) out = out.substring(0, out.length() - 6);
         if (out.endsWith("_seed")) out = out.substring(0, out.length() - 5);
+        out = out.replaceAll("_(plant|tree)\\d+$", "");
         return out;
     }
 
@@ -351,11 +360,187 @@ public final class ItemDatabase {
         }
     }
 
+    private static void rebuildValidationState() {
+        itemUseTypeById.clear();
+        unusableReasonById.clear();
+
+        for (item itm : allItems) {
+            if (itm == null) continue;
+            itemUseTypeById.put(itm.getItem_id(), determineItemUseType(itm));
+        }
+
+        for (item itm : allItems) {
+            if (itm == null) continue;
+            String reason = determineUnusableReason(itm.getItem_id());
+            if (reason != null && !reason.isBlank()) {
+                unusableReasonById.put(itm.getItem_id(), reason);
+            }
+        }
+    }
+
+    private static ItemUseType determineItemUseType(item itm) {
+        if (itm == null) return ItemUseType.UNKNOWN;
+
+        String rawType = normalizeType(itm.getItem_type_name());
+        String itemName = normalizeLookupKey(itm.getItem_name());
+        String imageFile = normalizeType(stripFileExtension(getImageFileName(itm.getItem_id())));
+
+        return switch (rawType) {
+            case "equipment", "equipments", "tool", "weapon" -> ItemUseType.EQUIPMENT;
+            case "edible", "food" -> ItemUseType.EDIBLE;
+            case "inedible", "material", "materials" -> ItemUseType.INEDIBLE;
+            case "recipe", "recipes" -> ItemUseType.RECIPE;
+            case "crop", "crops" -> ItemUseType.CROP;
+            case "seed", "seeds" -> ItemUseType.SEED;
+            default -> inferItemUseType(itemName, imageFile);
+        };
+    }
+
+    private static ItemUseType inferItemUseType(String itemName, String imageFile) {
+        String normalizedName = normalizeLookupKey(itemName);
+        String normalizedImage = normalizeType(imageFile);
+
+        if (normalizedName.endsWith(" seed") || normalizedName.endsWith(" seeds") || normalizedImage.endsWith("_seed")) {
+            return ItemUseType.SEED;
+        }
+
+        if (normalizedImage.matches(".*_(plant|tree)\\d+$") || normalizedName.matches(".*_(plant|tree)\\d+$")) {
+            return ItemUseType.CROP;
+        }
+
+        if (normalizedName.contains("axe")
+                || normalizedName.contains("pickaxe")
+                || normalizedName.contains("pick axe")
+                || normalizedName.contains("sickle")
+                || normalizedName.contains("fishing rod")
+                || normalizedName.contains("watering can")) {
+            return ItemUseType.EQUIPMENT;
+        }
+
+        return ItemUseType.UNKNOWN;
+    }
+
+    private static String determineUnusableReason(int itemId) {
+        if (itemId <= 0 || !containsItem(itemId)) {
+            return "Missing item record.";
+        }
+
+        return switch (getItemUseType(itemId)) {
+            case CROP -> "Crop-stage item is visual-only and should not be selectable or sold.";
+            case SEED -> hasCompleteFarmDataForSeed(itemId)
+                ? null
+                : "Seed is missing a complete crop-growth chain or a distinct harvest item.";
+            case RECIPE -> isValidRecipeUnlockItem(itemId)
+                ? null
+                : "Recipe item has no valid recipe definition or is missing ingredient items.";
+            case UNKNOWN -> "Item type is unknown, so it cannot be safely used in gameplay.";
+            case EQUIPMENT, EDIBLE, INEDIBLE -> null;
+        };
+    }
+
+    private static boolean isValidRecipeUnlockItem(int itemId) {
+        if (itemId <= 0 || !isRecipeItem(itemId)) {
+            return false;
+        }
+
+        List<RecipeCatalog.RecipeDefinition> definitions =
+            RecipeCatalog.findDefinitionsUnlockedByItemName(getItemName(itemId));
+
+        if (definitions.isEmpty()) {
+            return false;
+        }
+
+        for (RecipeCatalog.RecipeDefinition definition : definitions) {
+            if (!RecipeCatalog.hasAllIngredientItems(definition)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static item findNonSeedItemByName(String itemName) {
+        if (itemName == null || itemName.isBlank()) return null;
+        item direct = getItemByName(itemName);
+        return (direct != null && !isSeedItem(direct.getItem_id())) ? direct : null;
+    }
+
+    private static item findHarvestItem(String cropName) {
+        if (cropName == null || cropName.isBlank()) {
+            return null;
+        }
+
+        List<String> candidates = List.of(
+            cropName + " Fruit",
+            toSpriteKey(cropName) + "_fruit"
+        );
+
+        for (String candidate : candidates) {
+            item itm = getItemByName(candidate);
+            if (itm == null) continue;
+            int itemId = itm.getItem_id();
+            if (itemId > 0 && !isSeedItem(itemId) && !isCropItem(itemId)) {
+                return itm;
+            }
+        }
+
+        return null;
+    }
+
+    private static boolean isFruitLikeItem(int itemId) {
+        if (itemId <= 0) return false;
+        String name = normalizeLookupKey(getItemName(itemId));
+        String imageFile = normalizeType(stripFileExtension(getImageFileName(itemId)));
+        return name.endsWith(" fruit") || imageFile.endsWith("_fruit");
+    }
+
+    private static String guessCropSpriteKeyForSeed(int seedItemId) {
+        if (seedItemId <= 0) return null;
+
+        String imageFile = getImageFileName(seedItemId);
+        if (imageFile != null && !imageFile.isBlank()) {
+            String key = stripCropSuffixes(stripFileExtension(imageFile));
+            if (key != null && !key.isBlank()) {
+                return key;
+            }
+        }
+
+        String seedName = getItemName(seedItemId);
+        return seedName == null ? null : stripCropSuffixes(toSpriteKey(normalizeSeedName(seedName)));
+    }
+
+    private static item findCropStageItemBySpriteKey(String spriteKey) {
+        if (spriteKey == null || spriteKey.isBlank()) {
+            return null;
+        }
+
+        String normalizedSpriteKey = normalizeType(spriteKey);
+        for (item itm : allItems) {
+            if (itm == null || getItemUseType(itm.getItem_id()) != ItemUseType.CROP) {
+                continue;
+            }
+
+            String imageFile = normalizeType(stripFileExtension(getImageFileName(itm.getItem_id())));
+            if (imageFile.startsWith(normalizedSpriteKey + "_plant")
+                    || imageFile.startsWith(normalizedSpriteKey + "_tree")) {
+                return itm;
+            }
+        }
+
+        return null;
+    }
+
     private static String normalizeType(String type) {
         return type == null ? "" : type.trim().toLowerCase(Locale.ROOT);
     }
 
     private static String normalizeLookupKey(String value) {
         return value == null ? "" : value.trim().toLowerCase(Locale.ROOT).replace('_', ' ');
+    }
+
+    private static String stripFileExtension(String fileName) {
+        if (fileName == null || fileName.isBlank()) return "";
+        int dot = fileName.lastIndexOf('.');
+        return dot > 0 ? fileName.substring(0, dot) : fileName;
     }
 }
