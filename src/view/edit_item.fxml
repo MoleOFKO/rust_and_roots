@@ -17,7 +17,7 @@
     <children>
         <Group fx:id="uiRoot">
             <children>
-            <ImageView fitHeight="541.0" fitWidth="906.0" pickOnBounds="true">
+            <ImageView fitHeight="541.0" fitWidth="948.0" pickOnBounds="true">
                <image>
                   <Image url="@../image/Admin/dashboard.png" />
                </image>
@@ -70,23 +70,24 @@
                </image>
             </ImageView>
                <Button fx:id="btnlogout" layoutX="39.0" layoutY="441.0" mnemonicParsing="false" onAction="#handlebtnlogoutaction" opacity="0.0" prefWidth="139.0" text="Logout" />
-            <ImageView fitHeight="429.0" fitWidth="694.0" layoutX="215.0" layoutY="71.0" pickOnBounds="true">
+            <ImageView fitHeight="429.0" fitWidth="738.0" layoutX="215.0" layoutY="71.0" pickOnBounds="true">
                <image>
                   <Image url="@../image/Admin/paper_2of3.png" />
                </image>
             </ImageView>
-               <TableView fx:id="item_view" layoutX="227.0" layoutY="74.0" prefHeight="418.0" prefWidth="668.0" stylesheets="@../css/tableview-rich.css">
+               <TableView fx:id="item_view" layoutX="227.0" layoutY="74.0" prefHeight="418.0" prefWidth="714.0" stylesheets="@../css/tableview-rich.css">
                   <columns>
-                     <TableColumn fx:id="colaccid" prefWidth="67.0" text="Item ID" />
-                     <TableColumn fx:id="colaccname" prefWidth="126.0" text="Item Name" />
-                     <TableColumn fx:id="colprice" prefWidth="74.0" text="Price" />
+                     <TableColumn fx:id="colaccid" prefWidth="82.0" text="Item ID" />
+                     <TableColumn fx:id="colaccname" prefWidth="117.0" text="Item Name" />
+                     <TableColumn fx:id="colitemtype" prefWidth="82.0" text="Item Type" />
+                     <TableColumn fx:id="colprice" prefWidth="52.5" text="Price" />
                      <TableColumn fx:id="colstr" prefWidth="45.0" text="STR" />
-                     <TableColumn fx:id="colagi" prefWidth="45.0" text="AGI" />
-                     <TableColumn fx:id="colvit" prefWidth="41.0" text="VIT" />
-                     <TableColumn fx:id="coldex" prefWidth="49.0" text="DEX" />
-                     <TableColumn fx:id="colhp" minWidth="0.0" prefWidth="45.0" text="HP" />
-                     <TableColumn fx:id="colstimana" prefWidth="78.0" text="Stamina" />
-                     <TableColumn fx:id="colimage" minWidth="0.0" prefWidth="81.0" text="Image" />
+                     <TableColumn fx:id="colagi" prefWidth="44.5" text="AGI" />
+                     <TableColumn fx:id="colvit" prefWidth="45.0" text="VIT" />
+                     <TableColumn fx:id="coldex" prefWidth="47.0" text="DEX" />
+                     <TableColumn fx:id="colhp" minWidth="0.0" prefWidth="38.5" text="HP" />
+                     <TableColumn fx:id="colstimana" prefWidth="71.0" text="Stamina" />
+                     <TableColumn fx:id="colimage" minWidth="0.0" prefWidth="78.5" text="Image" />
                   </columns>
                </TableView>
             <ImageView fitHeight="39.0" fitWidth="210.0" layoutX="226.0" layoutY="25.0" pickOnBounds="true">

@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ResourceBundle;
 import java.util.concurrent.ThreadLocalRandom;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -20,8 +21,10 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import util.AppDialogs;
 import util.SmtpOtpSender;
+import util.WorldScaler;
 
 public class OTPController implements Initializable {
     private static final int OTP_LENGTH = 6;
@@ -31,9 +34,12 @@ public class OTPController implements Initializable {
     private String pendingOtpCode;
     private LocalDateTime pendingOtpExpiresAt;
     private String verifiedEmail;
+    private boolean otpAttemptConsumed;
 
     @FXML
     private Group world;
+    @FXML
+    private StackPane view;
     @FXML
     private Pane otppane;
     @FXML
@@ -66,6 +72,10 @@ public class OTPController implements Initializable {
     private FontAwesomeIcon openpassword1;
     @FXML
     private FontAwesomeIcon closedpassword1;
+    @FXML
+    private Button btnback1;
+    @FXML
+    private Button btnback;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -75,6 +85,8 @@ public class OTPController implements Initializable {
         } catch (ClassNotFoundException ex) {
             AppDialogs.showMessageDialog(null, "Database driver not found.");
         }
+        WorldScaler scaler = new WorldScaler(view, world);
+        Platform.runLater(scaler::scale);
 
         otppane.setVisible(true);
         newpasswordpane.setVisible(false);
@@ -106,17 +118,27 @@ public class OTPController implements Initializable {
             AppDialogs.showMessageDialog(null, "Please enter the OTP code.");
             return;
         }
+        if (otpAttemptConsumed) {
+            AppDialogs.showMessageDialog(null, "This OTP was already used. Please resend code.");
+            return;
+        }
         if (pendingOtpCode == null || pendingOtpExpiresAt == null || !email.equalsIgnoreCase(verifiedEmail)) {
             AppDialogs.showMessageDialog(null, "No OTP found for this email. Please send code first.");
             return;
         }
+
+        // One-time use: consume this OTP verification attempt immediately.
+        otpAttemptConsumed = true;
+
         if (LocalDateTime.now().isAfter(pendingOtpExpiresAt)) {
             clearOtpState();
             AppDialogs.showMessageDialog(null, "OTP has expired. Please resend code.");
             return;
         }
         if (!pendingOtpCode.equals(enteredOtp)) {
-            AppDialogs.showMessageDialog(null, "Incorrect OTP code.");
+            pendingOtpCode = null;
+            pendingOtpExpiresAt = null;
+            AppDialogs.showMessageDialog(null, "Incorrect OTP code. Please resend code to try again.");
             return;
         }
 
@@ -228,6 +250,7 @@ public class OTPController implements Initializable {
         pendingOtpCode = otp;
         pendingOtpExpiresAt = LocalDateTime.now().plusMinutes(OTP_EXPIRY_MINUTES);
         verifiedEmail = email;
+        otpAttemptConsumed = false;
         txtenterotp.setText("");
         AppDialogs.showMessageDialog(null, "OTP sent to " + email + ". It expires in 10 minutes.");
     }
@@ -283,6 +306,7 @@ public class OTPController implements Initializable {
         pendingOtpCode = null;
         pendingOtpExpiresAt = null;
         verifiedEmail = null;
+        otpAttemptConsumed = false;
     }
 
     private String safeTrim(String value) {
@@ -305,5 +329,10 @@ public class OTPController implements Initializable {
         txtenternewpasswordvisible.setManaged(!masked);
         openpassword1.setVisible(masked);
         closedpassword1.setVisible(!masked);
+    }
+
+    @FXML
+    private void handlbtnbackaction(ActionEvent event) {
+        util.SceneManager.switchScene("/view/login.fxml");
     }
 }
