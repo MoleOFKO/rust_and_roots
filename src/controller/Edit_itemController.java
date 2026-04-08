@@ -97,6 +97,8 @@ public class Edit_itemController implements Initializable {
     private Button btnadd;
     @FXML
     private TableColumn<?, ?> colprice;
+    @FXML
+    private TableColumn<?, ?> colitemtype;
     
     Connection con;
     ResultSet rs;
@@ -164,6 +166,7 @@ public class Edit_itemController implements Initializable {
             String sname=txtsearch.getText();
             String sql = """
                 SELECT i.item_id, i.item_name, i.price,
+                       it.item_type_name,
                        s.str_stat AS str,
                        s.agi_stat AS agi,
                        s.vit_stat AS vit,
@@ -173,6 +176,7 @@ public class Edit_itemController implements Initializable {
                        i.image
                 FROM items i
                 JOIN item_stats s ON i.item_stats_id = s.item_stats_id
+                LEFT JOIN item_types it ON i.item_type_id = it.item_type_id
                 WHERE i.item_name LIKE ?
             """;
             pst=con.prepareStatement(sql);
@@ -189,7 +193,19 @@ public class Edit_itemController implements Initializable {
             imgView.setPreserveRatio(true);
             
             
-            itemList.add(new item(rs.getInt("item_id"), rs.getString("item_name"), rs.getInt("price"), rs.getInt("str"), rs.getInt("agi"),rs.getInt("vit"),rs.getInt("dex"),rs.getInt("hp"),rs.getInt("stamina"),imgView));
+            itemList.add(new item(
+                    rs.getInt("item_id"),
+                    rs.getString("item_name"),
+                    rs.getString("item_type_name"),
+                    rs.getInt("price"),
+                    rs.getInt("str"),
+                    rs.getInt("agi"),
+                    rs.getInt("vit"),
+                    rs.getInt("dex"),
+                    rs.getInt("hp"),
+                    rs.getInt("stamina"),
+                    imgView
+            ));
          }
         }
     }
@@ -198,6 +214,7 @@ public class Edit_itemController implements Initializable {
         itemList = FXCollections.observableArrayList();
         String sql = """
             SELECT i.item_id, i.item_name, i.price,
+                   it.item_type_name,
                    s.str_stat AS str,
                    s.agi_stat AS agi,
                    s.vit_stat AS vit,
@@ -207,6 +224,7 @@ public class Edit_itemController implements Initializable {
                    i.image
             FROM items i
             JOIN item_stats s ON i.item_stats_id = s.item_stats_id
+            LEFT JOIN item_types it ON i.item_type_id = it.item_type_id
         """;
         st = con.createStatement();
         rs = st.executeQuery(sql);
@@ -221,7 +239,19 @@ public class Edit_itemController implements Initializable {
             imgView.setPreserveRatio(true);
             
             
-            itemList.add(new item(rs.getInt("item_id"), rs.getString("item_name"), rs.getInt("price"), rs.getInt("str"), rs.getInt("agi"),rs.getInt("vit"),rs.getInt("dex"),rs.getInt("hp"),rs.getInt("stamina") ,imgView));
+            itemList.add(new item(
+                    rs.getInt("item_id"),
+                    rs.getString("item_name"),
+                    rs.getString("item_type_name"),
+                    rs.getInt("price"),
+                    rs.getInt("str"),
+                    rs.getInt("agi"),
+                    rs.getInt("vit"),
+                    rs.getInt("dex"),
+                    rs.getInt("hp"),
+                    rs.getInt("stamina"),
+                    imgView
+            ));
          }
         item_view.setItems(itemList);
     }
@@ -230,6 +260,7 @@ public class Edit_itemController implements Initializable {
         
         colaccid.setCellValueFactory(new PropertyValueFactory("item_id"));
         colaccname.setCellValueFactory(new PropertyValueFactory("item_name"));
+        colitemtype.setCellValueFactory(new PropertyValueFactory("item_type_name"));
         colprice.setCellValueFactory(new PropertyValueFactory("price"));
         colstr.setCellValueFactory(new PropertyValueFactory("str"));
         colagi.setCellValueFactory(new PropertyValueFactory("agi"));
