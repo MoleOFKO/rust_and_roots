@@ -17,11 +17,12 @@ public class Farm {
     private final Rectangle detectionArea;
     private final Button actionButton;
     private final Map<String, ImageView> plotViews = new LinkedHashMap<>();
+    private final Map<String, String> renderedPlotStages = new LinkedHashMap<>();
     private final FarmState state;
 
     private Runnable onInteract;
 
-    private int totalStages = 3;
+    private int totalStages = FarmGrowthRules.TOTAL_GROWTH_STAGES;
     private String resourcePattern = "/image/crops/%s_plant%d.png";
 
     public Farm(Group root, Rectangle detectionArea, Button actionButton, FarmState state) {
@@ -39,6 +40,7 @@ public class Farm {
 
     public void addPlot(String plotId, ImageView plotImageView) {
         plotViews.put(plotId, plotImageView);
+        renderedPlotStages.remove(plotId);
         plotImageView.setImage(null);
         plotImageView.setVisible(false);
         state.getPlot(plotId);
@@ -70,6 +72,7 @@ public class Farm {
             FarmState.PlotData pd = state.getPlot(plotId);
 
             if (pd == null || pd.isEmpty()) {
+                renderedPlotStages.remove(plotId);
                 view.setImage(null);
                 view.setVisible(false);
                 continue;
@@ -77,7 +80,7 @@ public class Farm {
 
             int stage = pd.getStage(nowSeconds, totalStages);
             String spriteKey = resolveSpriteKey(pd);
-            showStage(view, spriteKey, stage);
+            showStage(plotId, view, spriteKey, stage);
         }
     }
 
@@ -90,20 +93,30 @@ public class Farm {
         return null;
     }
 
-    private void showStage(ImageView view, String spriteKey, int stageNumber1Based) {
+    private void showStage(String plotId, ImageView view, String spriteKey, int stageNumber1Based) {
         if (spriteKey == null || spriteKey.isBlank()) {
+            renderedPlotStages.remove(plotId);
             view.setImage(null);
             view.setVisible(false);
             return;
         }
+
+        String stageKey = spriteKey + "#" + stageNumber1Based;
+        if (stageKey.equals(renderedPlotStages.get(plotId))) {
+            view.setVisible(true);
+            return;
+        }
+
         String path = String.format(resourcePattern, spriteKey, stageNumber1Based);
         URL url = getClass().getResource(path);
         if (url == null) {
+            renderedPlotStages.remove(plotId);
             view.setImage(null);
             view.setVisible(false);
             return;
         }
         view.setImage(new Image(url.toExternalForm()));
         view.setVisible(true);
+        renderedPlotStages.put(plotId, stageKey);
     }
 }

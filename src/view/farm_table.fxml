@@ -281,7 +281,7 @@
                         </Pane>
                      </children>
                   </Group>
-                  <Pane layoutX="471.0" layoutY="313.0" prefHeight="92.0" prefWidth="111.0">
+                  <Pane fx:id="confirmPane" layoutX="471.0" layoutY="313.0" onMouseClicked="#handleConfirmPane" pickOnBounds="true" prefHeight="92.0" prefWidth="111.0">
                      <children>
                         <ImageView fitHeight="92.0" fitWidth="111.0" layoutX="1.0" pickOnBounds="true">
                            <image>

@@ -3,14 +3,17 @@ package controller;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.Comparator;
+import java.util.Set;
+import java.util.function.BooleanSupplier;
 
 import model.Inventory;
 import model.ItemDatabase;
 import model.NodeCollectors;
+import model.RecipeCatalog;
 import game.GameLoopManager;
 import game.GameState;
 import game.GameTimeManager;
@@ -39,10 +42,12 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import model.CollisionRegistry;
 import model.Farm;
+import model.FarmGrowthRules;
 import model.FarmPlotRegistrar;
 import model.InteractionZone;
 import model.Player;
 import model.PlayerState;
+import util.AppDialogs;
 import util.SceneManager;
 import util.SpawnTag;
 import util.WorldScaler;
@@ -187,6 +192,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     protected Image dayBg;
     protected Image nightBg;
     protected ChangeListener<Boolean> nightListener;
+    protected ChangeListener<Number> farmTimeListener;
 
     protected abstract String mapKey();
     protected abstract void configureExits();
@@ -217,7 +223,9 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     protected MenuTab activeMenuTab = MenuTab.INVENTORY;
     
     protected void configureFarm(Farm farm) {
-        // default: do nothing
+        if (farm != null) {
+            farm.setTotalStages(FarmGrowthRules.TOTAL_GROWTH_STAGES);
+        }
     }
 
     protected String farmTableFxmlPath() {
@@ -305,6 +313,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         setupInventoryUiIfPresent();
         setupHotbarIfPresent();
         setupDayNightBindingIfConfigured();
+        setupFarmTimeRefreshIfPresent();
         setupSettingsTabIfPresent();
 
         GameTimeManager.get().start();
@@ -320,6 +329,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     protected final void stopAndSwitchScene(String targetFxml, SpawnTag targetSpawn) {
         capturePlayerSnapshot();
         
+        detachFarmTimeRefresh();
         if (gameLoop != null) gameLoop.stop();
         if (player != null) player.stop();
         SceneManager.switchScene(targetFxml, targetSpawn);
@@ -1304,6 +1314,41 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         });
     }
 
+    private void setupFarmTimeRefreshIfPresent() {
+        if (farm == null || view == null) {
+            return;
+        }
+
+        detachFarmTimeRefresh();
+
+        GameTimeManager time = GameTimeManager.get();
+        farmTimeListener = (obs, oldValue, newValue) -> {
+            if (farm == null || view.getScene() == null) {
+                return;
+            }
+            double nowSeconds = (newValue == null) ? time.totalSecondsProperty().get() : newValue.doubleValue();
+            farm.update(nowSeconds);
+        };
+        time.totalSecondsProperty().addListener(farmTimeListener);
+
+        view.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene == null) {
+                detachFarmTimeRefresh();
+            } else {
+                farm.update(time.totalSecondsProperty().get());
+            }
+        });
+    }
+
+    protected final void detachFarmTimeRefresh() {
+        if (farmTimeListener == null) {
+            return;
+        }
+
+        GameTimeManager.get().totalSecondsProperty().removeListener(farmTimeListener);
+        farmTimeListener = null;
+    }
+
     protected Image loadImageOrNull(String path) {
         var url = getClass().getResource(path);
         if (url == null) {
@@ -1656,6 +1701,13 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         int quantity = playerState.getHotbarItemCount(index);
         if (itemId <= 0 || quantity <= 0) return false;
 
+        if (tryUnlockRecipeItem(itemId, () -> playerState.removeHotbarItems(index, 1))) {
+            refreshHotbarView();
+            refreshPlayerInventoryView();
+            refreshEquippedItemVisual();
+            return true;
+        }
+
         FoodEffectData effectData = resolveFoodEffectData(itemId);
         if (effectData == null) return false;
 
@@ -1679,6 +1731,14 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
         SlotData slot = slots.get(index);
         if (slot == null || slot.itemId() <= 0 || slot.quantity() <= 0) return false;
+
+        if (tryUnlockRecipeItem(slot.itemId(), () -> player.getInventory().removeItem(slot.itemId(), 1))) {
+            selectedPlayerInventoryItemId = null;
+            refreshPlayerInventoryView();
+            refreshHotbarView();
+            refreshEquippedItemVisual();
+            return true;
+        }
 
         FoodEffectData effectData = resolveFoodEffectData(slot.itemId());
         if (effectData == null) return false;
@@ -1725,6 +1785,10 @@ public abstract class BaseMapController implements Initializable, SceneControlle
             );
         }
 
+        if (!ItemDatabase.isEdibleItem(itemId)) {
+            return null;
+        }
+
         Object itm = ItemDatabase.getItemById(itemId);
         if (itm == null) return null;
 
@@ -1736,7 +1800,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         int agiDelta = extractItemStat(itm, "getAgi");
 
         if (hpDelta == 0 && staminaDelta == 0 && strDelta == 0 && vitDelta == 0 && dexDelta == 0 && agiDelta == 0) {
-            return null;
+            return new FoodEffectData(1, 2, 0, 0, 0, 0);
         }
 
         return new FoodEffectData(hpDelta, staminaDelta, strDelta, vitDelta, dexDelta, agiDelta);
@@ -1786,6 +1850,71 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         }
 
         return 0;
+    }
+
+    protected boolean tryUnlockRecipeItem(int itemId, BooleanSupplier consumeOneItem) {
+        if (itemId <= 0 || gameState == null || consumeOneItem == null || !ItemDatabase.isRecipeItem(itemId)) {
+            return false;
+        }
+
+        Set<String> matchedKeys = RecipeCatalog.getRecipeKeysUnlockedByItemName(ItemDatabase.getItemName(itemId));
+        if (matchedKeys.isEmpty()) {
+            return false;
+        }
+
+        List<String> matchedDisplayNames = new ArrayList<>();
+        for (String recipeKey : matchedKeys) {
+            RecipeCatalog.RecipeDefinition definition = RecipeCatalog.findDefinitionByKey(recipeKey);
+            matchedDisplayNames.add(
+                definition == null
+                    ? recipeKey.replace('_', ' ')
+                    : definition.getDisplayName()
+            );
+        }
+
+        List<String> newlyUnlocked = new ArrayList<>();
+        for (String recipeKey : matchedKeys) {
+            if (recipeKey == null || recipeKey.isBlank() || gameState.isRecipeUnlocked(recipeKey)) {
+                continue;
+            }
+            newlyUnlocked.add(recipeKey);
+        }
+
+        if (newlyUnlocked.isEmpty()) {
+            AppDialogs.showMessageDialog(
+                null,
+                "Already unlocked: " + String.join(", ", matchedDisplayNames),
+                "Recipe Known",
+                javax.swing.JOptionPane.INFORMATION_MESSAGE
+            );
+            return true;
+        }
+
+        if (!consumeOneItem.getAsBoolean()) {
+            return false;
+        }
+
+        for (String recipeKey : newlyUnlocked) {
+            gameState.unlockRecipe(recipeKey);
+        }
+
+        List<String> displayNames = new ArrayList<>();
+        for (String recipeKey : newlyUnlocked) {
+            RecipeCatalog.RecipeDefinition definition = RecipeCatalog.findDefinitionByKey(recipeKey);
+            displayNames.add(
+                definition == null
+                    ? recipeKey.replace('_', ' ')
+                    : definition.getDisplayName()
+            );
+        }
+
+        AppDialogs.showMessageDialog(
+            null,
+            "Unlocked recipe: " + String.join(", ", displayNames),
+            "Recipe Unlocked",
+            javax.swing.JOptionPane.INFORMATION_MESSAGE
+        );
+        return true;
     }
 
     protected String itemName(int itemId) {

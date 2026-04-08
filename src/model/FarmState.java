@@ -14,11 +14,11 @@ public class FarmState {
         public String cropItemName = null;
         public String cropSpriteKey = null;
 
-        public double totalGrowthSeconds = 15 * 60;
+        public double totalGrowthSeconds = FarmGrowthRules.DEFAULT_GROWTH_SECONDS;
         public double plantedAt = -1;
-        public double waterCooldownSeconds = 5 * 60;
+        public double waterCooldownSeconds = FarmGrowthRules.resolveWaterCooldownSeconds(FarmGrowthRules.DEFAULT_GROWTH_SECONDS);
         public double lastWateredAt = -1;
-        public double waterReductionSeconds = 60;
+        public double waterReductionSeconds = FarmGrowthRules.resolveWaterReductionSeconds(FarmGrowthRules.DEFAULT_GROWTH_SECONDS);
         public double accumulatedWaterReduction = 0;
 
         public boolean isEmpty() {
@@ -27,37 +27,35 @@ public class FarmState {
 
         public boolean isReady(double nowSeconds) {
             if (isEmpty()) return false;
-            double effectiveElapsed = (nowSeconds - plantedAt) + accumulatedWaterReduction;
-            return effectiveElapsed >= totalGrowthSeconds;
+            return FarmGrowthRules.isReady(plantedAt, accumulatedWaterReduction, totalGrowthSeconds, nowSeconds);
         }
 
         public boolean canWater(double nowSeconds) {
             if (isEmpty()) return false;
-            if (isReady(nowSeconds)) return false;
-            if (lastWateredAt < 0) return true;
-            return (nowSeconds - lastWateredAt) >= waterCooldownSeconds;
+            return FarmGrowthRules.canWater(
+                plantedAt,
+                lastWateredAt,
+                accumulatedWaterReduction,
+                totalGrowthSeconds,
+                waterReductionSeconds,
+                nowSeconds
+            );
         }
 
         public void water(double nowSeconds) {
             if (!canWater(nowSeconds)) return;
             lastWateredAt = nowSeconds;
-            accumulatedWaterReduction += waterReductionSeconds;
-            if (accumulatedWaterReduction > totalGrowthSeconds) {
-                accumulatedWaterReduction = totalGrowthSeconds;
-            }
+            accumulatedWaterReduction = FarmGrowthRules.clampAccumulatedWaterReduction(
+                accumulatedWaterReduction + Math.max(0.0, waterReductionSeconds),
+                totalGrowthSeconds
+            );
         }
 
         public int getStage(double nowSeconds, int totalStages) {
             if (isEmpty()) return 0;
             if (totalStages <= 1) return 1;
-
-            double effectiveElapsed = Math.max(0, (nowSeconds - plantedAt) + accumulatedWaterReduction);
-            double p = Math.min(1.0, effectiveElapsed / totalGrowthSeconds);
-
-            int stage = 1 + (int)Math.floor(p * (totalStages - 1));
-            if (stage < 1) stage = 1;
-            if (stage > totalStages) stage = totalStages;
-            return stage;
+            int stage = FarmGrowthRules.getStage(plantedAt, accumulatedWaterReduction, totalGrowthSeconds, nowSeconds);
+            return Math.min(totalStages, stage);
         }
 
         public void clearPlant() {

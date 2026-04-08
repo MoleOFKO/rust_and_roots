@@ -1,13 +1,9 @@
 package controller;
 
-import db.dbcon;
 import game.GameState;
 import game.GameTimeManager;
 import game.SceneController;
 import java.net.URL;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.util.ResourceBundle;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -32,13 +28,15 @@ import model.item;
 import java.util.*;
 import javafx.scene.image.Image;
 import javafx.scene.Group;
-import ui.InventorySlotsUIManager;
 import util.AppDialogs;
 import util.SpawnTag;
 
 public class ShopController implements Initializable, SceneController {
+    private static final int FIXED_BUY_SLOT_COUNT = 8;
+    private static final int RANDOM_BUY_SLOT_COUNT = 4;
     private static final int MAX_STOCK_PER_ITEM = 20;
     private static final int RESTOCK_PER_DAY = 10;
+    private static final String HOTBAR_SELL_ENTRY_STYLE = "-fx-text-fill: #8fdcff; -fx-font-weight: bold;";
 
     private GameState gameState;
     private Inventory inv;
@@ -111,6 +109,25 @@ public class ShopController implements Initializable, SceneController {
         }
     }
 
+    private enum SellInventoryEntrySource {
+        INVENTORY,
+        HOTBAR
+    }
+
+    private static final class SellInventoryEntry {
+        private final int itemId;
+        private final int quantity;
+        private final SellInventoryEntrySource source;
+        private final int hotbarIndex;
+
+        private SellInventoryEntry(int itemId, int quantity, SellInventoryEntrySource source, int hotbarIndex) {
+            this.itemId = itemId;
+            this.quantity = quantity;
+            this.source = (source == null) ? SellInventoryEntrySource.INVENTORY : source;
+            this.hotbarIndex = hotbarIndex;
+        }
+    }
+
     private final ObservableList<DetailRow> detailRows = FXCollections.observableArrayList();
 
     // ---------- button collections ----------
@@ -131,7 +148,7 @@ public class ShopController implements Initializable, SceneController {
     // ---------- inventory ui ----------
     private final List<ImageView> invImages = new ArrayList<>();
     private final List<Label> invLabels = new ArrayList<>();
-    private InventorySlotsUIManager inventorySlotsUIManager;
+    private final List<SellInventoryEntry> displayedSellInventoryEntries = new ArrayList<>();
 
     // ---------- FXML ----------
     @FXML private Button buybtn;
@@ -309,8 +326,6 @@ public class ShopController implements Initializable, SceneController {
         buildUiCollections();
         collectButtonsOnce();
 
-        inventorySlotsUIManager = new InventorySlotsUIManager(inv, invImages, invLabels, invBtns);
-
         loadShopItemsForToday();
         rebuildDailyShopAvailability();
         rebuildSellAvailabilityFromInventory();
@@ -470,7 +485,7 @@ public class ShopController implements Initializable, SceneController {
         for (var e : sellCart.entrySet()) {
             int itemId = e.getKey();
             int qty = e.getValue().get();
-            if (inv.getCount(itemId) < qty) return;
+            if (getCombinedOwnedCount(itemId) < qty) return;
         }
 
         int totalGain = computeSellTotal();
@@ -479,7 +494,9 @@ public class ShopController implements Initializable, SceneController {
         for (var e : sellCart.entrySet()) {
             int itemId = e.getKey();
             int qty = e.getValue().get();
-            inv.removeItem(itemId, qty);
+            if (!removeOwnedItemsForSale(itemId, qty)) {
+                return;
+            }
         }
 
         inv.addCoins(totalGain);
@@ -581,35 +598,158 @@ public class ShopController implements Initializable, SceneController {
     }
 
     private void refreshInventoryButtons() {
-        List<Integer> available = new ArrayList<>(inv.itemsProperty().keySet());
-        available.removeIf(id -> inv.getCount(id) <= 0);
-
-        available.sort(Comparator.comparing(this::itemNameSafe, String.CASE_INSENSITIVE_ORDER));
+        displayedSellInventoryEntries.clear();
+        displayedSellInventoryEntries.addAll(buildDisplayedSellInventoryEntries());
 
         for (int i = 0; i < invBtns.size(); i++) {
             Button b = invBtns.get(i);
+            ImageView img = (i < invImages.size()) ? invImages.get(i) : null;
+            Label lbl = (i < invLabels.size()) ? invLabels.get(i) : null;
 
-            if (b == null) continue;
-
-            if (i >= available.size()) {
-                b.setOnAction(null);
-                b.setDisable(true);
+            if (i >= displayedSellInventoryEntries.size()) {
+                if (img != null) img.setImage(null);
+                if (lbl != null) {
+                    lbl.setText("");
+                    lbl.setStyle("");
+                }
+                if (b != null) {
+                    b.setText("");
+                    b.setOnAction(null);
+                    b.setDisable(true);
+                }
                 continue;
             }
 
-            int itemId = available.get(i);
-            b.setDisable(false);
-            b.setOnAction(e -> {
-                if (mode == Mode.SELL) {
-                    int current = sellCart.containsKey(itemId) ? sellCart.get(itemId).get() : 0;
-                    setSellSelectionQty(itemId, current + 1);
+            SellInventoryEntry entry = displayedSellInventoryEntries.get(i);
+            int itemId = entry.itemId;
+            int availableQty = getSellAvailableCount(itemId);
+
+            if (img != null) {
+                img.setImage(ItemDatabase.getImage(itemId));
+            }
+            if (lbl != null) {
+                if (entry.source == SellInventoryEntrySource.HOTBAR) {
+                    lbl.setText("H" + (entry.hotbarIndex + 1) + " x" + entry.quantity);
+                    lbl.setStyle(HOTBAR_SELL_ENTRY_STYLE);
+                } else {
+                    lbl.setText(entry.quantity > 0 ? ("x" + entry.quantity) : "");
+                    lbl.setStyle("");
                 }
-            });
+            }
+            if (b != null) {
+                b.setText(itemNameSafe(itemId));
+                b.setDisable(availableQty <= 0);
+                b.setOnAction(e -> {
+                    if (mode == Mode.SELL) {
+                        int current = sellCart.containsKey(itemId) ? sellCart.get(itemId).get() : 0;
+                        setSellSelectionQty(itemId, current + 1);
+                    }
+                });
+            }
+        }
+    }
+
+    private List<SellInventoryEntry> buildDisplayedSellInventoryEntries() {
+        List<SellInventoryEntry> displayed = new ArrayList<>();
+        int slotCapacity = Math.min(invImages.size(), Math.min(invLabels.size(), invBtns.size()));
+        if (slotCapacity <= 0) {
+            return displayed;
         }
 
-        if (inventorySlotsUIManager != null) {
-            inventorySlotsUIManager.refresh();
+        List<Integer> inventoryItems = new ArrayList<>(inv.itemsProperty().keySet());
+        inventoryItems.removeIf(itemId -> getSellAvailableCount(itemId) <= 0);
+        inventoryItems.sort(Comparator.comparing(this::itemNameSafe, String.CASE_INSENSITIVE_ORDER));
+
+        for (Integer itemId : inventoryItems) {
+            if (itemId == null || itemId <= 0) {
+                continue;
+            }
+            displayed.add(new SellInventoryEntry(
+                itemId,
+                inv.getCount(itemId),
+                SellInventoryEntrySource.INVENTORY,
+                -1
+            ));
+            if (displayed.size() >= slotCapacity) {
+                return displayed;
+            }
         }
+
+        if (gameState == null || gameState.getPlayerState() == null) {
+            return displayed;
+        }
+
+        for (int i = 0; i < gameState.getPlayerState().getHotbarSize(); i++) {
+            int itemId = gameState.getPlayerState().getHotbarItemId(i);
+            int quantity = gameState.getPlayerState().getHotbarItemCount(i);
+            if (itemId <= 0 || quantity <= 0) {
+                continue;
+            }
+            displayed.add(new SellInventoryEntry(
+                itemId,
+                quantity,
+                SellInventoryEntrySource.HOTBAR,
+                i
+            ));
+            if (displayed.size() >= slotCapacity) {
+                break;
+            }
+        }
+
+        return displayed;
+    }
+
+    private int getSellAvailableCount(int itemId) {
+        IntegerProperty remaining = inventoryAvailableForSell.get(itemId);
+        if (remaining != null) {
+            return Math.max(0, remaining.get());
+        }
+        return getCombinedOwnedCount(itemId);
+    }
+
+    private int getCombinedOwnedCount(int itemId) {
+        if (itemId <= 0 || gameState == null || gameState.getPlayerState() == null) {
+            return 0;
+        }
+
+        int total = inv.getCount(itemId);
+        for (int i = 0; i < gameState.getPlayerState().getHotbarSize(); i++) {
+            if (gameState.getPlayerState().getHotbarItemId(i) == itemId) {
+                total += gameState.getPlayerState().getHotbarItemCount(i);
+            }
+        }
+        return total;
+    }
+
+    private boolean removeOwnedItemsForSale(int itemId, int quantity) {
+        if (itemId <= 0 || quantity <= 0) {
+            return false;
+        }
+
+        int remaining = quantity;
+        int fromInventory = Math.min(inv.getCount(itemId), remaining);
+        if (fromInventory > 0 && !inv.removeItem(itemId, fromInventory)) {
+            return false;
+        }
+        remaining -= fromInventory;
+
+        if (remaining <= 0 || gameState == null || gameState.getPlayerState() == null) {
+            return remaining <= 0;
+        }
+
+        for (int i = 0; i < gameState.getPlayerState().getHotbarSize() && remaining > 0; i++) {
+            if (gameState.getPlayerState().getHotbarItemId(i) != itemId) {
+                continue;
+            }
+            int slotQty = gameState.getPlayerState().getHotbarItemCount(i);
+            int removeFromSlot = Math.min(slotQty, remaining);
+            if (removeFromSlot > 0 && !gameState.getPlayerState().removeHotbarItems(i, removeFromSlot)) {
+                return false;
+            }
+            remaining -= removeFromSlot;
+        }
+
+        return remaining <= 0;
     }
 
     private void refreshBuyPane() {
@@ -727,90 +867,103 @@ public class ShopController implements Initializable, SceneController {
     }
 
     private void loadShopItemsForToday() {
-        String sql = "SELECT item_id, item_name, price FROM items ORDER BY item_id";
-        dbcon db = new dbcon();
+        Map<Integer, item> allById = new LinkedHashMap<>();
+        for (item itm : ItemDatabase.getAllItems()) {
+            if (itm == null) continue;
+            int itemId = itm.getItem_id();
+            if (!ItemDatabase.isShopDisplayableItem(itemId)) continue;
+            allById.put(itemId, itm);
+        }
 
-        try (
-            Connection con = db.getConnection();
-            PreparedStatement ps = con.prepareStatement(sql);
-            ResultSet rs = ps.executeQuery()
-        ) {
-            Map<Integer, item> allById = new LinkedHashMap<>();
+        shopItems.clear();
+        dbItemsById.clear();
 
-            while (rs.next()) {
-                int itemId = rs.getInt("item_id");
-                item itm = ItemDatabase.getItemById(itemId);
-                if (itm == null || !ItemDatabase.isShopDisplayableItem(itemId)) {
-                    continue;
-                }
-                allById.put(itemId, itm);
+        int today = GameTimeManager.get().dayNumberProperty().get();
+        int shopSlotCapacity = buyItemButtons.isEmpty() ? 12 : buyItemButtons.size();
+        int fixedSlotCapacity = Math.min(FIXED_BUY_SLOT_COUNT, Math.max(0, shopSlotCapacity));
+        int randomSlotCapacity = Math.min(
+            RANDOM_BUY_SLOT_COUNT,
+            Math.max(0, shopSlotCapacity - fixedSlotCapacity)
+        );
+        int fixedVisibleTarget = Math.min(fixedSlotCapacity, allById.size());
+        int totalVisibleTarget = Math.min(allById.size(), fixedVisibleTarget + randomSlotCapacity);
+
+        for (Integer itemId : gameState.getFixedShopItemIdsForDay(today)) {
+            item itm = allById.get(itemId);
+            if (itm != null && !dbItemsById.containsKey(itemId) && shopItems.size() < fixedVisibleTarget) {
+                shopItems.add(itm);
+                dbItemsById.put(itemId, itm);
             }
+        }
 
-            shopItems.clear();
-            dbItemsById.clear();
+        int targetRandomCount = Math.max(0, totalVisibleTarget - shopItems.size());
 
-            int today = GameTimeManager.get().dayNumberProperty().get();
-            List<Integer> fixedShopItemIds = gameState.getFixedShopItemIdsForDay(today);
-            int randomShopItemCount = gameState.getRandomShopItemCount();
-
-            for (Integer itemId : fixedShopItemIds) {
-                item itm = allById.get(itemId);
-                if (itm != null && !dbItemsById.containsKey(itemId)) {
-                    shopItems.add(itm);
-                    dbItemsById.put(itemId, itm);
-                }
+        List<Integer> savedRandomIds = new ArrayList<>();
+        for (Integer itemId : gameState.getDailyRandomShopItemIds()) {
+            if (itemId == null || dbItemsById.containsKey(itemId) || !allById.containsKey(itemId)) {
+                continue;
             }
-
-            List<Integer> savedRandomIds = new ArrayList<>();
-            for (Integer itemId : gameState.getDailyRandomShopItemIds()) {
-                if (itemId != null && allById.containsKey(itemId)) {
-                    savedRandomIds.add(itemId);
-                }
+            if (!savedRandomIds.contains(itemId)) {
+                savedRandomIds.add(itemId);
             }
+        }
 
-            boolean needNewRandom =
-                gameState.getShopRandomDay() != today ||
-                savedRandomIds == null ||
-                savedRandomIds.size() < randomShopItemCount;
+        boolean needNewRandom =
+            gameState.getShopRandomDay() != today ||
+            savedRandomIds.size() < targetRandomCount;
 
-            if (needNewRandom) {
-                List<item> randomPool = new ArrayList<>(allById.values());
-                randomPool.removeIf(itm -> dbItemsById.containsKey(itm.getItem_id()));
-                Collections.shuffle(randomPool);
+        List<Integer> selectedRandomIds = new ArrayList<>();
 
-                List<Integer> newRandomIds = new ArrayList<>();
-                for (int i = 0; i < randomShopItemCount && i < randomPool.size(); i++) {
-                    newRandomIds.add(randomPool.get(i).getItem_id());
-                }
-
-                gameState.setShopRandomDay(today);
-                gameState.setDailyRandomShopItemIds(newRandomIds);
-                savedRandomIds = newRandomIds;
-            }
-
-            int targetVisibleCount = Math.min(allById.size(), dbItemsById.size() + randomShopItemCount);
+        if (!needNewRandom) {
             for (Integer itemId : savedRandomIds) {
-                item itm = allById.get(itemId);
-                if (itm != null && !dbItemsById.containsKey(itemId) && shopItems.size() < targetVisibleCount) {
-                    shopItems.add(itm);
-                    dbItemsById.put(itemId, itm);
-                }
+                if (selectedRandomIds.size() >= targetRandomCount) break;
+                selectedRandomIds.add(itemId);
             }
+        } else {
+            List<item> randomPool = new ArrayList<>(allById.values());
+            randomPool.removeIf(itm -> dbItemsById.containsKey(itm.getItem_id()));
+            Collections.shuffle(randomPool);
 
-            if (shopItems.size() < targetVisibleCount) {
-                List<item> fallbackPool = new ArrayList<>(allById.values());
-                fallbackPool.removeIf(itm -> dbItemsById.containsKey(itm.getItem_id()));
-                Collections.shuffle(fallbackPool);
-
-                for (item itm : fallbackPool) {
-                    if (shopItems.size() >= targetVisibleCount) break;
-                    shopItems.add(itm);
-                    dbItemsById.put(itm.getItem_id(), itm);
-                }
+            for (item itm : randomPool) {
+                if (selectedRandomIds.size() >= targetRandomCount) break;
+                selectedRandomIds.add(itm.getItem_id());
             }
+        }
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (selectedRandomIds.size() < targetRandomCount) {
+            List<item> fallbackPool = new ArrayList<>(allById.values());
+            fallbackPool.removeIf(itm ->
+                dbItemsById.containsKey(itm.getItem_id()) || selectedRandomIds.contains(itm.getItem_id())
+            );
+            Collections.shuffle(fallbackPool);
+
+            for (item itm : fallbackPool) {
+                if (selectedRandomIds.size() >= targetRandomCount) break;
+                selectedRandomIds.add(itm.getItem_id());
+            }
+        }
+
+        gameState.setShopRandomDay(today);
+        gameState.setDailyRandomShopItemIds(selectedRandomIds);
+
+        for (Integer itemId : selectedRandomIds) {
+            item itm = allById.get(itemId);
+            if (itm != null && !dbItemsById.containsKey(itemId) && shopItems.size() < totalVisibleTarget) {
+                shopItems.add(itm);
+                dbItemsById.put(itemId, itm);
+            }
+        }
+
+        if (shopItems.size() < totalVisibleTarget) {
+            List<item> fallbackPool = new ArrayList<>(allById.values());
+            fallbackPool.removeIf(itm -> dbItemsById.containsKey(itm.getItem_id()));
+            Collections.shuffle(fallbackPool);
+
+            for (item itm : fallbackPool) {
+                if (shopItems.size() >= totalVisibleTarget) break;
+                shopItems.add(itm);
+                dbItemsById.put(itm.getItem_id(), itm);
+            }
         }
     }
 
@@ -860,8 +1013,18 @@ public class ShopController implements Initializable, SceneController {
     private void rebuildSellAvailabilityFromInventory() {
         inventoryAvailableForSell.clear();
 
-        for (Integer itemId : inv.itemsProperty().keySet()) {
-            int owned = inv.getCount(itemId);
+        LinkedHashSet<Integer> ownedItemIds = new LinkedHashSet<>(inv.itemsProperty().keySet());
+        if (gameState != null && gameState.getPlayerState() != null) {
+            for (int i = 0; i < gameState.getPlayerState().getHotbarSize(); i++) {
+                int itemId = gameState.getPlayerState().getHotbarItemId(i);
+                if (itemId > 0 && gameState.getPlayerState().getHotbarItemCount(i) > 0) {
+                    ownedItemIds.add(itemId);
+                }
+            }
+        }
+
+        for (Integer itemId : ownedItemIds) {
+            int owned = getCombinedOwnedCount(itemId);
             int selected = sellCart.containsKey(itemId) ? sellCart.get(itemId).get() : 0;
             int remaining = Math.max(0, owned - selected);
             inventoryAvailableForSell.put(itemId, new SimpleIntegerProperty(remaining));
@@ -893,7 +1056,7 @@ public class ShopController implements Initializable, SceneController {
     }
 
     private void setSellSelectionQty(int itemId, int newQty) {
-        int owned = inv.getCount(itemId);
+        int owned = getCombinedOwnedCount(itemId);
         int clamped = Math.max(0, Math.min(newQty, owned));
         int remaining = owned - clamped;
 

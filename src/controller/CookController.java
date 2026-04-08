@@ -20,6 +20,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import model.Inventory;
 import model.ItemDatabase;
+import model.RecipeCatalog;
 import model.item;
 import util.SceneManager;
 import util.SpawnTag;
@@ -161,11 +162,10 @@ public class CookController implements Initializable, SceneController {
 
     private void loadRecipes() {
         unlockedRecipes.clear();
-        List<RecipeTemplate> templates = buildPlannedRecipes();
         List<String> missing = new ArrayList<>();
 
-        for (RecipeTemplate template : templates) {
-            addRecipeIfValid(template, missing);
+        for (RecipeCatalog.RecipeDefinition definition : RecipeCatalog.getRecipes(RecipeCatalog.Domain.COOKING)) {
+            addRecipeIfValid(definition, missing);
         }
 
         if (!missing.isEmpty()) {
@@ -176,37 +176,44 @@ public class CookController implements Initializable, SceneController {
         }
     }
 
-    private void addRecipeIfValid(RecipeTemplate template, List<String> missingReport) {
-        item output = resolveItemByAliases(template.outputAliases);
+    private void addRecipeIfValid(RecipeCatalog.RecipeDefinition definition, List<String> missingReport) {
+        if (definition == null) {
+            return;
+        }
+        item output = resolveItemByAliases(definition.getOutputAliases());
         if (output == null) {
-            missingReport.add("Output item not found for recipe `" + template.key + "` aliases=" + Arrays.toString(template.outputAliases));
+            missingReport.add("Output item not found for recipe `" + definition.getKey() + "` aliases=" + Arrays.toString(definition.getOutputAliases()));
             return;
         }
         if (ItemDatabase.getImage(output.getItem_id()) == null) {
-            missingReport.add("Output image missing for item `" + output.getItem_name() + "` in recipe `" + template.key + "`");
+            missingReport.add("Output image missing for item `" + output.getItem_name() + "` in recipe `" + definition.getKey() + "`");
             return;
         }
 
         List<IngredientRequirement> ingredients = new ArrayList<>();
-        for (IngredientSpec spec : template.ingredients) {
-            item ingItem = resolveItemByAliases(spec.itemAliases);
+        for (RecipeCatalog.IngredientSpec spec : definition.getIngredients()) {
+            item ingItem = resolveItemByAliases(spec.getItemAliases());
             if (ingItem == null) {
-                missingReport.add("Ingredient not found for recipe `" + template.key + "` aliases=" + Arrays.toString(spec.itemAliases));
+                missingReport.add("Ingredient not found for recipe `" + definition.getKey() + "` aliases=" + Arrays.toString(spec.getItemAliases()));
                 return;
             }
             if (ItemDatabase.getImage(ingItem.getItem_id()) == null) {
-                missingReport.add("Ingredient image missing for `" + ingItem.getItem_name() + "` in recipe `" + template.key + "`");
+                missingReport.add("Ingredient image missing for `" + ingItem.getItem_name() + "` in recipe `" + definition.getKey() + "`");
                 return;
             }
-            ingredients.add(new IngredientRequirement(ingItem.getItem_id(), spec.amount));
+            ingredients.add(new IngredientRequirement(ingItem.getItem_id(), spec.getAmount()));
+        }
+
+        if (!gameState.canAccessRecipe(definition.getKey())) {
+            return;
         }
 
         RecipeDifficulty difficulty = difficultyForIngredientCount(ingredients.size());
         unlockedRecipes.add(new Recipe(
-            template.key,
+            definition.getKey(),
             output.getItem_id(),
-            output.getItem_name(),
-            template.effectText == null || template.effectText.isBlank() ? difficulty.effectText : template.effectText,
+            definition.getDisplayName(),
+            difficulty.effectText,
             difficulty.waitSeconds,
             difficulty.baseSuccessRate,
             difficulty.dexScaling,
@@ -226,86 +233,7 @@ public class CookController implements Initializable, SceneController {
     }
 
     private item resolveItemByAliases(String... aliases) {
-        if (aliases == null) return null;
-        for (String alias : aliases) {
-            if (alias == null || alias.isBlank()) continue;
-            item itm = ItemDatabase.getItemByName(alias);
-            if (itm != null) return itm;
-        }
-        return null;
-    }
-
-    private List<RecipeTemplate> buildPlannedRecipes() {
-        List<RecipeTemplate> recipes = new ArrayList<>();
-
-        recipes.add(new RecipeTemplate("tomato_slices", new String[]{"tomato_slices"}, null,
-            new IngredientSpec(new String[]{"tomato"}, 1)));
-        recipes.add(new RecipeTemplate("baked_potato", new String[]{"baked_potato"}, null,
-            new IngredientSpec(new String[]{"potato"}, 1)));
-        recipes.add(new RecipeTemplate("grilled_steak", new String[]{"grilled_steak"}, null,
-            new IngredientSpec(new String[]{"steak"}, 1)));
-        recipes.add(new RecipeTemplate("salad_leaves", new String[]{"salad_leaves"}, null,
-            new IngredientSpec(new String[]{"lettuce"}, 1)));
-
-        recipes.add(new RecipeTemplate("fresh_salad", new String[]{"fresh_salad"}, null,
-            new IngredientSpec(new String[]{"tomato"}, 1),
-            new IngredientSpec(new String[]{"lettuce"}, 1)));
-        recipes.add(new RecipeTemplate("beef_potato_stew", new String[]{"beef_potato_stew"}, null,
-            new IngredientSpec(new String[]{"potato"}, 1),
-            new IngredientSpec(new String[]{"beef"}, 1)));
-        recipes.add(new RecipeTemplate("pepper_steak", new String[]{"pepper_steak"}, null,
-            new IngredientSpec(new String[]{"steak"}, 1),
-            new IngredientSpec(new String[]{"red_bell_pepper", "red bellpepper"}, 1)));
-        recipes.add(new RecipeTemplate("pork_cabbage_stir_fry", new String[]{"pork_cabbage_stir-fry"}, null,
-            new IngredientSpec(new String[]{"pork"}, 1),
-            new IngredientSpec(new String[]{"cabbage"}, 1)));
-        recipes.add(new RecipeTemplate("chicken_corn_soup", new String[]{"chicken_corn_soup"}, null,
-            new IngredientSpec(new String[]{"chicken_thigh"}, 1),
-            new IngredientSpec(new String[]{"corn"}, 1)));
-        recipes.add(new RecipeTemplate("roasted_pumpkin_mash", new String[]{"roasted_pumpkin_mash"}, null,
-            new IngredientSpec(new String[]{"pumpkin"}, 1),
-            new IngredientSpec(new String[]{"sweet_potato"}, 1)));
-        recipes.add(new RecipeTemplate("spicy_eggplant", new String[]{"spicy_eggplant"}, null,
-            new IngredientSpec(new String[]{"eggplant"}, 1),
-            new IngredientSpec(new String[]{"green_chilli", "green chili"}, 1)));
-        recipes.add(new RecipeTemplate("root_mix", new String[]{"root_vegetable_mix", "root_mix"}, null,
-            new IngredientSpec(new String[]{"daikon"}, 1),
-            new IngredientSpec(new String[]{"carrot"}, 1)));
-
-        recipes.add(new RecipeTemplate("garden_salad", new String[]{"garden_salad"}, null,
-            new IngredientSpec(new String[]{"tomato"}, 1),
-            new IngredientSpec(new String[]{"lettuce"}, 1),
-            new IngredientSpec(new String[]{"red_bell_pepper", "red bellpepper"}, 1)));
-        recipes.add(new RecipeTemplate("beef_stew", new String[]{"beef_stew"}, null,
-            new IngredientSpec(new String[]{"beef"}, 1),
-            new IngredientSpec(new String[]{"potato"}, 1),
-            new IngredientSpec(new String[]{"carrot"}, 1)));
-        recipes.add(new RecipeTemplate("steak_dinner", new String[]{"steak_dinner"}, null,
-            new IngredientSpec(new String[]{"steak"}, 1),
-            new IngredientSpec(new String[]{"potato"}, 1),
-            new IngredientSpec(new String[]{"broccoli"}, 1)));
-        recipes.add(new RecipeTemplate("spicy_pork_stir_fry", new String[]{"spicy_pork_stir-fry"}, null,
-            new IngredientSpec(new String[]{"pork"}, 1),
-            new IngredientSpec(new String[]{"cabbage"}, 1),
-            new IngredientSpec(new String[]{"green_chilli", "green chili"}, 1)));
-        recipes.add(new RecipeTemplate("chicken_corn_soup_deluxe", new String[]{"chicken_corn_soup_deluxe"}, "Hearty deluxe soup",
-            new IngredientSpec(new String[]{"chicken_thigh"}, 1),
-            new IngredientSpec(new String[]{"corn"}, 1),
-            new IngredientSpec(new String[]{"carrot"}, 1)));
-        recipes.add(new RecipeTemplate("roasted_harvest_plate", new String[]{"roasted_harvest_plate"}, null,
-            new IngredientSpec(new String[]{"pumpkin"}, 1),
-            new IngredientSpec(new String[]{"sweet_potato"}, 1),
-            new IngredientSpec(new String[]{"ham"}, 1)));
-        recipes.add(new RecipeTemplate("spicy_eggplant_tomato", new String[]{"spicy_eggplant_tomato"}, null,
-            new IngredientSpec(new String[]{"eggplant"}, 1),
-            new IngredientSpec(new String[]{"tomato"}, 1),
-            new IngredientSpec(new String[]{"green_chilli", "green chili"}, 1)));
-        recipes.add(new RecipeTemplate("root_vegetable_beef_soup", new String[]{"root_vegetable_beef_soup"}, null,
-            new IngredientSpec(new String[]{"daikon"}, 1),
-            new IngredientSpec(new String[]{"carrot"}, 1),
-            new IngredientSpec(new String[]{"beef"}, 1)));
-
-        return recipes;
+        return RecipeCatalog.resolveItemByAliases(aliases);
     }
 
     private void refreshRecipeSlots() {
@@ -597,16 +525,6 @@ public class CookController implements Initializable, SceneController {
         }
     }
 
-    private static final class IngredientSpec {
-        private final String[] itemAliases;
-        private final int amount;
-
-        private IngredientSpec(String[] itemAliases, int amount) {
-            this.itemAliases = itemAliases;
-            this.amount = amount;
-        }
-    }
-
     private static final class RecipeDifficulty {
         private final int waitSeconds;
         private final int baseSuccessRate;
@@ -620,20 +538,6 @@ public class CookController implements Initializable, SceneController {
             this.dexScaling = dexScaling;
             this.staminaCost = staminaCost;
             this.effectText = effectText;
-        }
-    }
-
-    private static final class RecipeTemplate {
-        private final String key;
-        private final String[] outputAliases;
-        private final String effectText;
-        private final IngredientSpec[] ingredients;
-
-        private RecipeTemplate(String key, String[] outputAliases, String effectText, IngredientSpec... ingredients) {
-            this.key = key;
-            this.outputAliases = outputAliases;
-            this.effectText = effectText;
-            this.ingredients = ingredients;
         }
     }
 

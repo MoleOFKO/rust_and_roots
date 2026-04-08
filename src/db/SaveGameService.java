@@ -6,6 +6,7 @@ package db;
 
 import game.GameState;
 import game.GameTimeManager;
+import java.sql.DatabaseMetaData;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -43,6 +44,7 @@ public class SaveGameService {
             saveFarmPlots(con, gs);
             saveChestItems(con, gs);
             saveTime(con, gs);
+            saveUnlockedRecipes(con, gs);
 
             con.commit();
             System.out.println("Save complete. saved_id=" + gs.getCurrentSaveId());
@@ -366,6 +368,52 @@ public class SaveGameService {
         }
     }
 
+    private void saveUnlockedRecipes(Connection con, GameState gs) throws Exception {
+        if (!hasTable(con, "saved_unlocked_recipe")) {
+            return;
+        }
+
+        int saveId = gs.getCurrentSaveId();
+
+        try (PreparedStatement del = con.prepareStatement("DELETE FROM saved_unlocked_recipe WHERE saved_id = ?")) {
+            del.setInt(1, saveId);
+            del.executeUpdate();
+        }
+
+        if (gs.getUnlockedRecipeKeys().isEmpty()) {
+            return;
+        }
+
+        String sql = "INSERT INTO saved_unlocked_recipe (saved_id, recipe_key) VALUES (?, ?)";
+        try (PreparedStatement ins = con.prepareStatement(sql)) {
+            for (String recipeKey : gs.getUnlockedRecipeKeys()) {
+                if (recipeKey == null || recipeKey.isBlank()) {
+                    continue;
+                }
+                ins.setInt(1, saveId);
+                ins.setString(2, recipeKey);
+                ins.addBatch();
+            }
+            ins.executeBatch();
+        }
+    }
+
+    private boolean hasTable(Connection con, String tableName) throws Exception {
+        if (con == null || tableName == null || tableName.isBlank()) {
+            return false;
+        }
+
+        DatabaseMetaData metaData = con.getMetaData();
+        try (ResultSet rs = metaData.getTables(con.getCatalog(), null, tableName, new String[]{"TABLE"})) {
+            if (rs.next()) {
+                return true;
+            }
+        }
+        try (ResultSet rs = metaData.getTables(con.getCatalog(), null, tableName.toUpperCase(), new String[]{"TABLE"})) {
+            return rs.next();
+        }
+    }
+
     private int resolveMapId(Connection con, String mapKey) throws Exception {
         String sql = "SELECT map_id FROM game_map WHERE map_name = ?";
         try (PreparedStatement ps = con.prepareStatement(sql)) {
@@ -424,6 +472,7 @@ public class SaveGameService {
             saveFarmPlots(con, gs);
             saveChestItems(con, gs);
             saveTime(con, gs);
+            saveUnlockedRecipes(con, gs);
 
             con.commit();
             System.out.println("Save complete. slot=" + slotName + ", saved_id=" + gs.getCurrentSaveId());

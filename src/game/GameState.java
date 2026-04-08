@@ -5,8 +5,10 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import model.FarmState;
 import model.Inventory;
 import model.ItemDatabase;
@@ -18,6 +20,7 @@ public final class GameState {
 
     private static final int DEFAULT_SMELT_POINT_CAP = 10;
     private static final double DEFAULT_SMELT_POINT_REGEN_SECONDS = 15.0;
+    private static final int DEFAULT_FIXED_SHOP_ITEM_COUNT = 8;
     private static final int DEFAULT_RANDOM_SHOP_ITEM_COUNT = 4;
     private static final int NEW_GAME_STARTING_COINS = 100;
 
@@ -262,6 +265,7 @@ public final class GameState {
     private boolean activeCraftingSuccess = true;
 
     private final Map<Integer, Deque<FoodEffectOutcome>> cookedDishEffectsByItemId = new HashMap<>();
+    private final Set<String> unlockedRecipeKeys = new LinkedHashSet<>();
     private ActiveSmeltJob activeSmeltJob = null;
 
     private GameState() {
@@ -301,6 +305,7 @@ public final class GameState {
         activeCraftingSuccess = true;
 
         cookedDishEffectsByItemId.clear();
+        unlockedRecipeKeys.clear();
         activeSmeltJob = null;
         dailyRandomShopItemIds = new ArrayList<>();
         shopRandomDay = -1;
@@ -368,22 +373,83 @@ public final class GameState {
 
         ItemDatabase.loadItems();
 
-        addFixedShopItem(resolveShopItemId("Wheat Seed"), fixedShopItemIds);
-        addFixedShopItem(resolveShopItemId("Fishing Rod"), fixedShopItemIds);
-        addFixedShopItem(resolveShopItemId("Pickaxe"), fixedShopItemIds);
-        addFixedShopItem(resolveShopItemId("Pineapple Seed"), fixedShopItemIds);
-        addFixedShopItem(resolveShopItemId("Onion Seed"), fixedShopItemIds);
-        addFixedShopItem(resolveShopItemId("Axe"), fixedShopItemIds);
-        addFixedShopItem(resolveShopItemId("Grape Seed"), fixedShopItemIds);
-        addFixedShopItem(resolveShopItemId("Cucumber Seed"), fixedShopItemIds);
+        fixedShopItemIds.clear();
+
+        addPreferredFixedShopItem(fixedShopItemIds, "Fishing Rod");
+        addPreferredFixedShopItem(fixedShopItemIds, "Pickaxe");
+        addPreferredFixedShopItem(fixedShopItemIds, "Axe");
+
+        addPreferredFixedShopItem(fixedShopItemIds, "Wheat Seed");
+        addPreferredFixedShopItem(fixedShopItemIds, "Pineapple Seed");
+        addPreferredFixedShopItem(fixedShopItemIds, "Onion Seed");
+        addPreferredFixedShopItem(fixedShopItemIds, "Grape Seed");
+        addPreferredFixedShopItem(fixedShopItemIds, "Cucumber Seed");
+
+        fillFixedShopItemsByType(fixedShopItemIds, true);
+        fillFixedShopItemsByType(fixedShopItemIds, false);
     }
 
     private int resolveShopItemId(String... candidateNames) {
         return resolveStarterItemId(candidateNames);
     }
 
+    private void addPreferredFixedShopItem(List<Integer> target, String... candidateNames) {
+        if (target == null || target.size() >= DEFAULT_FIXED_SHOP_ITEM_COUNT) {
+            return;
+        }
+
+        int itemId = resolveShopItemId(candidateNames);
+        addFixedShopItem(itemId, target);
+    }
+
+    private void fillFixedShopItemsByType(List<Integer> target, boolean seedsFirst) {
+        if (target == null || target.size() >= DEFAULT_FIXED_SHOP_ITEM_COUNT) {
+            return;
+        }
+
+        List<Integer> candidates = new ArrayList<>();
+        for (model.item itm : ItemDatabase.getAllItems()) {
+            if (itm == null) {
+                continue;
+            }
+
+            int itemId = itm.getItem_id();
+            if (!ItemDatabase.isShopDisplayableItem(itemId)) {
+                continue;
+            }
+
+            boolean isSeed = ItemDatabase.isSeedItem(itemId);
+            boolean isEquipment = ItemDatabase.isEquipmentItem(itemId);
+
+            if (seedsFirst && !isSeed) {
+                continue;
+            }
+            if (!seedsFirst && !isEquipment) {
+                continue;
+            }
+
+            candidates.add(itemId);
+        }
+
+        candidates.sort((left, right) -> {
+            String leftName = ItemDatabase.getItemName(left);
+            String rightName = ItemDatabase.getItemName(right);
+            if (leftName == null && rightName == null) return 0;
+            if (leftName == null) return 1;
+            if (rightName == null) return -1;
+            return leftName.compareToIgnoreCase(rightName);
+        });
+
+        for (Integer itemId : candidates) {
+            if (target.size() >= DEFAULT_FIXED_SHOP_ITEM_COUNT) {
+                break;
+            }
+            addFixedShopItem(itemId, target);
+        }
+    }
+
     private void addFixedShopItem(int itemId, List<Integer> target) {
-        if (target == null || itemId <= 0 || target.contains(itemId)) return;
+        if (target == null || itemId <= 0 || target.contains(itemId) || !ItemDatabase.isShopDisplayableItem(itemId)) return;
         target.add(itemId);
     }
 
@@ -447,6 +513,40 @@ public final class GameState {
                 addFixedShopItem(itemId, fixedShopItemIds);
             }
         }
+    }
+    public boolean canAccessRecipe(String recipeKey) {
+        if (recipeKey == null || recipeKey.isBlank()) {
+            return false;
+        }
+        return unlockedRecipeKeys.contains(normalizeRecipeKey(recipeKey));
+    }
+    public boolean isRecipeUnlocked(String recipeKey) {
+        return recipeKey != null && unlockedRecipeKeys.contains(normalizeRecipeKey(recipeKey));
+    }
+    public void unlockRecipe(String recipeKey) {
+        if (recipeKey == null || recipeKey.isBlank()) {
+            return;
+        }
+        unlockedRecipeKeys.add(normalizeRecipeKey(recipeKey));
+    }
+    public Set<String> getUnlockedRecipeKeys() {
+        return Set.copyOf(unlockedRecipeKeys);
+    }
+    public void setUnlockedRecipeKeys(Iterable<String> recipeKeys) {
+        unlockedRecipeKeys.clear();
+        if (recipeKeys == null) {
+            return;
+        }
+
+        for (String recipeKey : recipeKeys) {
+            if (recipeKey == null || recipeKey.isBlank()) {
+                continue;
+            }
+            unlockedRecipeKeys.add(normalizeRecipeKey(recipeKey));
+        }
+    }
+    public void clearUnlockedRecipes() {
+        unlockedRecipeKeys.clear();
     }
     public int getRandomShopItemCount() {
         return Math.max(0, randomShopItemCount);
@@ -565,6 +665,10 @@ public final class GameState {
         FoodEffectOutcome outcome = q.removeFirst();
         if (q.isEmpty()) cookedDishEffectsByItemId.remove(itemId);
         return outcome;
+    }
+
+    private String normalizeRecipeKey(String key) {
+        return key == null ? "" : key.trim().toLowerCase().replace(' ', '_');
     }
 
     public void startSmeltJob(int sourceItemId, int resultItemId, int quantity, int costPerOre, double secondsPerOre, double startedAtSeconds) {

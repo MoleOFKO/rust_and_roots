@@ -23,6 +23,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import model.Inventory;
 import model.ItemDatabase;
+import model.RecipeCatalog;
 import model.item;
 import util.SceneManager;
 import util.SpawnTag;
@@ -106,61 +107,55 @@ public class CraftController implements Initializable, SceneController {
 
     private void loadRecipes() {
         unlockedRecipes.clear();
-        addRecipeIfValid(new RecipeTemplate("rope", "Rope", 35, 88, 3, 6, new IngredientSpec("tree_log", 2), new IngredientSpec("blue_fruit", 1)));
-        addRecipeIfValid(new RecipeTemplate("wooden_board", "Wooden Board", 45, 84, 3, 8, new IngredientSpec("tree_log", 3)));
-        addRecipeIfValid(new RecipeTemplate("stone_block", "Stone Block", 50, 82, 3, 8, new IngredientSpec("Rock1_5", 2)));
-        addRecipeIfValid(new RecipeTemplate("polished_stone", "Polished Stone", 55, 80, 4, 10, new IngredientSpec("Rock2_5", 2), new IngredientSpec("Rock1_5", 1)));
-        addRecipeIfValid(new RecipeTemplate("fruit_mix", "Fruit Mix", 30, 90, 2, 5, new IngredientSpec("blue_fruit", 1), new IngredientSpec("red_fruit", 1)));
-        if (unlockedRecipes.isEmpty()) {
-            addSelfCraftFallback("tree_log", 85, 5);
-            addSelfCraftFallback("Rock1_5", 82, 6);
-            addSelfCraftFallback("Rock2_5", 80, 7);
-            addSelfCraftFallback("blue_fruit", 90, 4);
-            addSelfCraftFallback("red_fruit", 90, 4);
+        for (RecipeCatalog.RecipeDefinition definition : RecipeCatalog.getRecipes(RecipeCatalog.Domain.CRAFTING)) {
+            addRecipeIfValid(definition);
         }
         unlockedRecipes.sort(Comparator.comparing(r -> r.name, String.CASE_INSENSITIVE_ORDER));
     }
 
-    private void addRecipeIfValid(RecipeTemplate template) {
-        item output = resolveItem(template.outputItemName);
+    private void addRecipeIfValid(RecipeCatalog.RecipeDefinition definition) {
+        if (definition == null || !gameState.canAccessRecipe(definition.getKey())) {
+            return;
+        }
+
+        item output = resolveItemByAliases(definition.getOutputAliases());
         if (output == null || !ItemDatabase.isDisplayableItem(output.getItem_id())) return;
         List<IngredientRequirement> ingredients = new ArrayList<>();
-        for (IngredientSpec spec : template.ingredients) {
-            item ingItem = resolveItem(spec.itemName);
+        for (RecipeCatalog.IngredientSpec spec : definition.getIngredients()) {
+            item ingItem = resolveItemByAliases(spec.getItemAliases());
             if (ingItem == null || !ItemDatabase.isDisplayableItem(ingItem.getItem_id())) return;
-            ingredients.add(new IngredientRequirement(ingItem.getItem_id(), spec.amount));
+            ingredients.add(new IngredientRequirement(ingItem.getItem_id(), spec.getAmount()));
         }
-        unlockedRecipes.add(new Recipe(template.key, output.getItem_id(), output.getItem_name(), template.waitSeconds, template.baseSuccessRate, template.dexScaling, template.staminaCost, ingredients));
+        CraftRecipeBalance balance = craftBalanceFor(definition);
+        unlockedRecipes.add(new Recipe(
+            definition.getKey(),
+            output.getItem_id(),
+            definition.getDisplayName(),
+            balance.waitSeconds,
+            balance.baseSuccessRate,
+            balance.dexScaling,
+            balance.staminaCost,
+            ingredients
+        ));
     }
 
-    private void addSelfCraftFallback(String itemName, int baseSuccessRate, int staminaCost) {
-        item itm = resolveItem(itemName);
-        if (itm == null || !ItemDatabase.isDisplayableItem(itm.getItem_id())) return;
-        unlockedRecipes.add(new Recipe("fallback_" + itm.getItem_id(), itm.getItem_id(), itm.getItem_name(), DEFAULT_WAIT_SECONDS, baseSuccessRate, 2, staminaCost, Collections.singletonList(new IngredientRequirement(itm.getItem_id(), 1))));
-    }
-
-    private item resolveItem(String key) {
-        if (key == null || key.isBlank()) return null;
-        item direct = ItemDatabase.getItemByName(key);
-        if (direct != null) return direct;
-        String normalized = normalizeKey(key);
-        for (item itm : ItemDatabase.getAllItems()) {
-            if (itm == null || itm.getItem_name() == null) continue;
-            if (normalizeKey(itm.getItem_name()).equals(normalized)) return itm;
-            String imageFile = ItemDatabase.getImageFileName(itm.getItem_id());
-            if (imageFile != null && normalizeKey(stripExtension(imageFile)).equals(normalized)) return itm;
+    private CraftRecipeBalance craftBalanceFor(RecipeCatalog.RecipeDefinition definition) {
+        if (definition == null) {
+            return new CraftRecipeBalance(DEFAULT_WAIT_SECONDS, 85, 2, 6);
         }
-        return null;
+
+        return switch (definition.getKey()) {
+            case "rope" -> new CraftRecipeBalance(35, 88, 3, 6);
+            case "wooden_board" -> new CraftRecipeBalance(45, 84, 3, 8);
+            case "stone_block" -> new CraftRecipeBalance(50, 82, 3, 8);
+            case "polished_stone" -> new CraftRecipeBalance(55, 80, 4, 10);
+            case "fruit_mix" -> new CraftRecipeBalance(30, 90, 2, 5);
+            default -> new CraftRecipeBalance(DEFAULT_WAIT_SECONDS, 85, 2, 6);
+        };
     }
 
-    private String normalizeKey(String value) {
-        return value == null ? "" : value.toLowerCase().replace(".png", "").replace("_", "").replace(" ", "").trim();
-    }
-
-    private String stripExtension(String value) {
-        if (value == null) return "";
-        int idx = value.lastIndexOf('.');
-        return idx >= 0 ? value.substring(0, idx) : value;
+    private item resolveItemByAliases(String... aliases) {
+        return RecipeCatalog.resolveItemByAliases(aliases);
     }
 
     private int extractItemStat(Object itm, String... methodNames) {
@@ -431,17 +426,22 @@ public class CraftController implements Initializable, SceneController {
         }
     }
 
-    private static final class IngredientSpec {
-        private final String itemName; private final int amount;
-        private IngredientSpec(String itemName, int amount) { this.itemName = itemName; this.amount = amount; }
-    }
     private static final class IngredientRequirement {
         private final int itemId; private final int requiredAmount;
         private IngredientRequirement(int itemId, int requiredAmount) { this.itemId = itemId; this.requiredAmount = requiredAmount; }
     }
-    private static final class RecipeTemplate {
-        private final String key; private final String outputItemName; private final int waitSeconds; private final int baseSuccessRate; private final int dexScaling; private final int staminaCost; private final IngredientSpec[] ingredients;
-        private RecipeTemplate(String key, String outputItemName, int waitSeconds, int baseSuccessRate, int dexScaling, int staminaCost, IngredientSpec... ingredients) { this.key = key; this.outputItemName = outputItemName; this.waitSeconds = waitSeconds; this.baseSuccessRate = baseSuccessRate; this.dexScaling = dexScaling; this.staminaCost = staminaCost; this.ingredients = ingredients; }
+    private static final class CraftRecipeBalance {
+        private final int waitSeconds;
+        private final int baseSuccessRate;
+        private final int dexScaling;
+        private final int staminaCost;
+
+        private CraftRecipeBalance(int waitSeconds, int baseSuccessRate, int dexScaling, int staminaCost) {
+            this.waitSeconds = waitSeconds;
+            this.baseSuccessRate = baseSuccessRate;
+            this.dexScaling = dexScaling;
+            this.staminaCost = staminaCost;
+        }
     }
     private static final class Recipe {
         private final String key; private final int outputItemId; private final String name; private final int waitSeconds; private final int baseSuccessRate; private final int dexScaling; private final int staminaCost; private final int baseOutputAmount; private final List<IngredientRequirement> ingredients;
