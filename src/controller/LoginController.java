@@ -14,6 +14,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Hashtable;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.ResourceBundle;
@@ -34,12 +35,17 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
+import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.util.Duration;
 import javax.swing.JOptionPane;
 import util.AppDialogs;
 import model.AccMg;
@@ -92,15 +98,21 @@ public class LoginController implements Initializable {
     public static String txtname;
     private static final int OTP_LENGTH = 6;
     private static final int OTP_EXPIRY_MINUTES = 10;
+    private static final int OTP_RESEND_COOLDOWN_SECONDS = 180;
+    private static final String PASSWORD_REGEX = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{8,}$";
     private String pendingOtpCode;
     private LocalDateTime pendingOtpExpiresAt;
     private String pendingOtpEmail;
     private String pendingOtpUsername;
     private String pendingOtpPassword;
+    private LocalDateTime otpResendAvailableAt;
+    private Timeline otpResendCooldownTimeline;
     @FXML
     private TextField otpcode;
     @FXML
     private Button btnotpsend;
+    @FXML
+    private Label lblOtpCooldown;
     @FXML
     private Hyperlink forgotpwd;
     @FXML
@@ -127,6 +139,11 @@ public class LoginController implements Initializable {
         if (txtlpasswordvisible != null && txtlpassword != null) {
             txtlpasswordvisible.textProperty().bindBidirectional(txtlpassword.textProperty());
             applyLoginPasswordMask(true);
+        }
+
+        if (btnotpsend != null) {
+            btnotpsend.setTooltip(new Tooltip("Send verification code"));
+            updateSignupOtpSendAvailability();
         }
     }   
  
@@ -240,7 +257,6 @@ public class LoginController implements Initializable {
         String pwd = txtspassword.getText();
         String confirmPwd = txtscpassword.getText();
         String enteredOtp = otpcode == null ? "" : otpcode.getText().trim();
-        String pwdRegex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$";
 
         if (email.isEmpty()) {
             AppDialogs.showMessageDialog(null, "Please enter your email.");
@@ -266,13 +282,14 @@ public class LoginController implements Initializable {
             AppDialogs.showMessageDialog(null, "This email domain has no valid MX record.");
             return;
         }
-        if (!pwd.matches(pwdRegex)) {
+        if (!pwd.matches(PASSWORD_REGEX)) {
             AppDialogs.showMessageDialog(null, """
                                                 Password must contain:
                                                 - At least 8 characters
                                                 - 1 uppercase letter
                                                 - 1 lowercase letter
-                                                - 1 number""");
+                                                - 1 number
+                                                - 1 special character""");
             return;
         }
         if (!pwd.equals(confirmPwd)) {
@@ -334,7 +351,18 @@ public class LoginController implements Initializable {
         gs.setCurrentSaveId(-1);
         gs.setCurrentPlayerName(username);
 
-        AppDialogs.showMessageDialog(null, "Account created successfully.");
+        boolean confirmationSent = SmtpOtpSender.sendAccountCreatedSuccess(email);
+        if (confirmationSent) {
+            AppDialogs.showMessageDialog(null, "Account created successfully! Rust&Roots");
+        } else {
+            String smtpReason = SmtpOtpSender.getLastError();
+            AppDialogs.showMessageDialog(
+                null,
+                "Account created successfully!\n"
+                + "Confirmation email could not be sent.\n"
+                + "Reason: " + (smtpReason == null || smtpReason.isBlank() ? "Unknown SMTP error" : smtpReason)
+            );
+        }
 
         resetSignupForm();
 
@@ -475,7 +503,6 @@ public class LoginController implements Initializable {
         String pwd = txtspassword.getText();
         String confirmPwd = txtscpassword.getText();
         String emailRegex = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
-        String pwdRegex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$";
 
         if (email.isEmpty()) {
             AppDialogs.showMessageDialog(null, "Please enter your email.");
@@ -501,13 +528,14 @@ public class LoginController implements Initializable {
             AppDialogs.showMessageDialog(null, "This email domain has no valid MX record.");
             return;
         }
-        if (!pwd.matches(pwdRegex)) {
+        if (!pwd.matches(PASSWORD_REGEX)) {
             AppDialogs.showMessageDialog(null, """
                                                 Password must contain:
                                                 - At least 8 characters
                                                 - 1 uppercase letter
                                                 - 1 lowercase letter
-                                                - 1 number""");
+                                                - 1 number
+                                                - 1 special character""");
             return;
         }
         if (!pwd.equals(confirmPwd)) {
@@ -549,6 +577,7 @@ public class LoginController implements Initializable {
             null,
             "Verification code sent to " + email + ".\nEnter the code and press Sign Up."
         );
+        startSignupOtpCooldown();
     }
 
     @FXML
@@ -573,5 +602,77 @@ public class LoginController implements Initializable {
         txtlpasswordvisible.setManaged(!masked);
         openlpassword.setVisible(masked);
         closedlpassword.setVisible(!masked);
+    }
+
+    private void startSignupOtpCooldown() {
+        otpResendAvailableAt = LocalDateTime.now().plusSeconds(OTP_RESEND_COOLDOWN_SECONDS);
+        ensureSignupOtpCooldownTimeline();
+        updateSignupOtpSendAvailability();
+        if (otpResendCooldownTimeline != null) {
+            otpResendCooldownTimeline.playFromStart();
+        }
+    }
+
+    private void ensureSignupOtpCooldownTimeline() {
+        if (otpResendCooldownTimeline != null) {
+            return;
+        }
+        otpResendCooldownTimeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> updateSignupOtpSendAvailability()));
+        otpResendCooldownTimeline.setCycleCount(Timeline.INDEFINITE);
+    }
+
+    private void updateSignupOtpSendAvailability() {
+        if (btnotpsend == null && lblOtpCooldown == null) {
+            return;
+        }
+
+        long remainingSeconds = getSignupOtpCooldownSecondsRemaining();
+        boolean cooldownActive = remainingSeconds > 0;
+        String cooldownText = cooldownActive ? formatCooldown(remainingSeconds) : "";
+
+        if (btnotpsend != null) {
+            btnotpsend.setDisable(cooldownActive);
+            btnotpsend.setVisible(!cooldownActive);
+            btnotpsend.setManaged(!cooldownActive);
+        }
+
+        if (lblOtpCooldown != null) {
+            lblOtpCooldown.setText(cooldownText);
+            lblOtpCooldown.setVisible(cooldownActive);
+            lblOtpCooldown.setManaged(cooldownActive);
+        }
+
+        if (btnotpsend != null) {
+            Tooltip tooltip = btnotpsend.getTooltip();
+            if (tooltip == null) {
+                tooltip = new Tooltip();
+                btnotpsend.setTooltip(tooltip);
+            }
+            tooltip.setText(cooldownActive
+                ? "You can send OTP again in " + cooldownText
+                : "Send verification code");
+        }
+
+        if (!cooldownActive && otpResendCooldownTimeline != null) {
+            otpResendCooldownTimeline.stop();
+        }
+    }
+
+    private long getSignupOtpCooldownSecondsRemaining() {
+        if (otpResendAvailableAt == null) {
+            return 0;
+        }
+        long remainingSeconds = ChronoUnit.SECONDS.between(LocalDateTime.now(), otpResendAvailableAt);
+        if (remainingSeconds <= 0) {
+            otpResendAvailableAt = null;
+            return 0;
+        }
+        return remainingSeconds;
+    }
+
+    private String formatCooldown(long totalSeconds) {
+        long minutes = totalSeconds / 60;
+        long seconds = totalSeconds % 60;
+        return String.format("%02d:%02d", minutes, seconds);
     }
 }

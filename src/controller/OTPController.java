@@ -8,8 +8,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ResourceBundle;
 import java.util.concurrent.ThreadLocalRandom;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -17,11 +20,14 @@ import javafx.fxml.Initializable;
 import javafx.scene.Group;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
+import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import javafx.util.Duration;
 import util.AppDialogs;
 import util.SmtpOtpSender;
 import util.WorldScaler;
@@ -29,12 +35,16 @@ import util.WorldScaler;
 public class OTPController implements Initializable {
     private static final int OTP_LENGTH = 6;
     private static final int OTP_EXPIRY_MINUTES = 10;
+    private static final int OTP_RESEND_COOLDOWN_SECONDS = 180;
+    private static final String PASSWORD_REGEX = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{8,}$";
 
     private Connection con;
     private String pendingOtpCode;
     private LocalDateTime pendingOtpExpiresAt;
     private String verifiedEmail;
     private boolean otpAttemptConsumed;
+    private LocalDateTime otpResendAvailableAt;
+    private Timeline otpResendCooldownTimeline;
 
     @FXML
     private Group world;
@@ -76,6 +86,8 @@ public class OTPController implements Initializable {
     private Button btnback1;
     @FXML
     private Button btnback;
+    @FXML
+    private Label lbltime;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -98,6 +110,8 @@ public class OTPController implements Initializable {
         txtenternewpasswordvisible.textProperty().bindBidirectional(txtenternewpassword.textProperty());
         applyConfirmPasswordMask(true);
         applyNewPasswordMask(true);
+        initializeOtpCooldownTooltips();
+        updateOtpSendControlsAvailability();
     }
 
     @FXML
@@ -177,14 +191,15 @@ public class OTPController implements Initializable {
             AppDialogs.showMessageDialog(null, "Passwords do not match.");
             return;
         }
-        if (!newPassword.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$")) {
+        if (!newPassword.matches(PASSWORD_REGEX)) {
             AppDialogs.showMessageDialog(
                 null,
                 "Password must contain:\n"
                 + "- At least 8 characters\n"
                 + "- 1 uppercase letter\n"
                 + "- 1 lowercase letter\n"
-                + "- 1 number"
+                + "- 1 number\n"
+                + "- 1 special character"
             );
             return;
         }
@@ -234,6 +249,12 @@ public class OTPController implements Initializable {
             AppDialogs.showMessageDialog(null, "No account found with this email.");
             return;
         }
+        long remainingCooldown = getOtpCooldownSecondsRemaining();
+        if (remainingCooldown > 0) {
+            updateOtpSendControlsAvailability();
+            AppDialogs.showMessageDialog(null, "Please wait " + formatCooldown(remainingCooldown) + " before sending OTP again.");
+            return;
+        }
 
         String otp = generateOtpCode(OTP_LENGTH);
         if (!SmtpOtpSender.sendVerificationCode(email, otp)) {
@@ -253,6 +274,7 @@ public class OTPController implements Initializable {
         otpAttemptConsumed = false;
         txtenterotp.setText("");
         AppDialogs.showMessageDialog(null, "OTP sent to " + email + ". It expires in 10 minutes.");
+        startOtpCooldown();
     }
 
     private boolean emailExists(String email) {
@@ -329,6 +351,85 @@ public class OTPController implements Initializable {
         txtenternewpasswordvisible.setManaged(!masked);
         openpassword1.setVisible(masked);
         closedpassword1.setVisible(!masked);
+    }
+
+    private void initializeOtpCooldownTooltips() {
+        if (btnsentotp != null) {
+            btnsentotp.setTooltip(new Tooltip("Send OTP"));
+        }
+        if (hpresendcode != null) {
+            hpresendcode.setTooltip(new Tooltip("Resend OTP"));
+        }
+    }
+
+    private void startOtpCooldown() {
+        otpResendAvailableAt = LocalDateTime.now().plusSeconds(OTP_RESEND_COOLDOWN_SECONDS);
+        ensureOtpCooldownTimeline();
+        updateOtpSendControlsAvailability();
+        if (otpResendCooldownTimeline != null) {
+            otpResendCooldownTimeline.playFromStart();
+        }
+    }
+
+    private void ensureOtpCooldownTimeline() {
+        if (otpResendCooldownTimeline != null) {
+            return;
+        }
+        otpResendCooldownTimeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> updateOtpSendControlsAvailability()));
+        otpResendCooldownTimeline.setCycleCount(Timeline.INDEFINITE);
+    }
+
+    private void updateOtpSendControlsAvailability() {
+        long remainingSeconds = getOtpCooldownSecondsRemaining();
+        boolean cooldownActive = remainingSeconds > 0;
+        String tooltipText = cooldownActive
+            ? "You can send OTP again in " + formatCooldown(remainingSeconds)
+            : null;
+        String labelText = cooldownActive ? formatCooldown(remainingSeconds) : "";
+
+        if (btnsentotp != null) {
+            btnsentotp.setDisable(cooldownActive);
+            Tooltip tooltip = btnsentotp.getTooltip();
+            if (tooltip == null) {
+                tooltip = new Tooltip();
+                btnsentotp.setTooltip(tooltip);
+            }
+            tooltip.setText(cooldownActive ? tooltipText : "Send OTP");
+        }
+        if (hpresendcode != null) {
+            hpresendcode.setDisable(cooldownActive);
+            Tooltip tooltip = hpresendcode.getTooltip();
+            if (tooltip == null) {
+                tooltip = new Tooltip();
+                hpresendcode.setTooltip(tooltip);
+            }
+            tooltip.setText(cooldownActive ? tooltipText : "Resend OTP");
+        }
+        if (lbltime != null) {
+            lbltime.setText(labelText);
+        }
+
+        if (!cooldownActive && otpResendCooldownTimeline != null) {
+            otpResendCooldownTimeline.stop();
+        }
+    }
+
+    private long getOtpCooldownSecondsRemaining() {
+        if (otpResendAvailableAt == null) {
+            return 0;
+        }
+        long remainingSeconds = ChronoUnit.SECONDS.between(LocalDateTime.now(), otpResendAvailableAt);
+        if (remainingSeconds <= 0) {
+            otpResendAvailableAt = null;
+            return 0;
+        }
+        return remainingSeconds;
+    }
+
+    private String formatCooldown(long totalSeconds) {
+        long minutes = totalSeconds / 60;
+        long seconds = totalSeconds % 60;
+        return String.format("%02d:%02d", minutes, seconds);
     }
 
     @FXML
