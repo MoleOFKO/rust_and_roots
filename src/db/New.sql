@@ -180,7 +180,7 @@ CREATE TABLE `item_types` (
 
 LOCK TABLES `item_types` WRITE;
 /*!40000 ALTER TABLE `item_types` DISABLE KEYS */;
-INSERT INTO `item_types` VALUES (5,'crop'),(1,'edible'),(3,'equiment'),(6,'inedible'),(2,'recipe'),(4,'seed');
+INSERT INTO `item_types` VALUES (5,'crop'),(1,'edible'),(3,'equipment'),(6,'inedible'),(2,'recipe'),(4,'seed');
 /*!40000 ALTER TABLE `item_types` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -599,4 +599,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-04-08 13:37:13
+-- Dump completed on 2026-04-08 15:12:09

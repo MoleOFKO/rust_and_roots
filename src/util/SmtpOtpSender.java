@@ -26,6 +26,21 @@ public final class SmtpOtpSender {
     private SmtpOtpSender() {}
 
     public static boolean sendVerificationCode(String toEmail, String code) {
+        String subject = "Rust & Roots verification code";
+        String body = "Your verification code is: " + code + "\r\n"
+            + "This code expires in 10 minutes.\r\n"
+            + "If you did not request this, you can ignore this email.\r\n";
+        return sendPlainTextEmail(toEmail, subject, body);
+    }
+
+    public static boolean sendAccountCreatedSuccess(String toEmail) {
+        String subject = "Account created successfully!";
+        String body = "Account created successfully! Rust&Roots\r\n"
+            + "Your Rust&Roots account is ready.\r\n";
+        return sendPlainTextEmail(toEmail, subject, body);
+    }
+
+    public static boolean sendPlainTextEmail(String toEmail, String subject, String body) {
         lastError = "";
         String host = readSetting("RNR_SMTP_HOST", "smtp.gmail.com");
         int port = parsePort(readSetting("RNR_SMTP_PORT", "465"));
@@ -37,11 +52,6 @@ public final class SmtpOtpSender {
             lastError = "Missing SMTP settings (RNR_SMTP_PASS is required).";
             return false;
         }
-
-        String subject = "Rust & Roots verification code";
-        String body = "Your verification code is: " + code + "\r\n"
-            + "This code expires in 10 minutes.\r\n"
-            + "If you did not request this, you can ignore this email.\r\n";
 
         try (SSLSocket socket = (SSLSocket) SSLSocketFactory.getDefault().createSocket(host, port);
              BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
