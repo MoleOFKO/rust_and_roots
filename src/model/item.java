@@ -13,6 +13,8 @@ import javafx.scene.image.ImageView;
 public class item {
     private int item_id;
     private String item_name;
+    private String item_type;
+    private String item_type_name;
     private int price;
     private int str;
     private int agi;
@@ -28,9 +30,10 @@ public class item {
         this.price = price;
     }
 
-    public item(int item_id, String item_name, int price, int str, int agi, int vid, int dex, int hp, int stimana, ImageView image) {
+    public item(int item_id, String item_name, String item_type_name, int price, int str, int agi, int vid, int dex, int hp, int stimana, ImageView image) {
         this.item_id = item_id;
         this.item_name = item_name;
+        setItem_type_name(item_type_name);
         this.price = price;
         this.str = str;
         this.agi = agi;
@@ -66,6 +69,24 @@ public class item {
 
     public void setItem_name(String item_name) {
         this.item_name = item_name;
+    }
+
+    public String getItem_type() {
+        return item_type;
+    }
+
+    public void setItem_type(String item_type) {
+        this.item_type = item_type;
+        this.item_type_name = item_type;
+    }
+
+    public String getItem_type_name() {
+        return item_type_name;
+    }
+
+    public void setItem_type_name(String item_type_name) {
+        this.item_type_name = item_type_name;
+        this.item_type = item_type_name;
     }
 
     public int getStr() {

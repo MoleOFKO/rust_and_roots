@@ -69,8 +69,10 @@ public final class ItemDatabase {
                 int itemId = rs.getInt("item_id");
                 String itemName = rs.getString("item_name");
                 int price = rs.getInt("price");
+                String itemTypeName = rs.getString("item_type");
 
                 item itm = new item(itemId, itemName, price);
+                itm.setItem_type_name(itemTypeName);
                 setItemStat(itm, rs.getInt("str"), "setStr");
                 setItemStat(itm, rs.getInt("agi"), "setAgi");
                 setItemStat(itm, rs.getInt("dex"), "setDex");
