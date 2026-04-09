@@ -314,7 +314,7 @@ public final class RecipeCatalog {
         recipes.add(new RecipeDefinition(Domain.COOKING, "baked_potato", new String[]{"baked_potato"}, null,
             new IngredientSpec(new String[]{"potato"}, 1)));
         recipes.add(new RecipeDefinition(Domain.COOKING, "grilled_steak", new String[]{"grilled_steak"}, null,
-            new IngredientSpec(new String[]{"steak"}, 1)));
+            new IngredientSpec(new String[]{"beef", "steak"}, 1)));
         recipes.add(new RecipeDefinition(Domain.COOKING, "salad_leaves", new String[]{"salad_leaves"}, null,
             new IngredientSpec(new String[]{"lettuce"}, 1)));
 
@@ -325,7 +325,7 @@ public final class RecipeCatalog {
             new IngredientSpec(new String[]{"potato"}, 1),
             new IngredientSpec(new String[]{"beef"}, 1)));
         recipes.add(new RecipeDefinition(Domain.COOKING, "pepper_steak", new String[]{"pepper_steak"}, null,
-            new IngredientSpec(new String[]{"steak"}, 1),
+            new IngredientSpec(new String[]{"beef", "steak"}, 1),
             new IngredientSpec(new String[]{"red_bell_pepper", "red bellpepper"}, 1)));
         recipes.add(new RecipeDefinition(Domain.COOKING, "pork_cabbage_stir_fry", new String[]{"pork_cabbage_stir-fry"}, null,
             new IngredientSpec(new String[]{"pork"}, 1),
@@ -352,14 +352,14 @@ public final class RecipeCatalog {
             new IngredientSpec(new String[]{"potato"}, 1),
             new IngredientSpec(new String[]{"carrot"}, 1)));
         recipes.add(new RecipeDefinition(Domain.COOKING, "steak_dinner", new String[]{"steak_dinner"}, null,
-            new IngredientSpec(new String[]{"steak"}, 1),
+            new IngredientSpec(new String[]{"beef", "steak"}, 1),
             new IngredientSpec(new String[]{"potato"}, 1),
             new IngredientSpec(new String[]{"broccoli"}, 1)));
         recipes.add(new RecipeDefinition(Domain.COOKING, "spicy_pork_stir_fry", new String[]{"spicy_pork_stir-fry"}, null,
             new IngredientSpec(new String[]{"pork"}, 1),
             new IngredientSpec(new String[]{"cabbage"}, 1),
             new IngredientSpec(new String[]{"green_chilli", "green chili"}, 1)));
-        recipes.add(new RecipeDefinition(Domain.COOKING, "chicken_corn_soup_deluxe", new String[]{"chicken_corn_soup_deluxe"}, "Hearty deluxe soup",
+        recipes.add(new RecipeDefinition(Domain.COOKING, "chicken_corn_soup_deluxe", new String[]{"chicken_corn_soup_deluxe", "chicken_corn_soup"}, "Hearty deluxe soup",
             new IngredientSpec(new String[]{"chicken_thigh"}, 1),
             new IngredientSpec(new String[]{"corn"}, 1),
             new IngredientSpec(new String[]{"carrot"}, 1)));
