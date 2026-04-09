@@ -14,6 +14,12 @@ public class FarmState {
         public String cropItemName = null;
         public String cropSpriteKey = null;
 
+        /**
+         * Max growth phases includes the initial "sowed/no-image" phase.
+         * Example: if crop images are plant1..plant4 then maxGrowthPhases is 4 (phase 1 shows no crop image).
+         */
+        public int maxGrowthPhases = FarmGrowthRules.DEFAULT_MAX_GROWTH_PHASES;
+
         public double totalGrowthSeconds = FarmGrowthRules.DEFAULT_GROWTH_SECONDS;
         public double plantedAt = -1;
         public double waterCooldownSeconds = FarmGrowthRules.resolveWaterCooldownSeconds(FarmGrowthRules.DEFAULT_GROWTH_SECONDS);
@@ -37,6 +43,7 @@ public class FarmState {
                 lastWateredAt,
                 accumulatedWaterReduction,
                 totalGrowthSeconds,
+                maxGrowthPhases,
                 waterReductionSeconds,
                 nowSeconds
             );
@@ -51,11 +58,17 @@ public class FarmState {
             );
         }
 
-        public int getStage(double nowSeconds, int totalStages) {
+        /**
+         * Returns the crop image stage to render, where 0 means "no crop image" (freshly sowed).
+         * For example, with maxGrowthPhases=4, this returns 0..3 and maps to plant1..plant3 by using stageNumber as-is.
+         */
+        public int getImageStage(double nowSeconds) {
             if (isEmpty()) return 0;
-            if (totalStages <= 1) return 1;
-            int stage = FarmGrowthRules.getStage(plantedAt, accumulatedWaterReduction, totalGrowthSeconds, nowSeconds);
-            return Math.min(totalStages, stage);
+            int phases = Math.max(1, maxGrowthPhases);
+            int phase = FarmGrowthRules.getPhase(plantedAt, accumulatedWaterReduction, totalGrowthSeconds, phases, nowSeconds);
+            int cropStages = Math.max(0, phases - 1);
+            int imageStage = Math.max(0, phase - 1);
+            return Math.min(cropStages, imageStage);
         }
 
         public void clearPlant() {
@@ -63,6 +76,7 @@ public class FarmState {
             seedItemName = null;
             cropItemName = null;
             cropSpriteKey = null;
+            maxGrowthPhases = FarmGrowthRules.DEFAULT_MAX_GROWTH_PHASES;
             plantedAt = -1;
             lastWateredAt = -1;
             accumulatedWaterReduction = 0;

@@ -28,6 +28,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javax.swing.JOptionPane;
 import util.AppDialogs;
+import model.GameplayDataVerifier;
 import model.PlayerState;
 import util.SceneManager;
 import util.WorldScaler;
@@ -162,6 +163,16 @@ public class New_gameController implements Initializable, SceneController {
         );
 
         if (confirm != JOptionPane.YES_OPTION) {
+            return;
+        }
+
+        GameplayDataVerifier.ValidationSummary validationSummary =
+            GameplayDataVerifier.prepareForGameplay("new game");
+        if (!validationSummary.isDatabaseReady()) {
+            AppDialogs.showMessageDialog(
+                null,
+                "Gameplay data could not be loaded from the database.\nPlease check the console output and try again."
+            );
             return;
         }
 
@@ -440,12 +451,16 @@ public class New_gameController implements Initializable, SceneController {
         playerState.setExp(playerState.getExp() - spentExp);
 
         if (pendingHpPoints > 0) {
+            int currentHp = playerState.getHp();
             playerState.setMaxHp(playerState.getMaxHp() + pendingHpPoints);
-            playerState.setHp(playerState.getMaxHp());
+            // Increasing the cap should not "top up" current HP; keep current value (clamped for safety).
+            playerState.setHp(Math.min(currentHp, playerState.getMaxHp()));
         }
         if (pendingSpPoints > 0) {
+            int currentStamina = playerState.getStamina();
             playerState.setMaxStamina(playerState.getMaxStamina() + pendingSpPoints);
-            playerState.setStamina(playerState.getMaxStamina());
+            // Increasing the cap should not "top up" current SP; keep current value (clamped for safety).
+            playerState.setStamina(Math.min(currentStamina, playerState.getMaxStamina()));
         }
         if (pendingStrPoints > 0) playerState.setStr(playerState.getStr() + pendingStrPoints);
         if (pendingVitPoints > 0) playerState.setVit(playerState.getVit() + pendingVitPoints);

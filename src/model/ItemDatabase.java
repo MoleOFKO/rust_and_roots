@@ -24,6 +24,8 @@ public final class ItemDatabase {
     private static final Map<Integer, String> itemTypeById = new HashMap<>();
     private static final Map<Integer, ItemUseType> itemUseTypeById = new HashMap<>();
     private static final Map<Integer, String> unusableReasonById = new LinkedHashMap<>();
+    // Seed -> number of crop image stages available for its crop sprite key (plant1..plantN).
+    private static final Map<Integer, Integer> cropStageCountBySeedId = new HashMap<>();
     private static final Map<Integer, Image> imageCache = new HashMap<>();
 
     private static boolean loaded = false;
@@ -42,6 +44,7 @@ public final class ItemDatabase {
         itemTypeById.clear();
         itemUseTypeById.clear();
         unusableReasonById.clear();
+        cropStageCountBySeedId.clear();
         imageCache.clear();
 
         String sql = """
@@ -147,6 +150,12 @@ public final class ItemDatabase {
                 && !unusableReasonById.containsKey(itemId);
     }
 
+    public static boolean isRuntimeUsableItem(int itemId) {
+        return itemId > 0
+                && isUsableItem(itemId)
+                && isDisplayableItem(itemId);
+    }
+
     public static boolean isShopDisplayableItem(int itemId) {
         return itemId > 0
                 && isUsableItem(itemId)
@@ -157,6 +166,28 @@ public final class ItemDatabase {
     public static String getItemName(int itemId) {
         item itm = getItemById(itemId);
         return itm == null ? null : itm.getItem_name();
+    }
+
+    public static String getVerificationFailure(int itemId) {
+        if (itemId <= 0 || !containsItem(itemId)) {
+            return "Missing item record.";
+        }
+
+        ItemUseType itemUseType = getItemUseType(itemId);
+        if (itemUseType != ItemUseType.CROP && itemUseType != ItemUseType.UNKNOWN && !hasImageAsset(itemId)) {
+            return "Item is missing its display image asset.";
+        }
+
+        return switch (itemUseType) {
+            case SEED -> hasCompleteFarmDataForSeed(itemId)
+                ? null
+                : "Seed is missing a complete crop-growth chain or a distinct harvest item.";
+            case RECIPE -> isValidRecipeUnlockItem(itemId)
+                ? null
+                : "Recipe item has no valid recipe definition or is missing ingredient/output items.";
+            case UNKNOWN -> "Item type is unknown, so it cannot be safely used in gameplay.";
+            case CROP, EQUIPMENT, EDIBLE, INEDIBLE -> null;
+        };
     }
 
     public static Image getImage(int itemId) {
@@ -292,10 +323,14 @@ public final class ItemDatabase {
         String spriteKey = buildCropSpriteKeyForSeed(seedItemId);
         if (spriteKey == null || spriteKey.isBlank()) return false;
 
-        return hasCropStageAsset(spriteKey, 1)
-                && hasCropStageAsset(spriteKey, 2)
-                && hasCropStageAsset(spriteKey, 3)
-                && hasCropStageAsset(spriteKey, 4);
+        int stageCount = resolveCropStageCountFromAssets(spriteKey);
+        if (stageCount <= 0) return false;
+
+        // Requires a contiguous stage chain from 1..stageCount.
+        for (int i = 1; i <= stageCount; i++) {
+            if (!hasCropStageAsset(spriteKey, i)) return false;
+        }
+        return true;
     }
 
     public static String buildCropSpriteKeyForSeed(int seedItemId) {
@@ -343,6 +378,43 @@ public final class ItemDatabase {
         return resourceExists(path);
     }
 
+    public static int getCropStageCountForSeed(int seedItemId) {
+        if (seedItemId <= 0) return 0;
+        Integer cached = cropStageCountBySeedId.get(seedItemId);
+        if (cached != null) return cached;
+        // Compute on-demand as a fallback (verification/rebuild normally populates this).
+        String spriteKey = buildCropSpriteKeyForSeed(seedItemId);
+        int count = resolveCropStageCountFromAssets(spriteKey);
+        cropStageCountBySeedId.put(seedItemId, count);
+        return count;
+    }
+
+    /**
+     * Max growth phases includes the initial sowed/no-image phase (phase 1).
+     *
+     * With the current rules, maxGrowthPhases equals the number of crop image assets found for the seed.
+     * Example: if a crop has plant1..plant4 then maxGrowthPhases is 4, and the last phase renders plant3.
+     */
+    public static int getMaxGrowthPhasesForSeed(int seedItemId) {
+        int cropStages = getCropStageCountForSeed(seedItemId);
+        if (cropStages <= 0) {
+            return FarmGrowthRules.DEFAULT_MAX_GROWTH_PHASES;
+        }
+        return Math.max(1, cropStages);
+    }
+
+    private static int resolveCropStageCountFromAssets(String spriteKey) {
+        if (spriteKey == null || spriteKey.isBlank()) return 0;
+        // Safety cap to avoid accidental infinite loops if something goes wrong.
+        int maxProbe = 12;
+        int count = 0;
+        for (int i = 1; i <= maxProbe; i++) {
+            if (!hasCropStageAsset(spriteKey, i)) break;
+            count = i;
+        }
+        return count;
+    }
+
     private static String normalizeCropAlias(String cropName) {
         if (cropName == null || cropName.isBlank()) return cropName;
         String normalized = cropName.trim();
@@ -363,10 +435,20 @@ public final class ItemDatabase {
     private static void rebuildValidationState() {
         itemUseTypeById.clear();
         unusableReasonById.clear();
+        cropStageCountBySeedId.clear();
 
         for (item itm : allItems) {
             if (itm == null) continue;
             itemUseTypeById.put(itm.getItem_id(), determineItemUseType(itm));
+        }
+
+        // Compute seed crop-stage counts up front so gameplay uses stable values for this run.
+        for (item itm : allItems) {
+            if (itm == null) continue;
+            int itemId = itm.getItem_id();
+            if (!isSeedItem(itemId)) continue;
+            String spriteKey = buildCropSpriteKeyForSeed(itemId);
+            cropStageCountBySeedId.put(itemId, resolveCropStageCountFromAssets(spriteKey));
         }
 
         for (item itm : allItems) {
@@ -425,15 +507,14 @@ public final class ItemDatabase {
             return "Missing item record.";
         }
 
+        String verificationFailure = getVerificationFailure(itemId);
+        if (verificationFailure != null && !verificationFailure.isBlank()) {
+            return verificationFailure;
+        }
+
         return switch (getItemUseType(itemId)) {
             case CROP -> "Crop-stage item is visual-only and should not be selectable or sold.";
-            case SEED -> hasCompleteFarmDataForSeed(itemId)
-                ? null
-                : "Seed is missing a complete crop-growth chain or a distinct harvest item.";
-            case RECIPE -> isValidRecipeUnlockItem(itemId)
-                ? null
-                : "Recipe item has no valid recipe definition or is missing ingredient items.";
-            case UNKNOWN -> "Item type is unknown, so it cannot be safely used in gameplay.";
+            case SEED, RECIPE, UNKNOWN -> verificationFailure;
             case EQUIPMENT, EDIBLE, INEDIBLE -> null;
         };
     }
@@ -451,7 +532,7 @@ public final class ItemDatabase {
         }
 
         for (RecipeCatalog.RecipeDefinition definition : definitions) {
-            if (!RecipeCatalog.hasAllIngredientItems(definition)) {
+            if (!RecipeCatalog.isGameplayValid(definition)) {
                 return false;
             }
         }

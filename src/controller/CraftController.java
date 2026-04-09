@@ -117,13 +117,16 @@ public class CraftController implements Initializable, SceneController {
         if (definition == null || !gameState.canAccessRecipe(definition.getKey())) {
             return;
         }
+        if (!RecipeCatalog.isGameplayValid(definition)) {
+            return;
+        }
 
         item output = resolveItemByAliases(definition.getOutputAliases());
-        if (output == null || !ItemDatabase.isDisplayableItem(output.getItem_id())) return;
+        if (output == null || !ItemDatabase.isRuntimeUsableItem(output.getItem_id())) return;
         List<IngredientRequirement> ingredients = new ArrayList<>();
         for (RecipeCatalog.IngredientSpec spec : definition.getIngredients()) {
             item ingItem = resolveItemByAliases(spec.getItemAliases());
-            if (ingItem == null || !ItemDatabase.isDisplayableItem(ingItem.getItem_id())) return;
+            if (ingItem == null || !ItemDatabase.isRuntimeUsableItem(ingItem.getItem_id())) return;
             ingredients.add(new IngredientRequirement(ingItem.getItem_id(), spec.getAmount()));
         }
         CraftRecipeBalance balance = craftBalanceFor(definition);

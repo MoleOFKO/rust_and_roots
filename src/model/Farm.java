@@ -78,7 +78,7 @@ public class Farm {
                 continue;
             }
 
-            int stage = pd.getStage(nowSeconds, totalStages);
+            int stage = pd.getImageStage(nowSeconds);
             String spriteKey = resolveSpriteKey(pd);
             showStage(plotId, view, spriteKey, stage);
         }
@@ -93,7 +93,7 @@ public class Farm {
         return null;
     }
 
-    private void showStage(String plotId, ImageView view, String spriteKey, int stageNumber1Based) {
+    private void showStage(String plotId, ImageView view, String spriteKey, int stageNumber) {
         if (spriteKey == null || spriteKey.isBlank()) {
             renderedPlotStages.remove(plotId);
             view.setImage(null);
@@ -101,13 +101,20 @@ public class Farm {
             return;
         }
 
-        String stageKey = spriteKey + "#" + stageNumber1Based;
+        if (stageNumber <= 0) {
+            renderedPlotStages.remove(plotId);
+            view.setImage(null);
+            view.setVisible(false);
+            return;
+        }
+
+        String stageKey = spriteKey + "#" + stageNumber;
         if (stageKey.equals(renderedPlotStages.get(plotId))) {
             view.setVisible(true);
             return;
         }
 
-        String path = String.format(resourcePattern, spriteKey, stageNumber1Based);
+        String path = String.format(resourcePattern, spriteKey, stageNumber);
         URL url = getClass().getResource(path);
         if (url == null) {
             renderedPlotStages.remove(plotId);
