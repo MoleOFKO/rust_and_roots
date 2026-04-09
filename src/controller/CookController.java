@@ -6,6 +6,7 @@ import game.SceneController;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.ResourceBundle;
 import javafx.animation.AnimationTimer;
@@ -301,6 +302,11 @@ public class CookController implements Initializable, SceneController {
     }
 
     private void updateIngredientViews() {
+        if (selectedRecipe == null) {
+            clearIngredientViews();
+            return;
+        }
+
         List<ImageView> images = Arrays.asList(Ing1, ing2, ing3);
         List<Label> labels = Arrays.asList(inglbl1, inglbl2, inglbl3);
 
@@ -573,7 +579,9 @@ public class CookController implements Initializable, SceneController {
             this.dexScaling = dexScaling;
             this.staminaCost = staminaCost;
             this.baseOutputAmount = Math.max(1, baseOutputAmount);
-            this.ingredients = ingredients;
+            this.ingredients = Collections.unmodifiableList(
+                new ArrayList<>(ingredients == null ? List.of() : ingredients)
+            );
         }
     }
 }
