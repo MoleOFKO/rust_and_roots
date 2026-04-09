@@ -55,6 +55,7 @@ public class InventorySlotsUIManager {
 
     public void refresh() {
         List<Integer> owned = new ArrayList<>(inventory.itemsProperty().keySet());
+        owned.removeIf(itemId -> !ItemDatabase.isRuntimeUsableItem(itemId));
 
         owned.sort(Comparator.comparing(id -> {
             item itm = ItemDatabase.getItemById(id);

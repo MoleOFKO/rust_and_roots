@@ -824,12 +824,16 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         playerState.setExp(playerState.getExp() - spentExp);
 
         if (pendingHpPoints > 0) {
+            int currentHp = playerState.getHp();
             playerState.setMaxHp(playerState.getMaxHp() + pendingHpPoints);
-            playerState.setHp(playerState.getMaxHp());
+            // Increasing the cap should not "top up" current HP; keep current value (clamped for safety).
+            playerState.setHp(Math.min(currentHp, playerState.getMaxHp()));
         }
         if (pendingSpPoints > 0) {
+            int currentStamina = playerState.getStamina();
             playerState.setMaxStamina(playerState.getMaxStamina() + pendingSpPoints);
-            playerState.setStamina(playerState.getMaxStamina());
+            // Increasing the cap should not "top up" current SP; keep current value (clamped for safety).
+            playerState.setStamina(Math.min(currentStamina, playerState.getMaxStamina()));
         }
         if (pendingStrPoints > 0) playerState.setStr(playerState.getStr() + pendingStrPoints);
         if (pendingVitPoints > 0) playerState.setVit(playerState.getVit() + pendingVitPoints);
@@ -1153,7 +1157,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         int itemId = -1;
         if (selectedHotbarIndex >= 0 && selectedHotbarIndex < playerState.getHotbarSize()) {
             itemId = playerState.getHotbarItemId(selectedHotbarIndex);
-            if (playerState.getHotbarItemCount(selectedHotbarIndex) <= 0) {
+            if (playerState.getHotbarItemCount(selectedHotbarIndex) <= 0 || !ItemDatabase.isRuntimeUsableItem(itemId)) {
                 itemId = -1;
             }
         }
@@ -1256,7 +1260,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
             int itemId = playerState.getHotbarItemId(i);
             int quantity = playerState.getHotbarItemCount(i);
 
-            if (itemId <= 0 || quantity <= 0) {
+            if (itemId <= 0 || quantity <= 0 || !ItemDatabase.isRuntimeUsableItem(itemId)) {
                 if (img != null) img.setImage(null);
                 if (lbl != null) lbl.setText("");
                 continue;
@@ -1537,6 +1541,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
         inventory.itemsProperty().entrySet().stream()
             .filter(e -> e.getValue() != null && e.getValue().get() > 0)
+            .filter(e -> ItemDatabase.isRuntimeUsableItem(e.getKey()))
             .sorted(Comparator.comparing(
                 e -> itemName(e.getKey()),
                 String.CASE_INSENSITIVE_ORDER
@@ -1699,7 +1704,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
         int itemId = playerState.getHotbarItemId(index);
         int quantity = playerState.getHotbarItemCount(index);
-        if (itemId <= 0 || quantity <= 0) return false;
+        if (itemId <= 0 || quantity <= 0 || !ItemDatabase.isRuntimeUsableItem(itemId)) return false;
 
         if (tryUnlockRecipeItem(itemId, () -> playerState.removeHotbarItems(index, 1))) {
             refreshHotbarView();
@@ -1730,7 +1735,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         if (index < 0 || index >= slots.size()) return false;
 
         SlotData slot = slots.get(index);
-        if (slot == null || slot.itemId() <= 0 || slot.quantity() <= 0) return false;
+        if (slot == null || slot.itemId() <= 0 || slot.quantity() <= 0 || !ItemDatabase.isRuntimeUsableItem(slot.itemId())) return false;
 
         if (tryUnlockRecipeItem(slot.itemId(), () -> player.getInventory().removeItem(slot.itemId(), 1))) {
             selectedPlayerInventoryItemId = null;
@@ -1853,11 +1858,17 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     }
 
     protected boolean tryUnlockRecipeItem(int itemId, BooleanSupplier consumeOneItem) {
-        if (itemId <= 0 || gameState == null || consumeOneItem == null || !ItemDatabase.isRecipeItem(itemId)) {
+        if (itemId <= 0 || gameState == null || consumeOneItem == null || !ItemDatabase.isRecipeItem(itemId) || !ItemDatabase.isRuntimeUsableItem(itemId)) {
             return false;
         }
 
-        Set<String> matchedKeys = RecipeCatalog.getRecipeKeysUnlockedByItemName(ItemDatabase.getItemName(itemId));
+        Set<String> matchedKeys = new java.util.LinkedHashSet<>();
+        for (String recipeKey : RecipeCatalog.getRecipeKeysUnlockedByItemName(ItemDatabase.getItemName(itemId))) {
+            RecipeCatalog.RecipeDefinition definition = RecipeCatalog.findDefinitionByKey(recipeKey);
+            if (definition != null && RecipeCatalog.isGameplayValid(definition)) {
+                matchedKeys.add(recipeKey);
+            }
+        }
         if (matchedKeys.isEmpty()) {
             return false;
         }

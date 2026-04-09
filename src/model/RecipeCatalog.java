@@ -143,6 +143,52 @@ public final class RecipeCatalog {
         return true;
     }
 
+    public static boolean isGameplayValid(RecipeDefinition definition) {
+        return collectGameplayValidationIssues(definition).isEmpty();
+    }
+
+    public static List<String> collectGameplayValidationIssues(RecipeDefinition definition) {
+        List<String> issues = new ArrayList<>();
+
+        if (definition == null) {
+            issues.add("Recipe definition is missing.");
+            return Collections.unmodifiableList(issues);
+        }
+
+        String recipeKey = (definition.getKey() == null || definition.getKey().isBlank())
+            ? "<unnamed_recipe>"
+            : definition.getKey();
+
+        item output = resolveItemByAliases(definition.getOutputAliases());
+        if (output == null) {
+            issues.add("Recipe `" + recipeKey + "` output item was not found in item data.");
+        } else {
+            appendGameplayItemIssue(issues, recipeKey, "output", output.getItem_id(), output.getItem_name());
+        }
+
+        int ingredientIndex = 1;
+        for (IngredientSpec spec : definition.getIngredients()) {
+            item ingredient = resolveItemByAliases(spec.getItemAliases());
+            if (ingredient == null) {
+                issues.add(
+                    "Recipe `" + recipeKey + "` ingredient #" + ingredientIndex
+                    + " was not found in item data."
+                );
+            } else {
+                appendGameplayItemIssue(
+                    issues,
+                    recipeKey,
+                    "ingredient #" + ingredientIndex,
+                    ingredient.getItem_id(),
+                    ingredient.getItem_name()
+                );
+            }
+            ingredientIndex++;
+        }
+
+        return Collections.unmodifiableList(issues);
+    }
+
     public static boolean isCookingOutputItem(int itemId) {
         if (itemId <= 0) {
             return false;
@@ -174,6 +220,47 @@ public final class RecipeCatalog {
         }
 
         return null;
+    }
+
+    private static void appendGameplayItemIssue(
+        List<String> issues,
+        String recipeKey,
+        String role,
+        int itemId,
+        String itemName
+    ) {
+        if (issues == null || itemId <= 0) {
+            return;
+        }
+
+        String normalizedRole = (role == null || role.isBlank()) ? "item" : role;
+        String displayName = (itemName == null || itemName.isBlank()) ? ("Item " + itemId) : itemName;
+
+        if (!ItemDatabase.containsItem(itemId)) {
+            issues.add("Recipe `" + recipeKey + "` " + normalizedRole + " [" + displayName + "] is missing.");
+            return;
+        }
+
+        ItemUseType useType = ItemDatabase.getItemUseType(itemId);
+        if (useType == ItemUseType.UNKNOWN) {
+            issues.add("Recipe `" + recipeKey + "` " + normalizedRole + " [" + displayName + "] has unknown item type.");
+            return;
+        }
+        if (useType == ItemUseType.CROP) {
+            issues.add("Recipe `" + recipeKey + "` " + normalizedRole + " [" + displayName + "] is a crop-stage visual item.");
+            return;
+        }
+        if (useType == ItemUseType.RECIPE) {
+            issues.add("Recipe `" + recipeKey + "` " + normalizedRole + " [" + displayName + "] is a recipe-unlock item, not a gameplay ingredient/output.");
+            return;
+        }
+        if (useType == ItemUseType.SEED && !ItemDatabase.hasCompleteFarmDataForSeed(itemId)) {
+            issues.add("Recipe `" + recipeKey + "` " + normalizedRole + " [" + displayName + "] is a seed with incomplete farm data.");
+            return;
+        }
+        if (!ItemDatabase.isDisplayableItem(itemId)) {
+            issues.add("Recipe `" + recipeKey + "` " + normalizedRole + " [" + displayName + "] is missing a display image.");
+        }
     }
 
     private static boolean matchesRecipeItemName(

@@ -14,6 +14,7 @@ import java.sql.Statement;
 import java.util.Map;
 import model.FarmState;
 import model.Inventory;
+import model.ItemDatabase;
 import model.PlayerState;
 
 public class SaveGameService {
@@ -26,6 +27,8 @@ public class SaveGameService {
         if (gs.getCurrentCharacterId() <= 0) {
             throw new IllegalStateException("GameState currentCharacterId is not set.");
         }
+
+        ItemDatabase.loadItems();
 
         dbcon db = new dbcon();
 
@@ -216,6 +219,10 @@ public class SaveGameService {
         String sql = "INSERT INTO saved_item (saved_id, item_id, qty) VALUES (?, ?, ?)";
         try (PreparedStatement ins = con.prepareStatement(sql)) {
             for (Map.Entry<Integer, Integer> e : inv.snapshot().entrySet()) {
+                if (!ItemDatabase.isRuntimeUsableItem(e.getKey()) || e.getValue() == null || e.getValue() <= 0) {
+                    logSkippedSaveItem("inventory", e.getKey(), e.getValue() == null ? 0 : e.getValue());
+                    continue;
+                }
                 ins.setInt(1, saveId);
                 ins.setInt(2, e.getKey());
                 ins.setInt(3, e.getValue());
@@ -243,6 +250,10 @@ public class SaveGameService {
                 ins.setInt(1, saveId);
                 ins.setInt(2, i);
                 if (itemId <= 0 || qty <= 0) {
+                    ins.setNull(3, java.sql.Types.INTEGER);
+                    ins.setInt(4, 0);
+                } else if (!ItemDatabase.isRuntimeUsableItem(itemId)) {
+                    logSkippedSaveItem("hotbar slot " + i, itemId, qty);
                     ins.setNull(3, java.sql.Types.INTEGER);
                     ins.setInt(4, 0);
                 } else {
@@ -283,12 +294,17 @@ public class SaveGameService {
 
         for (Map.Entry<String, FarmState.PlotData> e : farmState.getAllPlots().entrySet()) {
             FarmState.PlotData p = e.getValue();
+            Integer seedItemId = p.seedItemId;
+
+            if (seedItemId != null && seedItemId > 0 && !ItemDatabase.hasCompleteFarmDataForSeed(seedItemId)) {
+                logSkippedSaveFarmEntry(mapKey, e.getKey(), seedItemId, "seed is missing a complete crop-growth chain.");
+                continue;
+            }
 
             ins.setInt(1, saveId);
             ins.setString(2, mapKey);
             ins.setString(3, e.getKey());
 
-            Integer seedItemId = p.seedItemId;
             if (seedItemId == null || seedItemId <= 0) {
                 ins.setNull(4, java.sql.Types.INTEGER);
             } else {
@@ -309,6 +325,11 @@ public class SaveGameService {
     }
 
     private void saveFarmToolSlot(PreparedStatement ins, int saveId, String mapKey, String plotId, Integer itemId) throws Exception {
+        if (itemId != null && itemId > 0 && !ItemDatabase.isRuntimeUsableItem(itemId)) {
+            logSkippedSaveFarmEntry(mapKey, plotId, itemId, "farm tool is not gameplay-valid.");
+            itemId = null;
+        }
+
         ins.setInt(1, saveId);
         ins.setString(2, mapKey);
         ins.setString(3, plotId);
@@ -339,6 +360,10 @@ public class SaveGameService {
         String sql = "INSERT INTO saved_chest_item (saved_id, item_id, qty) VALUES (?, ?, ?)";
         try (PreparedStatement ins = con.prepareStatement(sql)) {
             for (Map.Entry<Integer, Integer> e : gs.getChestInventory().snapshot().entrySet()) {
+                if (!ItemDatabase.isRuntimeUsableItem(e.getKey()) || e.getValue() == null || e.getValue() <= 0) {
+                    logSkippedSaveItem("chest", e.getKey(), e.getValue() == null ? 0 : e.getValue());
+                    continue;
+                }
                 ins.setInt(1, saveId);
                 ins.setInt(2, e.getKey());
                 ins.setInt(3, e.getValue());
@@ -439,6 +464,30 @@ public class SaveGameService {
         }
         return -1;
     }
+
+    private void logSkippedSaveItem(String source, int itemId, int qty) {
+        String itemName = ItemDatabase.getItemName(itemId);
+        String reason = ItemDatabase.getUnusableReason(itemId);
+        System.out.println(
+            "[SaveGameService] Skipped invalid " + source
+            + " item during save: id=" + itemId
+            + ", name=" + ((itemName == null || itemName.isBlank()) ? "Unknown Item" : itemName)
+            + ", qty=" + qty
+            + (reason == null || reason.isBlank() ? "" : ", reason=" + reason)
+        );
+    }
+
+    private void logSkippedSaveFarmEntry(String mapKey, String plotId, Integer itemId, String reason) {
+        String itemName = (itemId == null) ? null : ItemDatabase.getItemName(itemId);
+        System.out.println(
+            "[SaveGameService] Skipped invalid farm save entry:"
+            + " map=" + (mapKey == null ? "<unknown>" : mapKey)
+            + ", plot=" + (plotId == null ? "<unknown>" : plotId)
+            + ", itemId=" + (itemId == null ? -1 : itemId)
+            + ", itemName=" + ((itemName == null || itemName.isBlank()) ? "Unknown Item" : itemName)
+            + ", reason=" + (reason == null || reason.isBlank() ? "invalid farm data" : reason)
+        );
+    }
     
     public void saveGameToSlot(GameState gs, int slotNumber) {
         if (gs == null) return;
@@ -448,6 +497,8 @@ public class SaveGameService {
         if (gs.getCurrentCharacterId() <= 0) {
             throw new IllegalStateException("GameState currentCharacterId is not set.");
         }
+
+        ItemDatabase.loadItems();
 
         String slotName = "Save " + slotNumber;
 

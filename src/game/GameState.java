@@ -363,7 +363,7 @@ public final class GameState {
     }
 
     private void addStarterChestItem(int itemId, int qty) {
-        if (itemId > 0 && qty > 0 && chestInventory.getCount(itemId) <= 0) {
+        if (itemId > 0 && qty > 0 && ItemDatabase.isRuntimeUsableItem(itemId) && chestInventory.getCount(itemId) <= 0) {
             chestInventory.addItem(itemId, qty);
         }
     }

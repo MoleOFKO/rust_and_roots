@@ -13,6 +13,7 @@ import java.sql.ResultSet;
 import model.Farm;
 import model.FarmGrowthRules;
 import model.FarmState;
+import model.GameplayDataVerifier;
 import model.Inventory;
 import model.ItemDatabase;
 import model.PlayerState;
@@ -24,6 +25,12 @@ public class LoadGameService {
 
     public boolean loadGame(int saveId) {
         if (saveId <= 0) return false;
+
+        GameplayDataVerifier.ValidationSummary validationSummary =
+            GameplayDataVerifier.prepareForGameplay("load game");
+        if (!validationSummary.isDatabaseReady()) {
+            return false;
+        }
 
         GameState gs = GameState.get();
         dbcon db = new dbcon();
@@ -162,6 +169,10 @@ public class LoadGameService {
                     int itemId = rs.getInt("item_id");
                     int qty = rs.getInt("qty");
                     if (itemId > 0 && qty > 0) {
+                        if (!ItemDatabase.isRuntimeUsableItem(itemId)) {
+                            logSkippedSavedItem("inventory", itemId, qty);
+                            continue;
+                        }
                         inv.addItem(itemId, qty);
                     }
                 }
@@ -181,12 +192,17 @@ public class LoadGameService {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     int slotIndex = rs.getInt("slot_index");
-                    int itemId = rs.getInt("item_id");
+                    Integer itemId = (Integer) rs.getObject("item_id");
                     int qty = rs.getInt("qty");
 
-                    if (!rs.wasNull()) {
-                        psState.setHotbarSlot(slotIndex, itemId, Math.max(1, qty));
+                    if (itemId == null || itemId <= 0) {
+                        continue;
                     }
+                    if (!ItemDatabase.isRuntimeUsableItem(itemId) || qty <= 0) {
+                        logSkippedSavedItem("hotbar slot " + slotIndex, itemId, qty);
+                        continue;
+                    }
+                    psState.setHotbarSlot(slotIndex, itemId, Math.max(1, qty));
                 }
             }
         }
@@ -205,6 +221,10 @@ public class LoadGameService {
                     int itemId = rs.getInt("item_id");
                     int qty = rs.getInt("qty");
                     if (itemId > 0 && qty > 0) {
+                        if (!ItemDatabase.isRuntimeUsableItem(itemId)) {
+                            logSkippedSavedItem("chest", itemId, qty);
+                            continue;
+                        }
                         chest.addItem(itemId, qty);
                     }
                 }
@@ -235,17 +255,42 @@ public class LoadGameService {
                     Integer seedItemId = (Integer) rs.getObject("seed_item_id");
 
                     if (FARM_SLOT_WATERING_CAN.equals(plotId)) {
-                        farm.setEquippedWateringCanItemId(seedItemId);
+                        if (isValidFarmTool(seedItemId, "watering can", "watering_can")) {
+                            farm.setEquippedWateringCanItemId(seedItemId);
+                        } else if (seedItemId != null && seedItemId > 0) {
+                            logSkippedFarmEntry(mapKey, plotId, seedItemId, "saved farm watering can is invalid.");
+                        }
                         continue;
                     }
 
                     if (FARM_SLOT_SICKLE.equals(plotId)) {
-                        farm.setEquippedSickleItemId(seedItemId);
+                        if (isValidFarmTool(seedItemId, "sickle")) {
+                            farm.setEquippedSickleItemId(seedItemId);
+                        } else if (seedItemId != null && seedItemId > 0) {
+                            logSkippedFarmEntry(mapKey, plotId, seedItemId, "saved farm sickle is invalid.");
+                        }
                         continue;
                     }
 
                     FarmState.PlotData plot = farm.getPlot(plotId);
                     if (plot == null) continue;
+
+                    if (seedItemId == null || seedItemId <= 0) {
+                        plot.seedItemId = null;
+                        plot.seedItemName = null;
+                        plot.cropItemName = null;
+                        plot.cropSpriteKey = null;
+                        continue;
+                    }
+
+                    if (!ItemDatabase.hasCompleteFarmDataForSeed(seedItemId)) {
+                        logSkippedFarmEntry(mapKey, plotId, seedItemId, "seed is missing a complete crop-growth chain.");
+                        plot.seedItemId = null;
+                        plot.seedItemName = null;
+                        plot.cropItemName = null;
+                        plot.cropSpriteKey = null;
+                        continue;
+                    }
 
                     plot.seedItemId = seedItemId;
 
@@ -261,10 +306,6 @@ public class LoadGameService {
                         plot.cropItemName = ItemDatabase.resolveCropNameForSeed(seedItemId);
                         plot.cropSpriteKey = ItemDatabase.buildCropSpriteKeyForSeed(seedItemId);
                         FarmGrowthRules.applyProfile(plot, seedItemId);
-                    } else {
-                        plot.seedItemName = null;
-                        plot.cropItemName = null;
-                        plot.cropSpriteKey = null;
                     }
                 }
             }
@@ -351,6 +392,52 @@ public class LoadGameService {
         try (ResultSet rs = metaData.getTables(con.getCatalog(), null, tableName.toUpperCase(), new String[]{"TABLE"})) {
             return rs.next();
         }
+    }
+
+    private boolean isValidFarmTool(Integer itemId, String... requiredTokens) {
+        if (itemId == null || itemId <= 0 || !ItemDatabase.isRuntimeUsableItem(itemId)) {
+            return false;
+        }
+
+        String itemName = ItemDatabase.getItemName(itemId);
+        if (itemName == null || itemName.isBlank()) {
+            return false;
+        }
+
+        String normalizedName = itemName.trim().toLowerCase(java.util.Locale.ROOT).replace('_', ' ');
+        for (String token : requiredTokens) {
+            if (token == null || token.isBlank()) {
+                continue;
+            }
+            if (normalizedName.contains(token.trim().toLowerCase(java.util.Locale.ROOT).replace('_', ' '))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void logSkippedSavedItem(String source, int itemId, int qty) {
+        String itemName = ItemDatabase.getItemName(itemId);
+        String reason = ItemDatabase.getUnusableReason(itemId);
+        System.out.println(
+            "[LoadGameService] Skipped invalid saved " + source
+            + " item: id=" + itemId
+            + ", name=" + ((itemName == null || itemName.isBlank()) ? "Unknown Item" : itemName)
+            + ", qty=" + qty
+            + (reason == null || reason.isBlank() ? "" : ", reason=" + reason)
+        );
+    }
+
+    private void logSkippedFarmEntry(String mapKey, String plotId, Integer itemId, String reason) {
+        String itemName = (itemId == null) ? null : ItemDatabase.getItemName(itemId);
+        System.out.println(
+            "[LoadGameService] Skipped invalid farm entry:"
+            + " map=" + (mapKey == null ? "<unknown>" : mapKey)
+            + ", plot=" + (plotId == null ? "<unknown>" : plotId)
+            + ", itemId=" + (itemId == null ? -1 : itemId)
+            + ", itemName=" + ((itemName == null || itemName.isBlank()) ? "Unknown Item" : itemName)
+            + ", reason=" + (reason == null || reason.isBlank() ? "invalid farm data" : reason)
+        );
     }
 
     private void clearInventoryItems(Inventory inv) {

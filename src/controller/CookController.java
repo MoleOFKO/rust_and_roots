@@ -181,12 +181,17 @@ public class CookController implements Initializable, SceneController {
         if (definition == null) {
             return;
         }
+        List<String> validationIssues = RecipeCatalog.collectGameplayValidationIssues(definition);
+        if (!validationIssues.isEmpty()) {
+            missingReport.addAll(validationIssues);
+            return;
+        }
         item output = resolveItemByAliases(definition.getOutputAliases());
         if (output == null) {
             missingReport.add("Output item not found for recipe `" + definition.getKey() + "` aliases=" + Arrays.toString(definition.getOutputAliases()));
             return;
         }
-        if (ItemDatabase.getImage(output.getItem_id()) == null) {
+        if (!ItemDatabase.isRuntimeUsableItem(output.getItem_id())) {
             missingReport.add("Output image missing for item `" + output.getItem_name() + "` in recipe `" + definition.getKey() + "`");
             return;
         }
@@ -198,7 +203,7 @@ public class CookController implements Initializable, SceneController {
                 missingReport.add("Ingredient not found for recipe `" + definition.getKey() + "` aliases=" + Arrays.toString(spec.getItemAliases()));
                 return;
             }
-            if (ItemDatabase.getImage(ingItem.getItem_id()) == null) {
+            if (!ItemDatabase.isRuntimeUsableItem(ingItem.getItem_id())) {
                 missingReport.add("Ingredient image missing for `" + ingItem.getItem_name() + "` in recipe `" + definition.getKey() + "`");
                 return;
             }

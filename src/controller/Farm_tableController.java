@@ -37,7 +37,6 @@ public class Farm_tableController implements Initializable, SceneController {
     private static final String TOOL_SLOT_STYLE = "-fx-effect: dropshadow(gaussian, rgba(255,215,0,0.85), 14, 0.55, 0, 0);";
 
     private static final double FARM_TABLE_TIME_SCALE = 0.25;
-    private static final int TOTAL_GROWTH_STAGES = FarmGrowthRules.TOTAL_GROWTH_STAGES;
     private static final int DEFAULT_PLANT_STAMINA_COST = 2;
 
     private static final String PLOT_IDLE_STYLE = "-fx-background-color: transparent; -fx-background-radius: 6; -fx-border-color: transparent; -fx-border-radius: 6;";
@@ -561,12 +560,16 @@ public class Farm_tableController implements Initializable, SceneController {
         if (gameState == null || gameState.getPlayerState() == null) return result;
 
         java.util.LinkedHashSet<Integer> ids = new java.util.LinkedHashSet<>();
-        ids.addAll(gameState.getPlayerState().getInventory().itemsProperty().keySet());
+        for (Integer itemId : gameState.getPlayerState().getInventory().itemsProperty().keySet()) {
+            if (itemId != null && ItemDatabase.isRuntimeUsableItem(itemId)) {
+                ids.add(itemId);
+            }
+        }
 
         for (int i = 0; i < gameState.getPlayerState().getHotbarSize(); i++) {
             int itemId = gameState.getPlayerState().getHotbarItemId(i);
             int qty = gameState.getPlayerState().getHotbarItemCount(i);
-            if (itemId > 0 && qty > 0) {
+            if (itemId > 0 && qty > 0 && ItemDatabase.isRuntimeUsableItem(itemId)) {
                 ids.add(itemId);
             }
         }
@@ -576,7 +579,7 @@ public class Farm_tableController implements Initializable, SceneController {
     }
 
     private int getCombinedOwnedCount(int itemId) {
-        if (gameState == null || gameState.getPlayerState() == null || itemId <= 0) return 0;
+        if (gameState == null || gameState.getPlayerState() == null || itemId <= 0 || !ItemDatabase.isRuntimeUsableItem(itemId)) return 0;
 
         int total = gameState.getPlayerState().getInventory().getCount(itemId);
 
@@ -699,10 +702,17 @@ public class Farm_tableController implements Initializable, SceneController {
                 continue;
             }
 
-            int stage = pd.getStage(now, TOTAL_GROWTH_STAGES);
+            int stage = pd.getImageStage(now);
             String spriteKey = pd.cropSpriteKey == null
                     ? ItemDatabase.buildCropSpriteKeyForSeed(pd.seedItemId == null ? -1 : pd.seedItemId)
                     : pd.cropSpriteKey;
+ 
+            if (stage <= 0) {
+                view.setImage(null);
+                view.setVisible(false);
+                view.setMouseTransparent(true);
+                continue;
+            }
 
             String path = String.format("/image/crops/%s_plant%d.png", spriteKey, stage);
             URL url = getClass().getResource(path);
@@ -972,8 +982,9 @@ public class Farm_tableController implements Initializable, SceneController {
 
     private void applySeedGrowthProfile(TempPlotData plotData, int seedItemId) {
         if (plotData == null || seedItemId <= 0) return;
+        plotData.maxGrowthPhases = Math.max(1, ItemDatabase.getMaxGrowthPhasesForSeed(seedItemId));
         plotData.totalGrowthSeconds = FarmGrowthRules.resolveTotalGrowthSeconds(seedItemId);
-        plotData.waterCooldownSeconds = FarmGrowthRules.resolveWaterCooldownSeconds(plotData.totalGrowthSeconds);
+        plotData.waterCooldownSeconds = FarmGrowthRules.resolveWaterCooldownSeconds(plotData.totalGrowthSeconds, plotData.maxGrowthPhases);
         plotData.waterReductionSeconds = FarmGrowthRules.resolveWaterReductionSeconds(plotData.totalGrowthSeconds);
         plotData.accumulatedWaterReduction = FarmGrowthRules.clampAccumulatedWaterReduction(
             plotData.accumulatedWaterReduction,
@@ -1013,6 +1024,7 @@ public class Farm_tableController implements Initializable, SceneController {
         String seedItemName;
         String cropItemName;
         String cropSpriteKey;
+        int maxGrowthPhases = FarmGrowthRules.DEFAULT_MAX_GROWTH_PHASES;
         double plantedAt;
         double lastWateredAt;
         double accumulatedWaterReduction;
@@ -1026,6 +1038,7 @@ public class Farm_tableController implements Initializable, SceneController {
             t.seedItemName = src.seedItemName;
             t.cropItemName = src.cropItemName;
             t.cropSpriteKey = src.cropSpriteKey;
+            t.maxGrowthPhases = src.maxGrowthPhases;
             t.plantedAt = src.plantedAt;
             t.lastWateredAt = src.lastWateredAt;
             t.accumulatedWaterReduction = src.accumulatedWaterReduction;
@@ -1040,6 +1053,7 @@ public class Farm_tableController implements Initializable, SceneController {
             dst.seedItemName = seedItemName;
             dst.cropItemName = cropItemName;
             dst.cropSpriteKey = cropSpriteKey;
+            dst.maxGrowthPhases = maxGrowthPhases;
             dst.plantedAt = plantedAt;
             dst.lastWateredAt = lastWateredAt;
             dst.accumulatedWaterReduction = accumulatedWaterReduction;
@@ -1064,6 +1078,7 @@ public class Farm_tableController implements Initializable, SceneController {
                 lastWateredAt,
                 accumulatedWaterReduction,
                 totalGrowthSeconds,
+                maxGrowthPhases,
                 waterReductionSeconds,
                 nowSeconds
             );
@@ -1076,11 +1091,13 @@ public class Farm_tableController implements Initializable, SceneController {
                 totalGrowthSeconds
             );
         }
-        int getStage(double nowSeconds, int totalStages) {
+        int getImageStage(double nowSeconds) {
             if (isEmpty()) return 0;
-            if (totalStages <= 1) return 1;
-            int stage = FarmGrowthRules.getStage(plantedAt, accumulatedWaterReduction, totalGrowthSeconds, nowSeconds);
-            return Math.min(totalStages, stage);
+            int phases = Math.max(1, maxGrowthPhases);
+            int phase = FarmGrowthRules.getPhase(plantedAt, accumulatedWaterReduction, totalGrowthSeconds, phases, nowSeconds);
+            int cropStages = Math.max(0, phases - 1);
+            int imageStage = Math.max(0, phase - 1);
+            return Math.min(cropStages, imageStage);
         }
         int harvestItemId() { return seedItemId == null ? -1 : ItemDatabase.resolveHarvestItemIdForSeed(seedItemId); }
     }
