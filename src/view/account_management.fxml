@@ -17,7 +17,7 @@
     <children>
         <Group fx:id="uiRoot">
             <children>
-            <ImageView fitHeight="519.0" fitWidth="840.0" pickOnBounds="true">
+            <ImageView fitHeight="543.0" fitWidth="881.0" pickOnBounds="true">
                <image>
                   <Image url="@../image/Admin/dashboard.png" />
                </image>
@@ -136,8 +136,6 @@
                      <Font name="System Bold" size="12.0" />
                   </font>
                </Button>
-            <Label layoutX="522.0" layoutY="30.0" />
-            <Label layoutX="778.0" layoutY="531.0" />
             <BorderPane layoutX="65.0" layoutY="220.0" prefHeight="34.0" prefWidth="119.0" style="-fx-border-color: black; -fx-border-radius: 5px; -fx-border-width: 4px;" />
             </children>
         </Group>

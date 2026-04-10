@@ -74,7 +74,8 @@
             <Group fx:id="human">
                <children>
                   <Rectangle fx:id="human_hitbox" arcHeight="5.0" arcWidth="5.0" fill="#ffffff00" height="20.0" layoutX="202.0" layoutY="155.0" opacity="0.0" stroke="BLACK" strokeType="INSIDE" width="14.0" />
-                  <ImageView fx:id="human_img" fitHeight="64.0" fitWidth="64.0" layoutX="176.0" layoutY="128.0" pickOnBounds="true" preserveRatio="true" />
+                        <ImageView fx:id="human_img" fitHeight="64.0" fitWidth="64.0" layoutX="176.0" layoutY="128.0" pickOnBounds="true" preserveRatio="true" />
+                        <ImageView fx:id="equip_img" fitHeight="64.0" fitWidth="64.0" layoutX="176.0" layoutY="128.0" pickOnBounds="true" preserveRatio="true" />
                </children>
             </Group>
                <Group fx:id="dialogboxes">

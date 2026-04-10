@@ -24,9 +24,11 @@ public class dbcon {
         System.out.println("load driver..........");
         try{
             con =DriverManager.getConnection(url, username, password);
+            DatabaseSchemaManager.ensureSchema(con);
             System.out.println("database connected");
         }catch(SQLException e){
             System.out.println("not connect");
+            throw new IllegalStateException("Failed to connect or initialize database schema", e);
         }
         return con;
       }
