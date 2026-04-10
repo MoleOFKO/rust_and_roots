@@ -21,28 +21,28 @@
                   <Image url="@../image/Admin/dashboard_with_cursed_paper.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="28.0" fitWidth="147.0" layoutX="16.0" layoutY="24.0" pickOnBounds="true">
+            <ImageView fitHeight="28.0" fitWidth="147.0" layoutX="10.0" layoutY="10.0" pickOnBounds="true">
                <image>
                   <Image url="@../image/Admin/admin_bar.png" />
                </image>
             </ImageView>
-               <Label layoutX="29.0" layoutY="29.0" prefHeight="17.0" prefWidth="43.0" text="Admin:" textFill="#873e00">
+               <Label layoutX="23.0" layoutY="15.0" prefHeight="17.0" prefWidth="43.0" text="Admin:" textFill="#873e00">
                <font>
                   <Font name="Serif Regular" size="12.0" />
                </font></Label>
-               <Label fx:id="lblaname" layoutX="74.0" layoutY="29.0" prefHeight="17.0" prefWidth="81.0" text="Name" textFill="#7a5500">
+               <Label fx:id="lblaname" layoutX="68.0" layoutY="15.0" prefHeight="17.0" prefWidth="81.0" text="Name" textFill="#7a5500">
                <font>
                   <Font name="Serif Regular" size="12.0" />
                </font></Label>
             <TextField fx:id="txtaccname" layoutX="186.0" layoutY="84.0" prefHeight="29.0" prefWidth="201.0" styleClass="textbox" stylesheets="@../css/style.css" />
                <TextField fx:id="txtemail" layoutX="186.0" layoutY="160.0" prefHeight="29.0" prefWidth="201.0" styleClass="textbox" stylesheets="@../css/style.css" />
                <TextField fx:id="txtpwd" layoutX="185.0" layoutY="195.0" prefHeight="29.0" prefWidth="202.0" styleClass="textbox" stylesheets="@../css/style.css" />
-            <ImageView fitHeight="30.0" fitWidth="72.0" layoutX="209.0" layoutY="256.0" pickOnBounds="true">
+            <ImageView fitHeight="30.0" fitWidth="72.0" layoutX="206.0" layoutY="246.0" pickOnBounds="true">
                <image>
                   <Image url="@../image/Admin/admin_save_button.png" />
                </image>
             </ImageView>
-               <Button fx:id="btnsave" layoutX="210.0" layoutY="257.0" mnemonicParsing="false" onAction="#handlebtnsaveaction" opacity="0.0" prefHeight="25.0" prefWidth="68.0" text="Save" />
+               <Button fx:id="btnsave" layoutX="207.0" layoutY="247.0" mnemonicParsing="false" onAction="#handlebtnsaveaction" opacity="0.0" prefHeight="25.0" prefWidth="68.0" text="Save" />
                <Label layoutX="93.0" layoutY="92.0" prefHeight="17.0" prefWidth="84.0" text="Account Name" textFill="#572a00">
                <font>
                   <Font name="Serif Bold" size="12.0" />
@@ -59,12 +59,12 @@
                <font>
                   <Font name="Serif Bold" size="12.0" />
                </font></Label>
-            <ImageView fitHeight="30.0" fitWidth="72.0" layoutX="391.0" layoutY="21.0" pickOnBounds="true">
+            <ImageView fitHeight="30.0" fitWidth="72.0" layoutX="388.0" layoutY="10.0" pickOnBounds="true">
                <image>
                   <Image url="@../image/Admin/admin_back_button.png" />
                </image>
             </ImageView>
-               <Button fx:id="btnback" layoutX="394.0" layoutY="23.0" mnemonicParsing="false" onAction="#handlebtnbackaction" opacity="0.0" prefHeight="25.0" prefWidth="67.0" text="Back">
+               <Button fx:id="btnback" layoutX="391.0" layoutY="12.0" mnemonicParsing="false" onAction="#handlebtnbackaction" opacity="0.0" prefHeight="25.0" prefWidth="67.0" text="Back">
                   <graphic>
                      <FontAwesomeIcon glyphName="ARROW_LEFT" />
                   </graphic>
@@ -75,8 +75,6 @@
                   <String fx:value="list-view" />
                   <String fx:value="list-cell" />
                </styleClass></ComboBox>
-            <Label layoutX="5.0" layoutY="15.0" prefHeight="17.0" prefWidth="22.0" />
-            <Label layoutX="450.0" layoutY="274.0" prefHeight="17.0" prefWidth="22.0" />
             </children>
         </Group>
     </children>

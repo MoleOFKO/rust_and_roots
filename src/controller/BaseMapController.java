@@ -1,6 +1,8 @@
 package controller;
 
+import db.SaveGameService;
 import java.net.URL;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -21,6 +23,7 @@ import game.InteractionManager;
 import game.SceneController;
 import java.util.Objects;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -76,6 +79,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
     @FXML protected Group human;
     @FXML protected ImageView human_img;
+    @FXML protected ImageView equip_img;
     @FXML protected Rectangle human_hitbox;
 
     @FXML protected Group walls;
@@ -293,8 +297,15 @@ public abstract class BaseMapController implements Initializable, SceneControlle
             150_000_000L
         );
 
+        if (equip_img != null) {
+            bindPlayerEquipmentView(equip_img);
+        }
+
         player.setOnToggleHotbarRequest(this::toggleHotbarVisible);
         player.setOnHotbarSlotRequest(this::selectHotbarSlot);
+
+        autoBridgeSharedUiFromControllerFields();
+        autoWireSharedUiHandlers();
 
         view.sceneProperty().addListener((obs, oldScene, newScene) -> {
             if (newScene != null) {
@@ -315,6 +326,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         setupDayNightBindingIfConfigured();
         setupFarmTimeRefreshIfPresent();
         setupSettingsTabIfPresent();
+        bindSharedStatusAndSettingControlsIfPresent();
 
         GameTimeManager.get().start();
         startLoop();
@@ -634,7 +646,9 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     
     // ---------- Shared status allocation logic ----------
     protected void refreshStatusAllocationUi() {
-        // subclasses override if they have status labels/buttons to refresh
+        refreshGenericStatusView();
+        refreshGenericSkillsView();
+        refreshGenericStatusButtons();
     }
 
     protected void resetPendingStatusChanges() {
@@ -1145,6 +1159,348 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         if (player == null) return;
         player.setEquipmentView(equipView);
         refreshEquippedItemVisual();
+    }
+
+    private void autoBridgeSharedUiFromControllerFields() {
+        HBox hotbarNode = controllerField("hotbar", HBox.class);
+        Label hotbarGuideNode = controllerField("hotbarguide", Label.class);
+        if (hotbarNode != null || hotbarGuideNode != null) {
+            bridgeSharedHotbarUi(
+                hotbarNode,
+                hotbarGuideNode,
+                controllerFieldList(StackPane.class, "Hslot", "Hslot1", "Hslot2", "Hslot3", "Hslot4"),
+                controllerFieldList(ImageView.class, "slotImg", "slotImg1", "slotImg2", "slotImg3", "slotImg4"),
+                controllerFieldList(Label.class, "slotLb", "slotLb1", "slotLb2", "slotLb3", "slotLb4"),
+                controllerFieldList(ToggleButton.class, "slotBtn", "slotBtn1", "slotBtn2", "slotBtn3", "slotBtn4")
+            );
+        }
+
+        Pane inventoryOverlayNode = controllerField("inventoryOverlay", Pane.class);
+        Group menuInventoryNode = controllerField("menuInventory", Group.class);
+        Group statusTabNode = controllerField("statusTab", Group.class);
+        Group settingsTabNode = controllerField("settingsTab", Group.class);
+        Group statusGroupNode = controllerField("statusgroup", Group.class);
+        Group skillsGroupNode = controllerField("skillsgroup", Group.class);
+        Group playerInventoryGroupNode = controllerField("player_inv_group", Group.class);
+        Button openInventoryNode = controllerField("openInventory", Button.class);
+        Button openStatusNode = controllerField("openstatus", Button.class);
+        Button openSettingNode = controllerField("opensetting", Button.class);
+        ImageView closeButtonNode = controllerField("btnclose", ImageView.class);
+        ImageView btnSkillNode = controllerField("btnskill", ImageView.class);
+        ImageView btnStatusNode = controllerField("btnstatus", ImageView.class);
+
+        if (inventoryOverlayNode != null || menuInventoryNode != null || statusTabNode != null || settingsTabNode != null) {
+            bridgeSharedInventoryOverlayUi(
+                inventoryOverlayNode,
+                menuInventoryNode,
+                statusTabNode,
+                settingsTabNode,
+                statusGroupNode,
+                skillsGroupNode,
+                playerInventoryGroupNode,
+                openInventoryNode,
+                openStatusNode,
+                openSettingNode,
+                closeButtonNode,
+                btnSkillNode,
+                btnStatusNode,
+                controllerIndexedFieldList(ImageView.class, "Playerinvimg", 20),
+                controllerIndexedFieldList(Label.class, "Playerinvlbl", 20),
+                controllerIndexedFieldList(Button.class, "Playerinvbtn", 20)
+            );
+        }
+    }
+
+    private void autoWireSharedUiHandlers() {
+        bindAction("slotBtn5", Button.class, e -> toggleInventory());
+        bindAction("openInventory", Button.class, e -> openInventory());
+        bindAction("openstatus", Button.class, e -> openStatus());
+        bindAction("opensetting", Button.class, e -> openSetting());
+        bindMouse("btnclose", ImageView.class, e -> closeMenuScreen());
+        bindMouse("btnskill", ImageView.class, e -> {
+            setSkillsOpen(true);
+            setStatusOpen(false);
+        });
+        bindMouse("btnstatus", ImageView.class, e -> {
+            setStatusOpen(true);
+            setSkillsOpen(false);
+        });
+        bindMouse("btnUsePoint", ImageView.class, e -> onSharedUsePoint());
+        bindMouse("btnConfirm", ImageView.class, e -> onSharedConfirm());
+        bindMouse("btnHPminus", ImageView.class, e -> onStatusHpMinus());
+        bindMouse("btnHPplus", ImageView.class, e -> onStatusHpPlus());
+        bindMouse("btnSPminus", ImageView.class, e -> onStatusSpMinus());
+        bindMouse("btnSPplus", ImageView.class, e -> onStatusSpPlus());
+        bindMouse("btnSTRminus", ImageView.class, e -> onStatusStrMinus());
+        bindMouse("btnSTRplus", ImageView.class, e -> onStatusStrPlus());
+        bindMouse("btnVITminus", ImageView.class, e -> onStatusVitMinus());
+        bindMouse("btnVITplus", ImageView.class, e -> onStatusVitPlus());
+        bindMouse("btnDEXminus", ImageView.class, e -> onStatusDexMinus());
+        bindMouse("btnDEXplus", ImageView.class, e -> onStatusDexPlus());
+        bindMouse("btnAGIminus", ImageView.class, e -> onStatusAgiMinus());
+        bindMouse("btnAGIplus", ImageView.class, e -> onStatusAgiPlus());
+        bindMouse("btnfarmingminus1", ImageView.class, e -> onSkillFarmingMinus());
+        bindMouse("btnfarmingplus1", ImageView.class, e -> onSkillFarmingPlus());
+        bindMouse("btngatheringminus1", ImageView.class, e -> onSkillGatheringMinus());
+        bindMouse("btngatheringplus1", ImageView.class, e -> onSkillGatheringPlus());
+        bindMouse("btncraftingminus1", ImageView.class, e -> onSkillCraftingMinus());
+        bindMouse("btncraftingplus1", ImageView.class, e -> onSkillCraftingPlus());
+        bindMouse("btnfishingminus1", ImageView.class, e -> onSkillFishingMinus());
+        bindMouse("btnfishingplus1", ImageView.class, e -> onSkillFishingPlus());
+        bindMouse("btncookingminus1", ImageView.class, e -> onSkillCookingMinus());
+        bindMouse("btncookingplus1", ImageView.class, e -> onSkillCookingPlus());
+    }
+
+    private void bindSharedStatusAndSettingControlsIfPresent() {
+        if (playerState != null) {
+            playerState.playerNameProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
+            playerState.expProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
+            playerState.hpProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
+            playerState.maxHpProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
+            playerState.staminaProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
+            playerState.maxStaminaProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
+            playerState.strProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
+            playerState.vitProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
+            playerState.dexProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
+            playerState.agiProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
+        }
+
+        GameTimeManager time = GameTimeManager.get();
+        Slider timeScaleSlider = controllerField("timescaleslider", Slider.class);
+        Label sliderScaleLabel = controllerField("sliderscale", Label.class);
+        Label daysLabel = controllerField("lbldays", Label.class);
+        Label timeLabelNode = controllerField("lbltime", Label.class);
+        Button setDayButton = controllerField("btnsetday", Button.class);
+        Button setNightButton = controllerField("btnsetnight", Button.class);
+        Button addHourButton = controllerField("btnplus1h", Button.class);
+        Button saveExitButton = controllerField("btnsaveandexit", Button.class);
+
+        if (timeScaleSlider != null) {
+            timeScaleSlider.valueProperty().unbindBidirectional(time.timeScaleProperty());
+            timeScaleSlider.valueProperty().bindBidirectional(time.timeScaleProperty());
+        }
+        if (sliderScaleLabel != null) {
+            sliderScaleLabel.textProperty().unbind();
+            sliderScaleLabel.textProperty().bind(Bindings.createStringBinding(
+                () -> String.format("Current Time Speed : x%.1f", time.timeScaleProperty().get()),
+                time.timeScaleProperty()
+            ));
+        }
+        if (daysLabel != null) {
+            daysLabel.textProperty().unbind();
+            daysLabel.textProperty().bind(Bindings.createStringBinding(
+                () -> "Days : " + time.dayNumberProperty().get(),
+                time.dayNumberProperty()
+            ));
+        }
+        if (timeLabelNode != null) {
+            timeLabelNode.textProperty().unbind();
+            timeLabelNode.textProperty().bind(Bindings.createStringBinding(
+                () -> "Time : " + time.formattedProperty().get(),
+                time.formattedProperty()
+            ));
+        }
+        if (setDayButton != null) setDayButton.setOnAction(e -> time.setTimeOfDay(8, 0));
+        if (setNightButton != null) setNightButton.setOnAction(e -> time.setTimeOfDay(20, 0));
+        if (addHourButton != null) addHourButton.setOnAction(e -> time.addMinutes(60));
+        if (saveExitButton != null) {
+            saveExitButton.setOnAction(e -> {
+                try {
+                    capturePlayerSnapshot();
+                    new SaveGameService().saveGame(GameState.get());
+                    if (gameLoop != null) gameLoop.stop();
+                    if (player != null) player.stop();
+                    SceneManager.switchScene("/view/main_menu.fxml");
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            });
+        }
+
+        refreshStatusAllocationUi();
+        refreshMenuState();
+    }
+
+    private void refreshGenericStatusView() {
+        Label statusNameNode = controllerField("statusName", Label.class);
+        Label statusExpNode = controllerField("statusEXP", Label.class);
+        Label statusHpNode = controllerField("statusHP", Label.class);
+        Label statusSpNode = controllerField("statusSP", Label.class);
+        Label statusStrNode = controllerField("statusSTR", Label.class);
+        Label statusVitNode = controllerField("statusVIT", Label.class);
+        Label statusDexNode = controllerField("statusDEX", Label.class);
+        Label statusAgiNode = controllerField("statusAGI", Label.class);
+
+        if (playerState == null) return;
+
+        if (statusNameNode != null) statusNameNode.setText("Name : " + playerState.getPlayerName());
+        if (statusExpNode != null) statusExpNode.setText(formatVisibleExpLabel());
+        if (statusHpNode != null) statusHpNode.setText("HP : " + playerState.getHp() + "/" + (playerState.getMaxHp() + pendingHpPoints) + formatPending(pendingHpPoints));
+        if (statusSpNode != null) statusSpNode.setText("SP : " + playerState.getStamina() + "/" + (playerState.getMaxStamina() + pendingSpPoints) + formatPending(pendingSpPoints));
+        if (statusStrNode != null) statusStrNode.setText("STR : " + playerState.getStr() + formatPending(pendingStrPoints));
+        if (statusVitNode != null) statusVitNode.setText("VIT : " + playerState.getVit() + formatPending(pendingVitPoints));
+        if (statusDexNode != null) statusDexNode.setText("DEX : " + playerState.getDex() + formatPending(pendingDexPoints));
+        if (statusAgiNode != null) statusAgiNode.setText("AGI : " + playerState.getAgi() + formatPending(pendingAgiPoints));
+    }
+
+    private void refreshGenericSkillsView() {
+        if (gameState == null) return;
+        GameState.PlayerSkills skills = gameState.getPlayerSkills();
+
+        Label farmingNode = controllerField("farming", Label.class);
+        Label gatheringNode = controllerField("gathering", Label.class);
+        Label craftingNode = controllerField("crafting", Label.class);
+        Label fishingNode = controllerField("fishing", Label.class);
+        Label cookingNode = controllerField("cooking", Label.class);
+
+        if (farmingNode != null) farmingNode.setText(appendPendingSkillCost(skills.getFarmingDisplay(), pendingFarmingSkillExp));
+        if (gatheringNode != null) gatheringNode.setText(appendPendingSkillCost(skills.getGatheringDisplay(), pendingGatheringSkillExp));
+        if (craftingNode != null) craftingNode.setText(appendPendingSkillCost(skills.getCraftingDisplay(), pendingCraftingSkillExp));
+        if (fishingNode != null) fishingNode.setText(appendPendingSkillCost(skills.getFishingDisplay(), pendingFishingSkillExp));
+        if (cookingNode != null) cookingNode.setText(appendPendingSkillCost(skills.getCookingDisplay(), pendingCookingSkillExp));
+    }
+
+    private void refreshGenericStatusButtons() {
+        boolean canUsePoint = playerState != null && playerState.getExp() > 0;
+        boolean skillsVisible = isSkillsScreenVisible();
+
+        configureImageButton(controllerField("btnUsePoint", ImageView.class), canUsePoint, true, statusAllocationMode || skillAllocationMode ? 1.0 : 0.85);
+
+        if (skillsVisible) {
+            configureImageButton(controllerField("btnConfirm", ImageView.class), skillAllocationMode && getPendingSkillExpTotal() > 0, skillAllocationMode, 1.0);
+            configureImageButton(controllerField("btnfarmingplus1", ImageView.class), canIncreaseSkill("farming"), skillAllocationMode, 1.0);
+            configureImageButton(controllerField("btngatheringplus1", ImageView.class), canIncreaseSkill("gathering"), skillAllocationMode, 1.0);
+            configureImageButton(controllerField("btncraftingplus1", ImageView.class), canIncreaseSkill("crafting"), skillAllocationMode, 1.0);
+            configureImageButton(controllerField("btnfishingplus1", ImageView.class), canIncreaseSkill("fishing"), skillAllocationMode, 1.0);
+            configureImageButton(controllerField("btncookingplus1", ImageView.class), canIncreaseSkill("cooking"), skillAllocationMode, 1.0);
+            configureImageButton(controllerField("btnfarmingminus1", ImageView.class), skillAllocationMode && pendingFarmingSkillExp > 0, skillAllocationMode, 1.0);
+            configureImageButton(controllerField("btngatheringminus1", ImageView.class), skillAllocationMode && pendingGatheringSkillExp > 0, skillAllocationMode, 1.0);
+            configureImageButton(controllerField("btncraftingminus1", ImageView.class), skillAllocationMode && pendingCraftingSkillExp > 0, skillAllocationMode, 1.0);
+            configureImageButton(controllerField("btnfishingminus1", ImageView.class), skillAllocationMode && pendingFishingSkillExp > 0, skillAllocationMode, 1.0);
+            configureImageButton(controllerField("btncookingminus1", ImageView.class), skillAllocationMode && pendingCookingSkillExp > 0, skillAllocationMode, 1.0);
+            disableStatusButtons();
+            return;
+        }
+
+        if (isStatusScreenVisible()) {
+            configureImageButton(controllerField("btnConfirm", ImageView.class), statusAllocationMode && getPendingExpCost() > 0, statusAllocationMode, 1.0);
+            configureImageButton(controllerField("btnHPplus", ImageView.class), canIncreaseStat("hp"), statusAllocationMode, 1.0);
+            configureImageButton(controllerField("btnSPplus", ImageView.class), canIncreaseStat("sp"), statusAllocationMode, 1.0);
+            configureImageButton(controllerField("btnSTRplus", ImageView.class), canIncreaseStat("str"), statusAllocationMode, 1.0);
+            configureImageButton(controllerField("btnVITplus", ImageView.class), canIncreaseStat("vit"), statusAllocationMode, 1.0);
+            configureImageButton(controllerField("btnDEXplus", ImageView.class), canIncreaseStat("dex"), statusAllocationMode, 1.0);
+            configureImageButton(controllerField("btnAGIplus", ImageView.class), canIncreaseStat("agi"), statusAllocationMode, 1.0);
+            configureImageButton(controllerField("btnHPminus", ImageView.class), statusAllocationMode && pendingHpPoints > 0, statusAllocationMode, 1.0);
+            configureImageButton(controllerField("btnSPminus", ImageView.class), statusAllocationMode && pendingSpPoints > 0, statusAllocationMode, 1.0);
+            configureImageButton(controllerField("btnSTRminus", ImageView.class), statusAllocationMode && pendingStrPoints > 0, statusAllocationMode, 1.0);
+            configureImageButton(controllerField("btnVITminus", ImageView.class), statusAllocationMode && pendingVitPoints > 0, statusAllocationMode, 1.0);
+            configureImageButton(controllerField("btnDEXminus", ImageView.class), statusAllocationMode && pendingDexPoints > 0, statusAllocationMode, 1.0);
+            configureImageButton(controllerField("btnAGIminus", ImageView.class), statusAllocationMode && pendingAgiPoints > 0, statusAllocationMode, 1.0);
+            disableSkillButtons();
+        }
+    }
+
+    private void disableStatusButtons() {
+        configureImageButton(controllerField("btnHPplus", ImageView.class), false, false, 1.0);
+        configureImageButton(controllerField("btnSPplus", ImageView.class), false, false, 1.0);
+        configureImageButton(controllerField("btnSTRplus", ImageView.class), false, false, 1.0);
+        configureImageButton(controllerField("btnVITplus", ImageView.class), false, false, 1.0);
+        configureImageButton(controllerField("btnDEXplus", ImageView.class), false, false, 1.0);
+        configureImageButton(controllerField("btnAGIplus", ImageView.class), false, false, 1.0);
+        configureImageButton(controllerField("btnHPminus", ImageView.class), false, false, 1.0);
+        configureImageButton(controllerField("btnSPminus", ImageView.class), false, false, 1.0);
+        configureImageButton(controllerField("btnSTRminus", ImageView.class), false, false, 1.0);
+        configureImageButton(controllerField("btnVITminus", ImageView.class), false, false, 1.0);
+        configureImageButton(controllerField("btnDEXminus", ImageView.class), false, false, 1.0);
+        configureImageButton(controllerField("btnAGIminus", ImageView.class), false, false, 1.0);
+    }
+
+    private void disableSkillButtons() {
+        configureImageButton(controllerField("btnfarmingplus1", ImageView.class), false, false, 1.0);
+        configureImageButton(controllerField("btngatheringplus1", ImageView.class), false, false, 1.0);
+        configureImageButton(controllerField("btncraftingplus1", ImageView.class), false, false, 1.0);
+        configureImageButton(controllerField("btnfishingplus1", ImageView.class), false, false, 1.0);
+        configureImageButton(controllerField("btncookingplus1", ImageView.class), false, false, 1.0);
+        configureImageButton(controllerField("btnfarmingminus1", ImageView.class), false, false, 1.0);
+        configureImageButton(controllerField("btngatheringminus1", ImageView.class), false, false, 1.0);
+        configureImageButton(controllerField("btncraftingminus1", ImageView.class), false, false, 1.0);
+        configureImageButton(controllerField("btnfishingminus1", ImageView.class), false, false, 1.0);
+        configureImageButton(controllerField("btncookingminus1", ImageView.class), false, false, 1.0);
+    }
+
+    private void configureImageButton(ImageView imageView, boolean enabled, boolean visible, double activeOpacity) {
+        if (imageView == null) return;
+        imageView.setVisible(visible);
+        imageView.setManaged(visible);
+        imageView.setDisable(!enabled);
+        imageView.setMouseTransparent(!visible || !enabled);
+        imageView.setOpacity(!visible ? 0.0 : (enabled ? activeOpacity : 0.45));
+    }
+
+    private String formatPending(int points) {
+        return points <= 0 ? "" : "(+" + points + ")";
+    }
+
+    private <T> T controllerField(String name, Class<T> type) {
+        Field field = findControllerField(name);
+        if (field == null) return null;
+        try {
+            field.setAccessible(true);
+            Object value = field.get(this);
+            return type.isInstance(value) ? type.cast(value) : null;
+        } catch (IllegalAccessException ignored) {
+            return null;
+        }
+    }
+
+    private Field findControllerField(String name) {
+        Class<?> current = getClass();
+        while (current != null) {
+            try {
+                return current.getDeclaredField(name);
+            } catch (NoSuchFieldException ignored) {
+                current = current.getSuperclass();
+            }
+        }
+        return null;
+    }
+
+    private <T> List<T> controllerFieldList(Class<T> type, String... names) {
+        List<T> values = new ArrayList<>();
+        if (names == null) return values;
+        for (String name : names) {
+            T value = controllerField(name, type);
+            if (value != null) {
+                values.add(value);
+            }
+        }
+        return values;
+    }
+
+    private <T> List<T> controllerIndexedFieldList(Class<T> type, String baseName, int count) {
+        List<T> values = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            String name = i == 0 ? baseName : baseName + i;
+            T value = controllerField(name, type);
+            if (value != null) {
+                values.add(value);
+            }
+        }
+        return values;
+    }
+
+    private <T extends javafx.scene.Node> void bindMouse(String fieldName, Class<T> type, javafx.event.EventHandler<? super MouseEvent> handler) {
+        T node = controllerField(fieldName, type);
+        if (node != null) {
+            node.setOnMouseClicked(handler);
+        }
+    }
+
+    private <T extends ButtonBase> void bindAction(String fieldName, Class<T> type, javafx.event.EventHandler<ActionEvent> handler) {
+        T node = controllerField(fieldName, type);
+        if (node != null) {
+            node.setOnAction(handler);
+        }
     }
 
     protected void refreshEquippedItemVisual() {

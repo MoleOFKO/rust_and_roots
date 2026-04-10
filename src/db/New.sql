@@ -62,7 +62,7 @@ CREATE TABLE `accounts` (
   KEY `fk_accounts_status` (`status_id`),
   CONSTRAINT `fk_accounts_role` FOREIGN KEY (`role_id`) REFERENCES `user_roles` (`role_id`),
   CONSTRAINT `fk_accounts_status` FOREIGN KEY (`status_id`) REFERENCES `account_statuses` (`status_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -71,7 +71,7 @@ CREATE TABLE `accounts` (
 
 LOCK TABLES `accounts` WRITE;
 /*!40000 ALTER TABLE `accounts` DISABLE KEYS */;
-INSERT INTO `accounts` VALUES (1,'koko',1,'hhhhh','123123',1,'2026-02-12 19:47:07','2026-02-27 22:26:31'),(2,'eiei',2,'aaaa','123456',1,'2026-02-13 15:01:57','2026-02-27 22:26:31'),(3,'koo',3,'hhhh','123123',1,'2026-02-11 14:45:22','2026-02-27 22:26:31'),(4,'kk',3,'hhh','123123',1,'2026-02-11 15:04:31','2026-02-27 22:26:31'),(5,'qqq',3,'qqq','123',1,'2026-02-13 16:02:00','2026-02-27 22:26:31'),(6,'yyyyy',3,'yyyyy','123',2,'2026-02-11 19:24:47','2026-02-27 22:26:31'),(7,'',3,'qqq@gmail.com','',2,'2026-02-12 18:40:54','2026-02-27 22:26:31'),(8,'asdf',3,'asd@gmail.com','',1,'2026-02-11 15:30:15','2026-02-27 22:26:31'),(9,'asdfg',3,'asdf@gmail.com','1234',1,'2026-02-11 15:32:01','2026-02-27 22:26:31'),(10,'qwerty',3,'asdfg@gmail.com','',1,'2026-02-11 15:46:51','2026-02-27 22:26:31'),(11,'qwertyu',3,'qwerty@gmail.com','',1,'2026-02-11 15:56:43','2026-02-27 22:26:31'),(12,'qwertyuiop',3,'qwertyuiop@gmail.com','',1,'2026-02-11 15:58:57','2026-02-27 22:26:31'),(13,'q123',3,'qQ123@gmail.com','',1,'2026-02-11 16:10:13','2026-02-27 22:26:31'),(14,'ER123',3,'lol123@gmail.com','Ahref123@',1,'2026-02-11 16:34:29','2026-02-27 22:26:31'),(15,'koshane',3,'asdfasdf@gmail.com','Shirt12!',1,'2026-03-19 01:58:01','2026-03-19 01:58:01'),(16,'HHHHHH',3,'larry@gmail.com','Koshane@11',1,'2026-04-02 07:09:15','2026-04-02 07:09:15'),(17,'Larry',3,'larry562005@gmail.com','Ko123123@',1,'2026-04-02 09:03:02','2026-04-02 09:03:02'),(18,'Yann',3,'yanaungbala5678@gmail.com','Koo123@@',1,'2026-04-07 09:24:04','2026-04-07 09:24:04');
+INSERT INTO `accounts` VALUES (1,'koko',1,'hhhhh','123123',1,'2026-02-12 19:47:07','2026-02-27 22:26:31'),(2,'eiei',2,'aaaa','123456',1,'2026-02-13 15:01:57','2026-02-27 22:26:31'),(3,'koo',3,'hhhh','123123',1,'2026-02-11 14:45:22','2026-02-27 22:26:31'),(4,'kk',3,'hhh','123123',1,'2026-02-11 15:04:31','2026-02-27 22:26:31'),(5,'qqq',3,'qqq','123',1,'2026-02-13 16:02:00','2026-02-27 22:26:31'),(6,'yyyyy',3,'yyyyy','123',2,'2026-02-11 19:24:47','2026-02-27 22:26:31'),(7,'',3,'qqq@gmail.com','',2,'2026-02-12 18:40:54','2026-02-27 22:26:31'),(8,'asdf',3,'asd@gmail.com','',1,'2026-02-11 15:30:15','2026-02-27 22:26:31'),(9,'asdfg',3,'asdf@gmail.com','1234',1,'2026-02-11 15:32:01','2026-02-27 22:26:31'),(10,'qwerty',3,'asdfg@gmail.com','',1,'2026-02-11 15:46:51','2026-02-27 22:26:31'),(11,'qwertyu',3,'qwerty@gmail.com','',1,'2026-02-11 15:56:43','2026-02-27 22:26:31'),(12,'qwertyuiop',3,'qwertyuiop@gmail.com','',1,'2026-02-11 15:58:57','2026-02-27 22:26:31'),(13,'q123',3,'qQ123@gmail.com','',1,'2026-02-11 16:10:13','2026-02-27 22:26:31'),(14,'ER123',3,'lol123@gmail.com','Ahref123@',1,'2026-02-11 16:34:29','2026-02-27 22:26:31'),(15,'koshane',3,'asdfasdf@gmail.com','Shirt12!',1,'2026-03-19 01:58:01','2026-03-19 01:58:01'),(16,'HHHHHH',3,'larry@gmail.com','Koshane@11',1,'2026-04-02 07:09:15','2026-04-02 07:09:15'),(17,'Larry',3,'larry562005@gmail.com','Ko123123@',1,'2026-04-02 09:03:02','2026-04-02 09:03:02'),(18,'Yann',3,'yanaungbala5678@gmail.com','Koo123@@',1,'2026-04-07 09:24:04','2026-04-07 09:24:04'),(20,'KoShane!',3,'shanekhant23@gmail.com','Ko123123',1,'2026-04-08 15:51:12','2026-04-08 15:51:12');
 /*!40000 ALTER TABLE `accounts` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -385,9 +385,9 @@ CREATE TABLE `saved_farm_plot` (
   `planted_at` double NOT NULL DEFAULT '-1',
   `last_watered_at` double NOT NULL DEFAULT '-1',
   `accumulated_water_reduction` double NOT NULL DEFAULT '0',
-  `total_growth_seconds` double NOT NULL DEFAULT '3600',
-  `water_cooldown_seconds` double NOT NULL DEFAULT '900',
-  `water_reduction_seconds` double NOT NULL DEFAULT '300',
+  `total_growth_seconds` double NOT NULL DEFAULT '900',
+  `water_cooldown_seconds` double NOT NULL DEFAULT '300',
+  `water_reduction_seconds` double NOT NULL DEFAULT '60',
   PRIMARY KEY (`saved_id`,`map_key`,`plot_id`),
   KEY `idx_saved_farm_plot_seed_item_id` (`seed_item_id`),
   CONSTRAINT `fk_saved_farm_plot_save` FOREIGN KEY (`saved_id`) REFERENCES `save_game` (`saved_id`) ON DELETE CASCADE,
@@ -401,7 +401,7 @@ CREATE TABLE `saved_farm_plot` (
 
 LOCK TABLES `saved_farm_plot` WRITE;
 /*!40000 ALTER TABLE `saved_farm_plot` DISABLE KEYS */;
-INSERT INTO `saved_farm_plot` VALUES (3,'Home_interior','__farm_slot_sickle__',NULL,-1,-1,0,0,0,0),(3,'Home_interior','__farm_slot_watering_can__',NULL,-1,-1,0,0,0,0),(3,'home_map','__farm_slot_sickle__',NULL,-1,-1,0,0,0,0),(3,'home_map','__farm_slot_watering_can__',NULL,-1,-1,0,0,0,0),(3,'home_map','Plot 1',NULL,-1,-1,0,3600,900,300),(3,'home_map','Plot 10',NULL,-1,-1,0,3600,900,300),(3,'home_map','Plot 11',NULL,-1,-1,0,3600,900,300),(3,'home_map','Plot 12',NULL,-1,-1,0,3600,900,300),(3,'home_map','Plot 13',NULL,-1,-1,0,3600,900,300),(3,'home_map','Plot 14',NULL,-1,-1,0,3600,900,300),(3,'home_map','Plot 15',NULL,-1,-1,0,3600,900,300),(3,'home_map','Plot 16',NULL,-1,-1,0,3600,900,300),(3,'home_map','Plot 17',NULL,-1,-1,0,3600,900,300),(3,'home_map','Plot 18',NULL,-1,-1,0,3600,900,300),(3,'home_map','Plot 19',NULL,-1,-1,0,3600,900,300),(3,'home_map','Plot 2',NULL,-1,-1,0,3600,900,300),(3,'home_map','Plot 20',NULL,-1,-1,0,3600,900,300),(3,'home_map','Plot 21',NULL,-1,-1,0,3600,900,300),(3,'home_map','Plot 22',NULL,-1,-1,0,3600,900,300),(3,'home_map','Plot 23',NULL,-1,-1,0,3600,900,300),(3,'home_map','Plot 24',NULL,-1,-1,0,3600,900,300),(3,'home_map','Plot 25',NULL,-1,-1,0,3600,900,300),(3,'home_map','Plot 26',NULL,-1,-1,0,3600,900,300),(3,'home_map','Plot 27',NULL,-1,-1,0,3600,900,300),(3,'home_map','Plot 28',NULL,-1,-1,0,3600,900,300),(3,'home_map','Plot 29',NULL,-1,-1,0,3600,900,300),(3,'home_map','Plot 3',NULL,-1,-1,0,3600,900,300),(3,'home_map','Plot 30',NULL,-1,-1,0,3600,900,300),(3,'home_map','Plot 31',NULL,-1,-1,0,3600,900,300),(3,'home_map','Plot 32',NULL,-1,-1,0,3600,900,300),(3,'home_map','Plot 33',NULL,-1,-1,0,3600,900,300),(3,'home_map','Plot 34',NULL,-1,-1,0,3600,900,300),(3,'home_map','Plot 35',NULL,-1,-1,0,3600,900,300),(3,'home_map','Plot 36',NULL,-1,-1,0,3600,900,300),(3,'home_map','Plot 37',NULL,-1,-1,0,3600,900,300),(3,'home_map','Plot 38',NULL,-1,-1,0,3600,900,300),(3,'home_map','Plot 39',NULL,-1,-1,0,3600,900,300),(3,'home_map','Plot 4',NULL,-1,-1,0,3600,900,300),(3,'home_map','Plot 40',NULL,-1,-1,0,3600,900,300),(3,'home_map','Plot 41',NULL,-1,-1,0,3600,900,300),(3,'home_map','Plot 42',NULL,-1,-1,0,3600,900,300),(3,'home_map','Plot 43',NULL,-1,-1,0,3600,900,300),(3,'home_map','Plot 44',NULL,-1,-1,0,3600,900,300),(3,'home_map','Plot 45',NULL,-1,-1,0,3600,900,300),(3,'home_map','Plot 5',NULL,-1,-1,0,3600,900,300),(3,'home_map','Plot 6',NULL,-1,-1,0,3600,900,300),(3,'home_map','Plot 7',NULL,-1,-1,0,3600,900,300),(3,'home_map','Plot 8',NULL,-1,-1,0,3600,900,300),(3,'home_map','Plot 9',NULL,-1,-1,0,3600,900,300),(12,'home_map','Plot 1',NULL,-1,-1,0,3600,900,300),(12,'home_map','Plot 10',NULL,-1,-1,0,3600,900,300),(12,'home_map','Plot 11',NULL,-1,-1,0,3600,900,300),(12,'home_map','Plot 12',NULL,-1,-1,0,3600,900,300),(12,'home_map','Plot 13',NULL,-1,-1,0,3600,900,300),(12,'home_map','Plot 14',NULL,-1,-1,0,3600,900,300),(12,'home_map','Plot 15',NULL,-1,-1,0,3600,900,300),(12,'home_map','Plot 16',NULL,-1,-1,0,3600,900,300),(12,'home_map','Plot 17',NULL,-1,-1,0,3600,900,300),(12,'home_map','Plot 18',NULL,-1,-1,0,3600,900,300),(12,'home_map','Plot 19',NULL,-1,-1,0,3600,900,300),(12,'home_map','Plot 2',NULL,-1,-1,0,3600,900,300),(12,'home_map','Plot 20',NULL,-1,-1,0,3600,900,300),(12,'home_map','Plot 21',NULL,-1,-1,0,3600,900,300),(12,'home_map','Plot 22',NULL,-1,-1,0,3600,900,300),(12,'home_map','Plot 23',NULL,-1,-1,0,3600,900,300),(12,'home_map','Plot 24',NULL,-1,-1,0,3600,900,300),(12,'home_map','Plot 25',NULL,-1,-1,0,3600,900,300),(12,'home_map','Plot 26',NULL,-1,-1,0,3600,900,300),(12,'home_map','Plot 27',NULL,-1,-1,0,3600,900,300),(12,'home_map','Plot 28',NULL,-1,-1,0,3600,900,300),(12,'home_map','Plot 29',NULL,-1,-1,0,3600,900,300),(12,'home_map','Plot 3',NULL,-1,-1,0,3600,900,300),(12,'home_map','Plot 30',NULL,-1,-1,0,3600,900,300),(12,'home_map','Plot 31',NULL,-1,-1,0,3600,900,300),(12,'home_map','Plot 32',NULL,-1,-1,0,3600,900,300),(12,'home_map','Plot 33',NULL,-1,-1,0,3600,900,300),(12,'home_map','Plot 34',NULL,-1,-1,0,3600,900,300),(12,'home_map','Plot 35',NULL,-1,-1,0,3600,900,300),(12,'home_map','Plot 36',NULL,-1,-1,0,3600,900,300),(12,'home_map','Plot 37',NULL,-1,-1,0,3600,900,300),(12,'home_map','Plot 38',NULL,-1,-1,0,3600,900,300),(12,'home_map','Plot 39',NULL,-1,-1,0,3600,900,300),(12,'home_map','Plot 4',NULL,-1,-1,0,3600,900,300),(12,'home_map','Plot 40',NULL,-1,-1,0,3600,900,300),(12,'home_map','Plot 41',NULL,-1,-1,0,3600,900,300),(12,'home_map','Plot 42',NULL,-1,-1,0,3600,900,300),(12,'home_map','Plot 43',NULL,-1,-1,0,3600,900,300),(12,'home_map','Plot 44',NULL,-1,-1,0,3600,900,300),(12,'home_map','Plot 45',NULL,-1,-1,0,3600,900,300),(12,'home_map','Plot 5',NULL,-1,-1,0,3600,900,300),(12,'home_map','Plot 6',NULL,-1,-1,0,3600,900,300),(12,'home_map','Plot 7',NULL,-1,-1,0,3600,900,300),(12,'home_map','Plot 8',NULL,-1,-1,0,3600,900,300),(12,'home_map','Plot 9',NULL,-1,-1,0,3600,900,300),(13,'home_map','Plot 1',NULL,-1,-1,0,3600,900,300),(13,'home_map','Plot 10',NULL,-1,-1,0,3600,900,300),(13,'home_map','Plot 11',NULL,-1,-1,0,3600,900,300),(13,'home_map','Plot 12',NULL,-1,-1,0,3600,900,300),(13,'home_map','Plot 13',NULL,-1,-1,0,3600,900,300),(13,'home_map','Plot 14',NULL,-1,-1,0,3600,900,300),(13,'home_map','Plot 15',NULL,-1,-1,0,3600,900,300),(13,'home_map','Plot 16',NULL,-1,-1,0,3600,900,300),(13,'home_map','Plot 17',NULL,-1,-1,0,3600,900,300),(13,'home_map','Plot 18',NULL,-1,-1,0,3600,900,300),(13,'home_map','Plot 19',NULL,-1,-1,0,3600,900,300),(13,'home_map','Plot 2',NULL,-1,-1,0,3600,900,300),(13,'home_map','Plot 20',NULL,-1,-1,0,3600,900,300),(13,'home_map','Plot 21',NULL,-1,-1,0,3600,900,300),(13,'home_map','Plot 22',NULL,-1,-1,0,3600,900,300),(13,'home_map','Plot 23',NULL,-1,-1,0,3600,900,300),(13,'home_map','Plot 24',NULL,-1,-1,0,3600,900,300),(13,'home_map','Plot 25',NULL,-1,-1,0,3600,900,300),(13,'home_map','Plot 26',NULL,-1,-1,0,3600,900,300),(13,'home_map','Plot 27',NULL,-1,-1,0,3600,900,300),(13,'home_map','Plot 28',NULL,-1,-1,0,3600,900,300),(13,'home_map','Plot 29',NULL,-1,-1,0,3600,900,300),(13,'home_map','Plot 3',NULL,-1,-1,0,3600,900,300),(13,'home_map','Plot 30',NULL,-1,-1,0,3600,900,300),(13,'home_map','Plot 31',NULL,-1,-1,0,3600,900,300),(13,'home_map','Plot 32',NULL,-1,-1,0,3600,900,300),(13,'home_map','Plot 33',NULL,-1,-1,0,3600,900,300),(13,'home_map','Plot 34',NULL,-1,-1,0,3600,900,300),(13,'home_map','Plot 35',NULL,-1,-1,0,3600,900,300),(13,'home_map','Plot 36',NULL,-1,-1,0,3600,900,300),(13,'home_map','Plot 37',NULL,-1,-1,0,3600,900,300),(13,'home_map','Plot 38',NULL,-1,-1,0,3600,900,300),(13,'home_map','Plot 39',NULL,-1,-1,0,3600,900,300),(13,'home_map','Plot 4',NULL,-1,-1,0,3600,900,300),(13,'home_map','Plot 40',NULL,-1,-1,0,3600,900,300),(13,'home_map','Plot 41',NULL,-1,-1,0,3600,900,300),(13,'home_map','Plot 42',NULL,-1,-1,0,3600,900,300),(13,'home_map','Plot 43',NULL,-1,-1,0,3600,900,300),(13,'home_map','Plot 44',NULL,-1,-1,0,3600,900,300),(13,'home_map','Plot 45',NULL,-1,-1,0,3600,900,300),(13,'home_map','Plot 5',NULL,-1,-1,0,3600,900,300),(13,'home_map','Plot 6',NULL,-1,-1,0,3600,900,300),(13,'home_map','Plot 7',NULL,-1,-1,0,3600,900,300),(13,'home_map','Plot 8',NULL,-1,-1,0,3600,900,300),(13,'home_map','Plot 9',NULL,-1,-1,0,3600,900,300),(14,'Home_interior','__farm_slot_sickle__',NULL,-1,-1,0,0,0,0),(14,'Home_interior','__farm_slot_watering_can__',NULL,-1,-1,0,0,0,0),(14,'home_map','__farm_slot_sickle__',NULL,-1,-1,0,0,0,0),(14,'home_map','__farm_slot_watering_can__',NULL,-1,-1,0,0,0,0),(14,'home_map','Plot 1',NULL,-1,-1,0,3600,900,300),(14,'home_map','Plot 10',NULL,-1,-1,0,3600,900,300),(14,'home_map','Plot 11',NULL,-1,-1,0,3600,900,300),(14,'home_map','Plot 12',NULL,-1,-1,0,3600,900,300),(14,'home_map','Plot 13',NULL,-1,-1,0,3600,900,300),(14,'home_map','Plot 14',NULL,-1,-1,0,3600,900,300),(14,'home_map','Plot 15',NULL,-1,-1,0,3600,900,300),(14,'home_map','Plot 16',NULL,-1,-1,0,3600,900,300),(14,'home_map','Plot 17',NULL,-1,-1,0,3600,900,300),(14,'home_map','Plot 18',NULL,-1,-1,0,3600,900,300),(14,'home_map','Plot 19',NULL,-1,-1,0,3600,900,300),(14,'home_map','Plot 2',NULL,-1,-1,0,3600,900,300),(14,'home_map','Plot 20',NULL,-1,-1,0,3600,900,300),(14,'home_map','Plot 21',NULL,-1,-1,0,3600,900,300),(14,'home_map','Plot 22',NULL,-1,-1,0,3600,900,300),(14,'home_map','Plot 23',NULL,-1,-1,0,3600,900,300),(14,'home_map','Plot 24',NULL,-1,-1,0,3600,900,300),(14,'home_map','Plot 25',NULL,-1,-1,0,3600,900,300),(14,'home_map','Plot 26',NULL,-1,-1,0,3600,900,300),(14,'home_map','Plot 27',NULL,-1,-1,0,3600,900,300),(14,'home_map','Plot 28',NULL,-1,-1,0,3600,900,300),(14,'home_map','Plot 29',NULL,-1,-1,0,3600,900,300),(14,'home_map','Plot 3',NULL,-1,-1,0,3600,900,300),(14,'home_map','Plot 30',NULL,-1,-1,0,3600,900,300),(14,'home_map','Plot 31',NULL,-1,-1,0,3600,900,300),(14,'home_map','Plot 32',NULL,-1,-1,0,3600,900,300),(14,'home_map','Plot 33',NULL,-1,-1,0,3600,900,300),(14,'home_map','Plot 34',NULL,-1,-1,0,3600,900,300),(14,'home_map','Plot 35',NULL,-1,-1,0,3600,900,300),(14,'home_map','Plot 36',NULL,-1,-1,0,3600,900,300),(14,'home_map','Plot 37',NULL,-1,-1,0,3600,900,300),(14,'home_map','Plot 38',NULL,-1,-1,0,3600,900,300),(14,'home_map','Plot 39',NULL,-1,-1,0,3600,900,300),(14,'home_map','Plot 4',NULL,-1,-1,0,3600,900,300),(14,'home_map','Plot 40',NULL,-1,-1,0,3600,900,300),(14,'home_map','Plot 41',NULL,-1,-1,0,3600,900,300),(14,'home_map','Plot 42',NULL,-1,-1,0,3600,900,300),(14,'home_map','Plot 43',NULL,-1,-1,0,3600,900,300),(14,'home_map','Plot 44',NULL,-1,-1,0,3600,900,300),(14,'home_map','Plot 45',NULL,-1,-1,0,3600,900,300),(14,'home_map','Plot 5',NULL,-1,-1,0,3600,900,300),(14,'home_map','Plot 6',NULL,-1,-1,0,3600,900,300),(14,'home_map','Plot 7',NULL,-1,-1,0,3600,900,300),(14,'home_map','Plot 8',NULL,-1,-1,0,3600,900,300),(14,'home_map','Plot 9',NULL,-1,-1,0,3600,900,300);
+INSERT INTO `saved_farm_plot` VALUES (3,'Home_interior','__farm_slot_sickle__',NULL,-1,-1,0,0,0,0),(3,'Home_interior','__farm_slot_watering_can__',NULL,-1,-1,0,0,0,0),(3,'home_map','__farm_slot_sickle__',NULL,-1,-1,0,0,0,0),(3,'home_map','__farm_slot_watering_can__',NULL,-1,-1,0,0,0,0),(3,'home_map','Plot 1',NULL,-1,-1,0,900,300,60),(3,'home_map','Plot 10',NULL,-1,-1,0,900,300,60),(3,'home_map','Plot 11',NULL,-1,-1,0,900,300,60),(3,'home_map','Plot 12',NULL,-1,-1,0,900,300,60),(3,'home_map','Plot 13',NULL,-1,-1,0,900,300,60),(3,'home_map','Plot 14',NULL,-1,-1,0,900,300,60),(3,'home_map','Plot 15',NULL,-1,-1,0,900,300,60),(3,'home_map','Plot 16',NULL,-1,-1,0,900,300,60),(3,'home_map','Plot 17',NULL,-1,-1,0,900,300,60),(3,'home_map','Plot 18',NULL,-1,-1,0,900,300,60),(3,'home_map','Plot 19',NULL,-1,-1,0,900,300,60),(3,'home_map','Plot 2',NULL,-1,-1,0,900,300,60),(3,'home_map','Plot 20',NULL,-1,-1,0,900,300,60),(3,'home_map','Plot 21',NULL,-1,-1,0,900,300,60),(3,'home_map','Plot 22',NULL,-1,-1,0,900,300,60),(3,'home_map','Plot 23',NULL,-1,-1,0,900,300,60),(3,'home_map','Plot 24',NULL,-1,-1,0,900,300,60),(3,'home_map','Plot 25',NULL,-1,-1,0,900,300,60),(3,'home_map','Plot 26',NULL,-1,-1,0,900,300,60),(3,'home_map','Plot 27',NULL,-1,-1,0,900,300,60),(3,'home_map','Plot 28',NULL,-1,-1,0,900,300,60),(3,'home_map','Plot 29',NULL,-1,-1,0,900,300,60),(3,'home_map','Plot 3',NULL,-1,-1,0,900,300,60),(3,'home_map','Plot 30',NULL,-1,-1,0,900,300,60),(3,'home_map','Plot 31',NULL,-1,-1,0,900,300,60),(3,'home_map','Plot 32',NULL,-1,-1,0,900,300,60),(3,'home_map','Plot 33',NULL,-1,-1,0,900,300,60),(3,'home_map','Plot 34',NULL,-1,-1,0,900,300,60),(3,'home_map','Plot 35',NULL,-1,-1,0,900,300,60),(3,'home_map','Plot 36',NULL,-1,-1,0,900,300,60),(3,'home_map','Plot 37',NULL,-1,-1,0,900,300,60),(3,'home_map','Plot 38',NULL,-1,-1,0,900,300,60),(3,'home_map','Plot 39',NULL,-1,-1,0,900,300,60),(3,'home_map','Plot 4',NULL,-1,-1,0,900,300,60),(3,'home_map','Plot 40',NULL,-1,-1,0,900,300,60),(3,'home_map','Plot 41',NULL,-1,-1,0,900,300,60),(3,'home_map','Plot 42',NULL,-1,-1,0,900,300,60),(3,'home_map','Plot 43',NULL,-1,-1,0,900,300,60),(3,'home_map','Plot 44',NULL,-1,-1,0,900,300,60),(3,'home_map','Plot 45',NULL,-1,-1,0,900,300,60),(3,'home_map','Plot 5',NULL,-1,-1,0,900,300,60),(3,'home_map','Plot 6',NULL,-1,-1,0,900,300,60),(3,'home_map','Plot 7',NULL,-1,-1,0,900,300,60),(3,'home_map','Plot 8',NULL,-1,-1,0,900,300,60),(3,'home_map','Plot 9',NULL,-1,-1,0,900,300,60),(12,'home_map','Plot 1',NULL,-1,-1,0,900,300,60),(12,'home_map','Plot 10',NULL,-1,-1,0,900,300,60),(12,'home_map','Plot 11',NULL,-1,-1,0,900,300,60),(12,'home_map','Plot 12',NULL,-1,-1,0,900,300,60),(12,'home_map','Plot 13',NULL,-1,-1,0,900,300,60),(12,'home_map','Plot 14',NULL,-1,-1,0,900,300,60),(12,'home_map','Plot 15',NULL,-1,-1,0,900,300,60),(12,'home_map','Plot 16',NULL,-1,-1,0,900,300,60),(12,'home_map','Plot 17',NULL,-1,-1,0,900,300,60),(12,'home_map','Plot 18',NULL,-1,-1,0,900,300,60),(12,'home_map','Plot 19',NULL,-1,-1,0,900,300,60),(12,'home_map','Plot 2',NULL,-1,-1,0,900,300,60),(12,'home_map','Plot 20',NULL,-1,-1,0,900,300,60),(12,'home_map','Plot 21',NULL,-1,-1,0,900,300,60),(12,'home_map','Plot 22',NULL,-1,-1,0,900,300,60),(12,'home_map','Plot 23',NULL,-1,-1,0,900,300,60),(12,'home_map','Plot 24',NULL,-1,-1,0,900,300,60),(12,'home_map','Plot 25',NULL,-1,-1,0,900,300,60),(12,'home_map','Plot 26',NULL,-1,-1,0,900,300,60),(12,'home_map','Plot 27',NULL,-1,-1,0,900,300,60),(12,'home_map','Plot 28',NULL,-1,-1,0,900,300,60),(12,'home_map','Plot 29',NULL,-1,-1,0,900,300,60),(12,'home_map','Plot 3',NULL,-1,-1,0,900,300,60),(12,'home_map','Plot 30',NULL,-1,-1,0,900,300,60),(12,'home_map','Plot 31',NULL,-1,-1,0,900,300,60),(12,'home_map','Plot 32',NULL,-1,-1,0,900,300,60),(12,'home_map','Plot 33',NULL,-1,-1,0,900,300,60),(12,'home_map','Plot 34',NULL,-1,-1,0,900,300,60),(12,'home_map','Plot 35',NULL,-1,-1,0,900,300,60),(12,'home_map','Plot 36',NULL,-1,-1,0,900,300,60),(12,'home_map','Plot 37',NULL,-1,-1,0,900,300,60),(12,'home_map','Plot 38',NULL,-1,-1,0,900,300,60),(12,'home_map','Plot 39',NULL,-1,-1,0,900,300,60),(12,'home_map','Plot 4',NULL,-1,-1,0,900,300,60),(12,'home_map','Plot 40',NULL,-1,-1,0,900,300,60),(12,'home_map','Plot 41',NULL,-1,-1,0,900,300,60),(12,'home_map','Plot 42',NULL,-1,-1,0,900,300,60),(12,'home_map','Plot 43',NULL,-1,-1,0,900,300,60),(12,'home_map','Plot 44',NULL,-1,-1,0,900,300,60),(12,'home_map','Plot 45',NULL,-1,-1,0,900,300,60),(12,'home_map','Plot 5',NULL,-1,-1,0,900,300,60),(12,'home_map','Plot 6',NULL,-1,-1,0,900,300,60),(12,'home_map','Plot 7',NULL,-1,-1,0,900,300,60),(12,'home_map','Plot 8',NULL,-1,-1,0,900,300,60),(12,'home_map','Plot 9',NULL,-1,-1,0,900,300,60),(13,'home_map','Plot 1',NULL,-1,-1,0,900,300,60),(13,'home_map','Plot 10',NULL,-1,-1,0,900,300,60),(13,'home_map','Plot 11',NULL,-1,-1,0,900,300,60),(13,'home_map','Plot 12',NULL,-1,-1,0,900,300,60),(13,'home_map','Plot 13',NULL,-1,-1,0,900,300,60),(13,'home_map','Plot 14',NULL,-1,-1,0,900,300,60),(13,'home_map','Plot 15',NULL,-1,-1,0,900,300,60),(13,'home_map','Plot 16',NULL,-1,-1,0,900,300,60),(13,'home_map','Plot 17',NULL,-1,-1,0,900,300,60),(13,'home_map','Plot 18',NULL,-1,-1,0,900,300,60),(13,'home_map','Plot 19',NULL,-1,-1,0,900,300,60),(13,'home_map','Plot 2',NULL,-1,-1,0,900,300,60),(13,'home_map','Plot 20',NULL,-1,-1,0,900,300,60),(13,'home_map','Plot 21',NULL,-1,-1,0,900,300,60),(13,'home_map','Plot 22',NULL,-1,-1,0,900,300,60),(13,'home_map','Plot 23',NULL,-1,-1,0,900,300,60),(13,'home_map','Plot 24',NULL,-1,-1,0,900,300,60),(13,'home_map','Plot 25',NULL,-1,-1,0,900,300,60),(13,'home_map','Plot 26',NULL,-1,-1,0,900,300,60),(13,'home_map','Plot 27',NULL,-1,-1,0,900,300,60),(13,'home_map','Plot 28',NULL,-1,-1,0,900,300,60),(13,'home_map','Plot 29',NULL,-1,-1,0,900,300,60),(13,'home_map','Plot 3',NULL,-1,-1,0,900,300,60),(13,'home_map','Plot 30',NULL,-1,-1,0,900,300,60),(13,'home_map','Plot 31',NULL,-1,-1,0,900,300,60),(13,'home_map','Plot 32',NULL,-1,-1,0,900,300,60),(13,'home_map','Plot 33',NULL,-1,-1,0,900,300,60),(13,'home_map','Plot 34',NULL,-1,-1,0,900,300,60),(13,'home_map','Plot 35',NULL,-1,-1,0,900,300,60),(13,'home_map','Plot 36',NULL,-1,-1,0,900,300,60),(13,'home_map','Plot 37',NULL,-1,-1,0,900,300,60),(13,'home_map','Plot 38',NULL,-1,-1,0,900,300,60),(13,'home_map','Plot 39',NULL,-1,-1,0,900,300,60),(13,'home_map','Plot 4',NULL,-1,-1,0,900,300,60),(13,'home_map','Plot 40',NULL,-1,-1,0,900,300,60),(13,'home_map','Plot 41',NULL,-1,-1,0,900,300,60),(13,'home_map','Plot 42',NULL,-1,-1,0,900,300,60),(13,'home_map','Plot 43',NULL,-1,-1,0,900,300,60),(13,'home_map','Plot 44',NULL,-1,-1,0,900,300,60),(13,'home_map','Plot 45',NULL,-1,-1,0,900,300,60),(13,'home_map','Plot 5',NULL,-1,-1,0,900,300,60),(13,'home_map','Plot 6',NULL,-1,-1,0,900,300,60),(13,'home_map','Plot 7',NULL,-1,-1,0,900,300,60),(13,'home_map','Plot 8',NULL,-1,-1,0,900,300,60),(13,'home_map','Plot 9',NULL,-1,-1,0,900,300,60),(14,'Home_interior','__farm_slot_sickle__',NULL,-1,-1,0,0,0,0),(14,'Home_interior','__farm_slot_watering_can__',NULL,-1,-1,0,0,0,0),(14,'home_map','__farm_slot_sickle__',NULL,-1,-1,0,0,0,0),(14,'home_map','__farm_slot_watering_can__',NULL,-1,-1,0,0,0,0),(14,'home_map','Plot 1',NULL,-1,-1,0,900,300,60),(14,'home_map','Plot 10',NULL,-1,-1,0,900,300,60),(14,'home_map','Plot 11',NULL,-1,-1,0,900,300,60),(14,'home_map','Plot 12',NULL,-1,-1,0,900,300,60),(14,'home_map','Plot 13',NULL,-1,-1,0,900,300,60),(14,'home_map','Plot 14',NULL,-1,-1,0,900,300,60),(14,'home_map','Plot 15',NULL,-1,-1,0,900,300,60),(14,'home_map','Plot 16',NULL,-1,-1,0,900,300,60),(14,'home_map','Plot 17',NULL,-1,-1,0,900,300,60),(14,'home_map','Plot 18',NULL,-1,-1,0,900,300,60),(14,'home_map','Plot 19',NULL,-1,-1,0,900,300,60),(14,'home_map','Plot 2',NULL,-1,-1,0,900,300,60),(14,'home_map','Plot 20',NULL,-1,-1,0,900,300,60),(14,'home_map','Plot 21',NULL,-1,-1,0,900,300,60),(14,'home_map','Plot 22',NULL,-1,-1,0,900,300,60),(14,'home_map','Plot 23',NULL,-1,-1,0,900,300,60),(14,'home_map','Plot 24',NULL,-1,-1,0,900,300,60),(14,'home_map','Plot 25',NULL,-1,-1,0,900,300,60),(14,'home_map','Plot 26',NULL,-1,-1,0,900,300,60),(14,'home_map','Plot 27',NULL,-1,-1,0,900,300,60),(14,'home_map','Plot 28',NULL,-1,-1,0,900,300,60),(14,'home_map','Plot 29',NULL,-1,-1,0,900,300,60),(14,'home_map','Plot 3',NULL,-1,-1,0,900,300,60),(14,'home_map','Plot 30',NULL,-1,-1,0,900,300,60),(14,'home_map','Plot 31',NULL,-1,-1,0,900,300,60),(14,'home_map','Plot 32',NULL,-1,-1,0,900,300,60),(14,'home_map','Plot 33',NULL,-1,-1,0,900,300,60),(14,'home_map','Plot 34',NULL,-1,-1,0,900,300,60),(14,'home_map','Plot 35',NULL,-1,-1,0,900,300,60),(14,'home_map','Plot 36',NULL,-1,-1,0,900,300,60),(14,'home_map','Plot 37',NULL,-1,-1,0,900,300,60),(14,'home_map','Plot 38',NULL,-1,-1,0,900,300,60),(14,'home_map','Plot 39',NULL,-1,-1,0,900,300,60),(14,'home_map','Plot 4',NULL,-1,-1,0,900,300,60),(14,'home_map','Plot 40',NULL,-1,-1,0,900,300,60),(14,'home_map','Plot 41',NULL,-1,-1,0,900,300,60),(14,'home_map','Plot 42',NULL,-1,-1,0,900,300,60),(14,'home_map','Plot 43',NULL,-1,-1,0,900,300,60),(14,'home_map','Plot 44',NULL,-1,-1,0,900,300,60),(14,'home_map','Plot 45',NULL,-1,-1,0,900,300,60),(14,'home_map','Plot 5',NULL,-1,-1,0,900,300,60),(14,'home_map','Plot 6',NULL,-1,-1,0,900,300,60),(14,'home_map','Plot 7',NULL,-1,-1,0,900,300,60),(14,'home_map','Plot 8',NULL,-1,-1,0,900,300,60),(14,'home_map','Plot 9',NULL,-1,-1,0,900,300,60);
 /*!40000 ALTER TABLE `saved_farm_plot` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -460,30 +460,6 @@ LOCK TABLES `saved_item` WRITE;
 /*!40000 ALTER TABLE `saved_item` DISABLE KEYS */;
 INSERT INTO `saved_item` VALUES (2,4,1),(3,1,2),(3,6,1),(3,123,3),(5,54,1),(12,7,1),(12,8,1),(14,5,1);
 /*!40000 ALTER TABLE `saved_item` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `saved_unlocked_recipe`
---
-
-DROP TABLE IF EXISTS `saved_unlocked_recipe`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `saved_unlocked_recipe` (
-  `saved_id` int NOT NULL,
-  `recipe_key` varchar(100) NOT NULL,
-  PRIMARY KEY (`saved_id`,`recipe_key`),
-  CONSTRAINT `fk_saved_unlocked_recipe_save` FOREIGN KEY (`saved_id`) REFERENCES `save_game` (`saved_id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `saved_unlocked_recipe`
---
-
-LOCK TABLES `saved_unlocked_recipe` WRITE;
-/*!40000 ALTER TABLE `saved_unlocked_recipe` DISABLE KEYS */;
-/*!40000 ALTER TABLE `saved_unlocked_recipe` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -623,4 +599,97 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-04-08 15:12:09
+DROP PROCEDURE IF EXISTS ensure_application_schema;
+DROP PROCEDURE IF EXISTS ensure_chicken_corn_soup_deluxe;
+DROP PROCEDURE IF EXISTS ensure_saved_unlocked_recipe_table;
+DROP PROCEDURE IF EXISTS ensure_saved_farm_plot_defaults;
+
+DELIMITER $$
+
+CREATE PROCEDURE ensure_saved_unlocked_recipe_table()
+BEGIN
+  CREATE TABLE IF NOT EXISTS saved_unlocked_recipe (
+    saved_id INT NOT NULL,
+    recipe_key VARCHAR(100) NOT NULL,
+    PRIMARY KEY (saved_id, recipe_key),
+    CONSTRAINT fk_saved_unlocked_recipe_save
+      FOREIGN KEY (saved_id) REFERENCES save_game (saved_id) ON DELETE CASCADE
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+END $$
+
+CREATE PROCEDURE ensure_saved_farm_plot_defaults()
+BEGIN
+  DECLARE v_has_table INT DEFAULT 0;
+  DECLARE v_required_columns INT DEFAULT 0;
+
+  SELECT COUNT(*)
+    INTO v_has_table
+    FROM information_schema.tables
+   WHERE table_schema = DATABASE()
+     AND table_name = 'saved_farm_plot';
+
+  IF v_has_table > 0 THEN
+    SELECT COUNT(*)
+      INTO v_required_columns
+      FROM information_schema.columns
+     WHERE table_schema = DATABASE()
+       AND table_name = 'saved_farm_plot'
+       AND column_name IN (
+         'total_growth_seconds',
+         'water_cooldown_seconds',
+         'water_reduction_seconds'
+       );
+
+    IF v_required_columns = 3 THEN
+      ALTER TABLE saved_farm_plot
+        MODIFY COLUMN total_growth_seconds DOUBLE NOT NULL DEFAULT '3600',
+        MODIFY COLUMN water_cooldown_seconds DOUBLE NOT NULL DEFAULT '900',
+        MODIFY COLUMN water_reduction_seconds DOUBLE NOT NULL DEFAULT '300';
+    END IF;
+  END IF;
+END $$
+
+CREATE PROCEDURE ensure_chicken_corn_soup_deluxe()
+BEGIN
+  DECLARE v_target_name VARCHAR(100) DEFAULT 'chicken_corn_soup_deluxe';
+  DECLARE v_existing_item_id INT DEFAULT NULL;
+  DECLARE v_new_item_stats_id INT DEFAULT NULL;
+  DECLARE v_fallback_type_id INT DEFAULT 1;
+
+  START TRANSACTION;
+
+  SELECT item_id
+    INTO v_existing_item_id
+    FROM items
+   WHERE LOWER(REPLACE(item_name, '_', ' ')) = LOWER(REPLACE(v_target_name, '_', ' '))
+   LIMIT 1;
+
+  IF v_existing_item_id IS NULL THEN
+    INSERT INTO item_stats (str_stat, agi_stat, dex_stat, vit_stat, hp, stamina)
+    VALUES (0, 0, 0, 0, 0, 0);
+
+    SET v_new_item_stats_id = LAST_INSERT_ID();
+
+    SELECT COALESCE(MIN(item_type_id), 1)
+      INTO v_fallback_type_id
+      FROM item_types;
+
+    INSERT INTO items (item_name, price, item_stats_id, image, item_type_id)
+    VALUES (v_target_name, 120, v_new_item_stats_id, 'chicken_corn_soup.png', v_fallback_type_id);
+  END IF;
+
+  COMMIT;
+END $$
+
+CREATE PROCEDURE ensure_application_schema()
+BEGIN
+  CALL ensure_saved_unlocked_recipe_table();
+  CALL ensure_saved_farm_plot_defaults();
+  CALL ensure_chicken_corn_soup_deluxe();
+END $$
+
+DELIMITER ;
+
+CALL ensure_application_schema();
+
+-- Dump completed on 2026-04-09 13:04:52
