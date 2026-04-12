@@ -25,6 +25,7 @@ public final class ItemDatabase {
     private static final Map<Integer, ItemUseType> itemUseTypeById = new HashMap<>();
     private static final Map<Integer, String> unusableReasonById = new LinkedHashMap<>();
     private static final Map<Integer, Image> imageCache = new HashMap<>();
+    private static final Map<Integer, Integer> maxGrowthPhasesBySeedId = new HashMap<>();
 
     private static boolean loaded = false;
 
@@ -43,6 +44,7 @@ public final class ItemDatabase {
         itemUseTypeById.clear();
         unusableReasonById.clear();
         imageCache.clear();
+        maxGrowthPhasesBySeedId.clear();
 
         String sql = """
             SELECT i.item_id,
@@ -93,6 +95,7 @@ public final class ItemDatabase {
             rebuildValidationState();
             loaded = true;
             System.out.println("Loaded items: " + allItems.size());
+            logVerificationFindings();
         } catch (Exception e) {
             loaded = false;
             e.printStackTrace();
@@ -294,8 +297,41 @@ public final class ItemDatabase {
 
         return hasCropStageAsset(spriteKey, 1)
                 && hasCropStageAsset(spriteKey, 2)
-                && hasCropStageAsset(spriteKey, 3)
-                && hasCropStageAsset(spriteKey, 4);
+                && hasCropStageAsset(spriteKey, 3);
+    }
+
+    public static int resolveMaxGrowthPhasesForSeed(int seedItemId) {
+        loadItems();
+        if (seedItemId <= 0 || !isSeedItem(seedItemId)) {
+            return FarmGrowthRules.TOTAL_GROWTH_STAGES;
+        }
+
+        Integer cached = maxGrowthPhasesBySeedId.get(seedItemId);
+        if (cached != null && cached > 0) {
+            return cached;
+        }
+
+        String spriteKey = buildCropSpriteKeyForSeed(seedItemId);
+        int cropImageStages = countCropImageStages(spriteKey);
+
+        int maxGrowthPhases = cropImageStages > 0 ? cropImageStages : FarmGrowthRules.TOTAL_GROWTH_STAGES;
+        maxGrowthPhasesBySeedId.put(seedItemId, maxGrowthPhases);
+        return maxGrowthPhases;
+    }
+
+    private static int countCropImageStages(String spriteKey) {
+        if (spriteKey == null || spriteKey.isBlank()) {
+            return 0;
+        }
+
+        int count = 0;
+        for (int stage = 1; stage <= 32; stage++) {
+            if (!hasCropStageAsset(spriteKey, stage)) {
+                break;
+            }
+            count++;
+        }
+        return count;
     }
 
     public static String buildCropSpriteKeyForSeed(int seedItemId) {
@@ -378,6 +414,81 @@ public final class ItemDatabase {
         }
     }
 
+    private static void logVerificationFindings() {
+        try {
+            logUnusableItems();
+            logRecipeDefinitionIssues();
+        } catch (Exception e) {
+            System.out.println("Verification logging failed: " + e.getMessage());
+        }
+    }
+
+    private static void logUnusableItems() {
+        if (unusableReasonById.isEmpty()) {
+            System.out.println("Item verification: OK");
+            return;
+        }
+
+        System.out.println("Item verification: unusable items (" + unusableReasonById.size() + ")");
+        for (Map.Entry<Integer, String> entry : unusableReasonById.entrySet()) {
+            int itemId = entry.getKey() == null ? -1 : entry.getKey();
+            String name = itemId > 0 ? getItemName(itemId) : null;
+            String safeName = (name == null || name.isBlank()) ? "<unknown>" : name;
+            String reason = entry.getValue();
+            System.out.println(" - item_id=" + itemId + " name=\"" + safeName + "\": " + reason);
+        }
+    }
+
+    private static void logRecipeDefinitionIssues() {
+        List<String> issues = new ArrayList<>();
+
+        for (RecipeCatalog.RecipeDefinition definition : RecipeCatalog.getAllRecipes()) {
+            if (definition == null) {
+                continue;
+            }
+
+            item output = RecipeCatalog.resolveItemByAliases(definition.getOutputAliases());
+            if (output == null || !isDisplayableItem(output.getItem_id())) {
+                issues.add(formatRecipeIssue(definition, "Missing or invalid output item."));
+                continue;
+            }
+
+            for (RecipeCatalog.IngredientSpec spec : definition.getIngredients()) {
+                item ingredient = RecipeCatalog.resolveItemByAliases(spec.getItemAliases());
+                if (ingredient == null || !isDisplayableItem(ingredient.getItem_id())) {
+                    issues.add(formatRecipeIssue(definition, "Missing or invalid ingredient item."));
+                    break;
+                }
+            }
+        }
+
+        if (issues.isEmpty()) {
+            System.out.println("Recipe verification: OK");
+            return;
+        }
+
+        System.out.println("Recipe verification: issues (" + issues.size() + ")");
+        for (String issue : issues) {
+            System.out.println(" - " + issue);
+        }
+    }
+
+    private static String formatRecipeIssue(RecipeCatalog.RecipeDefinition definition, String message) {
+        if (definition == null) {
+            return message;
+        }
+
+        String domain = definition.getDomain() == null ? "unknown" : definition.getDomain().name().toLowerCase(Locale.ROOT);
+        String key = definition.getKey();
+        if (key == null || key.isBlank()) {
+            key = definition.getDisplayName();
+        }
+        if (key == null || key.isBlank()) {
+            key = "<unknown>";
+        }
+        return "[" + domain + "] " + key + ": " + message;
+    }
+
     private static ItemUseType determineItemUseType(item itm) {
         if (itm == null) return ItemUseType.UNKNOWN;
 
@@ -452,6 +563,11 @@ public final class ItemDatabase {
 
         for (RecipeCatalog.RecipeDefinition definition : definitions) {
             if (!RecipeCatalog.hasAllIngredientItems(definition)) {
+                return false;
+            }
+
+            item output = RecipeCatalog.resolveItemByAliases(definition.getOutputAliases());
+            if (output == null || !isDisplayableItem(output.getItem_id())) {
                 return false;
             }
         }

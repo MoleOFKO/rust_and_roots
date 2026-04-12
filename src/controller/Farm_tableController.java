@@ -37,7 +37,6 @@ public class Farm_tableController implements Initializable, SceneController {
     private static final String TOOL_SLOT_STYLE = "-fx-effect: dropshadow(gaussian, rgba(255,215,0,0.85), 14, 0.55, 0, 0);";
 
     private static final double FARM_TABLE_TIME_SCALE = 0.25;
-    private static final int TOTAL_GROWTH_STAGES = FarmGrowthRules.TOTAL_GROWTH_STAGES;
     private static final int DEFAULT_PLANT_STAMINA_COST = 2;
 
     private static final String PLOT_IDLE_STYLE = "-fx-background-color: transparent; -fx-background-radius: 6; -fx-border-color: transparent; -fx-border-radius: 6;";
@@ -372,11 +371,7 @@ public class Farm_tableController implements Initializable, SceneController {
                     plotViews.put(plotId, img);
                     Region target = (img.getParent() instanceof Region region) ? region : null;
                     if (target != null) {
-                        target.getProperties().put("plotId", plotId);
-                        target.setPickOnBounds(true);
-                        target.setMouseTransparent(false);
-                        target.setOnMouseClicked(this::handleFarmPlot);
-                        plotTargets.put(plotId, target);
+                        registerPlotTarget(plotId, target, img);
                     }
                 }
             }
@@ -391,6 +386,62 @@ public class Farm_tableController implements Initializable, SceneController {
                 collectPlotNodesRecursive(child);
             }
         }
+    }
+
+    private void registerPlotTarget(String plotId, Region target, ImageView plotImageView) {
+        if (plotId == null || plotId.isBlank() || target == null) {
+            return;
+        }
+
+        target.getProperties().put("plotId", plotId);
+        target.setPickOnBounds(true);
+        target.setMouseTransparent(false);
+        target.setOnMouseClicked(this::handleFarmPlot);
+        target.setStyle(PLOT_IDLE_STYLE);
+
+        ensurePlotTargetSized(target, plotImageView);
+
+        plotTargets.put(plotId, target);
+    }
+
+    private void ensurePlotTargetSized(Region target, ImageView plotImageView) {
+        if (target == null || plotImageView == null) {
+            return;
+        }
+
+        double width = Math.max(0.0, target.getPrefWidth());
+        double height = Math.max(0.0, target.getPrefHeight());
+
+        double fitWidth = Math.max(0.0, plotImageView.getFitWidth());
+        double fitHeight = Math.max(0.0, plotImageView.getFitHeight());
+
+        if (fitWidth <= 0.0 && plotImageView.getImage() != null) {
+            fitWidth = Math.max(0.0, plotImageView.getImage().getWidth());
+        }
+        if (fitHeight <= 0.0 && plotImageView.getImage() != null) {
+            fitHeight = Math.max(0.0, plotImageView.getImage().getHeight());
+        }
+
+        double layoutX = plotImageView.getLayoutX();
+        double layoutY = plotImageView.getLayoutY();
+        if (Double.isNaN(layoutX)) layoutX = 0.0;
+        if (Double.isNaN(layoutY)) layoutY = 0.0;
+
+        if (fitWidth > 0.0) {
+            width = Math.max(width, Math.max(fitWidth, layoutX + fitWidth));
+        }
+
+        if (fitHeight > 0.0) {
+            height = Math.max(height, Math.max(fitHeight, layoutY + fitHeight));
+        }
+
+        width = Math.max(1.0, width);
+        height = Math.max(1.0, height);
+
+        target.setMinSize(width, height);
+        target.setPrefSize(width, height);
+        target.setMaxSize(width, height);
+        target.resize(width, height);
     }
 
     private void collectSeedSlots() {
@@ -686,38 +737,59 @@ public class Farm_tableController implements Initializable, SceneController {
             Region target = plotTargets.get(plotId);
             if (view == null) continue;
 
+            boolean routeClicksToTarget = target != null;
+            if (target != null) {
+                target.setVisible(true);
+                target.setMouseTransparent(false);
+                target.setPickOnBounds(true);
+            }
+
             if (pd == null || pd.isEmpty()) {
                 view.setImage(null);
                 view.setVisible(false);
-                view.setMouseTransparent(true);
+                view.setMouseTransparent(routeClicksToTarget);
                 if (target != null) {
-                    target.setVisible(true);
-                    target.setMouseTransparent(false);
-                    target.setPickOnBounds(true);
                     target.toFront();
                 }
                 continue;
             }
 
-            int stage = pd.getStage(now, TOTAL_GROWTH_STAGES);
+            int stage = pd.getStage(
+                now,
+                ItemDatabase.resolveMaxGrowthPhasesForSeed(pd.seedItemId == null ? -1 : pd.seedItemId)
+            );
+            int imageStage = Math.max(0, stage - 1);
             String spriteKey = pd.cropSpriteKey == null
                     ? ItemDatabase.buildCropSpriteKeyForSeed(pd.seedItemId == null ? -1 : pd.seedItemId)
                     : pd.cropSpriteKey;
 
-            String path = String.format("/image/crops/%s_plant%d.png", spriteKey, stage);
+            if (imageStage <= 0) {
+                view.setImage(null);
+                view.setVisible(false);
+                view.setMouseTransparent(routeClicksToTarget);
+                if (target != null) {
+                    target.toFront();
+                }
+                continue;
+            }
+
+            String path = String.format("/image/crops/%s_plant%d.png", spriteKey, imageStage);
             URL url = getClass().getResource(path);
 
             if (url == null) {
                 view.setImage(null);
                 view.setVisible(false);
-                view.setMouseTransparent(true);
+                view.setMouseTransparent(routeClicksToTarget);
+                if (target != null) {
+                    target.toFront();
+                }
                 continue;
             }
 
             view.setImage(new Image(url.toExternalForm()));
             view.setVisible(true);
             view.setOpacity(1.0);
-            view.setMouseTransparent(false);
+            view.setMouseTransparent(routeClicksToTarget);
         }
     }
 
@@ -737,8 +809,10 @@ public class Farm_tableController implements Initializable, SceneController {
     private void refreshPlotHighlights() {
         double now = GameTimeManager.get().totalSecondsProperty().get();
         for (Map.Entry<String, ImageView> entry : plotViews.entrySet()) {
+            String plotId = entry.getKey();
             ImageView view = entry.getValue();
-            TempPlotData pd = tempPlots.get(entry.getKey());
+            TempPlotData pd = tempPlots.get(plotId);
+            Region target = plotTargets.get(plotId);
             if (view == null) continue;
 
             boolean highlight = switch (activeMode) {
@@ -748,12 +822,16 @@ public class Farm_tableController implements Initializable, SceneController {
                 case NONE -> false;
             };
 
-            view.setVisible(true);
-            view.setMouseTransparent(false);
-            view.setPickOnBounds(true);
-            view.setStyle(highlight
-                    ? "-fx-effect: dropshadow(gaussian, yellow, 12, 0.6, 0, 0);"
-                    : "");
+            if (target != null) {
+                target.setVisible(true);
+                target.setMouseTransparent(false);
+                target.setPickOnBounds(true);
+                target.setStyle(highlight ? PLOT_HIGHLIGHT_STYLE : PLOT_IDLE_STYLE);
+            } else {
+                view.setStyle(highlight
+                        ? "-fx-effect: dropshadow(gaussian, yellow, 12, 0.6, 0, 0);"
+                        : "");
+            }
         }
     }
     
@@ -973,7 +1051,8 @@ public class Farm_tableController implements Initializable, SceneController {
     private void applySeedGrowthProfile(TempPlotData plotData, int seedItemId) {
         if (plotData == null || seedItemId <= 0) return;
         plotData.totalGrowthSeconds = FarmGrowthRules.resolveTotalGrowthSeconds(seedItemId);
-        plotData.waterCooldownSeconds = FarmGrowthRules.resolveWaterCooldownSeconds(plotData.totalGrowthSeconds);
+        int stages = ItemDatabase.resolveMaxGrowthPhasesForSeed(seedItemId);
+        plotData.waterCooldownSeconds = FarmGrowthRules.resolveWaterCooldownSeconds(plotData.totalGrowthSeconds, stages);
         plotData.waterReductionSeconds = FarmGrowthRules.resolveWaterReductionSeconds(plotData.totalGrowthSeconds);
         plotData.accumulatedWaterReduction = FarmGrowthRules.clampAccumulatedWaterReduction(
             plotData.accumulatedWaterReduction,
@@ -1059,13 +1138,15 @@ public class Farm_tableController implements Initializable, SceneController {
         }
         boolean canWater(double nowSeconds) {
             if (isEmpty()) return false;
+            int stages = ItemDatabase.resolveMaxGrowthPhasesForSeed(seedItemId == null ? -1 : seedItemId);
             return FarmGrowthRules.canWater(
                 plantedAt,
                 lastWateredAt,
                 accumulatedWaterReduction,
                 totalGrowthSeconds,
                 waterReductionSeconds,
-                nowSeconds
+                nowSeconds,
+                stages
             );
         }
         void water(double nowSeconds) {
@@ -1079,8 +1160,8 @@ public class Farm_tableController implements Initializable, SceneController {
         int getStage(double nowSeconds, int totalStages) {
             if (isEmpty()) return 0;
             if (totalStages <= 1) return 1;
-            int stage = FarmGrowthRules.getStage(plantedAt, accumulatedWaterReduction, totalGrowthSeconds, nowSeconds);
-            return Math.min(totalStages, stage);
+            int safeStages = Math.max(1, totalStages);
+            return FarmGrowthRules.getStage(plantedAt, accumulatedWaterReduction, totalGrowthSeconds, nowSeconds, safeStages);
         }
         int harvestItemId() { return seedItemId == null ? -1 : ItemDatabase.resolveHarvestItemIdForSeed(seedItemId); }
     }

@@ -265,7 +265,7 @@
                               </ImageView>
                            </children>
                         </Pane>
-                        <Pane layoutX="75.0" layoutY="22.0" mouseTransparent="true" prefHeight="66.0" prefWidth="62.0">
+                        <Pane layoutX="75.0" layoutY="22.0" prefHeight="66.0" prefWidth="62.0">
                            <children>
                               <ImageView fx:id="farm_img1" fitHeight="65.0" fitWidth="62.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
                            </children>

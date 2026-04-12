@@ -32,13 +32,15 @@ public class FarmState {
 
         public boolean canWater(double nowSeconds) {
             if (isEmpty()) return false;
+            int stages = ItemDatabase.resolveMaxGrowthPhasesForSeed(seedItemId);
             return FarmGrowthRules.canWater(
                 plantedAt,
                 lastWateredAt,
                 accumulatedWaterReduction,
                 totalGrowthSeconds,
                 waterReductionSeconds,
-                nowSeconds
+                nowSeconds,
+                stages
             );
         }
 
@@ -54,8 +56,8 @@ public class FarmState {
         public int getStage(double nowSeconds, int totalStages) {
             if (isEmpty()) return 0;
             if (totalStages <= 1) return 1;
-            int stage = FarmGrowthRules.getStage(plantedAt, accumulatedWaterReduction, totalGrowthSeconds, nowSeconds);
-            return Math.min(totalStages, stage);
+            int safeStages = Math.max(1, totalStages);
+            return FarmGrowthRules.getStage(plantedAt, accumulatedWaterReduction, totalGrowthSeconds, nowSeconds, safeStages);
         }
 
         public void clearPlant() {
