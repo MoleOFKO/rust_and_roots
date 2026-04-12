@@ -78,7 +78,8 @@ public class Farm {
                 continue;
             }
 
-            int stage = pd.getStage(nowSeconds, totalStages);
+            int stages = ItemDatabase.resolveMaxGrowthPhasesForSeed(pd.seedItemId == null ? -1 : pd.seedItemId);
+            int stage = pd.getStage(nowSeconds, stages);
             String spriteKey = resolveSpriteKey(pd);
             showStage(plotId, view, spriteKey, stage);
         }
@@ -101,13 +102,22 @@ public class Farm {
             return;
         }
 
+        int imageStageNumber = Math.max(0, stageNumber1Based - 1);
+
         String stageKey = spriteKey + "#" + stageNumber1Based;
         if (stageKey.equals(renderedPlotStages.get(plotId))) {
-            view.setVisible(true);
+            view.setVisible(imageStageNumber > 0);
             return;
         }
 
-        String path = String.format(resourcePattern, spriteKey, stageNumber1Based);
+        if (imageStageNumber <= 0) {
+            view.setImage(null);
+            view.setVisible(false);
+            renderedPlotStages.put(plotId, stageKey);
+            return;
+        }
+
+        String path = String.format(resourcePattern, spriteKey, imageStageNumber);
         URL url = getClass().getResource(path);
         if (url == null) {
             renderedPlotStages.remove(plotId);

@@ -34,3 +34,9 @@ nbproject/genfiles.properties
 nbproject/build-impl.xml
 nbproject/private/private.xml
 nbproject/project.xml
+
+# =========================
+# Temporary files
+# =========================
+tmp_ant.xml
+tmp_delete_test.txt

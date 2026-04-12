@@ -14,15 +14,24 @@ public final class FarmGrowthRules {
     }
 
     public static double resolvePhaseDurationSeconds(double totalGrowthSeconds) {
+        return resolvePhaseDurationSeconds(totalGrowthSeconds, TOTAL_GROWTH_STAGES);
+    }
+
+    public static double resolvePhaseDurationSeconds(double totalGrowthSeconds, int totalGrowthStages) {
+        int safeStages = Math.max(1, totalGrowthStages);
         double normalized = Math.max(0.0, totalGrowthSeconds);
         if (normalized <= 0.0) {
             return 0.0;
         }
-        return normalized / TOTAL_GROWTH_STAGES;
+        return normalized / safeStages;
     }
 
     public static double resolveWaterCooldownSeconds(double totalGrowthSeconds) {
         return resolvePhaseDurationSeconds(totalGrowthSeconds);
+    }
+
+    public static double resolveWaterCooldownSeconds(double totalGrowthSeconds, int totalGrowthStages) {
+        return resolvePhaseDurationSeconds(totalGrowthSeconds, totalGrowthStages);
     }
 
     public static double resolveWaterReductionSeconds(double totalGrowthSeconds) {
@@ -48,13 +57,24 @@ public final class FarmGrowthRules {
     }
 
     public static int getStage(double plantedAt, double accumulatedWaterReduction, double totalGrowthSeconds, double nowSeconds) {
+        return getStage(plantedAt, accumulatedWaterReduction, totalGrowthSeconds, nowSeconds, TOTAL_GROWTH_STAGES);
+    }
+
+    public static int getStage(
+        double plantedAt,
+        double accumulatedWaterReduction,
+        double totalGrowthSeconds,
+        double nowSeconds,
+        int totalGrowthStages
+    ) {
         if (plantedAt < 0) {
             return 0;
         }
 
-        double phaseDuration = resolvePhaseDurationSeconds(totalGrowthSeconds);
+        int safeStages = Math.max(1, totalGrowthStages);
+        double phaseDuration = resolvePhaseDurationSeconds(totalGrowthSeconds, safeStages);
         if (phaseDuration <= 0.0) {
-            return TOTAL_GROWTH_STAGES;
+            return safeStages;
         }
 
         double effectiveElapsed = computeEffectiveElapsed(plantedAt, accumulatedWaterReduction, nowSeconds);
@@ -64,8 +84,8 @@ public final class FarmGrowthRules {
         if (stage < 1) {
             stage = 1;
         }
-        if (stage > TOTAL_GROWTH_STAGES) {
-            stage = TOTAL_GROWTH_STAGES;
+        if (stage > safeStages) {
+            stage = safeStages;
         }
         return stage;
     }
@@ -78,16 +98,37 @@ public final class FarmGrowthRules {
         double waterReductionSeconds,
         double nowSeconds
     ) {
+        return canWater(
+            plantedAt,
+            lastWateredAt,
+            accumulatedWaterReduction,
+            totalGrowthSeconds,
+            waterReductionSeconds,
+            nowSeconds,
+            TOTAL_GROWTH_STAGES
+        );
+    }
+
+    public static boolean canWater(
+        double plantedAt,
+        double lastWateredAt,
+        double accumulatedWaterReduction,
+        double totalGrowthSeconds,
+        double waterReductionSeconds,
+        double nowSeconds,
+        int totalGrowthStages
+    ) {
         if (plantedAt < 0 || isReady(plantedAt, accumulatedWaterReduction, totalGrowthSeconds, nowSeconds)) {
             return false;
         }
 
-        double phaseDuration = resolvePhaseDurationSeconds(totalGrowthSeconds);
+        int safeStages = Math.max(1, totalGrowthStages);
+        double phaseDuration = resolvePhaseDurationSeconds(totalGrowthSeconds, safeStages);
         if (phaseDuration <= 0.0) {
             return false;
         }
 
-        int currentStage = getStage(plantedAt, accumulatedWaterReduction, totalGrowthSeconds, nowSeconds);
+        int currentStage = getStage(plantedAt, accumulatedWaterReduction, totalGrowthSeconds, nowSeconds, safeStages);
         double currentPhaseStartAt = plantedAt + Math.max(
             0.0,
             ((Math.max(1, currentStage) - 1) * phaseDuration) - Math.max(0.0, accumulatedWaterReduction)
@@ -101,8 +142,9 @@ public final class FarmGrowthRules {
             return;
         }
 
+        int stages = ItemDatabase.resolveMaxGrowthPhasesForSeed(seedItemId);
         plotData.totalGrowthSeconds = resolveTotalGrowthSeconds(seedItemId);
-        plotData.waterCooldownSeconds = resolveWaterCooldownSeconds(plotData.totalGrowthSeconds);
+        plotData.waterCooldownSeconds = resolveWaterCooldownSeconds(plotData.totalGrowthSeconds, stages);
         plotData.waterReductionSeconds = resolveWaterReductionSeconds(plotData.totalGrowthSeconds);
         plotData.accumulatedWaterReduction = clampAccumulatedWaterReduction(
             plotData.accumulatedWaterReduction,
