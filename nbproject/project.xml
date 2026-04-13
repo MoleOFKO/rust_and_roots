@@ -23,7 +23,7 @@
             </test-roots>
         </data>
         <libraries xmlns="http://www.netbeans.org/ns/ant-project-libraries/1">
-            <definitions>C:\Apache\zulu18.32.13-ca-fx-jdk18.0.2.1-win_x64\nblibraries.properties</definitions>
+            <definitions>D:\apache\zulu18.32.13-ca-fx-jdk18.0.2.1-win_x64 (2)\JDK_18\nblibraries.properties</definitions>
         </libraries>
     </configuration>
 </project>
