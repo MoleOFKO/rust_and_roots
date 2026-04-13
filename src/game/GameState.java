@@ -22,6 +22,7 @@ public final class GameState {
     private static final double DEFAULT_SMELT_POINT_REGEN_SECONDS = 15.0;
     private static final int DEFAULT_FIXED_SHOP_ITEM_COUNT = 8;
     private static final int DEFAULT_RANDOM_SHOP_ITEM_COUNT = 4;
+    private static final int CHEST_SLOT_CAPACITY = 42;
     private static final int NEW_GAME_STARTING_COINS = 100;
 
     public enum StatusPanelGroup {
@@ -237,7 +238,7 @@ public final class GameState {
     }
     
     private final PlayerState playerState = new PlayerState(100);
-    private final Inventory chestInventory = new Inventory(0);
+    private final Inventory chestInventory = new Inventory(0, CHEST_SLOT_CAPACITY);
 
     private SpawnTag pendingSpawn = SpawnTag.DEFAULT;
     private String returnFxml = null;
@@ -682,7 +683,9 @@ public final class GameState {
         if (activeSmeltJob == null) return 0;
         int ready = activeSmeltJob.getReadyCount(nowSeconds);
         if (ready <= 0) return 0;
-        playerState.getInventory().addItem(activeSmeltJob.getResultItemId(), ready);
+        if (!playerState.getInventory().addItem(activeSmeltJob.getResultItemId(), ready)) {
+            return 0;
+        }
         int remaining = activeSmeltJob.getQuantity() - ready;
         if (remaining > 0) {
             double nextStart = activeSmeltJob.getStartedAtSeconds() + (ready * activeSmeltJob.getSecondsPerOre());

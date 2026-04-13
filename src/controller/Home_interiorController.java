@@ -9,8 +9,11 @@ import game.GameState;
 import game.GameTimeManager;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
@@ -1203,8 +1206,8 @@ public class Home_interiorController extends BaseMapController {
     private final List<Button> chestButtons = new ArrayList<>();
 
     private Inventory chestInventory;
-    private final LinkedHashSet<Integer> selectedChestItemIds = new LinkedHashSet<>();
-    private final LinkedHashSet<Integer> selectedInteriorPlayerItemIds = new LinkedHashSet<>();
+    private final LinkedHashSet<Integer> selectedChestSlotIndices = new LinkedHashSet<>();
+    private final LinkedHashSet<Integer> selectedInteriorPlayerSlotIndices = new LinkedHashSet<>();
     private boolean insideBedZone = false;
     private javafx.animation.AnimationTimer sleepTimer;
     private double sleepPreviousTimeScale = 1.0;
@@ -1458,7 +1461,7 @@ public class Home_interiorController extends BaseMapController {
             SlotData slot = (i < slots.size()) ? slots.get(i) : null;
             boolean selected =
                 slot != null &&
-                selectedInteriorPlayerItemIds.contains(slot.itemId());
+                selectedInteriorPlayerSlotIndices.contains(i);
 
             imageView.setStyle(selected
                 ? "-fx-effect: dropshadow(gaussian, yellow, 14, 0.7, 0, 0);"
@@ -1483,26 +1486,29 @@ public class Home_interiorController extends BaseMapController {
         SlotData slot = slots.get(index);
         if (slot == null) return;
 
-        toggleInteriorPlayerSelection(slot.itemId());
+        toggleInteriorPlayerSelection(index, slot.itemId());
         refreshChestAndInventoryViews();
     }
 
-    private void toggleInteriorPlayerSelection(int itemId) {
-        if (itemId <= 0) return;
-        if (selectedInteriorPlayerItemIds.contains(itemId)) {
-            selectedInteriorPlayerItemIds.remove(itemId);
+    private void toggleInteriorPlayerSelection(int slotIndex, int itemId) {
+        if (slotIndex < 0 || itemId <= 0) return;
+
+        if (selectedInteriorPlayerSlotIndices.contains(slotIndex)) {
+            selectedInteriorPlayerSlotIndices.remove(slotIndex);
         } else {
-            selectedInteriorPlayerItemIds.add(itemId);
+            selectedInteriorPlayerSlotIndices.add(slotIndex);
         }
-        selectedPlayerInventoryItemId = selectedInteriorPlayerItemIds.isEmpty() ? null : selectedInteriorPlayerItemIds.iterator().next();
+
+        selectedPlayerInventoryItemId = selectedInteriorPlayerSlotIndices.isEmpty() ? null : itemId;
     }
 
-    private void toggleChestSelection(int itemId) {
-        if (itemId <= 0) return;
-        if (selectedChestItemIds.contains(itemId)) {
-            selectedChestItemIds.remove(itemId);
+    private void toggleChestSelection(int slotIndex) {
+        if (slotIndex < 0) return;
+
+        if (selectedChestSlotIndices.contains(slotIndex)) {
+            selectedChestSlotIndices.remove(slotIndex);
         } else {
-            selectedChestItemIds.add(itemId);
+            selectedChestSlotIndices.add(slotIndex);
         }
     }
     
@@ -1579,6 +1585,7 @@ public class Home_interiorController extends BaseMapController {
         if (slot == null) return;
 
         selectedPlayerInventoryItemId = slot.itemId();
+        selectedPlayerInventorySlotIndex = index;
         refreshChestAndInventoryViews();
     }
     
@@ -1777,13 +1784,13 @@ public class Home_interiorController extends BaseMapController {
         SlotData slot = slots.get(index);
         if (slot == null) return;
 
-        toggleChestSelection(slot.itemId());
+        toggleChestSelection(index);
         refreshChestAndInventoryViews();
     }
 
     private void moveSelectedItemsToChest() {
         if (player == null || chestInventory == null) return;
-        if (!moveSelectedItemBatch(player.getInventory(), chestInventory, selectedInteriorPlayerItemIds, CHEST_SLOT_CAPACITY)) {
+        if (!moveSelectedStackBatch(player.getInventory(), chestInventory, selectedInteriorPlayerSlotIndices, playerInventorySlotCapacity())) {
             pruneMissingSelections();
             refreshChestAndInventoryViews();
             return;
@@ -1795,7 +1802,7 @@ public class Home_interiorController extends BaseMapController {
 
     private void moveSelectedItemsToInventory() {
         if (player == null || chestInventory == null) return;
-        if (!moveSelectedItemBatch(chestInventory, player.getInventory(), selectedChestItemIds, playerInventorySlotCapacity())) {
+        if (!moveSelectedStackBatch(chestInventory, player.getInventory(), selectedChestSlotIndices, CHEST_SLOT_CAPACITY)) {
             pruneMissingSelections();
             refreshChestAndInventoryViews();
             return;
@@ -1805,6 +1812,52 @@ public class Home_interiorController extends BaseMapController {
         refreshChestAndInventoryViews();
     }
 
+    private boolean moveSelectedStackBatch(Inventory from, Inventory to, Collection<Integer> slotIndices, int fromCapacity) {
+        if (from == null || to == null || slotIndices == null || slotIndices.isEmpty()) return false;
+
+        List<SlotData> slots = snapshotSlots(from, fromCapacity);
+        if (slots.isEmpty()) return false;
+
+        Map<Integer, Integer> transfer = new LinkedHashMap<>();
+        for (Integer index : slotIndices) {
+            if (index == null) continue;
+            int slotIndex = index;
+            if (slotIndex < 0 || slotIndex >= slots.size()) continue;
+
+            SlotData slot = slots.get(slotIndex);
+            if (slot == null || slot.itemId() <= 0 || slot.quantity() <= 0) continue;
+
+            transfer.merge(slot.itemId(), slot.quantity(), Integer::sum);
+        }
+
+        if (transfer.isEmpty()) return false;
+        if (!to.canAddItems(transfer)) return false;
+
+        List<SlotData> removed = new ArrayList<>();
+        for (Map.Entry<Integer, Integer> entry : transfer.entrySet()) {
+            int itemId = entry.getKey();
+            int qty = entry.getValue();
+            if (qty <= 0) continue;
+
+            if (!from.removeItem(itemId, qty)) {
+                for (SlotData rollback : removed) {
+                    from.addItem(rollback.itemId(), rollback.quantity());
+                }
+                return false;
+            }
+            removed.add(new SlotData(itemId, qty));
+        }
+
+        if (!to.addItems(transfer)) {
+            for (SlotData rollback : removed) {
+                from.addItem(rollback.itemId(), rollback.quantity());
+            }
+            return false;
+        }
+
+        return true;
+    }
+
     private void clearSelection() {
         clearChestSelectionsOnly();
         clearPlayerInventorySelection();
@@ -1812,18 +1865,34 @@ public class Home_interiorController extends BaseMapController {
     }
 
     private void clearChestSelectionsOnly() {
-        selectedChestItemIds.clear();
-        selectedInteriorPlayerItemIds.clear();
+        selectedChestSlotIndices.clear();
+        selectedInteriorPlayerSlotIndices.clear();
     }
 
     private void pruneMissingSelections() {
         if (player != null) {
-            selectedInteriorPlayerItemIds.removeIf(itemId -> player.getInventory().getCount(itemId) <= 0);
+            List<SlotData> playerSlots = snapshotSlots(player.getInventory(), playerInventorySlotCapacity());
+            selectedInteriorPlayerSlotIndices.removeIf(idx -> idx == null || idx < 0 || idx >= playerSlots.size());
+
+            if (!selectedInteriorPlayerSlotIndices.isEmpty()) {
+                Integer first = selectedInteriorPlayerSlotIndices.iterator().next();
+                selectedPlayerInventoryItemId = (first != null && first >= 0 && first < playerSlots.size())
+                        ? playerSlots.get(first).itemId()
+                        : null;
+            } else {
+                selectedPlayerInventoryItemId = null;
+            }
+        } else {
+            selectedInteriorPlayerSlotIndices.clear();
+            selectedPlayerInventoryItemId = null;
         }
+
         if (chestInventory != null) {
-            selectedChestItemIds.removeIf(itemId -> chestInventory.getCount(itemId) <= 0);
+            List<SlotData> chestSlots = snapshotSlots(chestInventory, CHEST_SLOT_CAPACITY);
+            selectedChestSlotIndices.removeIf(idx -> idx == null || idx < 0 || idx >= chestSlots.size());
+        } else {
+            selectedChestSlotIndices.clear();
         }
-        selectedPlayerInventoryItemId = selectedInteriorPlayerItemIds.isEmpty() ? null : selectedInteriorPlayerItemIds.iterator().next();
     }
 
     private void refreshChestAndInventoryViews() {
@@ -1895,7 +1964,7 @@ public class Home_interiorController extends BaseMapController {
             SlotData slot = (i < slots.size()) ? slots.get(i) : null;
             boolean selected =
                 slot != null &&
-                selectedChestItemIds.contains(slot.itemId());
+                selectedChestSlotIndices.contains(i);
 
             imageView.setStyle(selected
                 ? "-fx-effect: dropshadow(gaussian, yellow, 14, 0.7, 0, 0);"
@@ -1923,7 +1992,7 @@ public class Home_interiorController extends BaseMapController {
             SlotData slot = (i < slots.size()) ? slots.get(i) : null;
             boolean selected =
                 slot != null &&
-                selectedInteriorPlayerItemIds.contains(slot.itemId());
+                selectedInteriorPlayerSlotIndices.contains(i);
 
             imageView.setStyle(selected
                 ? "-fx-effect: dropshadow(gaussian, yellow, 14, 0.7, 0, 0);"

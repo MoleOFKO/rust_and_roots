@@ -64,6 +64,7 @@ public final class PlayerState {
     private boolean sleeping = false;
 
     private static final int HOTBAR_SIZE = 5;
+    private static final int INVENTORY_SLOT_CAPACITY = 20;
     private final int[] hotbarItemIds = new int[HOTBAR_SIZE];
     private final int[] hotbarItemCounts = new int[HOTBAR_SIZE];
 
@@ -108,7 +109,7 @@ public final class PlayerState {
         }
 
         hotbarItemIds[index] = itemId;
-        hotbarItemCounts[index] = count;
+        hotbarItemCounts[index] = clampToStackLimit(itemId, count);
     }
 
     public boolean addHotbarItems(int index, int itemId, int amount) {
@@ -116,16 +117,24 @@ public final class PlayerState {
         if (itemId <= 0 || amount <= 0) return false;
 
         if (isHotbarSlotEmpty(index)) {
+            int maxStack = getMaxStackSize(itemId);
+            if (amount > maxStack) return false;
             setHotbarSlot(index, itemId, amount);
-            return true;
+            return amount <= maxStack;
         }
 
         if (hotbarItemIds[index] != itemId) {
             return false;
         }
 
-        hotbarItemCounts[index] += amount;
-        return true;
+        int maxStack = getMaxStackSize(itemId);
+        int next = hotbarItemCounts[index] + amount;
+        if (next > maxStack) {
+            return false;
+        }
+
+        hotbarItemCounts[index] = next;
+        return hotbarItemCounts[index] > 0;
     }
 
     public boolean removeHotbarItems(int index, int amount) {
@@ -138,6 +147,63 @@ public final class PlayerState {
             clearHotbarItem(index);
         }
         return true;
+    }
+
+    public boolean canFitHotbarItems(int itemId, int amount) {
+        if (itemId <= 0 || amount <= 0) return false;
+
+        int remaining = amount;
+        int maxStack = getMaxStackSize(itemId);
+
+        for (int i = 0; i < HOTBAR_SIZE && remaining > 0; i++) {
+            if (hotbarItemIds[i] == itemId && hotbarItemCounts[i] > 0 && hotbarItemCounts[i] < maxStack) {
+                remaining -= Math.min(maxStack - hotbarItemCounts[i], remaining);
+            }
+        }
+
+        if (remaining <= 0) return true;
+
+        for (int i = 0; i < HOTBAR_SIZE && remaining > 0; i++) {
+            if (isHotbarSlotEmpty(i)) {
+                remaining -= Math.min(maxStack, remaining);
+            }
+        }
+
+        return remaining <= 0;
+    }
+
+    /**
+     * Adds items to the hotbar by filling existing partial stacks first and then
+     * using empty slots. This is an all-or-nothing operation.
+     */
+    public boolean tryAddHotbarItems(int itemId, int amount) {
+        if (itemId <= 0 || amount <= 0) return false;
+        if (!canFitHotbarItems(itemId, amount)) return false;
+
+        int remaining = amount;
+        int maxStack = getMaxStackSize(itemId);
+
+        // Fill existing partial stacks of the same item.
+        for (int i = 0; i < HOTBAR_SIZE && remaining > 0; i++) {
+            if (hotbarItemIds[i] != itemId || hotbarItemCounts[i] <= 0) continue;
+            int current = hotbarItemCounts[i];
+            if (current >= maxStack) continue;
+
+            int add = Math.min(maxStack - current, remaining);
+            hotbarItemCounts[i] = current + add;
+            remaining -= add;
+        }
+
+        // Use empty slots for remaining items.
+        for (int i = 0; i < HOTBAR_SIZE && remaining > 0; i++) {
+            if (!isHotbarSlotEmpty(i)) continue;
+            int put = Math.min(maxStack, remaining);
+            hotbarItemIds[i] = itemId;
+            hotbarItemCounts[i] = put;
+            remaining -= put;
+        }
+
+        return remaining <= 0;
     }
 
     public int findHotbarSlotWithItem(int itemId) {
@@ -169,9 +235,20 @@ public final class PlayerState {
         hotbarItemIds[index] = 0;
         hotbarItemCounts[index] = 0;
     }
+
+    private int clampToStackLimit(int itemId, int count) {
+        if (count <= 0) return 0;
+        int maxStack = getMaxStackSize(itemId);
+        return Math.min(Math.max(1, count), maxStack);
+    }
+
+    private int getMaxStackSize(int itemId) {
+        int max = ItemDatabase.getMaxStackSize(itemId);
+        return Math.max(1, max);
+    }
     
     public PlayerState(int startingCoins) {
-        this.inventory = new Inventory(startingCoins);
+        this.inventory = new Inventory(startingCoins, INVENTORY_SLOT_CAPACITY);
     }
 
     public Inventory getInventory() {

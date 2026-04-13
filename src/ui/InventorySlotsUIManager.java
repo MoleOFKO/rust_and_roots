@@ -54,21 +54,15 @@ public class InventorySlotsUIManager {
     }
 
     public void refresh() {
-        List<Integer> owned = new ArrayList<>(inventory.itemsProperty().keySet());
-
-        owned.sort(Comparator.comparing(id -> {
-            item itm = ItemDatabase.getItemById(id);
-            return itm == null ? "" : itm.getItem_name();
-        }));
-
         int slotCount = Math.min(images.size(), labels.size());
+        List<SlotData> slots = snapshotSlots(slotCount);
 
         for (int i = 0; i < slotCount; i++) {
             ImageView imageView = images.get(i);
             Label label = labels.get(i);
             Button button = (buttons != null && i < buttons.size()) ? buttons.get(i) : null;
 
-            if (i >= owned.size()) {
+            if (i >= slots.size()) {
                 if (imageView != null) imageView.setImage(null);
                 if (label != null) label.setText("");
                 if (button != null) {
@@ -79,8 +73,9 @@ public class InventorySlotsUIManager {
                 continue;
             }
 
-            int itemId = owned.get(i);
-            int qty = inventory.getCount(itemId);
+            SlotData slot = slots.get(i);
+            int itemId = slot.itemId;
+            int qty = slot.quantity;
             item itm = ItemDatabase.getItemById(itemId);
             String itemName = (itm == null) ? ("Item " + itemId) : itm.getItem_name();
 
@@ -97,6 +92,46 @@ public class InventorySlotsUIManager {
                 button.setText(itemName);
             }
         }
+    }
+
+    private static final class SlotData {
+        private final int itemId;
+        private final int quantity;
+
+        private SlotData(int itemId, int quantity) {
+            this.itemId = itemId;
+            this.quantity = quantity;
+        }
+    }
+
+    private List<SlotData> snapshotSlots(int capacity) {
+        List<SlotData> result = new ArrayList<>();
+        if (inventory == null || capacity <= 0) return result;
+
+        List<Integer> owned = new ArrayList<>(inventory.itemsProperty().keySet());
+        owned.sort(Comparator.comparing(id -> {
+            item itm = ItemDatabase.getItemById(id);
+            return itm == null ? "" : itm.getItem_name();
+        }));
+
+        for (Integer itemId : owned) {
+            if (itemId == null || itemId <= 0) continue;
+            int remaining = inventory.getCount(itemId);
+            if (remaining <= 0) continue;
+
+            int maxStack = Math.max(1, ItemDatabase.getMaxStackSize(itemId));
+            while (remaining > 0 && result.size() < capacity) {
+                int stackQty = Math.min(maxStack, remaining);
+                result.add(new SlotData(itemId, stackQty));
+                remaining -= stackQty;
+            }
+
+            if (result.size() >= capacity) {
+                break;
+            }
+        }
+
+        return result;
     }
 }
 

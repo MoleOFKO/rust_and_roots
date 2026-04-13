@@ -10,6 +10,8 @@ import java.sql.DatabaseMetaData;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import model.Farm;
 import model.FarmGrowthRules;
 import model.FarmState;
@@ -37,9 +39,9 @@ public class LoadGameService {
 
             loadPlayerStats(con, gs, saveId);
             loadPlayerSkills(con, gs, saveId);
+            loadChestItems(con, gs, saveId);
             loadPlayerInventory(con, gs, saveId);
             loadHotbar(con, gs, saveId);
-            loadChestItems(con, gs, saveId);
             loadFarmPlots(con, gs, saveId);
             loadTime(con, saveId);
             loadUnlockedRecipes(con, gs, saveId);
@@ -152,6 +154,7 @@ public class LoadGameService {
     private void loadPlayerInventory(Connection con, GameState gs, int saveId) throws Exception {
         Inventory inv = gs.getPlayerState().getInventory();
         clearInventoryItems(inv);
+        Inventory chest = gs.getChestInventory();
 
         String sql = "SELECT item_id, qty FROM saved_item WHERE saved_id = ?";
         try (PreparedStatement ps = con.prepareStatement(sql)) {
@@ -162,7 +165,11 @@ public class LoadGameService {
                     int itemId = rs.getInt("item_id");
                     int qty = rs.getInt("qty");
                     if (itemId > 0 && qty > 0) {
-                        inv.addItem(itemId, qty);
+                        if (!inv.addItem(itemId, qty)) {
+                            if (!chest.addItem(itemId, qty)) {
+                                System.out.println("Load warning: inventory overflow dropped item_id=" + itemId + " qty=" + qty);
+                            }
+                        }
                     }
                 }
             }
@@ -171,8 +178,16 @@ public class LoadGameService {
 
     private void loadHotbar(Connection con, GameState gs, int saveId) throws Exception {
         PlayerState psState = gs.getPlayerState();
+        Inventory inv = psState.getInventory();
+        Inventory chest = gs.getChestInventory();
 
         psState.clearAllHotbarItems();
+
+        int hotbarSize = psState.getHotbarSize();
+        int[] slotItemIds = new int[hotbarSize];
+        int[] slotQuantities = new int[hotbarSize];
+        boolean[] hasSlotValue = new boolean[hotbarSize];
+        Map<Integer, Integer> overflowByItemId = new LinkedHashMap<>();
 
         String sql = "SELECT slot_index, item_id, qty FROM saved_hotbar WHERE saved_id = ?";
         try (PreparedStatement ps = con.prepareStatement(sql)) {
@@ -182,14 +197,82 @@ public class LoadGameService {
                 while (rs.next()) {
                     int slotIndex = rs.getInt("slot_index");
                     int itemId = rs.getInt("item_id");
+                    boolean itemWasNull = rs.wasNull();
                     int qty = rs.getInt("qty");
 
-                    if (!rs.wasNull()) {
-                        psState.setHotbarSlot(slotIndex, itemId, Math.max(1, qty));
+                    if (!itemWasNull && itemId > 0 && qty > 0) {
+                        if (slotIndex < 0 || slotIndex >= hotbarSize) {
+                            overflowByItemId.merge(itemId, qty, Integer::sum);
+                            continue;
+                        }
+
+                        slotItemIds[slotIndex] = itemId;
+                        slotQuantities[slotIndex] = qty;
+                        hasSlotValue[slotIndex] = true;
                     }
                 }
             }
         }
+
+        for (int i = 0; i < hotbarSize; i++) {
+            if (!hasSlotValue[i]) continue;
+
+            int itemId = slotItemIds[i];
+            int qty = slotQuantities[i];
+            if (itemId <= 0 || qty <= 0) continue;
+
+            int maxStack = Math.max(1, ItemDatabase.getMaxStackSize(itemId));
+            int safeQty = Math.min(qty, maxStack);
+            psState.setHotbarSlot(i, itemId, safeQty);
+
+            int overflow = qty - safeQty;
+            if (overflow > 0) {
+                overflowByItemId.merge(itemId, overflow, Integer::sum);
+            }
+        }
+
+        for (Map.Entry<Integer, Integer> entry : overflowByItemId.entrySet()) {
+            int itemId = entry.getKey();
+            int qty = entry.getValue();
+            if (itemId <= 0 || qty <= 0) continue;
+
+            int remaining = distributeHotbarOverflow(psState, itemId, qty);
+            if (remaining <= 0) continue;
+
+            if (!inv.addItem(itemId, remaining)) {
+                if (!chest.addItem(itemId, remaining)) {
+                    System.out.println("Load warning: hotbar overflow dropped item_id=" + itemId + " qty=" + remaining);
+                }
+            }
+        }
+    }
+
+    private int distributeHotbarOverflow(PlayerState psState, int itemId, int qty) {
+        if (psState == null || itemId <= 0 || qty <= 0) return qty;
+
+        int remaining = qty;
+        int maxStack = Math.max(1, ItemDatabase.getMaxStackSize(itemId));
+        int hotbarSize = psState.getHotbarSize();
+
+        for (int i = 0; i < hotbarSize && remaining > 0; i++) {
+            if (psState.getHotbarItemId(i) != itemId) continue;
+            int current = psState.getHotbarItemCount(i);
+            if (current <= 0 || current >= maxStack) continue;
+
+            int add = Math.min(maxStack - current, remaining);
+            psState.setHotbarSlot(i, itemId, current + add);
+            remaining -= add;
+        }
+
+        for (int i = 0; i < hotbarSize && remaining > 0; i++) {
+            if (!psState.isHotbarSlotEmpty(i)) continue;
+
+            int put = Math.min(maxStack, remaining);
+            psState.setHotbarSlot(i, itemId, put);
+            remaining -= put;
+        }
+
+        return remaining;
     }
 
     private void loadChestItems(Connection con, GameState gs, int saveId) throws Exception {
@@ -205,7 +288,9 @@ public class LoadGameService {
                     int itemId = rs.getInt("item_id");
                     int qty = rs.getInt("qty");
                     if (itemId > 0 && qty > 0) {
-                        chest.addItem(itemId, qty);
+                        if (!chest.addItem(itemId, qty)) {
+                            System.out.println("Load warning: chest overflow dropped item_id=" + itemId + " qty=" + qty);
+                        }
                     }
                 }
             }

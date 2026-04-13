@@ -217,6 +217,35 @@ public final class ItemDatabase {
         return itemId > 0 && getItemUseType(itemId) == ItemUseType.CROP;
     }
 
+    /**
+     * Returns the maximum number of items that can be stacked in a single slot.
+     *
+     * Stacking rules:
+     * - equipment + recipe: 1 per slot
+     * - edible: 32 per slot
+     * - seeds: 45 per slot
+     * - inedible (and everything else): 64 per slot
+     */
+    public static int getMaxStackSize(int itemId) {
+        if (itemId <= 0) return 0;
+
+        // Ensure item types are available when called early.
+        loadItems();
+
+        if (isEquipmentItem(itemId) || isRecipeItem(itemId)) {
+            return 1;
+        }
+        if (isSeedItem(itemId)) {
+            return 45;
+        }
+        if (isEdibleItem(itemId)) {
+            return 32;
+        }
+
+        // Default to INEDIBLE-like stacks for materials and unknowns.
+        return 64;
+    }
+
     public static List<Integer> getAllSeedItemIds() {
         List<Integer> ids = new ArrayList<>();
         for (item itm : allItems) {

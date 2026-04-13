@@ -21,6 +21,7 @@ import javafx.scene.layout.StackPane;
 import model.Inventory;
 import model.ItemDatabase;
 import model.item;
+import util.AppDialogs;
 import util.SceneManager;
 import util.SpawnTag;
 
@@ -282,7 +283,11 @@ public class MeltController implements Initializable, SceneController {
         double now = GameTimeManager.get().totalSecondsProperty().get();
         int ready = gameState.getReadySmeltCount(now);
         if (ready <= 0) return;
-        gameState.collectReadySmeltedItems(now);
+        int collected = gameState.collectReadySmeltedItems(now);
+        if (collected <= 0) {
+            AppDialogs.showMessageDialog(null, "Not enough inventory space to collect the smelted items.");
+            return;
+        }
         refreshAll();
     }
 

@@ -25,6 +25,7 @@ import model.Inventory;
 import model.ItemDatabase;
 import model.RecipeCatalog;
 import model.item;
+import util.AppDialogs;
 import util.SceneManager;
 import util.SpawnTag;
 
@@ -368,7 +369,12 @@ public class CraftController implements Initializable, SceneController {
         if (!gameState.hasActiveCraftingJob()) return;
         if (selectedRecipe.outputItemId != gameState.getActiveCraftingOutputItemId()) return;
         if (!gameState.isCraftingReady(now)) return;
-        inventory.addItem(selectedRecipe.outputItemId, gameState.getActiveCraftingOutputQuantity());
+
+        int qty = gameState.getActiveCraftingOutputQuantity();
+        if (qty > 0 && !inventory.addItem(selectedRecipe.outputItemId, qty)) {
+            AppDialogs.showMessageDialog(null, "Not enough inventory space to collect the crafted item.");
+            return;
+        }
         if (gameState.isActiveCraftingSuccess()) {
             gameState.queueCookedDishEffect(selectedRecipe.outputItemId, gameState.getActiveCraftingHpDelta(), gameState.getActiveCraftingStaminaDelta(), true);
         }
