@@ -6,8 +6,10 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
@@ -180,6 +182,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     protected final List<Button> playerInventoryButtons = new ArrayList<>();
 
     protected Integer selectedPlayerInventoryItemId = null;
+    protected int selectedPlayerInventorySlotIndex = -1;
     
     // ---------- Runtime ----------
     protected GameState gameState;
@@ -1060,27 +1063,6 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         return base + formatPendingSkillCost(pendingCost);
     }
 
-    protected boolean canAcceptItemBatch(Inventory inventory, Collection<Integer> itemIds, int capacity) {
-        if (inventory == null || itemIds == null) return false;
-
-        LinkedHashSet<Integer> uniqueIds = new LinkedHashSet<>();
-        for (Integer itemId : itemIds) {
-            if (itemId == null || itemId <= 0) continue;
-            uniqueIds.add(itemId);
-        }
-
-        if (uniqueIds.isEmpty()) return false;
-
-        int neededNewTypes = 0;
-        for (Integer itemId : uniqueIds) {
-            if (inventory.getCount(itemId) <= 0) {
-                neededNewTypes++;
-            }
-        }
-
-        return inventory.itemsProperty().size() + neededNewTypes <= capacity;
-    }
-
     protected boolean moveSelectedItemBatch(Inventory from, Inventory to, Collection<Integer> itemIds, int targetCapacity) {
         if (from == null || to == null || itemIds == null) return false;
 
@@ -1093,12 +1075,27 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         }
 
         if (uniqueIds.isEmpty()) return false;
-        if (!canAcceptItemBatch(to, uniqueIds, targetCapacity)) return false;
+
+        Map<Integer, Integer> transfer = new LinkedHashMap<>();
+        for (Integer itemId : uniqueIds) {
+            if (itemId == null || itemId <= 0) continue;
+            int qty = from.getCount(itemId);
+            if (qty > 0) {
+                transfer.put(itemId, qty);
+            }
+        }
+
+        if (transfer.isEmpty()) return false;
+        if (!to.canAddItems(transfer)) return false;
 
         List<SlotData> moved = new ArrayList<>();
-        for (Integer itemId : uniqueIds) {
-            int qty = from.getCount(itemId);
-            if (qty <= 0) continue;
+        for (Map.Entry<Integer, Integer> entry : transfer.entrySet()) {
+            int itemId = entry.getKey();
+            int qty = entry.getValue();
+            if (qty <= 0) {
+                continue;
+            }
+
             if (!from.removeItem(itemId, qty)) {
                 for (SlotData rollback : moved) {
                     from.addItem(rollback.itemId(), rollback.quantity());
@@ -1106,11 +1103,17 @@ public abstract class BaseMapController implements Initializable, SceneControlle
                 }
                 return false;
             }
-            to.addItem(itemId, qty);
             moved.add(new SlotData(itemId, qty));
         }
 
-        return !moved.isEmpty();
+        if (!to.addItems(transfer)) {
+            for (SlotData rollback : moved) {
+                from.addItem(rollback.itemId(), rollback.quantity());
+            }
+            return false;
+        }
+
+        return true;
     }
     
     protected void openInventory(){
@@ -1768,6 +1771,12 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     }
     
     protected int playerInventorySlotCapacity() {
+        if (player != null && player.getInventory() != null) {
+            return player.getInventory().getSlotCapacity();
+        }
+        if (playerState != null && playerState.getInventory() != null) {
+            return playerState.getInventory().getSlotCapacity();
+        }
         return DEFAULT_PLAYER_SLOT_CAPACITY;
     }
 
@@ -1785,6 +1794,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
     protected void onPlayerInventorySlotSelected(int index, SlotData slot) {
         selectedPlayerInventoryItemId = (slot == null) ? null : slot.itemId();
+        selectedPlayerInventorySlotIndex = (slot == null) ? -1 : index;
         refreshPlayerInventorySelectionHighlight();
     }
 
@@ -1846,7 +1856,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
                     if (index < snapshotSlots(player.getInventory(), playerInventorySlotCapacity()).size()) {
                         List<SlotData> slots = snapshotSlots(player.getInventory(), playerInventorySlotCapacity());
                         SlotData slot = (index < slots.size()) ? slots.get(index) : null;
-                        if (slot != null && selectedPlayerInventoryItemId != null && slot.itemId() == selectedPlayerInventoryItemId
+                        if (slot != null && index == selectedPlayerInventorySlotIndex
                                 && tryConsumeInventoryItem(index)) {
                             return;
                         }
@@ -1892,13 +1902,27 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         if (inventory == null) return result;
 
         inventory.itemsProperty().entrySet().stream()
-            .filter(e -> e.getValue() != null && e.getValue().get() > 0)
+            .filter(e -> e.getKey() != null && e.getKey() > 0 && e.getValue() != null && e.getValue().get() > 0)
             .sorted(Comparator.comparing(
                 e -> itemName(e.getKey()),
                 String.CASE_INSENSITIVE_ORDER
             ))
-            .limit(capacity)
-            .forEach(e -> result.add(new SlotData(e.getKey(), e.getValue().get())));
+            .forEach(e -> {
+                if (result.size() >= capacity) {
+                    return;
+                }
+
+                int itemId = e.getKey();
+                int qty = e.getValue().get();
+                int maxStack = Math.max(1, ItemDatabase.getMaxStackSize(itemId));
+
+                int remaining = qty;
+                while (remaining > 0 && result.size() < capacity) {
+                    int stackQty = Math.min(maxStack, remaining);
+                    result.add(new SlotData(itemId, stackQty));
+                    remaining -= stackQty;
+                }
+            });
 
         return result;
     }
@@ -1967,8 +1991,8 @@ public abstract class BaseMapController implements Initializable, SceneControlle
             SlotData slot = (i < slots.size()) ? slots.get(i) : null;
             boolean selected =
                 slot != null &&
-                selectedPlayerInventoryItemId != null &&
-                slot.itemId() == selectedPlayerInventoryItemId;
+                selectedPlayerInventorySlotIndex >= 0 &&
+                i == selectedPlayerInventorySlotIndex;
 
             imageView.setStyle(selected
                 ? "-fx-effect: dropshadow(gaussian, yellow, 14, 0.7, 0, 0);"
@@ -1995,21 +2019,18 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         SlotData slot = slots.get(index);
         if (slot == null || slot.itemId() <= 0 || slot.quantity() <= 0) return false;
 
-        int targetIndex = findHotbarTargetSlot(slot.itemId());
-        if (targetIndex < 0) {
-            return false;
-        }
-
         if (!player.getInventory().removeItem(slot.itemId(), slot.quantity())) {
             return false;
         }
 
-        if (!playerState.addHotbarItems(targetIndex, slot.itemId(), slot.quantity())) {
+        if (!playerState.tryAddHotbarItems(slot.itemId(), slot.quantity())) {
             player.getInventory().addItem(slot.itemId(), slot.quantity());
+            AppDialogs.showMessageDialog(null, "Not enough hotbar space.");
             return false;
         }
 
         selectedPlayerInventoryItemId = null;
+        selectedPlayerInventorySlotIndex = -1;
         refreshPlayerInventoryView();
         refreshHotbarView();
         refreshEquippedItemVisual();
@@ -2024,7 +2045,10 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         int quantity = playerState.getHotbarItemCount(index);
         if (itemId <= 0 || quantity <= 0) return false;
 
-        player.getInventory().addItem(itemId, quantity);
+        if (!player.getInventory().addItem(itemId, quantity)) {
+            AppDialogs.showMessageDialog(null, "Not enough inventory space.");
+            return false;
+        }
         playerState.clearHotbarItem(index);
 
         refreshPlayerInventoryView();
@@ -2036,9 +2060,14 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     protected int findHotbarTargetSlot(int itemId) {
         if (playerState == null || itemId <= 0) return -1;
 
-        int sameItemSlot = playerState.findHotbarSlotWithItem(itemId);
-        if (sameItemSlot >= 0) {
-            return sameItemSlot;
+        int maxStack = Math.max(1, ItemDatabase.getMaxStackSize(itemId));
+
+        for (int i = 0; i < playerState.getHotbarSize(); i++) {
+            if (playerState.getHotbarItemId(i) == itemId
+                    && playerState.getHotbarItemCount(i) > 0
+                    && playerState.getHotbarItemCount(i) < maxStack) {
+                return i;
+            }
         }
 
         return playerState.findFirstEmptyHotbarSlot();
@@ -2046,6 +2075,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
     protected void clearPlayerInventorySelection() {
         selectedPlayerInventoryItemId = null;
+        selectedPlayerInventorySlotIndex = -1;
         refreshPlayerInventorySelectionHighlight();
     }
 
@@ -2090,6 +2120,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
         if (tryUnlockRecipeItem(slot.itemId(), () -> player.getInventory().removeItem(slot.itemId(), 1))) {
             selectedPlayerInventoryItemId = null;
+            selectedPlayerInventorySlotIndex = -1;
             refreshPlayerInventoryView();
             refreshHotbarView();
             refreshEquippedItemVisual();
@@ -2102,6 +2133,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
         applyFoodEffectData(effectData);
         selectedPlayerInventoryItemId = null;
+        selectedPlayerInventorySlotIndex = -1;
         refreshPlayerInventoryView();
         refreshHotbarView();
         refreshEquippedItemVisual();

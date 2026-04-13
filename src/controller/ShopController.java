@@ -445,17 +445,29 @@ public class ShopController implements Initializable, SceneController {
             AppDialogs.showMessageDialog(null, "No item selected to buy.");
             return;
         }
+
+        Map<Integer, Integer> additions = new LinkedHashMap<>();
+        for (var e : buyCart.entrySet()) {
+            int itemId = e.getKey();
+            int qty = e.getValue() == null ? 0 : e.getValue().get();
+            if (itemId > 0 && qty > 0) {
+                additions.merge(itemId, qty, Integer::sum);
+            }
+        }
+
+        if (!additions.isEmpty() && !inv.canAddItems(additions)) {
+            AppDialogs.showMessageDialog(null, "Not enough inventory space to buy those items.");
+            return;
+        }
         if (!inv.canAfford(total)) return;
 
         int coinsBefore = inv.getCoins();
         if (!inv.spendCoins(total)) return;
 
-        for (var e : buyCart.entrySet()) {
-            int itemId = e.getKey();
-            int qty = e.getValue().get();
-            if (qty > 0) {
-                inv.addItem(itemId, qty);
-            }
+        if (!additions.isEmpty() && !inv.addItems(additions)) {
+            inv.addCoins(total);
+            AppDialogs.showMessageDialog(null, "Not enough inventory space to buy those items.");
+            return;
         }
 
         clearBuySelectionCommitted();

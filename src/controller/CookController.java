@@ -23,6 +23,7 @@ import model.Inventory;
 import model.ItemDatabase;
 import model.RecipeCatalog;
 import model.item;
+import util.AppDialogs;
 import util.SceneManager;
 import util.SpawnTag;
 
@@ -487,7 +488,11 @@ public class CookController implements Initializable, SceneController {
         if (!gameState.isCookingReady(now)) return;
 
         if (gameState.isActiveCookingSuccess()) {
-            inventory.addItem(selectedRecipe.outputItemId, gameState.getActiveCookingOutputQuantity());
+            int qty = gameState.getActiveCookingOutputQuantity();
+            if (qty > 0 && !inventory.addItem(selectedRecipe.outputItemId, qty)) {
+                AppDialogs.showMessageDialog(null, "Not enough inventory space to collect the cooked dish.");
+                return;
+            }
         }
         gameState.clearCookingJob();
         updateCookingStateUi();

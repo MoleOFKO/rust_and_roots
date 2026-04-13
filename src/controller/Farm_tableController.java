@@ -225,13 +225,27 @@ public class Farm_tableController implements Initializable, SceneController {
         }
 
         Map<Integer, Integer> seedsToRemove = computeSeedConsumption();
+        Map<Integer, Integer> outputsToAdd = buildFarmOutputAdditions();
         int staminaCost = computePendingFarmStaminaCost();
         if (gameState.getPlayerState().getStamina() < staminaCost) {
             AppDialogs.showMessageDialog(null, "Not enough stamina to confirm these farm changes.");
             return false;
         }
-        if (!moveEquippedFarmToolsToStorage(realFarm)) {
+
+        for (Map.Entry<Integer, Integer> entry : seedsToRemove.entrySet()) {
+            if (!hasEnoughInPlayerStorage(entry.getKey(), entry.getValue())) {
+                AppDialogs.showMessageDialog(null, "You do not have enough seeds left to confirm those plantings.");
+                return false;
+            }
+        }
+
+        if (!canSyncEquippedFarmTools(realFarm)) {
             AppDialogs.showMessageDialog(null, "The selected farm tools are no longer available in your inventory or hotbar.");
+            return false;
+        }
+
+        if (!canFitInventoryAfterFarmCommit(inv, realFarm, seedsToRemove, outputsToAdd)) {
+            AppDialogs.showMessageDialog(null, "Not enough inventory space to collect the harvest/seed returns.");
             return false;
         }
 
@@ -241,14 +255,18 @@ public class Farm_tableController implements Initializable, SceneController {
                 return false;
             }
         }
-        gameState.getPlayerState().consumeStamina(staminaCost);
 
-        for (Map.Entry<Integer, Integer> entry : pendingHarvests.entrySet()) {
-            inv.addItem(entry.getKey(), entry.getValue());
+        if (!moveEquippedFarmToolsToStorage(realFarm)) {
+            AppDialogs.showMessageDialog(null, "The selected farm tools are no longer available in your inventory or hotbar.");
+            return false;
         }
-        for (Map.Entry<Integer, Integer> entry : pendingSeedReturns.entrySet()) {
-            inv.addItem(entry.getKey(), entry.getValue());
+
+        if (!outputsToAdd.isEmpty() && !inv.addItems(outputsToAdd)) {
+            AppDialogs.showMessageDialog(null, "Not enough inventory space to collect the harvest/seed returns.");
+            return false;
         }
+
+        gameState.getPlayerState().consumeStamina(staminaCost);
 
         if (pendingFarmingExp > 0) {
             gameState.getPlayerSkills().addFarmingExp(pendingFarmingExp);
@@ -257,6 +275,162 @@ public class Farm_tableController implements Initializable, SceneController {
         tempPlots.forEach((plotId, temp) -> temp.applyTo(realFarm.getPlot(plotId)));
         returnToPreviousScene();
         return true;
+    }
+
+    private Map<Integer, Integer> buildFarmOutputAdditions() {
+        Map<Integer, Integer> additions = new LinkedHashMap<>();
+        for (Map.Entry<Integer, Integer> entry : pendingHarvests.entrySet()) {
+            int itemId = entry.getKey() == null ? -1 : entry.getKey();
+            int qty = entry.getValue() == null ? 0 : entry.getValue();
+            if (itemId > 0 && qty > 0) {
+                additions.merge(itemId, qty, Integer::sum);
+            }
+        }
+        for (Map.Entry<Integer, Integer> entry : pendingSeedReturns.entrySet()) {
+            int itemId = entry.getKey() == null ? -1 : entry.getKey();
+            int qty = entry.getValue() == null ? 0 : entry.getValue();
+            if (itemId > 0 && qty > 0) {
+                additions.merge(itemId, qty, Integer::sum);
+            }
+        }
+        return additions;
+    }
+
+    private boolean hasEnoughInPlayerStorage(int itemId, int qty) {
+        if (itemId <= 0 || qty <= 0) return true;
+        return getPlayerStorageCount(itemId) >= qty;
+    }
+
+    private boolean canSyncEquippedFarmTools(FarmState realFarm) {
+        if (realFarm == null) return false;
+
+        Integer targetWateringCan = normalizeItemId(equippedWateringCanItemId);
+        Integer targetSickle = normalizeItemId(equippedSickleItemId);
+        Integer currentWateringCan = normalizeItemId(realFarm.getEquippedWateringCanItemId());
+        Integer currentSickle = normalizeItemId(realFarm.getEquippedSickleItemId());
+
+        return canSyncSingleTool(currentWateringCan, targetWateringCan)
+                && canSyncSingleTool(currentSickle, targetSickle);
+    }
+
+    private boolean canSyncSingleTool(Integer currentItemId, Integer targetItemId) {
+        Integer normalizedCurrent = normalizeItemId(currentItemId);
+        Integer normalizedTarget = normalizeItemId(targetItemId);
+
+        if (java.util.Objects.equals(normalizedCurrent, normalizedTarget)) {
+            return true;
+        }
+
+        if (normalizedTarget == null) {
+            return true;
+        }
+
+        return hasEnoughInPlayerStorage(normalizedTarget, 1);
+    }
+
+    private int getPlayerStorageCount(int itemId) {
+        if (itemId <= 0 || gameState == null || gameState.getPlayerState() == null) {
+            return 0;
+        }
+
+        int total = gameState.getPlayerState().getInventory().getCount(itemId);
+        for (int i = 0; i < gameState.getPlayerState().getHotbarSize(); i++) {
+            if (gameState.getPlayerState().getHotbarItemId(i) == itemId) {
+                total += gameState.getPlayerState().getHotbarItemCount(i);
+            }
+        }
+        return total;
+    }
+
+    private boolean canFitInventoryAfterFarmCommit(
+            Inventory inventory,
+            FarmState realFarm,
+            Map<Integer, Integer> seedsToRemove,
+            Map<Integer, Integer> outputsToAdd
+    ) {
+        if (inventory == null) return false;
+
+        Map<Integer, Integer> counts = new LinkedHashMap<>(inventory.snapshot());
+
+        // Simulate seeds being removed from the INVENTORY first (hotbar removals do not affect inventory capacity).
+        if (seedsToRemove != null) {
+            for (Map.Entry<Integer, Integer> entry : seedsToRemove.entrySet()) {
+                int itemId = entry.getKey() == null ? -1 : entry.getKey();
+                int qty = entry.getValue() == null ? 0 : entry.getValue();
+                if (itemId <= 0 || qty <= 0) continue;
+
+                int current = counts.getOrDefault(itemId, 0);
+                int remove = Math.min(current, qty);
+                int next = current - remove;
+                if (next <= 0) {
+                    counts.remove(itemId);
+                } else {
+                    counts.put(itemId, next);
+                }
+            }
+        }
+
+        // Simulate tool swaps (removes come from inventory first; returns go back to inventory).
+        if (realFarm != null && gameState != null && gameState.getPlayerState() != null) {
+            simulateSingleToolSwap(counts, normalizeItemId(realFarm.getEquippedWateringCanItemId()), normalizeItemId(equippedWateringCanItemId));
+            simulateSingleToolSwap(counts, normalizeItemId(realFarm.getEquippedSickleItemId()), normalizeItemId(equippedSickleItemId));
+        }
+
+        if (outputsToAdd != null) {
+            for (Map.Entry<Integer, Integer> entry : outputsToAdd.entrySet()) {
+                int itemId = entry.getKey() == null ? -1 : entry.getKey();
+                int qty = entry.getValue() == null ? 0 : entry.getValue();
+                if (itemId > 0 && qty > 0) {
+                    counts.merge(itemId, qty, Integer::sum);
+                }
+            }
+        }
+
+        return computeUsedSlots(counts) <= inventory.getSlotCapacity();
+    }
+
+    private void simulateSingleToolSwap(Map<Integer, Integer> inventoryCounts, Integer currentItemId, Integer targetItemId) {
+        if (inventoryCounts == null) return;
+
+        Integer normalizedCurrent = normalizeItemId(currentItemId);
+        Integer normalizedTarget = normalizeItemId(targetItemId);
+
+        if (java.util.Objects.equals(normalizedCurrent, normalizedTarget)) {
+            return;
+        }
+
+        // Equip new target: remove it from inventory first if present.
+        if (normalizedTarget != null) {
+            int current = inventoryCounts.getOrDefault(normalizedTarget, 0);
+            if (current > 0) {
+                int next = current - 1;
+                if (next <= 0) {
+                    inventoryCounts.remove(normalizedTarget);
+                } else {
+                    inventoryCounts.put(normalizedTarget, next);
+                }
+            }
+        }
+
+        // Unequip old current: return it to inventory.
+        if (normalizedCurrent != null) {
+            inventoryCounts.merge(normalizedCurrent, 1, Integer::sum);
+        }
+    }
+
+    private int computeUsedSlots(Map<Integer, Integer> counts) {
+        if (counts == null || counts.isEmpty()) return 0;
+
+        int used = 0;
+        for (Map.Entry<Integer, Integer> entry : counts.entrySet()) {
+            int itemId = entry.getKey() == null ? -1 : entry.getKey();
+            int qty = entry.getValue() == null ? 0 : entry.getValue();
+            if (itemId <= 0 || qty <= 0) continue;
+
+            int maxStack = Math.max(1, ItemDatabase.getMaxStackSize(itemId));
+            used += (int) ((Math.max(0L, (long) qty) + (long) maxStack - 1L) / (long) maxStack);
+        }
+        return used;
     }
 
     @FXML
@@ -916,15 +1090,25 @@ public class Farm_tableController implements Initializable, SceneController {
         Integer currentWateringCan = normalizeItemId(realFarm.getEquippedWateringCanItemId());
         Integer currentSickle = normalizeItemId(realFarm.getEquippedSickleItemId());
 
-        if (!syncSingleEquippedTool(currentWateringCan, targetWateringCan)) return false;
-        if (!syncSingleEquippedTool(currentSickle, targetSickle)) return false;
+        List<ToolSyncDelta> deltas = new ArrayList<>();
+
+        if (!applyToolSwap(currentWateringCan, targetWateringCan, deltas)) {
+            rollbackToolSwaps(deltas);
+            return false;
+        }
+        if (!applyToolSwap(currentSickle, targetSickle, deltas)) {
+            rollbackToolSwaps(deltas);
+            return false;
+        }
 
         realFarm.setEquippedWateringCanItemId(targetWateringCan);
         realFarm.setEquippedSickleItemId(targetSickle);
         return true;
     }
 
-    private boolean syncSingleEquippedTool(Integer currentItemId, Integer targetItemId) {
+    private record ToolSyncDelta(int removedItemId, int addedItemId) {}
+
+    private boolean applyToolSwap(Integer currentItemId, Integer targetItemId, List<ToolSyncDelta> deltas) {
         Integer normalizedCurrent = normalizeItemId(currentItemId);
         Integer normalizedTarget = normalizeItemId(targetItemId);
 
@@ -932,21 +1116,59 @@ public class Farm_tableController implements Initializable, SceneController {
             return true;
         }
 
-        if (normalizedTarget == null) {
-            if (normalizedCurrent != null) {
-                gameState.getPlayerState().getInventory().addItem(normalizedCurrent, 1);
-            }
-            return true;
-        }
+        int removedId = 0;
+        int addedId = 0;
 
-        if (!removeSingleItemFromPlayerStorage(normalizedTarget)) {
-            return false;
+        if (normalizedTarget != null) {
+            if (!removeSingleItemFromPlayerStorage(normalizedTarget)) {
+                return false;
+            }
+            removedId = normalizedTarget;
         }
 
         if (normalizedCurrent != null) {
-            gameState.getPlayerState().getInventory().addItem(normalizedCurrent, 1);
+            if (!gameState.getPlayerState().getInventory().addItem(normalizedCurrent, 1)) {
+                restoreToolToStorage(removedId);
+                return false;
+            }
+            addedId = normalizedCurrent;
         }
+
+        if (removedId > 0 || addedId > 0) {
+            deltas.add(new ToolSyncDelta(removedId, addedId));
+        }
+
         return true;
+    }
+
+    private void rollbackToolSwaps(List<ToolSyncDelta> deltas) {
+        if (deltas == null || deltas.isEmpty()) return;
+        if (gameState == null || gameState.getPlayerState() == null) return;
+
+        Inventory inv = gameState.getPlayerState().getInventory();
+        for (int i = deltas.size() - 1; i >= 0; i--) {
+            ToolSyncDelta delta = deltas.get(i);
+            if (delta == null) continue;
+
+            if (delta.addedItemId() > 0) {
+                inv.removeItem(delta.addedItemId(), 1);
+            }
+
+            restoreToolToStorage(delta.removedItemId());
+        }
+    }
+
+    private void restoreToolToStorage(int itemId) {
+        if (itemId <= 0 || gameState == null || gameState.getPlayerState() == null) {
+            return;
+        }
+
+        Inventory inv = gameState.getPlayerState().getInventory();
+        if (inv.addItem(itemId, 1)) {
+            return;
+        }
+
+        gameState.getPlayerState().tryAddHotbarItems(itemId, 1);
     }
 
     private boolean removeSingleItemFromPlayerStorage(int itemId) {
