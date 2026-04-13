@@ -350,6 +350,8 @@ public class LeftMapNooneController extends BaseMapController {
     private Button openstatus;
     @FXML
     private Button opensetting;
+    @FXML
+    private ImageView equip_img;
   
 
     @Override

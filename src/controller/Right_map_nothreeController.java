@@ -377,6 +377,8 @@ public class Right_map_nothreeController extends BaseMapController {
     private Button openstatus;
     @FXML
     private Button opensetting;
+    @FXML
+    private ImageView equip_img;
 
     @Override
     protected String mapKey() {
@@ -388,7 +390,7 @@ public class Right_map_nothreeController extends BaseMapController {
         registerExit(exit_left, "/view/upper_map_nothree.fxml", SpawnTag.FROM_RIGHT);
         registerExit(exit_right, "/view/right_map_nothree_of_one.fxml", SpawnTag.FROM_LEFT);
         registerExit(exit_up, "/view/right_map_nofour.fxml", SpawnTag.FROM_DOWN);
-        registerExit(exit_bottom, "/view/right_mapnotwo.fxml", SpawnTag.FROM_UP);
+        registerExit(exit_down, "/view/right_mapnotwo.fxml", SpawnTag.FROM_UP);
     }
 
     @FXML

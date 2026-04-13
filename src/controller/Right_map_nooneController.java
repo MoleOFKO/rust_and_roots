@@ -350,6 +350,10 @@ public class Right_map_nooneController extends BaseMapController {
     private Button openstatus;
     @FXML
     private Button opensetting;
+    @FXML
+    private ImageView equip_img;
+    @FXML
+    private Rectangle spawn_from_right1;
 
     @Override
     protected String mapKey() {

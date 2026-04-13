@@ -35,7 +35,7 @@
             </Group>
             <Group layoutX="7.0" layoutY="71.0">
                <children>
-                  <Rectangle fx:id="exit_left" height="39.0" layoutX="-6.0" layoutY="72.0" opacity="0" width="15" />
+                  <Rectangle fx:id="exit_left" height="39.0" layoutX="-6.0" layoutY="72.0" opacity="0" width="6.0" />
                   <Label fx:id="hotbarguide" layoutX="225.0" layoutY="299.0" text="press 'e' to open hotbar">
                      <font>
                         <Font name="System Bold" size="12.0" />
@@ -48,8 +48,8 @@
             </Group>
             <Group layoutX="40.0" layoutY="90.0">
                <children>
-                  <Rectangle fx:id="spawn_default" height="10" layoutX="251.0" layoutY="55.0" opacity="0" width="10" />
-                  <Rectangle fx:id="spawn_from_left" height="10" layoutX="-11.0" layoutY="64.0" opacity="0" width="10" />
+                  <Rectangle fx:id="spawn_default" height="10" layoutX="251.0" layoutY="66.0" opacity="0" width="10" />
+                  <Rectangle fx:id="spawn_from_left" height="10" layoutX="-6.0" layoutY="66.0" opacity="0" width="10" />
                </children>
             </Group>
             <Group fx:id="walls" visible="false">

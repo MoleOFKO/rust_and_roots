@@ -351,6 +351,8 @@ public class Upper_map_nofourController extends BaseMapController{
     private Button openstatus;
     @FXML
     private Button opensetting;
+    @FXML
+    private ImageView equip_img;
    
 
     @Override
@@ -362,14 +364,15 @@ public class Upper_map_nofourController extends BaseMapController{
     protected void configureExits() {
         
         registerExit(exit_right, "/view/right_map_nofour.fxml", SpawnTag.FROM_LEFT);
-        if (exit_left != null) {
-            interactionManager.addZone(new InteractionZone(
-                exit_left,
-                null,
-                () -> JOptionPane.showMessageDialog(null, "Map unavailable"),
-                MAP_EXIT_DELAY_GAME_SECONDS
-            ));
-        }
+        registerExit(exit_left, "/view/right_map_nofour.fxml", SpawnTag.FROM_RIGHT);
+//        if (exit_left != null) {
+//            interactionManager.addZone(new InteractionZone(
+//                exit_left,
+//                null,
+//                () -> JOptionPane.showMessageDialog(null, "Map unavailable"),
+//                MAP_EXIT_DELAY_GAME_SECONDS
+//            ));
+//        }
     }
 
     @FXML

@@ -33,32 +33,48 @@
                   <Rectangle fx:id="human_hitbox" arcHeight="6" arcWidth="6" height="24" layoutX="18" layoutY="34" visible="false" width="28" />
                </children>
             </Group>
+            <Group fx:id="walls">
+               <children>
+                  <Rectangle fx:id="wall" height="3.0" layoutX="0" layoutY="0" opacity="0.0" width="600" />
+                  <Rectangle fx:id="wall1" layoutY="399.0" opacity="0.0" width="600" />
+                  <Rectangle fx:id="wall2" height="400" layoutX="0" layoutY="0" opacity="0.0" width="3.0" />
+                  <Rectangle fx:id="wall3" height="400" layoutX="599.0" opacity="0.0" width="2.0" />
+                  <Rectangle fx:id="wall4" fill="TRANSPARENT" height="182.0" layoutX="474.0" layoutY="208.0" opacity="0.0" stroke="BLACK" width="123.0" />
+                  <Rectangle fx:id="wall5" fill="TRANSPARENT" height="89.0" layoutX="389.0" layoutY="239.0" opacity="0.0" stroke="BLACK" width="91.0" />
+                  <Rectangle fx:id="wall6" fill="TRANSPARENT" height="14.0" layoutX="398.0" layoutY="224.0" opacity="0.0" stroke="BLACK" width="75.0" />
+                  <Rectangle fx:id="wall7" fill="TRANSPARENT" height="8.0" layoutX="429.0" layoutY="217.0" opacity="0.0" stroke="BLACK" width="46.0" />
+                  <Rectangle fx:id="wall8" fill="TRANSPARENT" height="15.0" layoutX="405.0" layoutY="328.0" opacity="0.0" stroke="BLACK" width="67.0" />
+                  <Rectangle fx:id="wall9" fill="TRANSPARENT" height="16.0" layoutX="415.0" layoutY="344.0" opacity="0.0" stroke="BLACK" width="59.0" />
+                  <Rectangle fx:id="wall10" fill="TRANSPARENT" height="17.0" layoutX="436.0" layoutY="360.0" opacity="0.0" stroke="BLACK" width="43.0" />
+                  <Rectangle fx:id="wall11" fill="TRANSPARENT" height="48.0" layoutX="524.0" layoutY="10.0" opacity="0.0" stroke="BLACK" width="44.0" />
+                  <Rectangle fx:id="wall12" fill="TRANSPARENT" height="50.0" layoutX="559.0" layoutY="39.0" opacity="0.0" stroke="BLACK" width="37.0" />
+                  <Rectangle fx:id="wall13" fill="TRANSPARENT" height="49.0" layoutX="532.0" layoutY="23.0" opacity="0.0" stroke="BLACK" width="30.0" />
+                  <Rectangle fx:id="wall14" fill="TRANSPARENT" height="16.0" layoutX="516.0" layoutY="11.0" opacity="0.0" stroke="BLACK" width="31.0" />
+               </children>
+            </Group>
+            <Group layoutX="7.0" layoutY="71.0">
+               <children>
+                  <Rectangle fx:id="exit_left" height="39.0" layoutX="-3.0" layoutY="66.0" opacity="0" width="7.0" />
+                  <Rectangle fx:id="exit_down" height="17.0" layoutX="257.0" layoutY="312.0" opacity="0" width="66.0" />
+                  <Rectangle fx:id="exit_right" height="39.0" layoutX="584.0" layoutY="76.0" opacity="0" width="7.0" />
+                  <Rectangle fx:id="exit_up" height="8.0" layoutX="417.0" layoutY="-64.0" opacity="0" width="34.0" />
+                  <Label fx:id="hotbarguide" layoutX="226.0" layoutY="309.0" text="press 'e' to open hotbar">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
+                     <effect>
+                        <DropShadow color="white" height="10.5" radius="6.9925" spread="0.67" width="19.47" />
+                     </effect>
+                  </Label>
+               </children>
+            </Group>
             <Group layoutX="40.0" layoutY="90.0">
                <children>
                   <Rectangle fx:id="spawn_default" height="10" layoutX="200.0" layoutY="57.0" opacity="0" width="10" />
-                  <Rectangle fx:id="spawn_from_left" height="10" layoutX="-9.0" layoutY="57.0" opacity="0" width="10" />
-                  <Rectangle fx:id="spawn_from_down" height="10" layoutX="269.0" layoutY="265.0" opacity="0" width="10" />
-                  <Rectangle fx:id="spawn_from_right" height="10" layoutX="516.0" layoutY="72.0" opacity="0" width="10" />
-                  <Rectangle fx:id="spawn_from_up" height="10" layoutX="378.0" layoutY="-55.0" opacity="0" width="10" />
-               </children>
-            </Group>
-            <Group fx:id="walls">
-               <children>
-                  <Rectangle fx:id="wall" height="3.0" layoutX="0" layoutY="0" width="600" />
-                  <Rectangle fx:id="wall1" height="2.0" layoutY="399.0" width="600" />
-                  <Rectangle fx:id="wall2" height="400" layoutX="0" layoutY="0" width="3.0" />
-                  <Rectangle fx:id="wall3" height="400" layoutX="599.0" width="2.0" />
-                  <Rectangle fx:id="wall4" fill="TRANSPARENT" height="182.0" layoutX="474.0" layoutY="208.0" stroke="BLACK" width="123.0" />
-                  <Rectangle fx:id="wall5" fill="TRANSPARENT" height="89.0" layoutX="389.0" layoutY="239.0" stroke="BLACK" width="91.0" />
-                  <Rectangle fx:id="wall6" fill="TRANSPARENT" height="14.0" layoutX="398.0" layoutY="224.0" stroke="BLACK" width="75.0" />
-                  <Rectangle fx:id="wall7" fill="TRANSPARENT" height="8.0" layoutX="429.0" layoutY="217.0" stroke="BLACK" width="46.0" />
-                  <Rectangle fx:id="wall8" fill="TRANSPARENT" height="15.0" layoutX="405.0" layoutY="328.0" stroke="BLACK" width="67.0" />
-                  <Rectangle fx:id="wall9" fill="TRANSPARENT" height="16.0" layoutX="415.0" layoutY="344.0" stroke="BLACK" width="59.0" />
-                  <Rectangle fx:id="wall10" fill="TRANSPARENT" height="17.0" layoutX="436.0" layoutY="360.0" stroke="BLACK" width="43.0" />
-                  <Rectangle fx:id="wall11" fill="TRANSPARENT" height="48.0" layoutX="524.0" layoutY="10.0" stroke="BLACK" width="44.0" />
-                  <Rectangle fx:id="wall12" fill="TRANSPARENT" height="50.0" layoutX="559.0" layoutY="39.0" stroke="BLACK" width="37.0" />
-                  <Rectangle fx:id="wall13" fill="TRANSPARENT" height="49.0" layoutX="532.0" layoutY="23.0" stroke="BLACK" width="30.0" />
-                  <Rectangle fx:id="wall14" fill="TRANSPARENT" height="16.0" layoutX="516.0" layoutY="11.0" stroke="BLACK" width="31.0" />
+                  <Rectangle fx:id="spawn_from_left" height="10" layoutY="62.0" opacity="0" width="10" />
+                  <Rectangle fx:id="spawn_from_down" height="18.0" layoutX="263.0" layoutY="244.0" opacity="0" width="24.0" />
+                  <Rectangle fx:id="spawn_from_right" height="10" layoutX="510.0" layoutY="67.0" opacity="0" width="10" />
+                  <Rectangle fx:id="spawn_from_up" height="10" layoutX="398.0" layoutY="-52.0" opacity="0" width="10" />
                </children>
             </Group>
             <Group layoutX="10.0">
@@ -870,22 +886,6 @@
                         <Button fx:id="opensetting" layoutX="375.0" layoutY="29.0" mnemonicParsing="false" onAction="#handleopensettingaction" opacity="0.0" prefHeight="25.0" prefWidth="64.0" />
                      </children>
                   </Pane>
-               </children>
-            </Group>
-            <Group layoutX="7.0" layoutY="71.0">
-               <children>
-                  <Rectangle fx:id="exit_left" height="39.0" layoutX="-3.0" layoutY="66.0" opacity="0" width="15" />
-                  <Rectangle fx:id="exit_down" height="25.0" layoutX="257.0" layoutY="304.0" opacity="0" width="66.0" />
-                  <Rectangle fx:id="exit_right" height="39.0" layoutX="571.0" layoutY="76.0" opacity="0" width="15" />
-                  <Rectangle fx:id="exit_up" height="15" layoutX="382.0" layoutY="-64.0" opacity="0" width="66.0" />
-                  <Label fx:id="hotbarguide" layoutX="226.0" layoutY="309.0" text="press 'e' to open hotbar">
-                     <font>
-                        <Font name="System Bold" size="12.0" />
-                     </font>
-                     <effect>
-                        <DropShadow color="white" height="10.5" radius="6.9925" spread="0.67" width="19.47" />
-                     </effect>
-                  </Label>
                </children>
             </Group>
          </children>

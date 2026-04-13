@@ -51,8 +51,6 @@ public class Upper_map_notwoController extends BaseMapController {
     @FXML
     private Rectangle spawn_from_right;
     @FXML
-    private Rectangle spawn_from_bottom;
-    @FXML
     private Group human;
     @FXML
     private Rectangle human_hitbox;
@@ -350,6 +348,10 @@ public class Upper_map_notwoController extends BaseMapController {
     private Button openstatus;
     @FXML
     private Button opensetting;
+    @FXML
+    private Rectangle spawn_from_down;
+    @FXML
+    private ImageView equip_img;
  
 
     @Override

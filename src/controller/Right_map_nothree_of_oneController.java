@@ -378,6 +378,8 @@ public class Right_map_nothree_of_oneController extends BaseMapController{
     private Button openstatus;
     @FXML
     private Button opensetting;
+    @FXML
+    private ImageView equip_img;
 
     @Override
     protected String mapKey() {
