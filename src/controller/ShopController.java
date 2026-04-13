@@ -676,15 +676,23 @@ public class ShopController implements Initializable, SceneController {
             if (itemId == null || itemId <= 0) {
                 continue;
             }
-            displayed.add(new SellInventoryEntry(
-                itemId,
-                inv.getCount(itemId),
-                SellInventoryEntrySource.INVENTORY,
-                -1
-            ));
-            if (displayed.size() >= slotCapacity) {
-                return displayed;
+
+            int remaining = inv.getCount(itemId);
+            if (remaining <= 0) continue;
+
+            int maxStack = Math.max(1, ItemDatabase.getMaxStackSize(itemId));
+            while (remaining > 0 && displayed.size() < slotCapacity) {
+                int stackQty = Math.min(maxStack, remaining);
+                displayed.add(new SellInventoryEntry(
+                    itemId,
+                    stackQty,
+                    SellInventoryEntrySource.INVENTORY,
+                    -1
+                ));
+                remaining -= stackQty;
             }
+
+            if (displayed.size() >= slotCapacity) return displayed;
         }
 
         if (gameState == null || gameState.getPlayerState() == null) {
@@ -831,12 +839,35 @@ public class ShopController implements Initializable, SceneController {
         List<Integer> selected = new ArrayList<>(sellCart.keySet());
         selected.sort(Comparator.comparing(this::itemNameSafe, String.CASE_INSENSITIVE_ORDER));
 
+        List<int[]> stackEntries = new ArrayList<>();
+        int maxStacksToShow = sellBtns.size();
+
+        for (Integer itemId : selected) {
+            if (itemId == null || itemId <= 0) continue;
+
+            IntegerProperty qtyProp = sellCart.get(itemId);
+            int qty = qtyProp == null ? 0 : qtyProp.get();
+            if (qty <= 0) continue;
+
+            int maxStack = Math.max(1, ItemDatabase.getMaxStackSize(itemId));
+            int remaining = qty;
+            while (remaining > 0 && stackEntries.size() < maxStacksToShow) {
+                int stackQty = Math.min(maxStack, remaining);
+                stackEntries.add(new int[] { itemId, stackQty });
+                remaining -= stackQty;
+            }
+
+            if (stackEntries.size() >= maxStacksToShow) {
+                break;
+            }
+        }
+
         for (int i = 0; i < sellBtns.size(); i++) {
             ImageView img = sellImages.get(i);
             Label lbl = sellLabels.get(i);
             Button btn = sellBtns.get(i);
 
-            if (i >= selected.size()) {
+            if (i >= stackEntries.size()) {
                 if (img != null) {
                     img.setImage(null);
                     img.setStyle("");
@@ -855,8 +886,10 @@ public class ShopController implements Initializable, SceneController {
                 continue;
             }
 
-            int itemId = selected.get(i);
-            int qty = sellCart.get(itemId).get();
+            int[] entry = stackEntries.get(i);
+            int itemId = entry[0];
+            int stackQty = entry[1];
+            int totalQty = sellCart.containsKey(itemId) ? sellCart.get(itemId).get() : 0;
 
             if (img != null) {
                 img.setImage(ItemDatabase.getImage(itemId));
@@ -867,13 +900,13 @@ public class ShopController implements Initializable, SceneController {
             }
 
             if (lbl != null) {
-                lbl.setText("x" + qty);
+                lbl.setText("x" + stackQty);
                 lbl.setStyle("-fx-text-fill: #c6ffb0; -fx-font-weight: bold;");
             }
 
             if (btn != null) {
                 btn.setDisable(mode != Mode.SELL);
-                btn.setOnAction(e -> setSellSelectionQty(itemId, qty - 1));
+                btn.setOnAction(e -> setSellSelectionQty(itemId, totalQty - 1));
             }
         }
     }
