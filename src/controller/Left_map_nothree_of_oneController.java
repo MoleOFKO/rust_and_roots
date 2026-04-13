@@ -366,6 +366,8 @@ public class Left_map_nothree_of_oneController extends BaseMapController {
     private Button openstatus;
     @FXML
     private Button opensetting;
+    @FXML
+    private ImageView equip_img;
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {

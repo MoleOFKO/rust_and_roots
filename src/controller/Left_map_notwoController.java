@@ -350,6 +350,8 @@ public class Left_map_notwoController extends BaseMapController {
     private Button openstatus;
     @FXML
     private Button opensetting;
+    @FXML
+    private ImageView equip_img;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {

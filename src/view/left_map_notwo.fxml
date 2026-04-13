@@ -28,9 +28,9 @@
             </ImageView>
             <Group layoutX="166.0" layoutY="2.0">
                <children>
-                  <Rectangle fx:id="exit_down" height="18.0" layoutX="92.0" layoutY="379.0" opacity="0" width="70.0" />
-                  <Rectangle fx:id="exit_right" height="38.0" layoutX="412.0" layoutY="117.0" opacity="0" width="20.0" />
-                  <Rectangle fx:id="exit_left" height="38.0" layoutX="-167.0" layoutY="126.0" opacity="0" width="17.0" />
+                  <Rectangle fx:id="exit_down" height="11.0" layoutX="92.0" layoutY="387.0" opacity="0" width="70.0" />
+                  <Rectangle fx:id="exit_right" height="38.0" layoutX="424.0" layoutY="117.0" opacity="0" width="9.0" />
+                  <Rectangle fx:id="exit_left" height="38.0" layoutX="-167.0" layoutY="126.0" opacity="0" width="8.0" />
                   <Label fx:id="hotbarguide" layoutX="58.0" layoutY="376.0" text="press 'e' to open hotbar">
                      <font>
                         <Font name="System Bold" size="12.0" />
@@ -52,9 +52,9 @@
             <Group autoSizeChildren="false" layoutX="168.0" layoutY="25.0">
                <children>
                   <Rectangle fx:id="spawn_default" height="10" layoutX="122.0" layoutY="143.0" opacity="0" width="10" />
-                  <Rectangle fx:id="spawn_from_left" height="10" layoutX="-134.0" layoutY="125.0" opacity="0" width="10" />
-                  <Rectangle fx:id="spawn_from_right" height="10" layoutX="393.0" layoutY="110.0" opacity="0" width="10" />
-                  <Rectangle fx:id="spawn_from_down" height="10" layoutX="120.0" layoutY="336.0" opacity="0" width="10" />
+                  <Rectangle fx:id="spawn_from_left" height="10" layoutX="-127.0" layoutY="119.0" opacity="0" width="10" />
+                  <Rectangle fx:id="spawn_from_right" height="10" layoutX="375.0" layoutY="106.0" opacity="0" width="10" />
+                  <Rectangle fx:id="spawn_from_down" height="18.0" layoutX="118.0" layoutY="308.0" opacity="0" width="18.0" />
                </children>
             </Group>
             <Group fx:id="human" layoutX="268.0" layoutY="168.0">

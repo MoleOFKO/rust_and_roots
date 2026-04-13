@@ -360,6 +360,10 @@ public class Left_map_notwo_of_oneController extends BaseMapController {
     private Button openstatus;
     @FXML
     private Button opensetting;
+    @FXML
+    private ImageView equip_img;
+    @FXML
+    private Rectangle spawn_from_up;
     
 
     @Override

@@ -43,9 +43,9 @@
             </Group>
             <Group layoutX="167.0" layoutY="89.0">
                <children>
-                  <Rectangle fx:id="exit_left" height="39.0" layoutX="-162.0" layoutY="44.0" opacity="0" width="15" />
-                  <Rectangle fx:id="exit_down" height="15" layoutX="147.0" layoutY="288.0" opacity="0" width="66.0" />
-                  <Rectangle fx:id="exit_right" height="39.0" layoutX="410.0" layoutY="80.0" opacity="0" width="15" />
+                  <Rectangle fx:id="exit_left" height="39.0" layoutX="-165.0" layoutY="44.0" opacity="0" width="6.0" />
+                  <Rectangle fx:id="exit_down" height="11.0" layoutX="147.0" layoutY="298.0" opacity="0" width="66.0" />
+                  <Rectangle fx:id="exit_right" height="39.0" layoutX="425.0" layoutY="80.0" opacity="0" width="7.0" />
                   <Label fx:id="hotbarguide" layoutX="66.0" layoutY="280.0" text="press 'e' to open hotbar">
                      <font>
                         <Font name="System Bold" size="12.0" />
@@ -59,9 +59,10 @@
             <Group layoutX="155.0" layoutY="105.0">
                <children>
                   <Rectangle fx:id="spawn_default" height="10" layoutX="200.0" layoutY="57.0" opacity="0" width="10" />
-                  <Rectangle fx:id="spawn_from_left" height="10" layoutX="-114.0" layoutY="43.0" opacity="0" width="10" />
-                  <Rectangle fx:id="spawn_from_down" height="10" layoutX="184.0" layoutY="253.0" opacity="0" width="10" />
-                  <Rectangle fx:id="spawn_from_right" height="10" layoutX="397.0" layoutY="79.0" opacity="0" width="10" />
+                  <Rectangle fx:id="spawn_from_left" height="10" layoutX="-112.0" layoutY="43.0" opacity="0" width="10" />
+                  <Rectangle fx:id="spawn_from_down" height="20.0" layoutX="178.0" layoutY="241.0" opacity="0" width="19.0" />
+                  <Rectangle fx:id="spawn_from_right" height="10" layoutX="392.0" layoutY="79.0" opacity="0" width="10" />
+                  <Rectangle fx:id="spawn_from_right1" height="10" layoutX="402.0" layoutY="89.0" opacity="0" width="10" />
                </children>
             </Group>
             <Group layoutX="10.0" layoutY="-1.0">

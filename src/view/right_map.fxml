@@ -43,18 +43,11 @@
             <Rectangle fx:id="wall4" height="400" layoutX="596.0" width="1.0" />
         </Group>
 
-        <!-- Spawn points (invisible) -->
-        <Group>
-            <Rectangle fx:id="spawn_default" height="10" layoutX="300" layoutY="200" opacity="0" width="10" />
-            <Rectangle fx:id="spawn_from_left" height="10" layoutX="20.0" layoutY="190.0" opacity="0" width="10" />
-            <Rectangle fx:id="spawn_from_up" height="10" layoutX="270.0" layoutY="20" opacity="0" width="10" />
-        </Group>
-
         <!-- Exit trigger zones (invisible). BaseMapController uses InteractionZone on these. :contentReference[oaicite:10]{index=10} -->
         <Group>
             <!-- stepping into these rectangles triggers scene switch -->
-            <Rectangle fx:id="exit_left" height="39.0" layoutY="173.0" opacity="0" width="15" />
-            <Rectangle fx:id="exit_up" height="15" layoutX="252.0" opacity="0" width="51.0" />
+            <Rectangle fx:id="exit_left" height="39.0" layoutY="173.0" opacity="0" width="6.0" />
+            <Rectangle fx:id="exit_up" height="6.0" layoutX="252.0" opacity="0" width="51.0" />
          <Label fx:id="hotbarguide" layoutX="240.0" layoutY="375.0" text="press 'e' to open hotbar">
             <font>
                <Font name="System Bold" size="12.0" />
@@ -63,6 +56,13 @@
                <DropShadow color="white" height="10.5" radius="6.9925" spread="0.67" width="19.47" />
             </effect>
          </Label>
+        </Group>
+
+        <!-- Spawn points (invisible) -->
+        <Group>
+            <Rectangle fx:id="spawn_default" height="10" layoutX="300" layoutY="200" opacity="0" width="10" />
+            <Rectangle fx:id="spawn_from_left" height="10" layoutX="37.0" layoutY="186.0" opacity="0" width="10" />
+            <Rectangle fx:id="spawn_from_up" height="10" layoutX="275.0" layoutY="33.0" opacity="0" width="10" />
         </Group>
       <Group layoutX="10.0" layoutY="1.0">
          <children>

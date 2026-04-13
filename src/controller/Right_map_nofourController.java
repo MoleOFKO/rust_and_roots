@@ -358,6 +358,10 @@ public class Right_map_nofourController extends BaseMapController {
     private Button openstatus;
     @FXML
     private Button opensetting;
+    @FXML
+    private ImageView equip_img;
+    @FXML
+    private Rectangle wall811;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {

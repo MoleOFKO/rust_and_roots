@@ -50,8 +50,8 @@
             </Group>
             <Group layoutX="292.0" layoutY="187.0">
                <children>
-                  <Rectangle fx:id="exit_left" height="48.0" layoutX="287.0" layoutY="64.0" opacity="0" width="15" />
-                  <Rectangle fx:id="exit_up" height="15" layoutX="-40.0" layoutY="-183.0" opacity="0" width="51.0" />
+                  <Rectangle fx:id="exit_left" height="48.0" layoutX="301.0" layoutY="64.0" opacity="0" width="6.0" />
+                  <Rectangle fx:id="exit_up" height="8.0" layoutX="-40.0" layoutY="-188.0" opacity="0" width="51.0" />
                   <Label fx:id="hotbarguide" layoutX="-68.0" layoutY="188.0" text="press 'e' to open hotbar">
                      <font>
                         <Font name="System Bold" size="12.0" />
@@ -64,9 +64,9 @@
             </Group>
             <Group autoSizeChildren="false" layoutX="-112.0" layoutY="233.0">
                <children>
-                  <Rectangle fx:id="spawn_default" height="10" layoutX="663.0" layoutY="41.0" opacity="0" width="10" />
-                  <Rectangle fx:id="spawn_from_left" height="10" layoutX="439.0" layoutY="-35.0" opacity="0" width="10" />
-                  <Rectangle fx:id="spawn_from_up" height="10" layoutX="385.0" layoutY="-202.0" opacity="0" width="10" />
+                  <Rectangle fx:id="spawn_default" height="10" layoutX="444.0" layoutY="-20.0" opacity="0" width="10" />
+                  <Rectangle fx:id="spawn_from_right" height="10" layoutX="664.0" layoutY="38.0" opacity="0" width="10" />
+                  <Rectangle fx:id="spawn_from_up" height="10" layoutX="385.0" layoutY="-189.0" opacity="0" width="10" />
                </children>
             </Group>
             <Group fx:id="human">

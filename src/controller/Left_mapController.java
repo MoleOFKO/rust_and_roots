@@ -79,8 +79,6 @@ public class Left_mapController extends BaseMapController {
     @FXML
     private Rectangle spawn_default;
     @FXML
-    private Rectangle spawn_from_left;
-    @FXML
     private Rectangle spawn_from_up;
     @FXML
     private Group human;
@@ -378,6 +376,10 @@ public class Left_mapController extends BaseMapController {
     private Button openstatus;
     @FXML
     private Button opensetting;
+    @FXML
+    private ImageView equip_img;
+    @FXML
+    private Rectangle spawn_from_right;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {

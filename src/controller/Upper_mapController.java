@@ -51,17 +51,11 @@ public class Upper_mapController extends BaseMapController {
     @FXML
     private Rectangle wall8;
     @FXML
-    private Rectangle exit_left;
-    @FXML
     private Rectangle exit_up;
     @FXML
     private Rectangle spawn_default;
     @FXML
-    private Rectangle spawn_from_left;
-    @FXML
     private Rectangle spawn_from_up;
-    @FXML
-    private Rectangle spawn_from_bottom;
     @FXML
     private Group human;
     @FXML
@@ -360,6 +354,14 @@ public class Upper_mapController extends BaseMapController {
     private Button openstatus;
     @FXML
     private Button opensetting;
+    @FXML
+    private Rectangle exit_right;
+    @FXML
+    private Rectangle spawn_from_right;
+    @FXML
+    private Rectangle spawn_from_down;
+    @FXML
+    private ImageView equip_img;
 
     @Override
     protected String mapKey() {

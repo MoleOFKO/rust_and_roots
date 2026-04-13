@@ -367,6 +367,8 @@ public class Left_map_nothreeController extends BaseMapController{
     private Button openstatus;
     @FXML
     private Button opensetting;
+    @FXML
+    private ImageView equip_img;
     
 
     @Override

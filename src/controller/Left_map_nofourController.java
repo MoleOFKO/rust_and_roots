@@ -368,6 +368,12 @@ public class Left_map_nofourController extends BaseMapController {
     private Button openstatus;
     @FXML
     private Button opensetting;
+    @FXML
+    private ImageView equip_img;
+    @FXML
+    private ImageView human_img1;
+    @FXML
+    private ImageView equip_img1;
 
     @Override
     protected String mapKey() {

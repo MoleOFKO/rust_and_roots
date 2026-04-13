@@ -34,17 +34,10 @@
                   <Rectangle fx:id="wall3" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="4.0" layoutX="2.0" layoutY="397.0" stroke="BLACK" strokeType="INSIDE" width="593.0" />
                </children>
             </Group>
-            <Group autoSizeChildren="false" layoutX="33.0" layoutY="83.0">
-               <children>
-                  <Rectangle fx:id="spawn_default" height="10" layoutX="254.0" layoutY="123.0" opacity="0" width="10" />
-                  <Rectangle fx:id="spawn_from_left" height="10" layoutX="-11.0" layoutY="82.0" opacity="0" width="10" />
-                  <Rectangle fx:id="spawn_from_right" height="10" layoutX="532.0" layoutY="81.0" opacity="0" width="10" />
-               </children>
-            </Group>
             <Group layoutX="2.0" layoutY="61.0">
                <children>
-                  <Rectangle fx:id="exit_right" height="38.0" layoutX="582.0" layoutY="87.0" opacity="0" width="20.0" />
-                  <Rectangle fx:id="exit_left" height="38.0" layoutY="88.0" opacity="0" width="17.0" />
+                  <Rectangle fx:id="exit_right" height="38.0" layoutX="590.0" layoutY="87.0" opacity="0" width="9.0" />
+                  <Rectangle fx:id="exit_left" height="38.0" layoutY="88.0" opacity="0" width="7.0" />
                   <Label fx:id="hotbarguide" layoutX="230.0" layoutY="314.0" text="press 'e' to open hotbar">
                      <font>
                         <Font name="System Bold" size="12.0" />
@@ -53,6 +46,13 @@
                         <DropShadow color="white" height="10.5" radius="6.9925" spread="0.67" width="19.47" />
                      </effect>
                   </Label>
+               </children>
+            </Group>
+            <Group autoSizeChildren="false" layoutX="33.0" layoutY="83.0">
+               <children>
+                  <Rectangle fx:id="spawn_default" height="10" layoutX="254.0" layoutY="123.0" opacity="0" width="10" />
+                  <Rectangle fx:id="spawn_from_left" height="10" layoutX="-5.0" layoutY="82.0" opacity="0" width="10" />
+                  <Rectangle fx:id="spawn_from_right" height="10" layoutX="520.0" layoutY="81.0" opacity="0" width="10" />
                </children>
             </Group>
             <Group fx:id="human" layoutX="269.0" layoutY="169.0">

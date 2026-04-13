@@ -28,9 +28,9 @@
             </ImageView>
             <Group>
                <children>
-                  <Rectangle fx:id="exit_right" height="48.0" layoutX="580.0" layoutY="132.0" opacity="0" width="15" />
-                  <Rectangle fx:id="exit_up" height="15" layoutX="305.0" layoutY="8.0" opacity="0" width="51.0" />
-                  <Rectangle fx:id="exit_down" height="15" layoutX="418.0" layoutY="376.0" opacity="0" width="85.0" />
+                  <Rectangle fx:id="exit_right" height="48.0" layoutX="591.0" layoutY="132.0" opacity="0" width="7.0" />
+                  <Rectangle fx:id="exit_up" height="7.0" layoutX="305.0" layoutY="8.0" opacity="0" width="51.0" />
+                  <Rectangle fx:id="exit_down" height="9.0" layoutX="418.0" layoutY="390.0" opacity="0" width="85.0" />
                   <Label fx:id="hotbarguide" layoutX="238.0" layoutY="373.0" text="press 'e' to open hotbar">
                      <font>
                         <Font name="System Bold" size="12.0" />
@@ -44,9 +44,9 @@
             <Group autoSizeChildren="false">
                <children>
                   <Rectangle fx:id="spawn_default" height="10" layoutX="446.0" layoutY="182.0" opacity="0" width="10" />
-                  <Rectangle fx:id="spawn_from_left" height="10" layoutX="560.0" layoutY="150.0" opacity="0" width="10" />
-                  <Rectangle fx:id="spawn_from_up" height="10" layoutX="330.0" layoutY="23.0" opacity="0" width="10" />
-                  <Rectangle fx:id="spawn_from_bottom" height="10" layoutX="456.0" layoutY="362.0" opacity="0" width="10" />
+                  <Rectangle fx:id="spawn_from_right" height="10" layoutX="560.0" layoutY="150.0" opacity="0" width="10" />
+                  <Rectangle fx:id="spawn_from_up" height="10" layoutX="330.0" layoutY="32.0" opacity="0" width="10" />
+                  <Rectangle fx:id="spawn_from_down" height="10" layoutX="456.0" layoutY="358.0" opacity="0" width="10" />
                </children>
             </Group>
             <Group fx:id="human">

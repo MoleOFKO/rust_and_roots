@@ -28,8 +28,8 @@
             </ImageView>
             <Group>
                <children>
-                  <Rectangle fx:id="exit_up" height="15" layoutX="260.0" layoutY="-3.0" opacity="0" width="51.0" />
-                  <Rectangle fx:id="exit_right" height="38.0" layoutX="583.0" layoutY="138.0" opacity="0" width="17.0" />
+                  <Rectangle fx:id="exit_up" height="10.0" layoutX="260.0" layoutY="-3.0" opacity="0" width="51.0" />
+                  <Rectangle fx:id="exit_right" height="38.0" layoutX="594.0" layoutY="138.0" opacity="0" width="9.0" />
                </children>
             </Group>
             <Group fx:id="walls" layoutX="-1.0" layoutY="-1.0" visible="false">
@@ -51,8 +51,8 @@
             <Group autoSizeChildren="false">
                <children>
                   <Rectangle fx:id="spawn_default" height="10" layoutX="275.0" layoutY="222.0" opacity="0" width="10" />
-                  <Rectangle fx:id="spawn_from_up" height="10" layoutX="284.0" layoutY="23.0" opacity="0" width="10" />
-                  <Rectangle fx:id="spawn_from_right" height="10" layoutX="560.0" layoutY="152.0" opacity="0" width="10" />
+                  <Rectangle fx:id="spawn_from_up" height="10" layoutX="284.0" layoutY="32.0" opacity="0" width="10" />
+                  <Rectangle fx:id="spawn_from_right" height="10" layoutX="547.0" layoutY="156.0" opacity="0" width="10" />
                </children>
             </Group>
             <Group fx:id="human">

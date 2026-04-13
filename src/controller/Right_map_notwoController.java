@@ -356,6 +356,8 @@ public class Right_map_notwoController extends BaseMapController{
     private Button openstatus;
     @FXML
     private Button opensetting;
+    @FXML
+    private ImageView equip_img;
 
     @Override
     protected String mapKey() {
