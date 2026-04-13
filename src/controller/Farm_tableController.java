@@ -5,6 +5,7 @@ import game.GameTimeManager;
 import game.SceneController;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,6 +68,10 @@ public class Farm_tableController implements Initializable, SceneController {
     private final List<ImageView> seedSlotImages = new ArrayList<>();
     private final List<Label> seedSlotLabels = new ArrayList<>();
     private final Map<String, Integer> seedSlotMapping = new LinkedHashMap<>();
+    private int selectedSeedSlotIndex = -1;
+    private final List<SeedListEntry> displayedSeedListEntries = new ArrayList<>();
+
+    private record SeedListEntry(int itemId, int quantity) {}
 
     @FXML private StackPane view;
     @FXML private Group world;
@@ -179,10 +184,14 @@ public class Farm_tableController implements Initializable, SceneController {
         Object source = event.getSource();
         if (!(source instanceof ImageView clickedView)) return;
 
-        Integer selectedItemId = seedSlotMapping.get(clickedView.getId());
-        if (selectedItemId == null || selectedItemId <= 0) return;
+        Integer slotIndex = seedSlotMapping.get(clickedView.getId());
+        if (slotIndex == null || slotIndex < 0 || slotIndex >= displayedSeedListEntries.size()) return;
+
+        int selectedItemId = displayedSeedListEntries.get(slotIndex).itemId();
+        if (selectedItemId <= 0) return;
 
         selectedSeedItemId = selectedItemId;
+        selectedSeedSlotIndex = slotIndex;
         switch (activeMode) {
             case WATER -> equippedWateringCanItemId = selectedItemId;
             case SICKLE -> equippedSickleItemId = selectedItemId;
@@ -700,13 +709,40 @@ public class Farm_tableController implements Initializable, SceneController {
 
     private void populateSeedList() {
         seedSlotMapping.clear();
-        List<Integer> availableItems = availableItemsForActiveMode();
+        displayedSeedListEntries.clear();
+        displayedSeedListEntries.addAll(buildSeedListEntriesForActiveMode(seedSlotImages.size()));
 
-        if (!availableItems.isEmpty() && (selectedSeedItemId == null || !availableItems.contains(selectedSeedItemId))) {
-            selectedSeedItemId = availableItems.get(0);
-        }
-        if (availableItems.isEmpty() && activeMode == ToolMode.SEED) {
-            selectedSeedItemId = null;
+        if (displayedSeedListEntries.isEmpty()) {
+            selectedSeedSlotIndex = -1;
+            if (activeMode == ToolMode.SEED) {
+                selectedSeedItemId = null;
+            }
+        } else {
+            Integer preferredItemId = switch (activeMode) {
+                case WATER -> isWateringCanSelectionValid(equippedWateringCanItemId)
+                        ? equippedWateringCanItemId
+                        : selectedSeedItemId;
+                case SICKLE -> isSickleSelectionValid(equippedSickleItemId)
+                        ? equippedSickleItemId
+                        : selectedSeedItemId;
+                case SEED, NONE -> selectedSeedItemId;
+            };
+
+            if (preferredItemId == null || preferredItemId <= 0) {
+                preferredItemId = displayedSeedListEntries.get(0).itemId();
+            }
+
+            int preferredIndex = findFirstSeedListIndex(preferredItemId);
+            if (preferredIndex < 0) {
+                preferredIndex = 0;
+            }
+
+            if (selectedSeedSlotIndex < 0 || selectedSeedSlotIndex >= displayedSeedListEntries.size()
+                    || displayedSeedListEntries.get(selectedSeedSlotIndex).itemId() != preferredItemId) {
+                selectedSeedSlotIndex = preferredIndex;
+            }
+
+            selectedSeedItemId = displayedSeedListEntries.get(selectedSeedSlotIndex).itemId();
         }
 
         for (int i = 0; i < seedSlotImages.size(); i++) {
@@ -714,7 +750,7 @@ public class Farm_tableController implements Initializable, SceneController {
             Label lbl = (i < seedSlotLabels.size()) ? seedSlotLabels.get(i) : null;
             if (img == null) continue;
 
-            if (i >= availableItems.size()) {
+            if (i >= displayedSeedListEntries.size()) {
                 img.setImage(null);
                 img.setVisible(false);
                 img.setOpacity(0.0);
@@ -723,17 +759,17 @@ public class Farm_tableController implements Initializable, SceneController {
                 continue;
             }
 
-            int itemId = availableItems.get(i);
-            int qty = getSelectableAvailableCount(itemId);
-            if (qty < 0) qty = 0;
+            SeedListEntry entry = displayedSeedListEntries.get(i);
+            int itemId = entry.itemId();
+            int qty = Math.max(0, entry.quantity());
 
             img.setImage(ItemDatabase.getImage(itemId));
             img.setVisible(true);
-            img.setOpacity(itemId == selectedSeedItemId ? 1.0 : 0.75);
-            img.setStyle(itemId == selectedSeedItemId
+            img.setOpacity(i == selectedSeedSlotIndex ? 1.0 : 0.75);
+            img.setStyle(i == selectedSeedSlotIndex
                     ? "-fx-effect: dropshadow(gaussian, yellow, 12, 0.6, 0, 0);"
                     : "");
-            seedSlotMapping.put(img.getId(), itemId);
+            seedSlotMapping.put(img.getId(), i);
 
             if (lbl != null) {
                 String itemName = ItemDatabase.getItemName(itemId);
@@ -743,6 +779,75 @@ public class Farm_tableController implements Initializable, SceneController {
         }
 
         refreshSelectedToolPreview();
+    }
+
+    private List<SeedListEntry> buildSeedListEntriesForActiveMode(int capacity) {
+        List<SeedListEntry> result = new ArrayList<>();
+        if (capacity <= 0 || gameState == null || gameState.getPlayerState() == null) return result;
+
+        List<Integer> availableItemIds = new ArrayList<>();
+
+        switch (activeMode) {
+            case SEED -> {
+                for (Integer itemId : ItemDatabase.getAllSeedItemIds()) {
+                    if (!isSeedSelectionValid(itemId)) continue;
+                    if (getSelectableAvailableCount(itemId) > 0) {
+                        availableItemIds.add(itemId);
+                    }
+                }
+            }
+            case WATER -> {
+                for (Integer itemId : ownedInventoryAndHotbarItemIds()) {
+                    if (!isWateringCanSelectionValid(itemId)) continue;
+                    if (getSelectableAvailableCount(itemId) > 0) {
+                        availableItemIds.add(itemId);
+                    }
+                }
+            }
+            case SICKLE -> {
+                for (Integer itemId : ownedInventoryAndHotbarItemIds()) {
+                    if (!isSickleSelectionValid(itemId)) continue;
+                    if (getSelectableAvailableCount(itemId) > 0) {
+                        availableItemIds.add(itemId);
+                    }
+                }
+            }
+            case NONE -> {
+            }
+        }
+
+        availableItemIds.sort(Comparator.comparing(id -> {
+            String name = ItemDatabase.getItemName(id == null ? -1 : id);
+            return name == null ? "" : name;
+        }, String.CASE_INSENSITIVE_ORDER));
+
+        for (Integer itemId : availableItemIds) {
+            if (itemId == null || itemId <= 0) continue;
+
+            int remaining = getSelectableAvailableCount(itemId);
+            if (remaining <= 0) continue;
+
+            int maxStack = Math.max(1, ItemDatabase.getMaxStackSize(itemId));
+            while (remaining > 0 && result.size() < capacity) {
+                int stackQty = Math.min(maxStack, remaining);
+                result.add(new SeedListEntry(itemId, stackQty));
+                remaining -= stackQty;
+            }
+
+            if (result.size() >= capacity) break;
+        }
+
+        return result;
+    }
+
+    private int findFirstSeedListIndex(Integer itemId) {
+        if (itemId == null || itemId <= 0) return -1;
+        for (int i = 0; i < displayedSeedListEntries.size(); i++) {
+            if (displayedSeedListEntries.get(i).itemId() == itemId) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     private List<Integer> availableItemsForActiveMode() {
