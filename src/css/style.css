@@ -182,3 +182,7 @@
     -fx-text-fill: #FAFAFA;
     -fx-prompt-text-fill: #FAFAFA;
 }
+.accent{
+    -fx-accent: #4CAF50;
+    -fx-background-color: transparent;
+}
