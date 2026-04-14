@@ -9,6 +9,7 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -35,6 +36,7 @@ import javafx.scene.Node;
 import javafx.scene.control.ButtonBase;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -1142,6 +1144,171 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         setActiveMenuTab(MenuTab.SETTINGS);
     }
 
+    // ---------- Shared FXML handlers (maps can rely on BaseMapController) ----------
+    @FXML
+    protected void handleopenInventoryaction(ActionEvent event) {
+        openInventory();
+    }
+
+    @FXML
+    protected void handleopenstatusaction(ActionEvent event) {
+        openStatus();
+    }
+
+    @FXML
+    protected void handleopensettingaction(ActionEvent event) {
+        openSetting();
+    }
+
+    @FXML
+    protected void handlecloseaction(MouseEvent event) {
+        closeMenuScreen();
+    }
+
+    @FXML
+    protected void handlecloseaction(ActionEvent event) {
+        closeMenuScreen();
+    }
+
+    @FXML
+    protected void handleusepointaction(MouseEvent event) {
+        onSharedUsePoint();
+    }
+
+    @FXML
+    protected void handleconfirmaction(MouseEvent event) {
+        onSharedConfirm();
+    }
+
+    @FXML
+    protected void handlebtnskillacion(MouseEvent event) {
+        if (gameState != null) gameState.setPreferredStatusPanelGroup(GameState.StatusPanelGroup.SKILLS);
+        setSkillsOpen(true);
+        setStatusOpen(false);
+        refreshStatusAllocationUi();
+    }
+
+    @FXML
+    protected void handlebtnstatusaction(MouseEvent event) {
+        if (gameState != null) gameState.setPreferredStatusPanelGroup(GameState.StatusPanelGroup.STATUS);
+        setStatusOpen(true);
+        setSkillsOpen(false);
+        refreshStatusAllocationUi();
+    }
+
+    @FXML
+    protected void handleHPminusaction(MouseEvent event) { onStatusHpMinus(); }
+
+    @FXML
+    protected void handleHPplusaction(MouseEvent event) { onStatusHpPlus(); }
+
+    @FXML
+    protected void handleSPminusaction(MouseEvent event) { onStatusSpMinus(); }
+
+    @FXML
+    protected void handleSPplusaction(MouseEvent event) { onStatusSpPlus(); }
+
+    @FXML
+    protected void handleSTRminusaction(MouseEvent event) { onStatusStrMinus(); }
+
+    @FXML
+    protected void handleSTRplusaction(MouseEvent event) { onStatusStrPlus(); }
+
+    @FXML
+    protected void handleVITminusaction(MouseEvent event) { onStatusVitMinus(); }
+
+    @FXML
+    protected void handleVITplusaction(MouseEvent event) { onStatusVitPlus(); }
+
+    @FXML
+    protected void handleDEXminusaction(MouseEvent event) { onStatusDexMinus(); }
+
+    @FXML
+    protected void handleDEXplusaction(MouseEvent event) { onStatusDexPlus(); }
+
+    @FXML
+    protected void handleAGIminusaction(MouseEvent event) { onStatusAgiMinus(); }
+
+    @FXML
+    protected void handleAGIplusaction(MouseEvent event) { onStatusAgiPlus(); }
+
+    @FXML
+    protected void handlefarmingminusaction(MouseEvent event) { onSkillFarmingMinus(); }
+
+    @FXML
+    protected void handlefarmingplusaction(MouseEvent event) { onSkillFarmingPlus(); }
+
+    @FXML
+    protected void handlegatheringminusaction(MouseEvent event) { onSkillGatheringMinus(); }
+
+    @FXML
+    protected void handlegatheringplusaction(MouseEvent event) { onSkillGatheringPlus(); }
+
+    @FXML
+    protected void handlecraftingminusaction(MouseEvent event) { onSkillCraftingMinus(); }
+
+    @FXML
+    protected void handlecraftingplusaction(MouseEvent event) { onSkillCraftingPlus(); }
+
+    @FXML
+    protected void handlefishingminusaction(MouseEvent event) { onSkillFishingMinus(); }
+
+    @FXML
+    protected void handlefishingplusaction(MouseEvent event) { onSkillFishingPlus(); }
+
+    @FXML
+    protected void handlecookingminusaction(MouseEvent event) { onSkillCookingMinus(); }
+
+    @FXML
+    protected void handlecookingplusaction(MouseEvent event) { onSkillCookingPlus(); }
+
+    @FXML
+    protected void handlesaveexitaction(ActionEvent event) {
+        saveAndExitToMainMenu();
+    }
+
+    @FXML
+    protected void handlesave(ActionEvent event) {
+        openSaveLoadMenu(true);
+    }
+
+    @FXML
+    protected void handleload(ActionEvent event) {
+        openSaveLoadMenu(false);
+    }
+
+    protected void openSaveLoadMenu(boolean saveMode) {
+        if (gameState == null) return;
+        gameState.setSaveMenuMode(saveMode);
+        gameState.setReturnScene(resolveCurrentSceneFxmlPath(), SpawnTag.DEFAULT);
+        stopAndSwitchScene("/view/saveloads.fxml", SpawnTag.DEFAULT);
+    }
+
+    protected void saveAndExitToMainMenu() {
+        try {
+            capturePlayerSnapshot();
+            if (gameState != null) {
+                int slot = Math.max(1, gameState.getSelectedSaveSlot());
+                new SaveGameService().saveGameToSlot(gameState, slot);
+                gameState.setSaveMenuMode(false);
+            }
+            detachFarmTimeRefresh();
+            if (gameLoop != null) gameLoop.stop();
+            if (player != null) player.stop();
+            SceneManager.switchScene("/view/main_menu.fxml");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    protected String resolveCurrentSceneFxmlPath() {
+        String key = mapKey();
+        if (key == null || key.isBlank()) {
+            return "/view/home_map.fxml";
+        }
+        return "/view/" + key.toLowerCase(Locale.ROOT) + ".fxml";
+    }
+
     protected void applyPreferredStatusPanelGroup() {
         if (gameState == null) return;
         switch (gameState.getPreferredStatusPanelGroup()) {
@@ -1184,7 +1351,10 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         Group settingsTabNode = controllerField("settingsTab", Group.class);
         Group statusGroupNode = controllerField("statusgroup", Group.class);
         Group skillsGroupNode = controllerField("skillsgroup", Group.class);
-        Group playerInventoryGroupNode = controllerField("player_inv_group", Group.class);
+        Group playerInventoryGroupNode = controllerField("player_inv_group1", Group.class);
+        if (playerInventoryGroupNode == null) {
+            playerInventoryGroupNode = controllerField("player_inv_group", Group.class);
+        }
         Button openInventoryNode = controllerField("openInventory", Button.class);
         Button openStatusNode = controllerField("openstatus", Button.class);
         Button openSettingNode = controllerField("opensetting", Button.class);
@@ -1193,6 +1363,37 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         ImageView btnStatusNode = controllerField("btnstatus", ImageView.class);
 
         if (inventoryOverlayNode != null || menuInventoryNode != null || statusTabNode != null || settingsTabNode != null) {
+            boolean hasAltMenuInventorySlots = controllerField("Playerinvimg112", ImageView.class) != null;
+            List<ImageView> playerInvImages = hasAltMenuInventorySlots
+                ? controllerFieldList(
+                    ImageView.class,
+                    "Playerinvimg112", "Playerinvimg110", "Playerinvimg21", "Playerinvimg31", "Playerinvimg41",
+                    "Playerinvimg51", "Playerinvimg61", "Playerinvimg71", "Playerinvimg81", "Playerinvimg91",
+                    "Playerinvimg101", "Playerinvimg111", "Playerinvimg121", "Playerinvimg131", "Playerinvimg141",
+                    "Playerinvimg151", "Playerinvimg161", "Playerinvimg171", "Playerinvimg181", "Playerinvimg191"
+                )
+                : controllerIndexedFieldList(ImageView.class, "Playerinvimg", 20);
+
+            List<Label> playerInvLabels = hasAltMenuInventorySlots
+                ? controllerFieldList(
+                    Label.class,
+                    "Playerinvlbl112", "Playerinvlbl110", "Playerinvlbl21", "Playerinvlbl31", "Playerinvlbl41",
+                    "Playerinvlbl51", "Playerinvlbl61", "Playerinvlbl71", "Playerinvlbl81", "Playerinvlbl91",
+                    "Playerinvlbl101", "Playerinvlbl111", "Playerinvlbl121", "Playerinvlbl131", "Playerinvlbl141",
+                    "Playerinvlbl151", "Playerinvlbl161", "Playerinvlbl171", "Playerinvlbl181", "Playerinvlbl191"
+                )
+                : controllerIndexedFieldList(Label.class, "Playerinvlbl", 20);
+
+            List<Button> playerInvButtons = hasAltMenuInventorySlots
+                ? controllerFieldList(
+                    Button.class,
+                    "Playerinvbtn112", "Playerinvbtn110", "Playerinvbtn21", "Playerinvbtn31", "Playerinvbtn41",
+                    "Playerinvbtn51", "Playerinvbtn61", "Playerinvbtn71", "Playerinvbtn81", "Playerinvbtn91",
+                    "Playerinvbtn101", "Playerinvbtn111", "Playerinvbtn121", "Playerinvbtn131", "Playerinvbtn141",
+                    "Playerinvbtn151", "Playerinvbtn161", "Playerinvbtn171", "Playerinvbtn181", "Playerinvbtn191"
+                )
+                : controllerIndexedFieldList(Button.class, "Playerinvbtn", 20);
+
             bridgeSharedInventoryOverlayUi(
                 inventoryOverlayNode,
                 menuInventoryNode,
@@ -1207,9 +1408,9 @@ public abstract class BaseMapController implements Initializable, SceneControlle
                 closeButtonNode,
                 btnSkillNode,
                 btnStatusNode,
-                controllerIndexedFieldList(ImageView.class, "Playerinvimg", 20),
-                controllerIndexedFieldList(Label.class, "Playerinvlbl", 20),
-                controllerIndexedFieldList(Button.class, "Playerinvbtn", 20)
+                playerInvImages,
+                playerInvLabels,
+                playerInvButtons
             );
         }
     }
@@ -1221,12 +1422,16 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         bindAction("opensetting", Button.class, e -> openSetting());
         bindMouse("btnclose", ImageView.class, e -> closeMenuScreen());
         bindMouse("btnskill", ImageView.class, e -> {
+            if (gameState != null) gameState.setPreferredStatusPanelGroup(GameState.StatusPanelGroup.SKILLS);
             setSkillsOpen(true);
             setStatusOpen(false);
+            refreshStatusAllocationUi();
         });
         bindMouse("btnstatus", ImageView.class, e -> {
+            if (gameState != null) gameState.setPreferredStatusPanelGroup(GameState.StatusPanelGroup.STATUS);
             setStatusOpen(true);
             setSkillsOpen(false);
+            refreshStatusAllocationUi();
         });
         bindMouse("btnUsePoint", ImageView.class, e -> onSharedUsePoint());
         bindMouse("btnConfirm", ImageView.class, e -> onSharedConfirm());
@@ -1307,17 +1512,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         if (setNightButton != null) setNightButton.setOnAction(e -> time.setTimeOfDay(20, 0));
         if (addHourButton != null) addHourButton.setOnAction(e -> time.addMinutes(60));
         if (saveExitButton != null) {
-            saveExitButton.setOnAction(e -> {
-                try {
-                    capturePlayerSnapshot();
-                    new SaveGameService().saveGame(GameState.get());
-                    if (gameLoop != null) gameLoop.stop();
-                    if (player != null) player.stop();
-                    SceneManager.switchScene("/view/main_menu.fxml");
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            });
+            saveExitButton.setOnAction(this::handlesaveexitaction);
         }
 
         refreshStatusAllocationUi();
@@ -1338,8 +1533,22 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
         if (statusNameNode != null) statusNameNode.setText("Name : " + playerState.getPlayerName());
         if (statusExpNode != null) statusExpNode.setText(formatVisibleExpLabel());
-        if (statusHpNode != null) statusHpNode.setText("HP : " + playerState.getHp() + "/" + (playerState.getMaxHp() + pendingHpPoints) + formatPending(pendingHpPoints));
-        if (statusSpNode != null) statusSpNode.setText("SP : " + playerState.getStamina() + "/" + (playerState.getMaxStamina() + pendingSpPoints) + formatPending(pendingSpPoints));
+
+        int shownMaxHp = Math.max(1, playerState.getMaxHp() + pendingHpPoints);
+        int shownMaxSp = Math.max(1, playerState.getMaxStamina() + pendingSpPoints);
+
+        if (statusHpNode != null) statusHpNode.setText("HP : " + playerState.getHp() + "/" + shownMaxHp + formatPending(pendingHpPoints));
+        if (statusSpNode != null) statusSpNode.setText("SP : " + playerState.getStamina() + "/" + shownMaxSp + formatPending(pendingSpPoints));
+
+        ProgressBar hpBarNode = controllerField("hpbar", ProgressBar.class);
+        ProgressBar spBarNode = controllerField("spbar", ProgressBar.class);
+        if (hpBarNode != null) {
+            hpBarNode.setProgress(Math.max(0.0, Math.min(1.0, playerState.getHp() / (double) shownMaxHp)));
+        }
+        if (spBarNode != null) {
+            spBarNode.setProgress(Math.max(0.0, Math.min(1.0, playerState.getStamina() / (double) shownMaxSp)));
+        }
+
         if (statusStrNode != null) statusStrNode.setText("STR : " + playerState.getStr() + formatPending(pendingStrPoints));
         if (statusVitNode != null) statusVitNode.setText("VIT : " + playerState.getVit() + formatPending(pendingVitPoints));
         if (statusDexNode != null) statusDexNode.setText("DEX : " + playerState.getDex() + formatPending(pendingDexPoints));
@@ -1536,6 +1745,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
     private void setupInventoryUiIfPresent() {
         setupPlayerInventoryGridIfPresent();
+        setupMenuTabs();
 
         if (inventoryOverlay != null) {
             inventoryOverlay.setVisible(false);
@@ -1545,20 +1755,33 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     }
 
     private void setupHotbarIfPresent() {
-        hotbarSlots.clear();
-        hotbarSlotButtons.clear();
-        hotbarImages.clear();
-        hotbarLabels.clear();
+        // If this controller uses shadowed FXML fields (common in existing maps),
+        // autoBridgeSharedUiFromControllerFields() will populate the hotbar lists.
+        // Only fall back to the BaseMapController @FXML fields when nothing was bridged.
+        if (hotbarSlotButtons.isEmpty() && hotbarSlots.isEmpty()) {
+            hotbarSlots.clear();
+            hotbarSlotButtons.clear();
+            hotbarImages.clear();
+            hotbarLabels.clear();
 
-        addHotbarSlot(Hslot, slotBtn, slotImg, slotLb);
-        addHotbarSlot(Hslot1, slotBtn1, slotImg1, slotLb1);
-        addHotbarSlot(Hslot2, slotBtn2, slotImg2, slotLb2);
-        addHotbarSlot(Hslot3, slotBtn3, slotImg3, slotLb3);
-        addHotbarSlot(Hslot4, slotBtn4, slotImg4, slotLb4);
+            addHotbarSlot(Hslot, slotBtn, slotImg, slotLb);
+            addHotbarSlot(Hslot1, slotBtn1, slotImg1, slotLb1);
+            addHotbarSlot(Hslot2, slotBtn2, slotImg2, slotLb2);
+            addHotbarSlot(Hslot3, slotBtn3, slotImg3, slotLb3);
+            addHotbarSlot(Hslot4, slotBtn4, slotImg4, slotLb4);
+        }
 
-        for (int i = 0; i < hotbarSlotButtons.size(); i++) {
+        int slotCount = Math.min(hotbarSlotButtons.size(), hotbarSlots.size());
+        if (slotCount <= 0) {
+            return;
+        }
+
+        for (int i = 0; i < slotCount; i++) {
             final int idx = i;
             ToggleButton button = hotbarSlotButtons.get(i);
+            if (button == null) {
+                continue;
+            }
             button.setFocusTraversable(false);
             button.setOnAction(e -> {
                 if (idx == selectedHotbarIndex && tryConsumeHotbarItem(idx)) {
@@ -1584,10 +1807,10 @@ public abstract class BaseMapController implements Initializable, SceneControlle
             setHotbarVisible(playerState.isHotbarVisible());
         }
 
-        if (!hotbarSlots.isEmpty()) {
+        if (slotCount > 0) {
             int savedIdx = 0;
             if (playerState != null) {
-                savedIdx = Math.min(playerState.getselectedHotbarIndex(), hotbarSlots.size() - 1);
+                savedIdx = Math.min(playerState.getselectedHotbarIndex(), slotCount - 1);
             }
             selectHotbarSlot(savedIdx);
             hotbarAssignmentIndex = savedIdx;
@@ -1608,8 +1831,13 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     protected void refreshHotbarView() {
         if (playerState == null) return;
 
-        for (int i = 0; i < hotbarImages.size(); i++) {
-            ImageView img = hotbarImages.get(i);
+        int slotCount = Math.max(
+            hotbarSlotButtons.size(),
+            Math.max(hotbarSlots.size(), Math.max(hotbarImages.size(), hotbarLabels.size()))
+        );
+
+        for (int i = 0; i < slotCount; i++) {
+            ImageView img = (i < hotbarImages.size()) ? hotbarImages.get(i) : null;
             Label lbl = (i < hotbarLabels.size()) ? hotbarLabels.get(i) : null;
 
             int itemId = playerState.getHotbarItemId(i);
