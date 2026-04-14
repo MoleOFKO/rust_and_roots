@@ -376,13 +376,14 @@ public class Left_map_notwo_of_oneController extends BaseMapController {
         registerExit(exit_up, "/view/left_map_nothree_of_one.fxml", SpawnTag.FROM_DOWN);
         registerExit(exit_down, "/view/left_map_noone_of_one.fxml", SpawnTag.FROM_UP);
         registerExit(exit_right, "/view/left_map_notwo.fxml", SpawnTag.FROM_LEFT);
-        if (exit_left != null) {
-            interactionManager.addZone(new InteractionZone(
-                exit_left,
-                null,
-                () -> JOptionPane.showMessageDialog(null, "Map unavailable"),
-                MAP_EXIT_DELAY_GAME_SECONDS
-            ));
-        }
+        registerExit(exit_left, "/view/left_map_notwo_of_two.fxml", SpawnTag.FROM_RIGHT);
+//        if (exit_left != null) {
+//            interactionManager.addZone(new InteractionZone(
+//                exit_left,
+//                null,
+//                () -> JOptionPane.showMessageDialog(null, "Map unavailable"),
+//                MAP_EXIT_DELAY_GAME_SECONDS
+//            ));
+//        }
     }
 }

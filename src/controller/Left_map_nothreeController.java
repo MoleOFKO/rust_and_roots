@@ -380,14 +380,15 @@ public class Left_map_nothreeController extends BaseMapController{
     protected void configureExits() {
         registerExit(exit_left, "/view/left_map_nothree_of_one.fxml", SpawnTag.FROM_RIGHT);
         registerExit(exit_right, "/view/upper_map_nothree.fxml", SpawnTag.FROM_LEFT);
-        if (exit_up != null) {
-            interactionManager.addZone(new InteractionZone(
-                exit_up,
-                null,
-                () -> JOptionPane.showMessageDialog(null, "Map unavailable"),
-                MAP_EXIT_DELAY_GAME_SECONDS
-            ));
-        }
+        registerExit(exit_up, "/view/left_map_nofour.fxml", SpawnTag.FROM_DOWN);
+//        if (exit_up != null) {
+//            interactionManager.addZone(new InteractionZone(
+//                exit_up,
+//                null,
+//                () -> JOptionPane.showMessageDialog(null, "Map unavailable"),
+//                MAP_EXIT_DELAY_GAME_SECONDS
+//            ));
+//        }
     }
     
 }

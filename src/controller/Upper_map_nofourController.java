@@ -364,7 +364,7 @@ public class Upper_map_nofourController extends BaseMapController{
     protected void configureExits() {
         
         registerExit(exit_right, "/view/right_map_nofour.fxml", SpawnTag.FROM_LEFT);
-        registerExit(exit_left, "/view/right_map_nofour.fxml", SpawnTag.FROM_RIGHT);
+        registerExit(exit_left, "/view/left_map_nofour.fxml", SpawnTag.FROM_RIGHT);
 //        if (exit_left != null) {
 //            interactionManager.addZone(new InteractionZone(
 //                exit_left,
