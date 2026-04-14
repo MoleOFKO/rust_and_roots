@@ -81,7 +81,7 @@ public class Farm {
             int stages = ItemDatabase.resolveMaxGrowthPhasesForSeed(pd.seedItemId == null ? -1 : pd.seedItemId);
             int stage = pd.getStage(nowSeconds, stages);
             String spriteKey = resolveSpriteKey(pd);
-            showStage(plotId, view, spriteKey, stage);
+            showStage(plotId, view, spriteKey, stage, stages);
         }
     }
 
@@ -94,7 +94,7 @@ public class Farm {
         return null;
     }
 
-    private void showStage(String plotId, ImageView view, String spriteKey, int stageNumber1Based) {
+    private void showStage(String plotId, ImageView view, String spriteKey, int stageNumber1Based, int maxSpriteStages) {
         if (spriteKey == null || spriteKey.isBlank()) {
             renderedPlotStages.remove(plotId);
             view.setImage(null);
@@ -102,7 +102,7 @@ public class Farm {
             return;
         }
 
-        int imageStageNumber = Math.max(0, stageNumber1Based - 1);
+        int imageStageNumber = FarmGrowthRules.mapGrowthStageToPlantSpriteStage(stageNumber1Based, maxSpriteStages);
 
         String stageKey = spriteKey + "#" + stageNumber1Based;
         if (stageKey.equals(renderedPlotStages.get(plotId))) {

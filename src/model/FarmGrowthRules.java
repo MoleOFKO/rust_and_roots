@@ -3,14 +3,25 @@ package model;
 public final class FarmGrowthRules {
 
     public static final int TOTAL_GROWTH_STAGES = 4;
-    public static final double DEFAULT_GROWTH_SECONDS = 60 * 60.0;
+    public static final double DEFAULT_GROWTH_PHASE_SECONDS = 10 * 60.0;
+    public static final double DEFAULT_GROWTH_SECONDS = (TOTAL_GROWTH_STAGES - 1) * DEFAULT_GROWTH_PHASE_SECONDS;
     public static final double WATER_REDUCTION_SECONDS = 5 * 60.0;
 
     private FarmGrowthRules() {
     }
 
     public static double resolveTotalGrowthSeconds(int seedItemId) {
-        return DEFAULT_GROWTH_SECONDS;
+        int stages = ItemDatabase.resolveMaxGrowthPhasesForSeed(seedItemId);
+        return resolveTotalGrowthSeconds(seedItemId, stages);
+    }
+
+    public static double resolveTotalGrowthSeconds(int seedItemId, int totalGrowthStages) {
+        int safeStages = Math.max(1, totalGrowthStages);
+        int timedPhases = Math.max(0, safeStages - 1);
+        if (timedPhases <= 0) {
+            return 0.0;
+        }
+        return timedPhases * DEFAULT_GROWTH_PHASE_SECONDS;
     }
 
     public static double resolvePhaseDurationSeconds(double totalGrowthSeconds) {
@@ -19,11 +30,12 @@ public final class FarmGrowthRules {
 
     public static double resolvePhaseDurationSeconds(double totalGrowthSeconds, int totalGrowthStages) {
         int safeStages = Math.max(1, totalGrowthStages);
+        int timedPhases = Math.max(1, safeStages - 1);
         double normalized = Math.max(0.0, totalGrowthSeconds);
         if (normalized <= 0.0) {
             return 0.0;
         }
-        return normalized / safeStages;
+        return normalized / timedPhases;
     }
 
     public static double resolveWaterCooldownSeconds(double totalGrowthSeconds) {
@@ -90,6 +102,27 @@ public final class FarmGrowthRules {
         return stage;
     }
 
+    public static int mapGrowthStageToPlantSpriteStage(int stageNumber1Based, int availableSpriteStages) {
+        if (stageNumber1Based <= 0) {
+            return 0;
+        }
+
+        int mapped = stageNumber1Based;
+
+        // Required sequence:
+        // stage 1 -> plant1, stage 2 -> plant2, stage 3 -> plant4, stage 4 -> plant3
+        if (stageNumber1Based == 3 && availableSpriteStages >= 4) {
+            mapped = 4;
+        } else if (stageNumber1Based == 4 && availableSpriteStages >= 3) {
+            mapped = 3;
+        }
+
+        if (availableSpriteStages > 0) {
+            mapped = Math.min(mapped, availableSpriteStages);
+        }
+        return Math.max(0, mapped);
+    }
+
     public static boolean canWater(
         double plantedAt,
         double lastWateredAt,
@@ -143,7 +176,7 @@ public final class FarmGrowthRules {
         }
 
         int stages = ItemDatabase.resolveMaxGrowthPhasesForSeed(seedItemId);
-        plotData.totalGrowthSeconds = resolveTotalGrowthSeconds(seedItemId);
+        plotData.totalGrowthSeconds = resolveTotalGrowthSeconds(seedItemId, stages);
         plotData.waterCooldownSeconds = resolveWaterCooldownSeconds(plotData.totalGrowthSeconds, stages);
         plotData.waterReductionSeconds = resolveWaterReductionSeconds(plotData.totalGrowthSeconds);
         plotData.accumulatedWaterReduction = clampAccumulatedWaterReduction(

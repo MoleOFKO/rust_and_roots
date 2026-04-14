@@ -326,7 +326,8 @@ public final class ItemDatabase {
 
         return hasCropStageAsset(spriteKey, 1)
                 && hasCropStageAsset(spriteKey, 2)
-                && hasCropStageAsset(spriteKey, 3);
+                && hasCropStageAsset(spriteKey, 3)
+                && hasCropStageAsset(spriteKey, 4);
     }
 
     public static int resolveMaxGrowthPhasesForSeed(int seedItemId) {

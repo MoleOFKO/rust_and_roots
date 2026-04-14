@@ -1033,11 +1033,9 @@ public class Farm_tableController implements Initializable, SceneController {
                 continue;
             }
 
-            int stage = pd.getStage(
-                now,
-                ItemDatabase.resolveMaxGrowthPhasesForSeed(pd.seedItemId == null ? -1 : pd.seedItemId)
-            );
-            int imageStage = Math.max(0, stage - 1);
+            int maxStages = ItemDatabase.resolveMaxGrowthPhasesForSeed(pd.seedItemId == null ? -1 : pd.seedItemId);
+            int stage = pd.getStage(now, maxStages);
+            int imageStage = FarmGrowthRules.mapGrowthStageToPlantSpriteStage(stage, maxStages);
             String spriteKey = pd.cropSpriteKey == null
                     ? ItemDatabase.buildCropSpriteKeyForSeed(pd.seedItemId == null ? -1 : pd.seedItemId)
                     : pd.cropSpriteKey;
@@ -1377,8 +1375,8 @@ public class Farm_tableController implements Initializable, SceneController {
 
     private void applySeedGrowthProfile(TempPlotData plotData, int seedItemId) {
         if (plotData == null || seedItemId <= 0) return;
-        plotData.totalGrowthSeconds = FarmGrowthRules.resolveTotalGrowthSeconds(seedItemId);
         int stages = ItemDatabase.resolveMaxGrowthPhasesForSeed(seedItemId);
+        plotData.totalGrowthSeconds = FarmGrowthRules.resolveTotalGrowthSeconds(seedItemId, stages);
         plotData.waterCooldownSeconds = FarmGrowthRules.resolveWaterCooldownSeconds(plotData.totalGrowthSeconds, stages);
         plotData.waterReductionSeconds = FarmGrowthRules.resolveWaterReductionSeconds(plotData.totalGrowthSeconds);
         plotData.accumulatedWaterReduction = FarmGrowthRules.clampAccumulatedWaterReduction(
