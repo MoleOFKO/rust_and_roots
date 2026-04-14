@@ -67,6 +67,9 @@ public class ShopController implements Initializable, SceneController {
     // sellCart = selected qty in sell pane / table
     private final Map<Integer, IntegerProperty> inventoryAvailableForSell = new LinkedHashMap<>();
     private final Map<Integer, IntegerProperty> sellCart = new LinkedHashMap<>();
+    // Per-slot reservation tracking for sell mode (supports split stacks)
+    private final Map<SellSlotKey, Integer> reservedForSaleBySlot = new LinkedHashMap<>();
+    private final Map<Integer, ArrayDeque<SellSlotKey>> sellReservationOrderByItemId = new LinkedHashMap<>();
 
     // ---------- rows shown in table ----------
     public static class DetailRow {
@@ -114,17 +117,55 @@ public class ShopController implements Initializable, SceneController {
         HOTBAR
     }
 
+    private static final class SellSlotKey {
+        private final SellInventoryEntrySource source;
+        private final int itemId;
+        private final int inventoryStackIndex;
+        private final int hotbarIndex;
+
+        private SellSlotKey(SellInventoryEntrySource source, int itemId, int inventoryStackIndex, int hotbarIndex) {
+            this.source = (source == null) ? SellInventoryEntrySource.INVENTORY : source;
+            this.itemId = itemId;
+            this.inventoryStackIndex = inventoryStackIndex;
+            this.hotbarIndex = hotbarIndex;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof SellSlotKey)) return false;
+            SellSlotKey that = (SellSlotKey) o;
+            return itemId == that.itemId &&
+                inventoryStackIndex == that.inventoryStackIndex &&
+                hotbarIndex == that.hotbarIndex &&
+                source == that.source;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(source, itemId, inventoryStackIndex, hotbarIndex);
+        }
+    }
+
     private static final class SellInventoryEntry {
         private final int itemId;
         private final int quantity;
         private final SellInventoryEntrySource source;
         private final int hotbarIndex;
+        private final int inventoryStackIndex;
 
-        private SellInventoryEntry(int itemId, int quantity, SellInventoryEntrySource source, int hotbarIndex) {
+        private SellInventoryEntry(
+            int itemId,
+            int quantity,
+            SellInventoryEntrySource source,
+            int hotbarIndex,
+            int inventoryStackIndex
+        ) {
             this.itemId = itemId;
             this.quantity = quantity;
             this.source = (source == null) ? SellInventoryEntrySource.INVENTORY : source;
             this.hotbarIndex = hotbarIndex;
+            this.inventoryStackIndex = inventoryStackIndex;
         }
     }
 
@@ -503,12 +544,23 @@ public class ShopController implements Initializable, SceneController {
         int totalGain = computeSellTotal();
         int coinsBefore = inv.getCoins();
 
-        for (var e : sellCart.entrySet()) {
-            int itemId = e.getKey();
-            int qty = e.getValue().get();
-            if (!removeOwnedItemsForSale(itemId, qty)) {
-                return;
+        boolean removed;
+        if (!reservedForSaleBySlot.isEmpty()) {
+            removed = removeReservedItemsForSale();
+        } else {
+            removed = true;
+            for (var e : sellCart.entrySet()) {
+                int itemId = e.getKey();
+                int qty = e.getValue().get();
+                if (!removeOwnedItemsForSale(itemId, qty)) {
+                    removed = false;
+                    break;
+                }
             }
+        }
+
+        if (!removed) {
+            return;
         }
 
         inv.addCoins(totalGain);
@@ -634,28 +686,28 @@ public class ShopController implements Initializable, SceneController {
 
             SellInventoryEntry entry = displayedSellInventoryEntries.get(i);
             int itemId = entry.itemId;
-            int availableQty = getSellAvailableCount(itemId);
+            int availableQty = getSellSlotAvailableCount(entry);
 
             if (img != null) {
                 img.setImage(ItemDatabase.getImage(itemId));
             }
             if (lbl != null) {
                 if (entry.source == SellInventoryEntrySource.HOTBAR) {
-                    lbl.setText("H" + (entry.hotbarIndex + 1) + " x" + entry.quantity);
+                    lbl.setText("H" + (entry.hotbarIndex + 1) + " x" + availableQty);
                     lbl.setStyle(HOTBAR_SELL_ENTRY_STYLE);
                 } else {
-                    lbl.setText(entry.quantity > 0 ? ("x" + entry.quantity) : "");
+                    lbl.setText(availableQty > 0 ? ("x" + availableQty) : "");
                     lbl.setStyle("");
                 }
             }
             if (b != null) {
                 b.setText(itemNameSafe(itemId));
-                b.setDisable(availableQty <= 0);
-                b.setOnAction(e -> {
-                    if (mode == Mode.SELL) {
-                        int current = sellCart.containsKey(itemId) ? sellCart.get(itemId).get() : 0;
-                        setSellSelectionQty(itemId, current + 1);
-                    }
+                b.setDisable(mode != Mode.SELL || availableQty <= 0);
+                b.setOnAction(null);
+                b.setOnMouseClicked(e -> {
+                    if (mode != Mode.SELL) return;
+                    if (e.getButton() != javafx.scene.input.MouseButton.PRIMARY) return;
+                    reserveItemForSaleFromSlot(entry, 1);
                 });
             }
         }
@@ -681,14 +733,20 @@ public class ShopController implements Initializable, SceneController {
             if (remaining <= 0) continue;
 
             int maxStack = Math.max(1, ItemDatabase.getMaxStackSize(itemId));
+            int stackIndex = 0;
             while (remaining > 0 && displayed.size() < slotCapacity) {
                 int stackQty = Math.min(maxStack, remaining);
-                displayed.add(new SellInventoryEntry(
+                SellInventoryEntry entry = new SellInventoryEntry(
                     itemId,
                     stackQty,
                     SellInventoryEntrySource.INVENTORY,
-                    -1
-                ));
+                    -1,
+                    stackIndex
+                );
+                if (getSellSlotAvailableCount(entry) > 0) {
+                    displayed.add(entry);
+                }
+                stackIndex++;
                 remaining -= stackQty;
             }
 
@@ -705,18 +763,180 @@ public class ShopController implements Initializable, SceneController {
             if (itemId <= 0 || quantity <= 0) {
                 continue;
             }
-            displayed.add(new SellInventoryEntry(
+            SellInventoryEntry entry = new SellInventoryEntry(
                 itemId,
                 quantity,
                 SellInventoryEntrySource.HOTBAR,
-                i
-            ));
+                i,
+                -1
+            );
+            if (getSellSlotAvailableCount(entry) > 0) {
+                displayed.add(entry);
+            }
             if (displayed.size() >= slotCapacity) {
                 break;
             }
         }
 
         return displayed;
+    }
+
+    private SellSlotKey getSellSlotKey(SellInventoryEntry entry) {
+        if (entry == null) return null;
+        if (entry.source == SellInventoryEntrySource.HOTBAR) {
+            return new SellSlotKey(SellInventoryEntrySource.HOTBAR, entry.itemId, -1, entry.hotbarIndex);
+        }
+        return new SellSlotKey(SellInventoryEntrySource.INVENTORY, entry.itemId, entry.inventoryStackIndex, -1);
+    }
+
+    private int getReservedForSaleCount(SellSlotKey key) {
+        if (key == null) return 0;
+        Integer reserved = reservedForSaleBySlot.get(key);
+        return reserved == null ? 0 : Math.max(0, reserved);
+    }
+
+    private int getSellSlotAvailableCount(SellInventoryEntry entry) {
+        if (entry == null) return 0;
+        SellSlotKey key = getSellSlotKey(entry);
+        int reserved = getReservedForSaleCount(key);
+        int base = Math.max(0, entry.quantity);
+        if (reserved >= base) return 0;
+        return base - reserved;
+    }
+
+    private void reserveItemForSaleFromSlot(SellInventoryEntry entry, int amount) {
+        if (entry == null || amount <= 0) return;
+        if (mode != Mode.SELL) return;
+
+        int reserved = reserveItemForSaleFromSlotInternal(entry, amount);
+        if (reserved <= 0) return;
+
+        rebuildSellAvailabilityFromInventory();
+        refreshTableFromSellCart();
+        refreshInventoryButtons();
+        refreshSellPane();
+        refreshTotalLabel();
+    }
+
+    private int reserveItemForSaleFromSlotInternal(SellInventoryEntry entry, int amount) {
+        if (entry == null || amount <= 0) return 0;
+        int itemId = entry.itemId;
+        if (itemId <= 0) return 0;
+
+        int available = getSellSlotAvailableCount(entry);
+        if (available <= 0) return 0;
+        int toReserve = Math.min(amount, available);
+
+        SellSlotKey key = getSellSlotKey(entry);
+        if (key == null) return 0;
+
+        int currentReserved = getReservedForSaleCount(key);
+        reservedForSaleBySlot.put(key, currentReserved + toReserve);
+
+        ArrayDeque<SellSlotKey> order = sellReservationOrderByItemId.computeIfAbsent(itemId, k -> new ArrayDeque<>());
+        for (int i = 0; i < toReserve; i++) {
+            order.addLast(key);
+        }
+
+        int currentSelected = sellCart.containsKey(itemId) ? sellCart.get(itemId).get() : 0;
+        int nextSelected = currentSelected + toReserve;
+        sellCart.computeIfAbsent(itemId, k -> new SimpleIntegerProperty(0)).set(nextSelected);
+
+        return toReserve;
+    }
+
+    private int reserveItemForSaleAuto(int itemId, int amount) {
+        if (itemId <= 0 || amount <= 0) return 0;
+        int remaining = amount;
+
+        int invCount = inv.getCount(itemId);
+        int maxStack = Math.max(1, ItemDatabase.getMaxStackSize(itemId));
+        int stackIndex = 0;
+
+        while (invCount > 0 && remaining > 0) {
+            int stackQty = Math.min(maxStack, invCount);
+            SellInventoryEntry entry = new SellInventoryEntry(
+                itemId,
+                stackQty,
+                SellInventoryEntrySource.INVENTORY,
+                -1,
+                stackIndex
+            );
+            int reserved = reserveItemForSaleFromSlotInternal(entry, remaining);
+            remaining -= reserved;
+
+            stackIndex++;
+            invCount -= stackQty;
+        }
+
+        if (remaining > 0 && gameState != null && gameState.getPlayerState() != null) {
+            for (int i = 0; i < gameState.getPlayerState().getHotbarSize() && remaining > 0; i++) {
+                if (gameState.getPlayerState().getHotbarItemId(i) != itemId) continue;
+                int qty = gameState.getPlayerState().getHotbarItemCount(i);
+                if (qty <= 0) continue;
+
+                SellInventoryEntry entry = new SellInventoryEntry(
+                    itemId,
+                    qty,
+                    SellInventoryEntrySource.HOTBAR,
+                    i,
+                    -1
+                );
+                int reserved = reserveItemForSaleFromSlotInternal(entry, remaining);
+                remaining -= reserved;
+            }
+        }
+
+        return amount - remaining;
+    }
+
+    private int releaseReservedForSaleInternal(int itemId, int amount) {
+        if (itemId <= 0 || amount <= 0) return 0;
+        int currentSelected = sellCart.containsKey(itemId) ? sellCart.get(itemId).get() : 0;
+        if (currentSelected <= 0) return 0;
+        int toRelease = Math.min(amount, currentSelected);
+
+        int released = 0;
+        ArrayDeque<SellSlotKey> order = sellReservationOrderByItemId.get(itemId);
+
+        while (released < toRelease) {
+            SellSlotKey key = (order == null) ? null : order.pollLast();
+            if (key == null) {
+                key = findAnyReservedSlotKeyForItem(itemId);
+            }
+            if (key == null) {
+                break;
+            }
+
+            int currentReserved = getReservedForSaleCount(key);
+            if (currentReserved <= 1) {
+                reservedForSaleBySlot.remove(key);
+            } else {
+                reservedForSaleBySlot.put(key, currentReserved - 1);
+            }
+            released++;
+        }
+
+        int nextSelected = currentSelected - released;
+        if (nextSelected <= 0) {
+            sellCart.remove(itemId);
+            sellReservationOrderByItemId.remove(itemId);
+        } else {
+            sellCart.computeIfAbsent(itemId, k -> new SimpleIntegerProperty(0)).set(nextSelected);
+        }
+
+        return released;
+    }
+
+    private SellSlotKey findAnyReservedSlotKeyForItem(int itemId) {
+        for (var e : reservedForSaleBySlot.entrySet()) {
+            SellSlotKey key = e.getKey();
+            Integer qty = e.getValue();
+            if (key != null && key.itemId == itemId && qty != null && qty > 0) {
+                return key;
+            }
+        }
+        return null;
     }
 
     private int getSellAvailableCount(int itemId) {
@@ -770,6 +990,55 @@ public class ShopController implements Initializable, SceneController {
         }
 
         return remaining <= 0;
+    }
+
+    private boolean removeReservedItemsForSale() {
+        if (gameState == null || gameState.getPlayerState() == null) {
+            return false;
+        }
+
+        Map<Integer, Integer> removeFromInventory = new LinkedHashMap<>();
+        Map<Integer, Integer> removeFromHotbar = new LinkedHashMap<>();
+        Map<Integer, Integer> hotbarItemIds = new LinkedHashMap<>();
+
+        for (var e : reservedForSaleBySlot.entrySet()) {
+            SellSlotKey key = e.getKey();
+            Integer qtyObj = e.getValue();
+            int qty = (qtyObj == null) ? 0 : qtyObj;
+            if (key == null || qty <= 0) continue;
+
+            if (key.source == SellInventoryEntrySource.HOTBAR) {
+                removeFromHotbar.merge(key.hotbarIndex, qty, Integer::sum);
+                hotbarItemIds.putIfAbsent(key.hotbarIndex, key.itemId);
+            } else {
+                removeFromInventory.merge(key.itemId, qty, Integer::sum);
+            }
+        }
+
+        for (var e : removeFromInventory.entrySet()) {
+            int itemId = e.getKey();
+            int qty = e.getValue();
+            if (qty <= 0) continue;
+            if (!inv.removeItem(itemId, qty)) {
+                return false;
+            }
+        }
+
+        for (var e : removeFromHotbar.entrySet()) {
+            int index = e.getKey();
+            int qty = e.getValue();
+            if (qty <= 0) continue;
+            int expectedItemId = hotbarItemIds.getOrDefault(index, -1);
+            int currentItemId = gameState.getPlayerState().getHotbarItemId(index);
+            if (expectedItemId > 0 && currentItemId != expectedItemId) {
+                return false;
+            }
+            if (!gameState.getPlayerState().removeHotbarItems(index, qty)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private void refreshBuyPane() {
@@ -1102,19 +1371,16 @@ public class ShopController implements Initializable, SceneController {
 
     private void setSellSelectionQty(int itemId, int newQty) {
         int owned = getCombinedOwnedCount(itemId);
-        int clamped = Math.max(0, Math.min(newQty, owned));
-        int remaining = owned - clamped;
+        int desired = Math.max(0, Math.min(newQty, owned));
+        int currentSelected = sellCart.containsKey(itemId) ? sellCart.get(itemId).get() : 0;
 
-        if (clamped <= 0) {
-            sellCart.remove(itemId);
-        } else {
-            sellCart.computeIfAbsent(itemId, k -> new SimpleIntegerProperty(0)).set(clamped);
+        if (desired > currentSelected) {
+            reserveItemForSaleAuto(itemId, desired - currentSelected);
+        } else if (desired < currentSelected) {
+            releaseReservedForSaleInternal(itemId, currentSelected - desired);
         }
 
-        inventoryAvailableForSell
-            .computeIfAbsent(itemId, k -> new SimpleIntegerProperty(owned))
-            .set(remaining);
-
+        rebuildSellAvailabilityFromInventory();
         refreshTableFromSellCart();
         refreshInventoryButtons();
         refreshSellPane();
@@ -1141,6 +1407,8 @@ public class ShopController implements Initializable, SceneController {
     private void clearSellSelection() {
         sellCart.clear();
         inventoryAvailableForSell.clear();
+        reservedForSaleBySlot.clear();
+        sellReservationOrderByItemId.clear();
         rebuildSellAvailabilityFromInventory();
     }
 
