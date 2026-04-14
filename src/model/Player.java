@@ -53,6 +53,7 @@ public class Player {
 
     private IntConsumer onHotbarSlotRequest;
     private Runnable onToggleHotbarRequest;
+    private Runnable onAttackStarted;
 
     private double staminaDrainRemainder = 0.0;
     private List<Rectangle> walls = List.of();
@@ -209,6 +210,26 @@ public class Player {
 
     public int getEquippedItemId() {
         return equippedItemId;
+    }
+
+    public enum FacingDirection {
+        DOWN,
+        LEFT,
+        RIGHT,
+        UP
+    }
+
+    public FacingDirection getFacingDirection() {
+        return switch (facingRow) {
+            case 1 -> FacingDirection.LEFT;
+            case 2 -> FacingDirection.RIGHT;
+            case 3 -> FacingDirection.UP;
+            default -> FacingDirection.DOWN;
+        };
+    }
+
+    public void setOnAttackStarted(Runnable onAttackStarted) {
+        this.onAttackStarted = onAttackStarted;
     }
 
     public boolean isRemovedFromWorld() {
@@ -807,6 +828,9 @@ public class Player {
         attackEndsAtNanos = now + attackDuration;
         nextAttackAvailableAtNanos = attackEndsAtNanos;
         setAnimState(AnimState.ATTACK, true);
+        if (onAttackStarted != null) {
+            onAttackStarted.run();
+        }
     }
 
     private long getAttackDurationNanos(EquipmentAnimationSet animationSet) {

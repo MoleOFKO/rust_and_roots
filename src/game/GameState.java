@@ -13,6 +13,7 @@ import model.FarmState;
 import model.Inventory;
 import model.ItemDatabase;
 import model.PlayerState;
+import model.TreeMapState;
 import util.SpawnTag;
 
 public final class GameState {
@@ -245,6 +246,7 @@ public final class GameState {
     private SpawnTag returnSpawn = SpawnTag.DEFAULT;
     private String activeFarmMapKey = "home_map";
     private final Map<String, FarmState> farmByMap = new HashMap<>();
+    private final Map<String, TreeMapState> treesByMap = new HashMap<>();
 
     private int shopRandomDay = -1;
     private List<Integer> dailyRandomShopItemIds = new ArrayList<>();
@@ -283,6 +285,7 @@ public final class GameState {
 
         clearFarmState(getFarmState("home_map"));
         clearFarmState(getFarmState("Home_interior"));
+        clearTreeStates();
 
         playerSkills.clear();
         activeFarmMapKey = "home_map";
@@ -467,6 +470,21 @@ public final class GameState {
     
     public FarmState getFarmState(String mapKey) { 
         return farmByMap.computeIfAbsent(mapKey, k -> new FarmState()); 
+    }
+
+    public TreeMapState getTreeState(String mapKey) {
+        if (mapKey == null || mapKey.isBlank()) {
+            mapKey = "home_map";
+        }
+        return treesByMap.computeIfAbsent(mapKey, k -> new TreeMapState());
+    }
+
+    public Map<String, TreeMapState> getAllTreeStates() {
+        return treesByMap;
+    }
+
+    public void clearTreeStates() {
+        treesByMap.clear();
     }
     public void setReturnScene(String fxml, SpawnTag spawn) { 
         this.returnFxml = fxml; this.returnSpawn = (spawn == null) ? SpawnTag.DEFAULT : spawn; 
