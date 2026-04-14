@@ -10,6 +10,7 @@ public final class GameTimeManager {
 
     // ---- Config ----
     private static final double SECONDS_PER_DAY = 24.0 * 60.0 * 60.0;
+    private static final double GAME_SECONDS_PER_REAL_SECOND = 24.0;
     private static final int NIGHT_START_HOUR = 18; // 18:00
     private static final int NIGHT_END_HOUR = 6;    // 06:00
 
@@ -19,6 +20,7 @@ public final class GameTimeManager {
 
     // total simulated seconds since day 1 start (00:00)
     private final DoubleProperty totalSeconds = new SimpleDoubleProperty(0);
+    private final ReadOnlyDoubleWrapper realWorldElapsedSeconds = new ReadOnlyDoubleWrapper(0);
 
     private final ReadOnlyIntegerWrapper dayNumber = new ReadOnlyIntegerWrapper(1);
     private final ReadOnlyObjectWrapper<LocalTime> timeOfDay = new ReadOnlyObjectWrapper<>(LocalTime.MIDNIGHT);
@@ -32,6 +34,7 @@ public final class GameTimeManager {
     private GameTimeManager() {
         // Recompute derived properties whenever totalSeconds changes
         totalSeconds.addListener((obs, oldV, newV) -> recomputeDerived());
+        realWorldElapsedSeconds.addListener((obs, oldV, newV) -> recomputeDerived());
         recomputeDerived();
     }
 
@@ -44,11 +47,15 @@ public final class GameTimeManager {
                 if (lastNanos == 0) { lastNanos = now; return; }
                 long dtNanos = now - lastNanos;
                 lastNanos = now;
+                
+                double dt = dtNanos / 1_000_000_000.0;
+                if (dt > 0) {
+                    realWorldElapsedSeconds.set(realWorldElapsedSeconds.get() + dt);
+                }
 
                 if (paused.get()) return;
 
-                double dt = dtNanos / 1_000_000_000.0;
-                double scaled = dt * Math.max(0.0, timeScale.get());
+                double scaled = dt * GAME_SECONDS_PER_REAL_SECOND * Math.max(0.0, timeScale.get());
                 if (scaled <= 0) return;
 
                 totalSeconds.set(totalSeconds.get() + scaled);
@@ -80,7 +87,11 @@ public final class GameTimeManager {
         dayNumber.set(day);
         timeOfDay.set(lt);
 
-        boolean isNight = (h >= NIGHT_START_HOUR) || (h < NIGHT_END_HOUR);
+        int secondsOfDay = (h * 3600) + (m * 60);
+        int cycleSeconds = 24 * 3600;      // 24-hour anchor cycle (for 0..360)
+        int anchorAtSix = 6 * 3600;        // 06:00 => 0 degree
+        int elapsedFromSix = Math.floorMod(secondsOfDay - anchorAtSix, cycleSeconds);
+        boolean isNight = elapsedFromSix >= (12 * 3600); // switch every 12 in-game hours from 06:00
         night.set(isNight);
 
         formatted.set(String.format("Day %d %02d:%02d", day, h, m));
@@ -95,6 +106,7 @@ public final class GameTimeManager {
     public ReadOnlyObjectProperty<LocalTime> timeOfDayProperty() { return timeOfDay.getReadOnlyProperty(); }
     public ReadOnlyBooleanProperty nightProperty() { return night.getReadOnlyProperty(); }
     public ReadOnlyStringProperty formattedProperty() { return formatted.getReadOnlyProperty(); }
+    public ReadOnlyDoubleProperty realWorldElapsedSecondsProperty() { return realWorldElapsedSeconds.getReadOnlyProperty(); }
 
     public boolean isNight() { return night.get(); }
 

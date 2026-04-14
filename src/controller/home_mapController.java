@@ -5,6 +5,7 @@ import game.GameState;
 import game.GameTimeManager;
 import java.io.IOException;
 import java.net.URL;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.ResourceBundle;
 import javafx.application.Platform;
@@ -14,6 +15,7 @@ import javafx.fxml.FXML;
 import javafx.scene.Group;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Slider;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
@@ -36,7 +38,7 @@ public class home_mapController extends BaseMapController {
     private Merchant merChant;
     private InteractionZone merchantZone;
 
-    private static final String DAY_BG_PATH = "/image/homemapuse.png";
+    private static final String DAY_BG_PATH = "/image/maps/home_map_withoutshop.png";
     private static final String NIGHT_BG_PATH = "/image/homemapuse_night.png";
 
     @FXML private Rectangle merchantdetect;
@@ -238,12 +240,6 @@ public class home_mapController extends BaseMapController {
     @FXML
     private ImageView farm_img28;
     @FXML
-    private ImageView farm_img29;
-    @FXML
-    private ImageView farm_img30;
-    @FXML
-    private ImageView farm_img31;
-    @FXML
     private ImageView farm_img19;
     @FXML
     private ImageView farm_img20;
@@ -259,34 +255,6 @@ public class home_mapController extends BaseMapController {
     private ImageView farm_img25;
     @FXML
     private ImageView farm_img26;
-    @FXML
-    private ImageView farm_img32;
-    @FXML
-    private ImageView farm_img33;
-    @FXML
-    private ImageView farm_img34;
-    @FXML
-    private ImageView farm_img35;
-    @FXML
-    private ImageView farm_img36;
-    @FXML
-    private ImageView farm_img37;
-    @FXML
-    private ImageView farm_img38;
-    @FXML
-    private ImageView farm_img39;
-    @FXML
-    private ImageView farm_img40;
-    @FXML
-    private ImageView farm_img41;
-    @FXML
-    private ImageView farm_img42;
-    @FXML
-    private ImageView farm_img43;
-    @FXML
-    private ImageView farm_img44;
-    @FXML
-    private ImageView farm_img45;
     @FXML
     private Button farm1_button;
     @FXML
@@ -499,6 +467,23 @@ public class home_mapController extends BaseMapController {
     private ToggleButton slotBtn4;
     @FXML
     private ImageView equip_img;
+    @FXML
+    private Group daynightnavgroup;
+    @FXML
+    private Label day;
+    @FXML
+    private ImageView daynightcircleimg;
+    @FXML
+    private Label time;
+    @FXML
+    private Label name;
+    @FXML
+    private Label coin;
+    @FXML
+    private ProgressBar hpbar;
+    @FXML
+    private ProgressBar spbar;
+    
 
     @Override
     protected String mapKey() {
@@ -530,9 +515,12 @@ public class home_mapController extends BaseMapController {
         bridgeHomeSharedUi();
         setupMerchant();
         setupMerchantZone();
+        setupDayNightNavHoverEffect();
+        setupDayNightCircleRotation();
         setupMenuTabs();
         bindStatusLabels();
         bindSettingControls();
+        bindDayNightNavUi();
 
         if (playerState != null) {
             playerState.expProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
@@ -641,40 +629,40 @@ public class home_mapController extends BaseMapController {
      }
         
     private void bindSettingControls() {
-        GameTimeManager time = GameTimeManager.get();
+        GameTimeManager timeManager = GameTimeManager.get();
 
         if (timescaleslider != null) {
-            timescaleslider.valueProperty().unbindBidirectional(time.timeScaleProperty());
-            timescaleslider.valueProperty().bindBidirectional(time.timeScaleProperty());
+            timescaleslider.valueProperty().unbindBidirectional(timeManager.timeScaleProperty());
+            timescaleslider.valueProperty().bindBidirectional(timeManager.timeScaleProperty());
         }
 
         if (sliderscale != null) {
             sliderscale.textProperty().unbind();
             sliderscale.textProperty().bind(Bindings.createStringBinding(
-                () -> String.format("Current Time Speed : x%.1f", time.timeScaleProperty().get()),
-                time.timeScaleProperty()
+                () -> String.format("Current Time Speed : x%.1f", timeManager.timeScaleProperty().get()),
+                timeManager.timeScaleProperty()
             ));
         }
 
         if (lbldays != null) {
             lbldays.textProperty().unbind();
             lbldays.textProperty().bind(Bindings.createStringBinding(
-                () -> "Days : " + time.dayNumberProperty().get(),
-                time.dayNumberProperty()
+                () -> "Days : " + timeManager.dayNumberProperty().get(),
+                timeManager.dayNumberProperty()
             ));
         }
 
         if (lbltime != null) {
             lbltime.textProperty().unbind();
             lbltime.textProperty().bind(Bindings.createStringBinding(
-                () -> "Time : " + time.formattedProperty().get(),
-                time.formattedProperty()
+                () -> "Time : " + formatClockOnly(timeManager.timeOfDayProperty().get()),
+                timeManager.timeOfDayProperty()
             ));
         }
 
-        if (btnsetday != null) btnsetday.setOnAction(e -> time.setTimeOfDay(8, 0));
-        if (btnsetnight != null) btnsetnight.setOnAction(e -> time.setTimeOfDay(20, 0));
-        if (btnplus1h != null) btnplus1h.setOnAction(e -> time.addMinutes(60));
+        if (btnsetday != null) btnsetday.setOnAction(e -> timeManager.setTimeOfDay(8, 0));
+        if (btnsetnight != null) btnsetnight.setOnAction(e -> timeManager.setTimeOfDay(20, 0));
+        if (btnplus1h != null) btnplus1h.setOnAction(e -> timeManager.addMinutes(60));
         if (btnsaveandexit != null) {
             btnsaveandexit.setOnAction(e -> {
                 try {
@@ -688,6 +676,55 @@ public class home_mapController extends BaseMapController {
                 }
             });
         }
+    }
+    
+    private void setupDayNightNavHoverEffect() {
+        if (daynightnavgroup == null) return;
+        daynightnavgroup.setOpacity(0.45);
+        daynightnavgroup.setOnMouseEntered(e -> daynightnavgroup.setOpacity(1.0));
+        daynightnavgroup.setOnMouseExited(e -> daynightnavgroup.setOpacity(0.45));
+    }
+    
+    private void setupDayNightCircleRotation() {
+        if (daynightcircleimg == null) return;
+        
+        GameTimeManager timeManager = GameTimeManager.get();
+        daynightcircleimg.rotateProperty().unbind();
+        daynightcircleimg.rotateProperty().bind(Bindings.createDoubleBinding(
+            () -> {
+                int secondsOfDay = (int) Math.floor(timeManager.totalSecondsProperty().get() % (24.0 * 60.0 * 60.0));
+                if (secondsOfDay < 0) secondsOfDay += 24 * 60 * 60;
+                int cycleSeconds = 24 * 60 * 60;
+                int anchorAtSix = 6 * 60 * 60;
+                int elapsedFromSix = Math.floorMod(secondsOfDay - anchorAtSix, cycleSeconds);
+                return -(elapsedFromSix * (360.0 / cycleSeconds));
+            },
+            timeManager.totalSecondsProperty()
+        ));
+    }
+    
+    private void bindDayNightNavUi() {
+        if (day != null && lbldays != null) {
+            day.textProperty().unbind();
+            day.textProperty().bind(lbldays.textProperty());
+        }
+        if (time != null && lbltime != null) {
+            time.textProperty().unbind();
+            time.textProperty().bind(lbltime.textProperty());
+        }
+        if (name != null && statusName != null) {
+            name.textProperty().unbind();
+            name.textProperty().bind(statusName.textProperty());
+        }
+        if (coin != null && playerState != null && playerState.getInventory() != null) {
+            coin.textProperty().unbind();
+            coin.textProperty().bind(playerState.getInventory().coinsProperty().asString(": %d"));
+        }
+    }
+    
+    private String formatClockOnly(LocalTime localTime) {
+        LocalTime safeTime = (localTime == null) ? LocalTime.MIDNIGHT : localTime;
+        return String.format("%02d:%02d", safeTime.getHour(), safeTime.getMinute());
     }
 
     @Override
@@ -704,11 +741,20 @@ public class home_mapController extends BaseMapController {
         if (statusEXP != null) {
             statusEXP.setText(formatVisibleExpLabel());
         }
+        int shownMaxHp = Math.max(1, playerState.getMaxHp() + pendingHpPoints);
+        int shownMaxSp = Math.max(1, playerState.getMaxStamina() + pendingSpPoints);
+
         if (statusHP != null) {
-            statusHP.setText("HP : " + playerState.getHp() + "/" + (playerState.getMaxHp() + pendingHpPoints) + formatPending(pendingHpPoints));
+            statusHP.setText("HP : " + playerState.getHp() + "/" + shownMaxHp + formatPending(pendingHpPoints));
         }
         if (statusSP != null) {
-            statusSP.setText("SP : " + playerState.getStamina() + "/" + (playerState.getMaxStamina() + pendingSpPoints) + formatPending(pendingSpPoints));
+            statusSP.setText("SP : " + playerState.getStamina() + "/" + shownMaxSp + formatPending(pendingSpPoints));
+        }
+        if (hpbar != null) {
+            hpbar.setProgress(Math.max(0.0, Math.min(1.0, playerState.getHp() / (double) shownMaxHp)));
+        }
+        if (spbar != null) {
+            spbar.setProgress(Math.max(0.0, Math.min(1.0, playerState.getStamina() / (double) shownMaxSp)));
         }
         if (statusSTR != null) statusSTR.setText("STR : " + playerState.getStr() + formatPending(pendingStrPoints));
         if (statusVIT != null) statusVIT.setText("VIT : " + playerState.getVit() + formatPending(pendingVitPoints));
