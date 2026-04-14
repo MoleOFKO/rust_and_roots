@@ -18,6 +18,7 @@ import model.FarmState;
 import model.Inventory;
 import model.ItemDatabase;
 import model.PlayerState;
+import model.TreeMapState;
 
 public class LoadGameService {
     private static final String FARM_SLOT_WATERING_CAN = "__farm_slot_watering_can__";
@@ -44,6 +45,7 @@ public class LoadGameService {
             loadHotbar(con, gs, saveId);
             loadFarmPlots(con, gs, saveId);
             loadTime(con, saveId);
+            loadTreeResources(con, gs, saveId);
             loadUnlockedRecipes(con, gs, saveId);
             gs.setPreferredStatusPanelGroup(GameState.StatusPanelGroup.STATUS);
 
@@ -402,6 +404,54 @@ public class LoadGameService {
         clearInventoryItems(gs.getChestInventory());
         clearFarmState(gs.getFarmState("home_map"));
         clearFarmState(gs.getFarmState("Home_interior"));
+        gs.clearTreeStates();
+    }
+
+    private void loadTreeResources(Connection con, GameState gs, int saveId) throws Exception {
+        if (con == null || gs == null || saveId <= 0) return;
+        if (!hasTable(con, "saved_tree_resource")) {
+            return;
+        }
+
+        String sql = """
+            SELECT map_key,
+                   tree_id,
+                   tree_type,
+                   current_stage,
+                   lived_days,
+                   hp,
+                   vit,
+                   respawn_at_total_seconds,
+                   last_updated_day_number
+            FROM saved_tree_resource
+            WHERE saved_id = ?
+            """;
+
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, saveId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    String mapKey = rs.getString("map_key");
+                    String treeId = rs.getString("tree_id");
+                    if (mapKey == null || mapKey.isBlank() || treeId == null || treeId.isBlank()) {
+                        continue;
+                    }
+
+                    TreeMapState mapState = gs.getTreeState(mapKey);
+                    TreeMapState.TreeData tree = mapState.getTree(treeId);
+
+                    tree.type = TreeMapState.TreeType.fromDb(rs.getString("tree_type"), TreeMapState.TreeType.BLUE);
+                    tree.currentStage = rs.getInt("current_stage");
+                    tree.livedDays = rs.getInt("lived_days");
+                    tree.hp = rs.getInt("hp");
+                    tree.vit = rs.getInt("vit");
+                    tree.respawnAtTotalSeconds = rs.getDouble("respawn_at_total_seconds");
+                    tree.lastUpdatedDayNumber = rs.getInt("last_updated_day_number");
+                    tree.pendingDrops.clear();
+                }
+            }
+        }
     }
 
     private void loadUnlockedRecipes(Connection con, GameState gs, int saveId) throws Exception {

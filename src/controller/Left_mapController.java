@@ -6,9 +6,12 @@ import game.GameTimeManager;
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
+import javafx.geometry.Bounds;
 import javafx.scene.Group;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -16,11 +19,19 @@ import javafx.scene.control.Slider;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
+import java.util.Locale;
+import java.util.concurrent.ThreadLocalRandom;
+import model.CollisionRegistry;
+import model.ItemDatabase;
+import model.TreeMapState;
+import model.item;
+import util.AppDialogs;
 import util.SceneManager;
 import util.SpawnTag;
 /**
@@ -29,6 +40,25 @@ import util.SpawnTag;
  * @author MITUSER-1
  */
 public class Left_mapController extends BaseMapController {
+
+    private static final String MAIN_TREE_ID = "tree";
+    // Respawn time while in stage 1: half an in-game day (12 hours).
+    private static final double TREE_RESPAWN_SECONDS = 12.0 * 60.0 * 60.0;
+
+    // Growth rules (tunable). Stage 2 = day 0, stage 3 = day >= 1.
+    private static final int TREE_STAGE3_AFTER_LIVED_DAYS = 1;
+    private static final int TREE_STAGE2_BASE_HP = 6;
+    private static final int TREE_STAGE3_BASE_HP = 8;
+    private static final int TREE_STAGE2_BASE_VIT = 1;
+    private static final int TREE_STAGE3_BASE_VIT = 1;
+
+    private TreeMapState.TreeData mainTreeData;
+    private String renderedTreeVisualKey = null;
+
+    private int treeLogItemId = -1;
+    private int blueFruitItemId = -1;
+    private int redFruitItemId = -1;
+    private int yellowFruitItemId = -1;
 
     @FXML
     private StackPane view;
@@ -380,6 +410,22 @@ public class Left_mapController extends BaseMapController {
     private ImageView equip_img;
     @FXML
     private Rectangle spawn_from_right;
+    @FXML
+    private Rectangle human_hitbox_left;
+    @FXML
+    private Rectangle human_hitbox_up;
+    @FXML
+    private Rectangle human_hitbox_down;
+    @FXML
+    private Rectangle human_hitbox_right;
+    @FXML
+    private Group tree;
+    @FXML
+    private ImageView tree_img;
+    @FXML
+    private Rectangle tree_hitbox;
+    @FXML
+    private Rectangle tree_hitbox_wall;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -389,6 +435,391 @@ public class Left_mapController extends BaseMapController {
         bindSettingControls();
         refreshStatusAllocationUi();
         refreshMenuState();
+        setupTreeSystemIfPresent();
+    }
+
+    private void setupTreeSystemIfPresent() {
+        if (tree_img == null || tree_hitbox == null) {
+            return;
+        }
+
+        if (gameState == null) {
+            gameState = GameState.get();
+        }
+
+        TreeMapState mapTrees = gameState.getTreeState(mapKey());
+        mainTreeData = mapTrees.getTree(MAIN_TREE_ID);
+
+        int currentDay = GameTimeManager.get().dayNumberProperty().get();
+        double nowSeconds = GameTimeManager.get().totalSecondsProperty().get();
+        initializeTreeDefaults(mainTreeData, currentDay, nowSeconds);
+
+        tree_img.setOnMouseClicked(this::handleTreeClicked);
+
+        if (player != null) {
+            player.setOnAttackStarted(this::handlePlayerAttackStarted);
+        }
+
+        // Ensure the tree wall participates in player collision on this map.
+        if (player != null && tree_hitbox_wall != null) {
+            List<Rectangle> colliders = new ArrayList<>();
+            if (super.walls != null) {
+                colliders.addAll(CollisionRegistry.collectWalls(super.walls));
+            }
+            colliders.add(tree_hitbox_wall);
+            player.setWalls(colliders);
+        }
+
+        // Render once immediately.
+        renderTreeVisual();
+    }
+
+    private void initializeTreeDefaults(TreeMapState.TreeData data, int currentDay, double nowSeconds) {
+        if (data == null) return;
+
+        if (data.type == null) {
+            data.type = randomTreeType();
+        }
+
+        if (data.lastUpdatedDayNumber <= 0) {
+            data.lastUpdatedDayNumber = Math.max(1, currentDay);
+        }
+
+        if (data.livedDays < 0) data.livedDays = 0;
+
+        if (data.currentStage < 1 || data.currentStage > 3) {
+            data.currentStage = stageFromLivedDays(data.livedDays);
+        }
+
+        if (data.currentStage == 1) {
+            data.hp = 0;
+            if (data.respawnAtTotalSeconds < 0) {
+                data.respawnAtTotalSeconds = nowSeconds + TREE_RESPAWN_SECONDS;
+            }
+        } else {
+            data.currentStage = stageFromLivedDays(data.livedDays);
+            data.vit = vitFor(data.currentStage, data.livedDays);
+            int maxHp = maxHpFor(data.currentStage, data.livedDays);
+            if (data.hp <= 0 || data.hp > maxHp) data.hp = maxHp;
+            data.respawnAtTotalSeconds = -1;
+        }
+    }
+
+    private TreeMapState.TreeType randomTreeType() {
+        TreeMapState.TreeType[] types = TreeMapState.TreeType.values();
+        return types[ThreadLocalRandom.current().nextInt(types.length)];
+    }
+
+    @Override
+    protected void onGameLoopUpdate(Bounds playerBounds) {
+        syncDirectionalHitboxes();
+        updateTreeState();
+    }
+
+    private void syncDirectionalHitboxes() {
+        if (player == null) return;
+        var facing = player.getFacingDirection();
+
+        setDirectionalHitboxActive(human_hitbox_left, facing == model.Player.FacingDirection.LEFT);
+        setDirectionalHitboxActive(human_hitbox_right, facing == model.Player.FacingDirection.RIGHT);
+        setDirectionalHitboxActive(human_hitbox_up, facing == model.Player.FacingDirection.UP);
+        setDirectionalHitboxActive(human_hitbox_down, facing == model.Player.FacingDirection.DOWN);
+    }
+
+    private void setDirectionalHitboxActive(Rectangle hitbox, boolean active) {
+        if (hitbox == null) return;
+        hitbox.setDisable(!active);
+        hitbox.setVisible(active);
+        hitbox.setManaged(active);
+    }
+
+    private Rectangle resolveActiveAttackHitbox() {
+        if (player == null) return null;
+        return switch (player.getFacingDirection()) {
+            case LEFT -> human_hitbox_left;
+            case RIGHT -> human_hitbox_right;
+            case UP -> human_hitbox_up;
+            case DOWN -> human_hitbox_down;
+        };
+    }
+
+    private void handlePlayerAttackStarted() {
+        if (mainTreeData == null || tree_hitbox == null) return;
+        if (mainTreeData.currentStage == 1) return; // stage 1 cannot receive damage
+
+        Rectangle attackHitbox = resolveActiveAttackHitbox();
+        if (attackHitbox == null) return;
+
+        Bounds attackBounds = attackHitbox.localToScene(attackHitbox.getBoundsInLocal());
+        Bounds treeBounds = tree_hitbox.localToScene(tree_hitbox.getBoundsInLocal());
+        if (!attackBounds.intersects(treeBounds)) {
+            return;
+        }
+
+        int damage = calculatePlayerDamageAgainstTree(mainTreeData);
+        if (damage <= 0) return;
+
+        mainTreeData.hp = Math.max(0, mainTreeData.hp - damage);
+        if (mainTreeData.hp <= 0) {
+            chopTree(mainTreeData);
+        }
+
+        renderTreeVisual();
+    }
+
+    private int calculatePlayerDamageAgainstTree(TreeMapState.TreeData tree) {
+        if (playerState == null || tree == null) return 0;
+
+        int playerStr = Math.max(0, playerState.getStr());
+        int treeVit = Math.max(0, tree.vit);
+
+        int damage = playerStr - treeVit;
+        if (isAxeEquipped()) {
+            damage += 1;
+        }
+        return Math.max(0, damage);
+    }
+
+    private boolean isAxeEquipped() {
+        if (player == null) return false;
+        int equippedId = player.getEquippedItemId();
+        if (equippedId <= 0) return false;
+        String name = ItemDatabase.getItemName(equippedId);
+        if (name == null || name.isBlank()) return false;
+
+        String normalized = name.trim().toLowerCase(Locale.ROOT);
+        if (normalized.equals("axe")) return true;
+
+        // Be defensive for future item naming like "Stone Axe". Avoid matching pickaxes.
+        if (normalized.contains("pickaxe") || normalized.contains("pick axe")) return false;
+        return normalized.contains("axe");
+    }
+
+    private void chopTree(TreeMapState.TreeData tree) {
+        if (tree == null) return;
+        if (tree.currentStage != 2 && tree.currentStage != 3) return;
+
+        tree.pendingDrops.clear();
+
+        int logId = resolveTreeLogItemId();
+        int fruitId = resolveFruitItemIdForType(tree.type);
+
+        int livedDays = Math.max(0, tree.livedDays);
+        int logCount = 1 + (livedDays / 2);
+        int fruitCount = (tree.currentStage == 3) ? (1 + (livedDays / 3)) : 0;
+
+        if (logId > 0) {
+            for (int i = 0; i < logCount; i++) tree.pendingDrops.addLast(logId);
+        }
+        if (fruitId > 0) {
+            for (int i = 0; i < fruitCount; i++) tree.pendingDrops.addLast(fruitId);
+        }
+
+        double nowSeconds = GameTimeManager.get().totalSecondsProperty().get();
+        int currentDay = GameTimeManager.get().dayNumberProperty().get();
+
+        tree.currentStage = 1;
+        tree.hp = 0;
+        tree.respawnAtTotalSeconds = nowSeconds + TREE_RESPAWN_SECONDS;
+        tree.livedDays = 0;
+        tree.lastUpdatedDayNumber = Math.max(1, currentDay);
+    }
+
+    private int resolveTreeLogItemId() {
+        if (treeLogItemId > 0) return treeLogItemId;
+        treeLogItemId = resolveItemId("tree_log");
+        return treeLogItemId;
+    }
+
+    private int resolveFruitItemIdForType(TreeMapState.TreeType type) {
+        TreeMapState.TreeType safe = (type == null) ? TreeMapState.TreeType.BLUE : type;
+        return switch (safe) {
+            case BLUE -> resolveBlueFruitItemId();
+            case RED -> resolveRedFruitItemId();
+            case YELLOW -> resolveYellowFruitItemId();
+        };
+    }
+
+    private int resolveBlueFruitItemId() {
+        if (blueFruitItemId > 0) return blueFruitItemId;
+        blueFruitItemId = resolveItemId("blue_fruit");
+        return blueFruitItemId;
+    }
+
+    private int resolveRedFruitItemId() {
+        if (redFruitItemId > 0) return redFruitItemId;
+        redFruitItemId = resolveItemId("red_fruit");
+        return redFruitItemId;
+    }
+
+    private int resolveYellowFruitItemId() {
+        if (yellowFruitItemId > 0) return yellowFruitItemId;
+        yellowFruitItemId = resolveItemId("yellow_fruit");
+        return yellowFruitItemId;
+    }
+
+    private int resolveItemId(String itemName) {
+        item itm = ItemDatabase.getItemByName(itemName);
+        return (itm == null) ? -1 : itm.getItem_id();
+    }
+
+    private void handleTreeClicked(MouseEvent event) {
+        if (event == null || event.getButton() != MouseButton.PRIMARY) return;
+        if (mainTreeData == null || player == null) return;
+        if (mainTreeData.currentStage != 1) return;
+        if (mainTreeData.pendingDrops.isEmpty()) return;
+
+        int itemId = mainTreeData.pendingDrops.peekFirst();
+        if (itemId <= 0) {
+            mainTreeData.pendingDrops.pollFirst();
+            renderTreeVisual();
+            return;
+        }
+
+        if (!player.getInventory().addItem(itemId, 1)) {
+            AppDialogs.showMessageDialog(null, "Not enough inventory space to collect this drop.");
+            return;
+        }
+
+        mainTreeData.pendingDrops.pollFirst();
+        renderTreeVisual();
+    }
+
+    private void updateTreeState() {
+        if (mainTreeData == null) return;
+
+        GameTimeManager time = GameTimeManager.get();
+        int currentDay = time.dayNumberProperty().get();
+        double nowSeconds = time.totalSecondsProperty().get();
+
+        if (mainTreeData.currentStage == 1) {
+            if (mainTreeData.respawnAtTotalSeconds >= 0 && nowSeconds >= mainTreeData.respawnAtTotalSeconds) {
+                // Respawn and erase any unclaimed drops.
+                mainTreeData.pendingDrops.clear();
+                mainTreeData.currentStage = 2;
+                mainTreeData.livedDays = 0;
+                mainTreeData.vit = vitFor(2, 0);
+                mainTreeData.hp = maxHpFor(2, 0);
+                mainTreeData.respawnAtTotalSeconds = -1;
+                mainTreeData.lastUpdatedDayNumber = Math.max(1, currentDay);
+            }
+            renderTreeVisual();
+            return;
+        }
+
+        applyTreeDailyGrowthIfNeeded(mainTreeData, currentDay);
+
+        // Defensive: keep stats consistent even when no day change occurred.
+        if (mainTreeData.currentStage != 1) {
+            mainTreeData.currentStage = stageFromLivedDays(mainTreeData.livedDays);
+            int maxHp = maxHpFor(mainTreeData.currentStage, mainTreeData.livedDays);
+            mainTreeData.vit = vitFor(mainTreeData.currentStage, mainTreeData.livedDays);
+            if (mainTreeData.hp > maxHp) mainTreeData.hp = maxHp;
+            if (mainTreeData.hp < 0) mainTreeData.hp = 0;
+            if (mainTreeData.hp == 0) {
+                chopTree(mainTreeData);
+            }
+        }
+
+        renderTreeVisual();
+    }
+
+    private void applyTreeDailyGrowthIfNeeded(TreeMapState.TreeData tree, int currentDay) {
+        if (tree == null) return;
+        if (tree.currentStage == 1) return;
+        int safeDay = Math.max(1, currentDay);
+        int last = tree.lastUpdatedDayNumber <= 0 ? safeDay : tree.lastUpdatedDayNumber;
+
+        if (safeDay == last) {
+            return;
+        }
+
+        if (safeDay < last) {
+            tree.lastUpdatedDayNumber = safeDay;
+            return;
+        }
+
+        int oldStage = stageFromLivedDays(tree.livedDays);
+        int oldMaxHp = maxHpFor(oldStage, tree.livedDays);
+
+        int delta = safeDay - last;
+        tree.lastUpdatedDayNumber = safeDay;
+        tree.livedDays = Math.max(0, tree.livedDays + delta);
+
+        int newStage = stageFromLivedDays(tree.livedDays);
+        int newMaxHp = maxHpFor(newStage, tree.livedDays);
+        int growth = Math.max(0, newMaxHp - oldMaxHp);
+
+        tree.currentStage = newStage;
+        tree.vit = vitFor(newStage, tree.livedDays);
+
+        int currentHp = Math.max(0, tree.hp);
+        tree.hp = Math.min(newMaxHp, currentHp + growth);
+    }
+
+    private int stageFromLivedDays(int livedDays) {
+        return Math.max(0, livedDays) >= TREE_STAGE3_AFTER_LIVED_DAYS ? 3 : 2;
+    }
+
+    private int maxHpFor(int stage, int livedDays) {
+        int days = Math.max(0, livedDays);
+        return switch (stage) {
+            case 3 -> TREE_STAGE3_BASE_HP + (days * 2);
+            default -> TREE_STAGE2_BASE_HP + days;
+        };
+    }
+
+    private int vitFor(int stage, int livedDays) {
+        int days = Math.max(0, livedDays);
+        return switch (stage) {
+            case 3 -> TREE_STAGE3_BASE_VIT + (days / 3);
+            default -> TREE_STAGE2_BASE_VIT;
+        };
+    }
+
+    private void renderTreeVisual() {
+        if (tree_img == null || mainTreeData == null) return;
+
+        String visualKey;
+        if (mainTreeData.currentStage == 1) {
+            int drop = mainTreeData.pendingDrops.peekFirst() == null ? -1 : mainTreeData.pendingDrops.peekFirst();
+            visualKey = "stage1#drop:" + drop;
+        } else {
+            visualKey = "stage:" + mainTreeData.currentStage + "#type:" + (mainTreeData.type == null ? "null" : mainTreeData.type.name());
+        }
+
+        if (visualKey.equals(renderedTreeVisualKey)) {
+            return;
+        }
+        renderedTreeVisualKey = visualKey;
+
+        if (mainTreeData.currentStage == 1) {
+            if (!mainTreeData.pendingDrops.isEmpty()) {
+                int itemId = mainTreeData.pendingDrops.peekFirst();
+                tree_img.setImage(ItemDatabase.getImage(itemId));
+                tree_img.setVisible(true);
+                tree_img.setManaged(true);
+            } else {
+                tree_img.setImage(null);
+                tree_img.setVisible(false);
+                tree_img.setManaged(false);
+            }
+            return;
+        }
+
+        tree_img.setManaged(true);
+        tree_img.setVisible(true);
+
+        String color = (mainTreeData.type == null) ? "blue" : mainTreeData.type.name().toLowerCase();
+        String spriteName = color + "_tree" + (mainTreeData.currentStage == 3 ? "2" : "1");
+        item spriteItem = ItemDatabase.getItemByName(spriteName);
+
+        if (spriteItem != null) {
+            tree_img.setImage(ItemDatabase.getImage(spriteItem.getItem_id()));
+        } else {
+            // Fallback to loading directly from resources if DB entry is missing.
+            tree_img.setImage(loadImageOrNull("/image/items/" + spriteName + ".png"));
+        }
     }
 
     private void bridgeLeftMapSharedUi() {
@@ -638,5 +1069,4 @@ public class Left_mapController extends BaseMapController {
        registerExit(exit_left, "/view/home_map.fxml", SpawnTag.FROM_LEFT);
        registerExit(exit_up, "/view/left_map_noone.fxml", SpawnTag.FROM_DOWN);
     }
-     
 }

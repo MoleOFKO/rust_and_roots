@@ -32,6 +32,7 @@ public final class DatabaseSchemaManager {
         execute(con, "DROP PROCEDURE IF EXISTS ensure_chicken_corn_soup_deluxe");
         execute(con, "DROP PROCEDURE IF EXISTS ensure_saved_unlocked_recipe_table");
         execute(con, "DROP PROCEDURE IF EXISTS ensure_saved_farm_plot_defaults");
+        execute(con, "DROP PROCEDURE IF EXISTS ensure_saved_tree_resource_table");
 
         execute(con, """
             CREATE PROCEDURE ensure_chicken_corn_soup_deluxe()
@@ -81,6 +82,27 @@ public final class DatabaseSchemaManager {
             """);
 
         execute(con, """
+            CREATE PROCEDURE ensure_saved_tree_resource_table()
+            BEGIN
+                CREATE TABLE IF NOT EXISTS saved_tree_resource (
+                    saved_id INT NOT NULL,
+                    map_key VARCHAR(50) NOT NULL,
+                    tree_id VARCHAR(50) NOT NULL,
+                    tree_type VARCHAR(10) NOT NULL,
+                    current_stage INT NOT NULL DEFAULT '2',
+                    lived_days INT NOT NULL DEFAULT '0',
+                    hp INT NOT NULL DEFAULT '0',
+                    vit INT NOT NULL DEFAULT '0',
+                    respawn_at_total_seconds DOUBLE NOT NULL DEFAULT '-1',
+                    last_updated_day_number INT NOT NULL DEFAULT '1',
+                    PRIMARY KEY (saved_id, map_key, tree_id),
+                    CONSTRAINT fk_saved_tree_resource_save
+                        FOREIGN KEY (saved_id) REFERENCES save_game (saved_id) ON DELETE CASCADE
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+            END
+            """);
+
+        execute(con, """
             CREATE PROCEDURE ensure_saved_farm_plot_defaults()
             BEGIN
                 DECLARE v_has_table INT DEFAULT 0;
@@ -118,6 +140,7 @@ public final class DatabaseSchemaManager {
             CREATE PROCEDURE ensure_application_schema()
             BEGIN
                 CALL ensure_saved_unlocked_recipe_table();
+                CALL ensure_saved_tree_resource_table();
                 CALL ensure_saved_farm_plot_defaults();
                 CALL ensure_chicken_corn_soup_deluxe();
             END
