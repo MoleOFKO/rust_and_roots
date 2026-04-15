@@ -263,6 +263,11 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         // default: do nothing
     }
 
+    /** Hook for subclasses during the shared game loop tick (called every frame). */
+    protected void onGameLoopUpdate(Bounds playerBounds) {
+        // default: do nothing
+    }
+
     @Override
     public void init(GameState gs) {
         this.gameState = gs;
@@ -1993,6 +1998,8 @@ public abstract class BaseMapController implements Initializable, SceneControlle
                 double nowSeconds = GameTimeManager.get().totalSecondsProperty().get();
                 farm.update(nowSeconds);
             }
+
+            onGameLoopUpdate(playerBounds);
         });
 
         gameLoop.start();

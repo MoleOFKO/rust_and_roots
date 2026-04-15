@@ -15,6 +15,7 @@ import java.util.Map;
 import model.FarmState;
 import model.Inventory;
 import model.PlayerState;
+import model.TreeMapState;
 
 public class SaveGameService {
     private static final String FARM_SLOT_WATERING_CAN = "__farm_slot_watering_can__";
@@ -42,6 +43,7 @@ public class SaveGameService {
             savePlayerInventory(con, gs);
             saveHotbar(con, gs);
             saveFarmPlots(con, gs);
+            saveTreeResources(con, gs);
             saveChestItems(con, gs);
             saveTime(con, gs);
             saveUnlockedRecipes(con, gs);
@@ -278,6 +280,68 @@ public class SaveGameService {
         }
     }
 
+    private void saveTreeResources(Connection con, GameState gs) throws Exception {
+        if (con == null || gs == null) return;
+        if (!hasTable(con, "saved_tree_resource")) {
+            return;
+        }
+
+        int saveId = gs.getCurrentSaveId();
+
+        try (PreparedStatement del = con.prepareStatement("DELETE FROM saved_tree_resource WHERE saved_id = ?")) {
+            del.setInt(1, saveId);
+            del.executeUpdate();
+        }
+
+        if (gs.getAllTreeStates().isEmpty()) {
+            return;
+        }
+
+        String sql = """
+            INSERT INTO saved_tree_resource
+                (saved_id, map_key, tree_id, tree_type,
+                 current_stage, lived_days, hp, vit,
+                 respawn_at_total_seconds, last_updated_day_number)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """;
+
+        try (PreparedStatement ins = con.prepareStatement(sql)) {
+            for (Map.Entry<String, TreeMapState> mapEntry : gs.getAllTreeStates().entrySet()) {
+                String mapKey = mapEntry == null ? null : mapEntry.getKey();
+                TreeMapState mapState = mapEntry == null ? null : mapEntry.getValue();
+                if (mapKey == null || mapKey.isBlank() || mapState == null) {
+                    continue;
+                }
+
+                for (Map.Entry<String, TreeMapState.TreeData> treeEntry : mapState.getAllTrees().entrySet()) {
+                    String treeId = treeEntry == null ? null : treeEntry.getKey();
+                    TreeMapState.TreeData tree = treeEntry == null ? null : treeEntry.getValue();
+                    if (treeId == null || treeId.isBlank() || tree == null) {
+                        continue;
+                    }
+
+                    String type = tree.type == null ? TreeMapState.TreeType.BLUE.name() : tree.type.name();
+                    int stage = tree.currentStage;
+                    if (stage < 1 || stage > 3) stage = 2;
+
+                    ins.setInt(1, saveId);
+                    ins.setString(2, mapKey);
+                    ins.setString(3, treeId);
+                    ins.setString(4, type);
+                    ins.setInt(5, stage);
+                    ins.setInt(6, Math.max(0, tree.livedDays));
+                    ins.setInt(7, Math.max(0, tree.hp));
+                    ins.setInt(8, Math.max(0, tree.vit));
+                    ins.setDouble(9, tree.respawnAtTotalSeconds);
+                    ins.setInt(10, Math.max(1, tree.lastUpdatedDayNumber));
+                    ins.addBatch();
+                }
+            }
+
+            ins.executeBatch();
+        }
+    }
+
     private void saveFarmMap(PreparedStatement ins, int saveId, String mapKey, FarmState farmState) throws Exception {
         if (farmState == null) return;
 
@@ -470,6 +534,7 @@ public class SaveGameService {
             savePlayerInventory(con, gs);
             saveHotbar(con, gs);
             saveFarmPlots(con, gs);
+            saveTreeResources(con, gs);
             saveChestItems(con, gs);
             saveTime(con, gs);
             saveUnlockedRecipes(con, gs);
