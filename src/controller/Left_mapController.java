@@ -411,6 +411,8 @@ public class Left_mapController extends BaseMapController {
     @FXML
     private Rectangle spawn_from_right;
     @FXML
+    private Rectangle exit_right;
+    @FXML
     private Rectangle human_hitbox_left;
     @FXML
     private Rectangle human_hitbox_up;
@@ -1066,7 +1068,7 @@ public class Left_mapController extends BaseMapController {
 
     @Override
     protected void configureExits() {
-       registerExit(exit_left, "/view/home_map.fxml", SpawnTag.FROM_LEFT);
+       registerExit(exit_right, "/view/home_map.fxml", SpawnTag.FROM_LEFT);
        registerExit(exit_up, "/view/left_map_noone.fxml", SpawnTag.FROM_DOWN);
     }
 }
