@@ -33,6 +33,7 @@ public final class DatabaseSchemaManager {
         execute(con, "DROP PROCEDURE IF EXISTS ensure_saved_unlocked_recipe_table");
         execute(con, "DROP PROCEDURE IF EXISTS ensure_saved_farm_plot_defaults");
         execute(con, "DROP PROCEDURE IF EXISTS ensure_saved_tree_resource_table");
+        execute(con, "DROP PROCEDURE IF EXISTS ensure_saved_tree_drop_table");
 
         execute(con, """
             CREATE PROCEDURE ensure_chicken_corn_soup_deluxe()
@@ -84,21 +85,159 @@ public final class DatabaseSchemaManager {
         execute(con, """
             CREATE PROCEDURE ensure_saved_tree_resource_table()
             BEGIN
+                DECLARE v_missing_max_hp INT DEFAULT 0;
+                DECLARE v_missing_drop_rate_pity INT DEFAULT 0;
+                DECLARE v_missing_drops_this_life INT DEFAULT 0;
+                DECLARE v_missing_damage_since_last_drop_roll INT DEFAULT 0;
+                DECLARE v_missing_last_hp_growth_total_seconds INT DEFAULT 0;
+                DECLARE v_tree_type_len INT DEFAULT 0;
+
                 CREATE TABLE IF NOT EXISTS saved_tree_resource (
                     saved_id INT NOT NULL,
                     map_key VARCHAR(50) NOT NULL,
                     tree_id VARCHAR(50) NOT NULL,
-                    tree_type VARCHAR(10) NOT NULL,
+                    tree_type VARCHAR(50) NOT NULL,
                     current_stage INT NOT NULL DEFAULT '2',
                     lived_days INT NOT NULL DEFAULT '0',
                     hp INT NOT NULL DEFAULT '0',
+                    max_hp INT NOT NULL DEFAULT '0',
                     vit INT NOT NULL DEFAULT '0',
+                    drop_rate_pity INT NOT NULL DEFAULT '0',
+                    drops_this_life INT NOT NULL DEFAULT '0',
+                    damage_since_last_drop_roll INT NOT NULL DEFAULT '0',
+                    last_hp_growth_total_seconds DOUBLE NOT NULL DEFAULT '-1',
                     respawn_at_total_seconds DOUBLE NOT NULL DEFAULT '-1',
                     last_updated_day_number INT NOT NULL DEFAULT '1',
                     PRIMARY KEY (saved_id, map_key, tree_id),
                     CONSTRAINT fk_saved_tree_resource_save
                         FOREIGN KEY (saved_id) REFERENCES save_game (saved_id) ON DELETE CASCADE
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+                SELECT COALESCE(CHARACTER_MAXIMUM_LENGTH, 0)
+                  INTO v_tree_type_len
+                  FROM information_schema.columns
+                 WHERE table_schema = DATABASE()
+                   AND table_name = 'saved_tree_resource'
+                   AND column_name = 'tree_type'
+                 LIMIT 1;
+                IF v_tree_type_len IS NULL OR v_tree_type_len < 50 THEN
+                    ALTER TABLE saved_tree_resource
+                        MODIFY COLUMN tree_type VARCHAR(50) NOT NULL;
+                END IF;
+
+                SELECT COUNT(*)
+                  INTO v_missing_max_hp
+                  FROM information_schema.columns
+                 WHERE table_schema = DATABASE()
+                   AND table_name = 'saved_tree_resource'
+                   AND column_name = 'max_hp';
+                IF v_missing_max_hp = 0 THEN
+                    ALTER TABLE saved_tree_resource
+                        ADD COLUMN max_hp INT NOT NULL DEFAULT '0' AFTER hp;
+                END IF;
+
+                SELECT COUNT(*)
+                  INTO v_missing_drop_rate_pity
+                  FROM information_schema.columns
+                 WHERE table_schema = DATABASE()
+                   AND table_name = 'saved_tree_resource'
+                   AND column_name = 'drop_rate_pity';
+                IF v_missing_drop_rate_pity = 0 THEN
+                    ALTER TABLE saved_tree_resource
+                        ADD COLUMN drop_rate_pity INT NOT NULL DEFAULT '0' AFTER vit;
+                END IF;
+
+                SELECT COUNT(*)
+                  INTO v_missing_drops_this_life
+                  FROM information_schema.columns
+                 WHERE table_schema = DATABASE()
+                   AND table_name = 'saved_tree_resource'
+                   AND column_name = 'drops_this_life';
+                IF v_missing_drops_this_life = 0 THEN
+                    ALTER TABLE saved_tree_resource
+                        ADD COLUMN drops_this_life INT NOT NULL DEFAULT '0' AFTER drop_rate_pity;
+                END IF;
+
+                SELECT COUNT(*)
+                  INTO v_missing_damage_since_last_drop_roll
+                  FROM information_schema.columns
+                 WHERE table_schema = DATABASE()
+                   AND table_name = 'saved_tree_resource'
+                   AND column_name = 'damage_since_last_drop_roll';
+                IF v_missing_damage_since_last_drop_roll = 0 THEN
+                    ALTER TABLE saved_tree_resource
+                        ADD COLUMN damage_since_last_drop_roll INT NOT NULL DEFAULT '0' AFTER drops_this_life;
+                END IF;
+
+                SELECT COUNT(*)
+                  INTO v_missing_last_hp_growth_total_seconds
+                  FROM information_schema.columns
+                 WHERE table_schema = DATABASE()
+                   AND table_name = 'saved_tree_resource'
+                   AND column_name = 'last_hp_growth_total_seconds';
+                IF v_missing_last_hp_growth_total_seconds = 0 THEN
+                    ALTER TABLE saved_tree_resource
+                        ADD COLUMN last_hp_growth_total_seconds DOUBLE NOT NULL DEFAULT '-1' AFTER damage_since_last_drop_roll;
+                END IF;
+            END
+            """);
+
+        execute(con, """
+            CREATE PROCEDURE ensure_saved_tree_drop_table()
+            BEGIN
+                DECLARE v_missing_quantity INT DEFAULT 0;
+                DECLARE v_missing_spawned_at_total_seconds INT DEFAULT 0;
+                DECLARE v_missing_expires_at_total_seconds INT DEFAULT 0;
+
+                CREATE TABLE IF NOT EXISTS saved_tree_drop (
+                    saved_id INT NOT NULL,
+                    map_key VARCHAR(50) NOT NULL,
+                    tree_id VARCHAR(50) NOT NULL,
+                    drop_slot INT NOT NULL,
+                    item_id INT NOT NULL,
+                    quantity INT NOT NULL DEFAULT '1',
+                    spawned_at_total_seconds DOUBLE NOT NULL DEFAULT '0',
+                    expires_at_total_seconds DOUBLE NOT NULL DEFAULT '0',
+                    PRIMARY KEY (saved_id, map_key, tree_id, drop_slot),
+                    KEY idx_saved_tree_drop_item_id (item_id),
+                    CONSTRAINT fk_saved_tree_drop_save
+                        FOREIGN KEY (saved_id) REFERENCES save_game (saved_id) ON DELETE CASCADE,
+                    CONSTRAINT fk_saved_tree_drop_item
+                        FOREIGN KEY (item_id) REFERENCES items (item_id) ON DELETE CASCADE
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+                SELECT COUNT(*)
+                  INTO v_missing_quantity
+                  FROM information_schema.columns
+                 WHERE table_schema = DATABASE()
+                   AND table_name = 'saved_tree_drop'
+                   AND column_name = 'quantity';
+                IF v_missing_quantity = 0 THEN
+                    ALTER TABLE saved_tree_drop
+                        ADD COLUMN quantity INT NOT NULL DEFAULT '1' AFTER item_id;
+                END IF;
+
+                SELECT COUNT(*)
+                  INTO v_missing_spawned_at_total_seconds
+                  FROM information_schema.columns
+                 WHERE table_schema = DATABASE()
+                   AND table_name = 'saved_tree_drop'
+                   AND column_name = 'spawned_at_total_seconds';
+                IF v_missing_spawned_at_total_seconds = 0 THEN
+                    ALTER TABLE saved_tree_drop
+                        ADD COLUMN spawned_at_total_seconds DOUBLE NOT NULL DEFAULT '0' AFTER quantity;
+                END IF;
+
+                SELECT COUNT(*)
+                  INTO v_missing_expires_at_total_seconds
+                  FROM information_schema.columns
+                 WHERE table_schema = DATABASE()
+                   AND table_name = 'saved_tree_drop'
+                   AND column_name = 'expires_at_total_seconds';
+                IF v_missing_expires_at_total_seconds = 0 THEN
+                    ALTER TABLE saved_tree_drop
+                        ADD COLUMN expires_at_total_seconds DOUBLE NOT NULL DEFAULT '0' AFTER spawned_at_total_seconds;
+                END IF;
             END
             """);
 
@@ -141,6 +280,7 @@ public final class DatabaseSchemaManager {
             BEGIN
                 CALL ensure_saved_unlocked_recipe_table();
                 CALL ensure_saved_tree_resource_table();
+                CALL ensure_saved_tree_drop_table();
                 CALL ensure_saved_farm_plot_defaults();
                 CALL ensure_chicken_corn_soup_deluxe();
             END
