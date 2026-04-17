@@ -364,23 +364,48 @@ public class CraftController implements Initializable, SceneController {
 
     @FXML
     private void handleresultitemaction(MouseEvent event) {
-        if (selectedRecipe == null) return;
         double now = GameTimeManager.get().totalSecondsProperty().get();
         if (!gameState.hasActiveCraftingJob()) return;
-        if (selectedRecipe.outputItemId != gameState.getActiveCraftingOutputItemId()) return;
         if (!gameState.isCraftingReady(now)) return;
 
+        int outputItemId = gameState.getActiveCraftingOutputItemId();
+        Recipe jobRecipe = findUnlockedRecipeByOutputItemId(outputItemId);
+        if (jobRecipe != null) {
+            selectedRecipe = jobRecipe;
+        }
+
         int qty = gameState.getActiveCraftingOutputQuantity();
-        if (qty > 0 && !inventory.addItem(selectedRecipe.outputItemId, qty)) {
-            AppDialogs.showMessageDialog(null, "Not enough inventory space to collect the crafted item.");
-            return;
+        if (gameState.isActiveCraftingSuccess()) {
+            if (qty > 0 && !inventory.addItem(outputItemId, qty)) {
+                AppDialogs.showMessageDialog(null, "Not enough inventory space to collect the crafted item.");
+                return;
+            }
+        } else {
+            AppDialogs.showMessageDialog(null, "Crafting failed.");
         }
         if (gameState.isActiveCraftingSuccess()) {
-            gameState.queueCookedDishEffect(selectedRecipe.outputItemId, gameState.getActiveCraftingHpDelta(), gameState.getActiveCraftingStaminaDelta(), true);
+            int hpDelta = gameState.getActiveCraftingHpDelta();
+            int staminaDelta = gameState.getActiveCraftingStaminaDelta();
+            if (qty > 0 && (hpDelta != 0 || staminaDelta != 0)) {
+                for (int i = 0; i < qty; i++) {
+                    gameState.queueCookedDishEffect(outputItemId, hpDelta, staminaDelta, true);
+                }
+            }
         }
         gameState.clearCraftingJob();
         updateCraftingStateUi();
         updateIngredientViews();
+        refreshRecipeSelectionHighlight();
+    }
+
+    private Recipe findUnlockedRecipeByOutputItemId(int outputItemId) {
+        if (outputItemId <= 0) return null;
+        for (Recipe recipe : unlockedRecipes) {
+            if (recipe != null && recipe.outputItemId == outputItemId) {
+                return recipe;
+            }
+        }
+        return null;
     }
 
     @FXML

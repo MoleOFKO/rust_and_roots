@@ -148,6 +148,28 @@ public final class GameState {
     public void ensureAutomaticRecipeUnlocks() {
         ensureCookingRecipeUnlocksThroughLevel(playerSkills.getCookingLevel());
         ensureCraftingRecipeUnlocksThroughLevel(playerSkills.getCraftingLevel());
+        ensureBaselineCraftRecipesUnlocked();
+    }
+
+    private void ensureBaselineCraftRecipesUnlocked() {
+        ItemDatabase.loadItems();
+        unlockRecipeIfDefinitionValid("rope");
+        unlockRecipeIfDefinitionValid("stick");
+    }
+
+    private void unlockRecipeIfDefinitionValid(String recipeKey) {
+        if (recipeKey == null || recipeKey.isBlank()) {
+            return;
+        }
+
+        RecipeCatalog.RecipeDefinition definition = RecipeCatalog.findDefinitionByKey(recipeKey);
+        if (definition == null) {
+            return;
+        }
+
+        if (isRecipeDefinitionValid(definition)) {
+            unlockRecipe(definition.getKey());
+        }
     }
 
     private void addRecipeSkillExp(RecipeCatalog.Domain domain, int amount) {

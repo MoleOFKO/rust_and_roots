@@ -383,8 +383,9 @@ public final class RecipeCatalog {
         List<RecipeDefinition> recipes = new ArrayList<>();
 
         recipes.add(new RecipeDefinition(Domain.CRAFTING, "rope", new String[]{"Rope"}, null,
-            new IngredientSpec(new String[]{"tree_log"}, 2),
-            new IngredientSpec(new String[]{"blue_fruit"}, 1)));
+            new IngredientSpec(new String[]{"plant_fiber", "plant fiber"}, 1)));
+        recipes.add(new RecipeDefinition(Domain.CRAFTING, "stick", new String[]{"Stick"}, null,
+            new IngredientSpec(new String[]{"tree_log"}, 1)));
         recipes.add(new RecipeDefinition(Domain.CRAFTING, "wooden_board", new String[]{"Wooden Board"}, null,
             new IngredientSpec(new String[]{"tree_log"}, 3)));
         recipes.add(new RecipeDefinition(Domain.CRAFTING, "stone_block", new String[]{"Stone Block"}, null,

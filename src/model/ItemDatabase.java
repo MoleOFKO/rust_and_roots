@@ -169,7 +169,7 @@ public final class ItemDatabase {
             imageCache.put(itemId, null);
             return null;
         }
-        String[] attempts = { "/image/item/" + file, "/image/items/" + file, "/image/" + file };
+        String[] attempts = { "/image/item/" + file, "/image/items/" + file, "/image/recipe/" + file, "/image/weapons/" + file, "/image/" + file };
         for (String path : attempts) {
             InputStream is = ItemDatabase.class.getResourceAsStream(path);
             if (is == null) continue;

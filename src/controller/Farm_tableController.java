@@ -65,6 +65,7 @@ public class Farm_tableController implements Initializable, SceneController {
     private final Map<Integer, Integer> pendingHarvests = new LinkedHashMap<>();
     private final Map<Integer, Integer> pendingSeedReturns = new LinkedHashMap<>();
     private int pendingFarmingExp = 0;
+    private int plantFiberItemId = -1;
     private final List<ImageView> seedSlotImages = new ArrayList<>();
     private final List<Label> seedSlotLabels = new ArrayList<>();
     private final Map<String, Integer> seedSlotMapping = new LinkedHashMap<>();
@@ -692,6 +693,14 @@ public class Farm_tableController implements Initializable, SceneController {
                 int seedReturnCount = computeSeedReturnCount(pd.seedItemId);
                 if (seedReturnCount > 0 && pd.seedItemId != null && pd.seedItemId > 0) {
                     pendingSeedReturns.merge(pd.seedItemId, seedReturnCount, Integer::sum);
+                }
+
+                int plantFiberCount = computePlantFiberDropCount(pd.seedItemId);
+                if (plantFiberCount > 0) {
+                    int fiberItemId = resolvePlantFiberItemId();
+                    if (fiberItemId > 0) {
+                        pendingHarvests.merge(fiberItemId, plantFiberCount, Integer::sum);
+                    }
                 }
 
                 pendingFarmingExp++;
@@ -1325,6 +1334,43 @@ public class Farm_tableController implements Initializable, SceneController {
     private double computeSeedReturnChancePercent() {
         int dex = Math.max(0, gameState.getPlayerState().getDex());
         return (dex * 0.01) + (getEffectiveFarmingLevel() * 1.0);
+    }
+
+    private int resolvePlantFiberItemId() {
+        if (plantFiberItemId > 0) {
+            return plantFiberItemId;
+        }
+
+        model.item itm = ItemDatabase.getItemByName("plant_fiber");
+        plantFiberItemId = (itm == null) ? -1 : itm.getItem_id();
+        return plantFiberItemId;
+    }
+
+    private int computePlantFiberDropCount(Integer seedItemId) {
+        if (seedItemId == null || seedItemId <= 0 || gameState == null || gameState.getPlayerState() == null) {
+            return 0;
+        }
+
+        if (!ItemDatabase.hasCompleteFarmDataForSeed(seedItemId)) {
+            return 0;
+        }
+
+        if (resolvePlantFiberItemId() <= 0) {
+            return 0;
+        }
+
+        double chancePercent = computePlantFiberChancePercent();
+        if (chancePercent <= 0.0) {
+            return 0;
+        }
+
+        double roll = ThreadLocalRandom.current().nextDouble(100.0);
+        return roll < chancePercent ? 1 : 0;
+    }
+
+    private double computePlantFiberChancePercent() {
+        int dex = Math.max(0, gameState.getPlayerState().getDex());
+        return 4.0 + (dex * 0.25) + (getEffectiveFarmingLevel() * 1.25);
     }
 
     private int computeHarvestOutputCount(Integer seedItemId) {
