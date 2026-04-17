@@ -399,7 +399,9 @@ public class CookController implements Initializable, SceneController {
         boolean currentSelectionMatchesJob = selectedRecipe != null && hasJob && selectedRecipe.outputItemId == gameState.getActiveCookingOutputItemId();
 
         if (ready && currentSelectionMatchesJob) {
-            if (cookwaitingtimelbl != null) cookwaitingtimelbl.setText("Ready to collect");
+            if (cookwaitingtimelbl != null) {
+                cookwaitingtimelbl.setText("Ready to collect (" + (gameState.isActiveCookingSuccess() ? "Success" : "Failure") + ")");
+            }
             if (selectedcook != null) {
                 selectedcook.setStyle("-fx-effect: dropshadow(gaussian, yellow, 18, 0.8, 0, 0);");
                 selectedcook.setOpacity(1.0);
@@ -481,22 +483,39 @@ public class CookController implements Initializable, SceneController {
     }
 
     private void handleCollectCookedDish(MouseEvent event) {
-        if (selectedRecipe == null) return;
         double now = GameTimeManager.get().totalSecondsProperty().get();
         if (!gameState.hasActiveCookingJob()) return;
-        if (selectedRecipe.outputItemId != gameState.getActiveCookingOutputItemId()) return;
         if (!gameState.isCookingReady(now)) return;
+
+        int outputItemId = gameState.getActiveCookingOutputItemId();
+        Recipe jobRecipe = findUnlockedRecipeByOutputItemId(outputItemId);
+        if (jobRecipe != null) {
+            selectedRecipe = jobRecipe;
+        }
 
         if (gameState.isActiveCookingSuccess()) {
             int qty = gameState.getActiveCookingOutputQuantity();
-            if (qty > 0 && !inventory.addItem(selectedRecipe.outputItemId, qty)) {
+            if (qty > 0 && !inventory.addItem(outputItemId, qty)) {
                 AppDialogs.showMessageDialog(null, "Not enough inventory space to collect the cooked dish.");
                 return;
             }
+        } else {
+            AppDialogs.showMessageDialog(null, "Cooking failed.");
         }
         gameState.clearCookingJob();
         updateCookingStateUi();
         updateIngredientViews();
+        refreshRecipeSelectionHighlight();
+    }
+
+    private Recipe findUnlockedRecipeByOutputItemId(int outputItemId) {
+        if (outputItemId <= 0) return null;
+        for (Recipe recipe : unlockedRecipes) {
+            if (recipe != null && recipe.outputItemId == outputItemId) {
+                return recipe;
+            }
+        }
+        return null;
     }
 
     @FXML

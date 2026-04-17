@@ -68,6 +68,7 @@ public class Left_mapController extends BaseMapController {
 
     private int treeLogItemId = -1;
     private int treeStumpItemId = -1;
+    private int plantFiberItemId = -1;
 
     private List<String> cachedValidTreeTypeKeys = null;
 
@@ -811,15 +812,18 @@ public class Left_mapController extends BaseMapController {
 
         int logId = resolveTreeLogItemId();
         int fruitId = resolveFruitItemIdForTypeKey(tree.typeKey);
+        int fiberId = resolvePlantFiberItemId();
 
         if (stageAtDeath == 2) {
             trySpawnTreeDrop(tree, logId, nowSeconds);
+            trySpawnPlantFiberDrop(tree, fiberId, nowSeconds);
             return;
         }
 
         if (stageAtDeath == 3) {
             trySpawnTreeDrop(tree, logId, nowSeconds);
             trySpawnTreeDrop(tree, fruitId, nowSeconds);
+            trySpawnPlantFiberDrop(tree, fiberId, nowSeconds);
         }
     }
 
@@ -872,6 +876,20 @@ public class Left_mapController extends BaseMapController {
         return (int) Math.round(baseZeroWeight * (1.0 - clamped));
     }
     
+    private void trySpawnPlantFiberDrop(TreeMapState.TreeData tree, int plantFiberId, double nowSeconds) {
+        if (tree == null) return;
+        if (plantFiberId <= 0) return;
+
+        double chancePercent = computePlantFiberDropChancePercent(tree);
+        if (chancePercent <= 0.0) return;
+
+        if (ThreadLocalRandom.current().nextDouble(100.0) >= chancePercent) {
+            return;
+        }
+
+        trySpawnTreeDrop(tree, plantFiberId, nowSeconds);
+    }
+
     private int chooseValidTreeDropItemId(int logId, int fruitId) {
         boolean hasLog = logId > 0;
         boolean hasFruit = fruitId > 0;
@@ -911,10 +929,29 @@ public class Left_mapController extends BaseMapController {
         return treeLogItemId;
     }
 
+    private int resolvePlantFiberItemId() {
+        if (plantFiberItemId > 0) return plantFiberItemId;
+        plantFiberItemId = resolveItemId("plant_fiber");
+        return plantFiberItemId;
+    }
+
     private int resolveTreeStumpItemId() {
         if (treeStumpItemId > 0) return treeStumpItemId;
         treeStumpItemId = resolveItemId("tree_stumb");
         return treeStumpItemId;
+    }
+
+    private double computePlantFiberDropChancePercent(TreeMapState.TreeData tree) {
+        int playerDex = Math.max(0, playerState == null ? 0 : playerState.getDex());
+        int gatheringLevel = 0;
+        if (gameState != null && gameState.getPlayerSkills() != null) {
+            gatheringLevel = Math.max(0, gameState.getPlayerSkills().getGatheringLevel());
+        }
+
+        int stage = tree == null ? 0 : tree.currentStage;
+        double base = stage >= 3 ? 12.0 : 9.0;
+        double chance = base + (playerDex * 0.20) + (gatheringLevel * 0.75);
+        return Math.max(0.0, Math.min(35.0, chance));
     }
 
     private int resolveFruitItemIdForTypeKey(String typeKey) {

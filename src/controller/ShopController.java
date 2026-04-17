@@ -24,8 +24,10 @@ import javafx.scene.layout.StackPane;
 import javafx.util.converter.IntegerStringConverter;
 import model.Inventory;
 import model.ItemDatabase;
+import model.RecipeCatalog;
 import model.item;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 import javafx.scene.image.Image;
 import javafx.scene.Group;
 import util.AppDialogs;
@@ -1194,91 +1196,520 @@ public class ShopController implements Initializable, SceneController {
 
         int today = GameTimeManager.get().dayNumberProperty().get();
         int shopSlotCapacity = buyItemButtons.isEmpty() ? 12 : buyItemButtons.size();
-        int fixedSlotCapacity = Math.min(FIXED_BUY_SLOT_COUNT, Math.max(0, shopSlotCapacity));
-        int randomSlotCapacity = Math.min(
-            RANDOM_BUY_SLOT_COUNT,
-            Math.max(0, shopSlotCapacity - fixedSlotCapacity)
-        );
-        int fixedVisibleTarget = Math.min(fixedSlotCapacity, allById.size());
-        int totalVisibleTarget = Math.min(allById.size(), fixedVisibleTarget + randomSlotCapacity);
+        shopSlotCapacity = Math.max(0, shopSlotCapacity);
 
-        for (Integer itemId : gameState.getFixedShopItemIdsForDay(today)) {
-            item itm = allById.get(itemId);
-            if (itm != null && !dbItemsById.containsKey(itemId) && shopItems.size() < fixedVisibleTarget) {
-                shopItems.add(itm);
-                dbItemsById.put(itemId, itm);
+        if (allById.isEmpty() || shopSlotCapacity <= 0) {
+            gameState.setShopRandomDay(today);
+            gameState.setDailyRandomShopItemIds(List.of());
+            return;
+        }
+
+        List<Integer> selectedIds = null;
+        List<Integer> savedIds = gameState.getDailyRandomShopItemIds();
+
+        boolean canReuse = gameState.getShopRandomDay() == today
+            && savedIds != null
+            && savedIds.size() >= shopSlotCapacity;
+
+        if (canReuse) {
+            List<Integer> reuse = new ArrayList<>(shopSlotCapacity);
+            for (int i = 0; i < shopSlotCapacity; i++) {
+                Integer itemId = savedIds.get(i);
+                if (itemId == null || !allById.containsKey(itemId)) {
+                    canReuse = false;
+                    break;
+                }
+                reuse.add(itemId);
+            }
+            if (canReuse) {
+                selectedIds = reuse;
             }
         }
 
-        int targetRandomCount = Math.max(0, totalVisibleTarget - shopItems.size());
-
-        List<Integer> savedRandomIds = new ArrayList<>();
-        for (Integer itemId : gameState.getDailyRandomShopItemIds()) {
-            if (itemId == null || dbItemsById.containsKey(itemId) || !allById.containsKey(itemId)) {
-                continue;
-            }
-            if (!savedRandomIds.contains(itemId)) {
-                savedRandomIds.add(itemId);
-            }
-        }
-
-        boolean needNewRandom =
-            gameState.getShopRandomDay() != today ||
-            savedRandomIds.size() < targetRandomCount;
-
-        List<Integer> selectedRandomIds = new ArrayList<>();
-
-        if (!needNewRandom) {
-            for (Integer itemId : savedRandomIds) {
-                if (selectedRandomIds.size() >= targetRandomCount) break;
-                selectedRandomIds.add(itemId);
-            }
-        } else {
-            List<item> randomPool = new ArrayList<>(allById.values());
-            randomPool.removeIf(itm -> dbItemsById.containsKey(itm.getItem_id()));
-            Collections.shuffle(randomPool);
-
-            for (item itm : randomPool) {
-                if (selectedRandomIds.size() >= targetRandomCount) break;
-                selectedRandomIds.add(itm.getItem_id());
-            }
-        }
-
-        if (selectedRandomIds.size() < targetRandomCount) {
-            List<item> fallbackPool = new ArrayList<>(allById.values());
-            fallbackPool.removeIf(itm ->
-                dbItemsById.containsKey(itm.getItem_id()) || selectedRandomIds.contains(itm.getItem_id())
-            );
-            Collections.shuffle(fallbackPool);
-
-            for (item itm : fallbackPool) {
-                if (selectedRandomIds.size() >= targetRandomCount) break;
-                selectedRandomIds.add(itm.getItem_id());
-            }
+        if (selectedIds == null) {
+            selectedIds = generateShopItemIdsForDay(today, shopSlotCapacity, allById);
         }
 
         gameState.setShopRandomDay(today);
-        gameState.setDailyRandomShopItemIds(selectedRandomIds);
+        gameState.setDailyRandomShopItemIds(selectedIds);
 
-        for (Integer itemId : selectedRandomIds) {
-            item itm = allById.get(itemId);
-            if (itm != null && !dbItemsById.containsKey(itemId) && shopItems.size() < totalVisibleTarget) {
-                shopItems.add(itm);
-                dbItemsById.put(itemId, itm);
+        for (Integer itemId : selectedIds) {
+            item itm = itemId == null ? null : allById.get(itemId);
+            if (itm == null) continue;
+            shopItems.add(itm);
+            dbItemsById.putIfAbsent(itemId, itm);
+        }
+    }
+
+    private List<Integer> generateShopItemIdsForDay(int dayNumber, int slotCount, Map<Integer, item> shopById) {
+        List<Integer> allShopIds = new ArrayList<>(shopById.keySet());
+
+        Map<ShopCategory, List<Integer>> categoryPools = buildShopCategoryPools(allShopIds);
+
+        List<Integer> equipmentIds = new ArrayList<>();
+        List<Integer> seedIds = new ArrayList<>();
+        for (Integer itemId : allShopIds) {
+            if (itemId == null || itemId <= 0) {
+                continue;
+            }
+            if (ItemDatabase.isEquipmentItem(itemId)) {
+                equipmentIds.add(itemId);
+            }
+            if (ItemDatabase.isSeedItem(itemId)) {
+                seedIds.add(itemId);
             }
         }
 
-        if (shopItems.size() < totalVisibleTarget) {
-            List<item> fallbackPool = new ArrayList<>(allById.values());
-            fallbackPool.removeIf(itm -> dbItemsById.containsKey(itm.getItem_id()));
-            Collections.shuffle(fallbackPool);
+        List<Integer> cookingIngredientPool = buildIngredientPoolIds(RecipeCatalog.Domain.COOKING, shopById);
+        List<Integer> craftingIngredientPool = buildIngredientPoolIds(RecipeCatalog.Domain.CRAFTING, shopById);
+        List<Integer> meltIngredientPool = buildMeltIngredientPoolIds(shopById);
 
-            for (item itm : fallbackPool) {
-                if (shopItems.size() >= totalVisibleTarget) break;
-                shopItems.add(itm);
-                dbItemsById.put(itm.getItem_id(), itm);
+        Set<Integer> unlockedCookingIngredients = buildUnlockedIngredientIds(RecipeCatalog.Domain.COOKING, shopById);
+        Set<Integer> unlockedCraftingIngredients = buildUnlockedIngredientIds(RecipeCatalog.Domain.CRAFTING, shopById);
+
+        Set<Integer> unlockedAllIngredients = new LinkedHashSet<>();
+        unlockedAllIngredients.addAll(unlockedCookingIngredients);
+        unlockedAllIngredients.addAll(unlockedCraftingIngredients);
+        unlockedAllIngredients.addAll(meltIngredientPool);
+
+        Set<Integer> preferredSeedIds = buildPreferredSeedIds(seedIds, unlockedAllIngredients);
+
+        List<Integer> result = new ArrayList<>(slotCount);
+        Set<Integer> used = new LinkedHashSet<>();
+        List<Integer> unlockedCookingIngredientList = new ArrayList<>(unlockedCookingIngredients);
+        List<Integer> unlockedCraftingIngredientList = new ArrayList<>(unlockedCraftingIngredients);
+
+        for (int slotIndex = 0; slotIndex < slotCount; slotIndex++) {
+            int chosenId = -1;
+
+            int slotNumber = slotIndex + 1;
+
+            // Slot layout (1-based):
+            //  1-2: equipment (day 1: Axe + Pickaxe; day 2+: random equipment)
+            //  3: seeds (harvest output is needed by unlocked recipes, if possible)
+            //  4: seeds (random)
+            //  5: unlocked cooking-ingredient (always)
+            //  6: unlocked crafting-ingredient (always, else any craft ingredient)
+            //  7: melt ingredient (always, else any inedible)
+            //  8: type weights: recipe 15%, seed 10%, equipment 10%, edible 50%, inedible 15%
+            //  9: type weights: recipe 25%, seed 15%, equipment 15%, edible 20%, inedible 25%
+            // 10-12: wildcard (penalize repeats from earlier slots)
+            if (slotNumber == 1) {
+                if (dayNumber <= 1) {
+                    chosenId = resolveShopItemId(shopById, "Axe");
+                } else {
+                    chosenId = pickWeightedItemId(equipmentIds, Set.of(), Set.of(), used, 1.0, 1.0);
+                    if (chosenId <= 0) {
+                        chosenId = pickWeightedItemId(equipmentIds, Set.of(), Set.of(), Set.of(), 1.0, 1.0);
+                    }
+                }
+            } else if (slotNumber == 2) {
+                if (dayNumber <= 1) {
+                    chosenId = resolveShopItemId(shopById, "Pickaxe", "pickaxe");
+                } else {
+                    chosenId = pickWeightedItemId(equipmentIds, Set.of(), Set.of(), used, 1.0, 1.0);
+                    if (chosenId <= 0) {
+                        chosenId = pickWeightedItemId(equipmentIds, Set.of(), Set.of(), Set.of(), 1.0, 1.0);
+                    }
+                }
+            } else if (slotNumber == 3) {
+                List<Integer> preferred = preferredSeedIds.isEmpty() ? seedIds : new ArrayList<>(preferredSeedIds);
+                chosenId = pickWeightedItemId(preferred, Set.of(), Set.of(), used, 1.0, 1.0);
+                if (chosenId <= 0) {
+                    chosenId = pickWeightedItemId(preferred, Set.of(), Set.of(), Set.of(), 1.0, 1.0);
+                }
+            } else if (slotNumber == 4) {
+                chosenId = pickWeightedItemId(seedIds, Set.of(), Set.of(), used, 1.0, 1.0);
+                if (chosenId <= 0) {
+                    chosenId = pickWeightedItemId(seedIds, Set.of(), Set.of(), Set.of(), 1.0, 1.0);
+                }
+            } else if (slotNumber == 5) {
+                List<Integer> cookingCandidates = !unlockedCookingIngredientList.isEmpty()
+                    ? unlockedCookingIngredientList
+                    : cookingIngredientPool;
+                chosenId = pickWeightedItemId(cookingCandidates, Set.of(), Set.of(), used, 1.0, 1.0);
+                if (chosenId <= 0) {
+                    chosenId = pickWeightedItemId(cookingCandidates, Set.of(), Set.of(), Set.of(), 1.0, 1.0);
+                }
+            } else if (slotNumber == 6) {
+                List<Integer> craftingCandidates = !unlockedCraftingIngredientList.isEmpty()
+                    ? unlockedCraftingIngredientList
+                    : craftingIngredientPool;
+                chosenId = pickWeightedItemId(craftingCandidates, Set.of(), Set.of(), used, 1.0, 1.0);
+                if (chosenId <= 0) {
+                    chosenId = pickWeightedItemId(craftingCandidates, Set.of(), Set.of(), Set.of(), 1.0, 1.0);
+                }
+            } else if (slotNumber == 7) {
+                List<Integer> meltCandidates = !meltIngredientPool.isEmpty()
+                    ? meltIngredientPool
+                    : categoryPools.getOrDefault(ShopCategory.INEDIBLE, List.of());
+                chosenId = pickWeightedItemId(meltCandidates, Set.of(), Set.of(), used, 1.0, 1.0);
+                if (chosenId <= 0) {
+                    chosenId = pickWeightedItemId(meltCandidates, Set.of(), Set.of(), Set.of(), 1.0, 1.0);
+                }
+            } else if (slotNumber == 8) {
+                chosenId = pickItemIdFromCategoryWeights(categoryPools, 15, 10, 10, 50, 15, Set.of());
+            } else if (slotNumber == 9) {
+                chosenId = pickItemIdFromCategoryWeights(categoryPools, 25, 15, 15, 20, 25, Set.of());
+            } else {
+                Set<Integer> penalize = new LinkedHashSet<>(result);
+                chosenId = pickWeightedItemId(allShopIds, Set.of(), penalize, Set.of(), 1.0, 0.25);
+            }
+
+            if (chosenId <= 0 || !shopById.containsKey(chosenId)) {
+                chosenId = pickWeightedItemId(allShopIds, Set.of(), Set.of(), Set.of(), 1.0, 1.0);
+            }
+
+            result.add(chosenId);
+            used.add(chosenId);
+        }
+
+        return result;
+    }
+
+    private enum ShopCategory {
+        RECIPE,
+        SEED,
+        EQUIPMENT,
+        EDIBLE,
+        INEDIBLE
+    }
+
+    private Map<ShopCategory, List<Integer>> buildShopCategoryPools(List<Integer> shopItemIds) {
+        EnumMap<ShopCategory, List<Integer>> pools = new EnumMap<>(ShopCategory.class);
+        for (ShopCategory category : ShopCategory.values()) {
+            pools.put(category, new ArrayList<>());
+        }
+
+        if (shopItemIds == null) {
+            return pools;
+        }
+
+        for (Integer rawId : shopItemIds) {
+            int itemId = rawId == null ? -1 : rawId;
+            if (itemId <= 0) continue;
+
+            if (ItemDatabase.isRecipeItem(itemId)) {
+                pools.get(ShopCategory.RECIPE).add(itemId);
+            } else if (ItemDatabase.isSeedItem(itemId)) {
+                pools.get(ShopCategory.SEED).add(itemId);
+            } else if (ItemDatabase.isEquipmentItem(itemId)) {
+                pools.get(ShopCategory.EQUIPMENT).add(itemId);
+            } else if (ItemDatabase.isEdibleItem(itemId)) {
+                pools.get(ShopCategory.EDIBLE).add(itemId);
+            } else {
+                pools.get(ShopCategory.INEDIBLE).add(itemId);
             }
         }
+
+        return pools;
+    }
+
+    private boolean hasAvailableItem(List<Integer> ids, Set<Integer> excludedIds) {
+        if (ids == null || ids.isEmpty()) return false;
+        if (excludedIds == null || excludedIds.isEmpty()) {
+            for (Integer id : ids) {
+                if (id != null && id > 0) return true;
+            }
+            return false;
+        }
+
+        for (Integer id : ids) {
+            int itemId = id == null ? -1 : id;
+            if (itemId > 0 && !excludedIds.contains(itemId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private int pickItemIdFromCategoryWeights(
+        Map<ShopCategory, List<Integer>> pools,
+        int recipeWeight,
+        int seedWeight,
+        int equipmentWeight,
+        int edibleWeight,
+        int inedibleWeight,
+        Set<Integer> excludedIds
+    ) {
+        if (pools == null || pools.isEmpty()) return -1;
+
+        ShopCategory[] categories = {
+            ShopCategory.RECIPE,
+            ShopCategory.SEED,
+            ShopCategory.EQUIPMENT,
+            ShopCategory.EDIBLE,
+            ShopCategory.INEDIBLE
+        };
+
+        int[] baseWeights = {
+            Math.max(0, recipeWeight),
+            Math.max(0, seedWeight),
+            Math.max(0, equipmentWeight),
+            Math.max(0, edibleWeight),
+            Math.max(0, inedibleWeight)
+        };
+
+        for (int attempt = 0; attempt < categories.length; attempt++) {
+            int total = 0;
+            int[] weights = new int[baseWeights.length];
+
+            for (int i = 0; i < categories.length; i++) {
+                int w = baseWeights[i];
+                if (w <= 0) {
+                    weights[i] = 0;
+                    continue;
+                }
+
+                List<Integer> ids = pools.get(categories[i]);
+                if (!hasAvailableItem(ids, excludedIds)) {
+                    weights[i] = 0;
+                    continue;
+                }
+
+                weights[i] = w;
+                total += w;
+            }
+
+            if (total <= 0) {
+                return -1;
+            }
+
+            int roll = ThreadLocalRandom.current().nextInt(total);
+            int acc = 0;
+            int pickedIndex = -1;
+
+            for (int i = 0; i < weights.length; i++) {
+                int w = weights[i];
+                if (w <= 0) continue;
+                acc += w;
+                if (roll < acc) {
+                    pickedIndex = i;
+                    break;
+                }
+            }
+
+            if (pickedIndex < 0) {
+                return -1;
+            }
+
+            ShopCategory pickedCategory = categories[pickedIndex];
+            int picked = pickWeightedItemId(pools.get(pickedCategory), Set.of(), Set.of(), excludedIds, 1.0, 1.0);
+            if (picked > 0) {
+                return picked;
+            }
+
+            baseWeights[pickedIndex] = 0;
+        }
+
+        return -1;
+    }
+
+    private int resolveShopItemId(Map<Integer, item> shopById, String... candidateNames) {
+        if (shopById == null || candidateNames == null) {
+            return -1;
+        }
+
+        for (String name : candidateNames) {
+            if (name == null || name.isBlank()) {
+                continue;
+            }
+
+            item itm = ItemDatabase.getItemByName(name);
+            if (itm != null && shopById.containsKey(itm.getItem_id())) {
+                return itm.getItem_id();
+            }
+        }
+
+        return -1;
+    }
+
+    private List<Integer> buildIngredientPoolIds(RecipeCatalog.Domain domain, Map<Integer, item> shopById) {
+        LinkedHashSet<Integer> ids = new LinkedHashSet<>();
+
+        for (RecipeCatalog.RecipeDefinition definition : RecipeCatalog.getRecipes(domain)) {
+            if (definition == null || definition.getIngredients() == null) {
+                continue;
+            }
+
+            for (RecipeCatalog.IngredientSpec spec : definition.getIngredients()) {
+                if (spec == null) {
+                    continue;
+                }
+
+                item ing = RecipeCatalog.resolveItemByAliases(spec.getItemAliases());
+                if (ing == null) {
+                    continue;
+                }
+
+                int itemId = ing.getItem_id();
+                if (itemId > 0 && shopById.containsKey(itemId)) {
+                    ids.add(itemId);
+                }
+            }
+        }
+
+        return new ArrayList<>(ids);
+    }
+
+    private Set<Integer> buildUnlockedIngredientIds(RecipeCatalog.Domain domain, Map<Integer, item> shopById) {
+        LinkedHashSet<Integer> ids = new LinkedHashSet<>();
+
+        if (gameState == null) {
+            return ids;
+        }
+
+        for (RecipeCatalog.RecipeDefinition definition : RecipeCatalog.getRecipes(domain)) {
+            if (definition == null || definition.getIngredients() == null) {
+                continue;
+            }
+
+            if (!gameState.canAccessRecipe(definition.getKey())) {
+                continue;
+            }
+
+            for (RecipeCatalog.IngredientSpec spec : definition.getIngredients()) {
+                if (spec == null) {
+                    continue;
+                }
+
+                item ing = RecipeCatalog.resolveItemByAliases(spec.getItemAliases());
+                if (ing == null) {
+                    continue;
+                }
+
+                int itemId = ing.getItem_id();
+                if (itemId > 0 && shopById.containsKey(itemId)) {
+                    ids.add(itemId);
+                }
+            }
+        }
+
+        return ids;
+    }
+
+    private List<Integer> buildMeltIngredientPoolIds(Map<Integer, item> shopById) {
+        LinkedHashSet<Integer> ids = new LinkedHashSet<>();
+
+        List<String> candidates = List.of(
+            "Copper Ore",
+            "Iron Ore",
+            "Silver Ore",
+            "Gold Ore",
+            "Coal"
+        );
+
+        for (String name : candidates) {
+            item itm = ItemDatabase.getItemByName(name);
+            if (itm != null && shopById.containsKey(itm.getItem_id())) {
+                ids.add(itm.getItem_id());
+            }
+        }
+
+        return new ArrayList<>(ids);
+    }
+
+    private Set<Integer> buildPreferredSeedIds(List<Integer> seedItemIds, Set<Integer> unlockedIngredientItemIds) {
+        if (seedItemIds == null || seedItemIds.isEmpty() || unlockedIngredientItemIds == null || unlockedIngredientItemIds.isEmpty()) {
+            return Set.of();
+        }
+
+        LinkedHashSet<Integer> preferred = new LinkedHashSet<>();
+        for (Integer seedId : seedItemIds) {
+            if (seedId == null || seedId <= 0) {
+                continue;
+            }
+
+            if (unlockedIngredientItemIds.contains(seedId)) {
+                preferred.add(seedId);
+                continue;
+            }
+
+            int harvestItemId = ItemDatabase.resolveHarvestItemIdForSeed(seedId);
+            if (harvestItemId > 0 && unlockedIngredientItemIds.contains(harvestItemId)) {
+                preferred.add(seedId);
+            }
+        }
+
+        return preferred;
+    }
+
+    private int pickWeightedItemId(
+        List<Integer> candidateIds,
+        Set<Integer> boostedIds,
+        Set<Integer> penalizedIds,
+        Set<Integer> excludedIds,
+        double boostedMultiplier,
+        double penalizedMultiplier
+    ) {
+        if (candidateIds == null || candidateIds.isEmpty()) {
+            return -1;
+        }
+
+        double safeBoost = Math.max(0.0, boostedMultiplier);
+        double safePenalty = Math.max(0.0, penalizedMultiplier);
+
+        double totalWeight = 0.0;
+        double[] weights = new double[candidateIds.size()];
+
+        for (int i = 0; i < candidateIds.size(); i++) {
+            Integer rawId = candidateIds.get(i);
+            int itemId = rawId == null ? -1 : rawId;
+            if (itemId <= 0) {
+                weights[i] = 0.0;
+                continue;
+            }
+
+            if (excludedIds != null && excludedIds.contains(itemId)) {
+                weights[i] = 0.0;
+                continue;
+            }
+
+            double weight = 1.0;
+            if (boostedIds != null && boostedIds.contains(itemId)) {
+                weight *= safeBoost;
+            }
+            if (penalizedIds != null && penalizedIds.contains(itemId)) {
+                weight *= safePenalty;
+            }
+
+            if (weight <= 0.0) {
+                weights[i] = 0.0;
+                continue;
+            }
+
+            weights[i] = weight;
+            totalWeight += weight;
+        }
+
+        if (totalWeight <= 0.0) {
+            return -1;
+        }
+
+        double roll = ThreadLocalRandom.current().nextDouble(totalWeight);
+        double acc = 0.0;
+
+        for (int i = 0; i < candidateIds.size(); i++) {
+            double weight = weights[i];
+            if (weight <= 0.0) {
+                continue;
+            }
+
+            acc += weight;
+            if (roll < acc) {
+                Integer picked = candidateIds.get(i);
+                return picked == null ? -1 : picked;
+            }
+        }
+
+        for (int i = 0; i < candidateIds.size(); i++) {
+            if (weights[i] > 0.0) {
+                Integer picked = candidateIds.get(i);
+                return picked == null ? -1 : picked;
+            }
+        }
+
+        return -1;
     }
 
     private void rebuildDailyShopAvailability() {
