@@ -370,10 +370,6 @@ public class Left_map_nofourController extends BaseMapController {
     private Button opensetting;
     @FXML
     private ImageView equip_img;
-    @FXML
-    private ImageView human_img1;
-    @FXML
-    private ImageView equip_img1;
 
     @Override
     protected String mapKey() {
@@ -385,5 +381,137 @@ public class Left_map_nofourController extends BaseMapController {
         registerExit(exit_right, "/view/upper_map_nofour.fxml", SpawnTag.FROM_LEFT);
         registerExit(exit_down, "/view/left_map_nothree.fxml", SpawnTag.FROM_UP);
     }
-
+//
+//    @FXML
+//    private void handleusepointaction(MouseEvent event) {
+//    }
+//
+//    @FXML
+//    private void handleconfirmaction(MouseEvent event) {
+//    }
+//
+//    @FXML
+//    private void handlebtnskillacion(MouseEvent event) {
+//    }
+//
+//    @FXML
+//    private void handleHPminusaction(MouseEvent event) {
+//    }
+//
+//    @FXML
+//    private void handleHPplusaction(MouseEvent event) {
+//    }
+//
+//    @FXML
+//    private void handleSPminusaction(MouseEvent event) {
+//    }
+//
+//    @FXML
+//    private void handleSTRminusaction(MouseEvent event) {
+//    }
+//
+//    @FXML
+//    private void handleVITminusaction(MouseEvent event) {
+//    }
+//
+//    @FXML
+//    private void handleDEXminusaction(MouseEvent event) {
+//    }
+//
+//    @FXML
+//    private void handleAGIminusaction(MouseEvent event) {
+//    }
+//
+//    @FXML
+//    private void handleSPplusaction(MouseEvent event) {
+//    }
+//
+//    @FXML
+//    private void handleSTRplusaction(MouseEvent event) {
+//    }
+//
+//    @FXML
+//    private void handleVITplusaction(MouseEvent event) {
+//    }
+//
+//    @FXML
+//    private void handleDEXplusaction(MouseEvent event) {
+//    }
+//
+//    @FXML
+//    private void handleAGIplusaction(MouseEvent event) {
+//    }
+//
+//    @FXML
+//    private void handlebtnstatusaction(MouseEvent event) {
+//    }
+//
+//    @FXML
+//    private void handlefarmingminusaction(MouseEvent event) {
+//    }
+//
+//    @FXML
+//    private void handlefarmingplusaction(MouseEvent event) {
+//    }
+//
+//    @FXML
+//    private void handlegatheringminusaction(MouseEvent event) {
+//    }
+//
+//    @FXML
+//    private void handlecraftingminusaction(MouseEvent event) {
+//    }
+//
+//    @FXML
+//    private void handlefishingminusaction(MouseEvent event) {
+//    }
+//
+//    @FXML
+//    private void handlecookingminusaction(MouseEvent event) {
+//    }
+//
+//    @FXML
+//    private void handlegatheringplusaction(MouseEvent event) {
+//    }
+//
+//    @FXML
+//    private void handlecraftingplusaction(MouseEvent event) {
+//    }
+//
+//    @FXML
+//    private void handlefishingplusaction(MouseEvent event) {
+//    }
+//
+//    @FXML
+//    private void handlecookingplusaction(MouseEvent event) {
+//    }
+//
+//    @FXML
+//    private void handlesaveexitaction(ActionEvent event) {
+//    }
+//
+//    @FXML
+//    private void handlesave(ActionEvent event) {
+//    }
+//
+//    @FXML
+//    private void handleload(ActionEvent event) {
+//    }
+//
+//    @FXML
+//    private void handleopenInventoryaction(ActionEvent event) {
+//    }
+//
+//    @FXML
+//    private void handlecloseaction(MouseEvent event) {
+//    }
+//
+//    @FXML
+//    private void handleopenstatusaction(ActionEvent event) {
+//    }
+//
+//    @FXML
+//    private void handleopensettingaction(ActionEvent event) {
+//    }
+//
 }

@@ -263,6 +263,11 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         // default: do nothing
     }
 
+    /** Hook for subclasses during the shared game loop tick (called every frame). */
+    protected void onGameLoopUpdate(Bounds playerBounds) {
+        // default: do nothing
+    }
+
     @Override
     public void init(GameState gs) {
         this.gameState = gs;
@@ -977,11 +982,11 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
         playerState.setExp(playerState.getExp() - spentExp);
 
-        if (pendingFarmingSkillExp > 0) gameState.getPlayerSkills().addFarmingExp(pendingFarmingSkillExp);
-        if (pendingGatheringSkillExp > 0) gameState.getPlayerSkills().addGatheringExp(pendingGatheringSkillExp);
-        if (pendingCraftingSkillExp > 0) gameState.getPlayerSkills().addCraftingExp(pendingCraftingSkillExp);
-        if (pendingFishingSkillExp > 0) gameState.getPlayerSkills().addFishingExp(pendingFishingSkillExp);
-        if (pendingCookingSkillExp > 0) gameState.getPlayerSkills().addCookingExp(pendingCookingSkillExp);
+        if (pendingFarmingSkillExp > 0) gameState.addFarmingSkillExp(pendingFarmingSkillExp);
+        if (pendingGatheringSkillExp > 0) gameState.addGatheringSkillExp(pendingGatheringSkillExp);
+        if (pendingCraftingSkillExp > 0) gameState.addCraftingSkillExp(pendingCraftingSkillExp);
+        if (pendingFishingSkillExp > 0) gameState.addFishingSkillExp(pendingFishingSkillExp);
+        if (pendingCookingSkillExp > 0) gameState.addCookingSkillExp(pendingCookingSkillExp);
 
         skillAllocationMode = false;
         resetPendingSkillChanges();
@@ -1993,6 +1998,8 @@ public abstract class BaseMapController implements Initializable, SceneControlle
                 double nowSeconds = GameTimeManager.get().totalSecondsProperty().get();
                 farm.update(nowSeconds);
             }
+
+            onGameLoopUpdate(playerBounds);
         });
 
         gameLoop.start();
@@ -2497,9 +2504,66 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         }
 
         if (newlyUnlocked.isEmpty()) {
+            if (!consumeOneItem.getAsBoolean()) {
+                return false;
+            }
+
+            RecipeCatalog.RecipeDefinition bestDefinition = null;
+            int bestComboSize = 1;
+
+            for (String recipeKey : matchedKeys) {
+                RecipeCatalog.RecipeDefinition definition = RecipeCatalog.findDefinitionByKey(recipeKey);
+                if (definition == null || definition.getIngredients() == null) {
+                    continue;
+                }
+
+                int comboSize = definition.getIngredients().size();
+                if (comboSize > bestComboSize) {
+                    bestComboSize = comboSize;
+                    bestDefinition = definition;
+                } else if (comboSize == bestComboSize && bestDefinition == null) {
+                    bestDefinition = definition;
+                }
+            }
+
+            int expGain = Math.min(3, Math.max(1, bestComboSize));
+            RecipeCatalog.Domain domain = (bestDefinition == null || bestDefinition.getDomain() == null)
+                ? RecipeCatalog.Domain.COOKING
+                : bestDefinition.getDomain();
+
+            int rawExpBefore = playerState == null ? 0 : playerState.getExp();
+            int skillExpBefore = switch (domain) {
+                case COOKING -> gameState.getPlayerSkills().getCookingExp();
+                case CRAFTING -> gameState.getPlayerSkills().getCraftingExp();
+            };
+
+            switch (domain) {
+                case COOKING -> gameState.addCookingSkillExp(expGain);
+                case CRAFTING -> gameState.addCraftingSkillExp(expGain);
+            }
+
+            String skillName = domain == RecipeCatalog.Domain.CRAFTING ? "Crafting" : "Cooking";
+            int rawExpAfter = playerState == null ? rawExpBefore : playerState.getExp();
+            int skillExpAfter = switch (domain) {
+                case COOKING -> gameState.getPlayerSkills().getCookingExp();
+                case CRAFTING -> gameState.getPlayerSkills().getCraftingExp();
+            };
+
+            int rawDelta = Math.max(0, rawExpAfter - rawExpBefore);
+            int skillDelta = Math.max(0, skillExpAfter - skillExpBefore);
+
+            String expMessage;
+            if (rawDelta > 0 && skillDelta <= 0) {
+                expMessage = "Gained +" + rawDelta + " raw EXP (skill is MAX).";
+            } else if (rawDelta > 0) {
+                expMessage = "Gained +" + skillDelta + " " + skillName + " EXP and +" + rawDelta + " raw EXP.";
+            } else {
+                expMessage = "Gained +" + skillDelta + " " + skillName + " EXP.";
+            }
+
             AppDialogs.showMessageDialog(
                 null,
-                "Already unlocked: " + String.join(", ", matchedDisplayNames),
+                "Already unlocked: " + String.join(", ", matchedDisplayNames) + "\n" + expMessage,
                 "Recipe Known",
                 javax.swing.JOptionPane.INFORMATION_MESSAGE
             );

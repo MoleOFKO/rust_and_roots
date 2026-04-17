@@ -50,7 +50,7 @@
             </Group>
             <Group layoutX="292.0" layoutY="187.0">
                <children>
-                  <Rectangle fx:id="exit_left" height="48.0" layoutX="301.0" layoutY="64.0" opacity="0" width="6.0" />
+                  <Rectangle fx:id="exit_right" height="48.0" layoutX="301.0" layoutY="64.0" opacity="0" width="6.0" />
                   <Rectangle fx:id="exit_up" height="8.0" layoutX="-40.0" layoutY="-188.0" opacity="0" width="51.0" />
                   <Label fx:id="hotbarguide" layoutX="-68.0" layoutY="188.0" text="press 'e' to open hotbar">
                      <font>
@@ -71,9 +71,21 @@
             </Group>
             <Group fx:id="human">
                <children>
-                  <Rectangle fx:id="human_hitbox" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="262.0" layoutY="171.0" stroke="#ff000000" strokeType="INSIDE" translateX="24" translateY="28" width="14.0" />
+                  <Rectangle fx:id="human_hitbox" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="262.0" layoutY="171.0" stroke="RED" strokeType="INSIDE" translateX="24" translateY="28" width="14.0" />
                   <ImageView fx:id="human_img" fitHeight="64" fitWidth="64" layoutX="262.0" layoutY="176.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
                   <ImageView fx:id="equip_img" fitHeight="64" fitWidth="64" layoutX="262.0" layoutY="176.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
+                  <Rectangle fx:id="human_hitbox_left" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="272.0" layoutY="200.0" stroke="RED" strokeType="INSIDE" width="14.0" />
+                  <Rectangle fx:id="human_hitbox_up" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="286.0" layoutY="181.0" stroke="RED" strokeType="INSIDE" width="14.0" />
+                  <Rectangle fx:id="human_hitbox_down" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="286.0" layoutY="218.0" stroke="RED" strokeType="INSIDE" width="14.0" />
+                  <Rectangle fx:id="human_hitbox_right" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="299.0" layoutY="199.0" stroke="RED" strokeType="INSIDE" width="14.0" />
+               </children>
+            </Group>
+            <Group fx:id="tree" layoutX="-103.0" layoutY="-156.0">
+               <children>
+                  <ImageView fx:id="tree_img" fitHeight="126.0" fitWidth="107.0" layoutX="262.0" layoutY="176.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
+                  <Rectangle fx:id="tree_hitbox" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="34.0" layoutX="275.0" layoutY="236.0" stroke="RED" strokeType="INSIDE" translateX="24" translateY="28" width="35.0" />
+                  <Rectangle fx:id="tree_hitbox_wall" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="34.0" layoutX="305.0" layoutY="264.0" stroke="RED" strokeType="INSIDE" width="21.0" />
+                  <ImageView fx:id="drops_img" fitHeight="28.0" fitWidth="28.0" layoutX="303.0" layoutY="267.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
                </children>
             </Group>
             <Group>

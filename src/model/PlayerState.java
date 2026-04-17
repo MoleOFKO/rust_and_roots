@@ -404,6 +404,11 @@ public final class PlayerState {
         exp.set(Math.max(0, value));
     }
 
+    public void addExp(int delta) {
+        if (delta == 0) return;
+        setExp(getExp() + delta);
+    }
+
     public StringProperty playerNameProperty() {
         return playerName;
     }

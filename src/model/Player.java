@@ -38,6 +38,7 @@ public class Player {
     private static final long RUN_FRAME_DELAY_NANOS = 90_000_000L;
     private static final long IDLE_FRAME_DELAY_NANOS = 120_000_000L;
     private static final long BASE_ATTACK_FRAME_DELAY_NANOS = 110_000_000L;
+    private static final long MIN_ATTACK_FRAME_DELAY_NANOS = (long) NANOS_PER_60FPS_FRAME;
     private static final long DEATH_FRAME_DELAY_NANOS = 90_000_000L;
     private static final double ATTACK_SPEED_PER_AGI = 0.045;
 
@@ -53,6 +54,7 @@ public class Player {
 
     private IntConsumer onHotbarSlotRequest;
     private Runnable onToggleHotbarRequest;
+    private Runnable onAttackStarted;
 
     private double staminaDrainRemainder = 0.0;
     private List<Rectangle> walls = List.of();
@@ -209,6 +211,26 @@ public class Player {
 
     public int getEquippedItemId() {
         return equippedItemId;
+    }
+
+    public enum FacingDirection {
+        DOWN,
+        LEFT,
+        RIGHT,
+        UP
+    }
+
+    public FacingDirection getFacingDirection() {
+        return switch (facingRow) {
+            case 1 -> FacingDirection.LEFT;
+            case 2 -> FacingDirection.RIGHT;
+            case 3 -> FacingDirection.UP;
+            default -> FacingDirection.DOWN;
+        };
+    }
+
+    public void setOnAttackStarted(Runnable onAttackStarted) {
+        this.onAttackStarted = onAttackStarted;
     }
 
     public boolean isRemovedFromWorld() {
@@ -499,24 +521,32 @@ public class Player {
         }
 
         long delay = getFrameDelay(animState);
-        if (now - lastAnimFrameTime < delay) {
+        long elapsed = now - lastAnimFrameTime;
+        if (elapsed < delay) {
             return;
         }
 
-        lastAnimFrameTime = now;
+        long steps = elapsed / Math.max(1L, delay);
+        if (steps <= 0L) {
+            return;
+        }
+        // Cap catch-up after long stalls so we don't fast-forward entire animations in one frame.
+        steps = Math.min(steps, 5L);
+        lastAnimFrameTime += steps * delay;
 
         int frameCount = getFrameCount(animState);
+        int frameSteps = (int) (steps % Math.max(1, frameCount));
 
         switch (animState) {
-            case IDLE -> frameIndex = (frameIndex + 1) % frameCount;
+            case IDLE -> frameIndex = (frameIndex + frameSteps) % frameCount;
             case WALK, RUN -> {
                 if (moving) {
-                    frameIndex = (frameIndex + 1) % frameCount;
+                    frameIndex = (frameIndex + frameSteps) % frameCount;
                 } else {
                     frameIndex = 0;
                 }
             }
-            case ATTACK -> frameIndex = (frameIndex + 1) % frameCount;
+            case ATTACK -> frameIndex = (frameIndex + frameSteps) % frameCount;
             case DEATH -> {
             }
         }
@@ -807,6 +837,9 @@ public class Player {
         attackEndsAtNanos = now + attackDuration;
         nextAttackAvailableAtNanos = attackEndsAtNanos;
         setAnimState(AnimState.ATTACK, true);
+        if (onAttackStarted != null) {
+            onAttackStarted.run();
+        }
     }
 
     private long getAttackDurationNanos(EquipmentAnimationSet animationSet) {
@@ -846,7 +879,8 @@ public class Player {
     private long getAttackFrameDelayNanos() {
         double agiBonusScale = 1.0 + (Math.max(0.0, state.getAgi() - NORMAL_AGI) * ATTACK_SPEED_PER_AGI);
         double speedScale = 1.0 / agiBonusScale;
-        return Math.max(1L, (long) Math.floor(BASE_ATTACK_FRAME_DELAY_NANOS * speedScale));
+        long computed = Math.max(1L, (long) Math.floor(BASE_ATTACK_FRAME_DELAY_NANOS * speedScale));
+        return Math.max(MIN_ATTACK_FRAME_DELAY_NANOS, computed);
     }
 
     private EquipmentKind resolveEquipmentKind(int itemId) {

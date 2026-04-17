@@ -213,6 +213,7 @@ CREATE TABLE `items` (
 LOCK TABLES `items` WRITE;
 /*!40000 ALTER TABLE `items` DISABLE KEYS */;
 INSERT INTO `items` VALUES (1,'Axe',10,121,'Axe.png',3),(2,'Pickaxe',10,122,'pickaxe.png',3),(3,'Sickle',10,123,'sickle.png',3),(4,'Fishing Rod',10,124,'fishing_rod.png',3),(5,'Onion Seed',10,125,'onion_seed.png',4),(6,'Green Eggplant Seed',10,126,'green_eggplant_seed.png',4),(7,'Grape Seed',10,127,'grape_seed.png',4),(8,'Cucumber Seed',10,128,'cucumber_seed.png',4),(9,'Chilli Seed',10,129,'chilli_seed.png',4),(10,'Cauliflower Seed',10,130,'cauliflower_seed.png',4),(11,'Broccoli Seed',10,131,'broccoli_seed.png',4),(12,'Beetroot Seed',10,132,'beetroot_seed.png',4),(13,'Bean Seed',10,133,'bean_seed.png',6),(14,'Pink Radish',50,22,'pink_radish.png',6),(15,'Patty Pan',100,23,'patty_pan.png',6),(16,'Onion',30,24,'onion.png',6),(17,'Long Beans',50,25,'long_beans.png',6),(18,'Lettuce',60,26,'lettuce.png',6),(19,'Ice Tuber',200,27,'ice_tuber.png',6),(20,'Hop cone',100,28,'hop_cone.png',6),(21,'Ham',500,29,'ham.png',6),(22,'Green Zucchili',80,30,'green_zucchili.png',6),(23,'Green Pea',40,31,'green_pea.png',6),(24,'Green Chili',20,32,'green_chilli.png',6),(25,'Gourd',45,33,'gourd.png',6),(26,'Garlic',30,34,'garlic.png',6),(27,'Fennel bulb',60,35,'fennel_bulb.png',6),(28,'Eggplant',40,36,'eggplant.png',6),(29,'DaiKon',30,37,'daikon.png',6),(30,'Cucumber',30,38,'cucumber.png',6),(31,'Corn',50,39,'corn.png',6),(32,'Chili pepper',40,40,'chili_pepper.png',6),(33,'Chicken Wing',400,41,'chicken_wing.png',6),(34,'Chicken thigh',470,42,'chicken_thigh.png',6),(35,'Cauliflower',70,43,'cauliflower.png',6),(36,'Carrot',40,44,'carrot.png',6),(37,'Cabbage',70,45,'cabbage.png',6),(38,'Broccoli',60,46,'broccoli.png',6),(39,'Bok Choy',40,47,'bok_choy.png',6),(40,'Bitter Melon',40,48,'bitter_melon.png',6),(41,'Beef',600,49,'beef.png',6),(42,'Beans',40,50,'beans.png',6),(43,'Bamboo Shoot',30,51,'bamboo_shoot.png',6),(44,'Asparagus',30,52,'asparagus.png',6),(45,'Antichoke',50,53,'artichoke.png',6),(46,'Bacon',100,54,'bacon.png',6),(47,'Bear Skin',50,55,'bear_skin.png',6),(48,'Blackened Meat',50,56,'blackened_meat.png',6),(49,'Blue Cloth',10,57,'blue_cloth.png',6),(50,'Bone',10,58,'bone.png',6),(51,'Dirty Rigs',10,59,'dirty_rags.png',6),(52,'Feathered Hide',10,60,'feathered_hide.png',6),(53,'Fish Meat',10,61,'fish_meat.png',6),(54,'Gilled Meat',10,62,'gilled_meat.png',6),(55,'Ham',20,63,'ham.png',6),(56,'Haunch',10,64,'haunch.png',6),(57,'Heart',10,65,'heart.png',6),(58,'Hooves',20,66,'hooves.png',6),(59,'Horn1',10,67,'horn1.png',6),(60,'Horn2',10,68,'horn2.png',6),(61,'Horn3',10,69,'horn3.png',6),(62,'Horn4',10,70,'horn4.png',6),(63,'Horn5',10,71,'horn5.png',6),(64,'Horn6',10,72,'horn6.png',6),(65,'Kidney',20,73,'kidney.png',6),(66,'Large Meat Chunk',10,74,'large_meat_chunk.png',6),(67,'Pork',10,75,'pork.png',6),(68,'Raw Ribs',10,76,'raw_ribs.png',6),(69,'Rotten Meat',10,77,'rotten_meat.png',6),(70,'Scarly Meat',10,78,'scaly_meat.png',6),(71,'Red Cloth',10,79,'red_cloth.png',6),(72,'Skull1',10,80,'skull1.png',6),(73,'Skull2',10,81,'skull2.png',6),(74,'Skull3',10,82,'skull3.png',6),(75,'Skull3',10,83,'skull4.png',6),(76,'Small Meat Chunk',10,84,'small_meat_chunk.png',6),(77,'Stringy Meat',10,85,'stringy_meat.png',6),(78,'Tongue',10,86,'tongue.png',6),(79,'roasted_harvest_plate',100,92,'roasted_harvest_plate.png',6),(80,'beef_stew',10,93,'beef_stew.png',6),(81,'garden_salad',100,94,'garden_salad.png',6),(82,'spicy_pork_stir-fry',100,95,'spicy_pork_stir-fry.png',6),(83,'steak_dinner',100,96,'steak_dinner.png',6),(84,'root_vegetable_beef_soup',100,97,'root_vegetable_beef_soup.png',6),(85,'spicy_eggplant_tomato',100,98,'spicy_eggplant_tomato.png',6),(86,'spicy_eggplant',100,99,'spicy_eggplant.png',6),(87,'root_vegetable_mix',100,100,'root_mix.png',6),(88,'roasted_pumpkin_mash',100,101,'roasted_pumpkin_mash.png',6),(89,'chicken_corn_soup',100,102,'chicken_corn_soup.png',6),(90,'pork_cabbage_stir-fry',100,103,'pork_cabbage_stir-fry.png',6),(91,'beef_potato_stew',100,104,'beef_potato_stew.png',6),(92,'pepper_steak',100,105,'pepper_steak.png',6),(93,'salad_leaves',100,106,'salad_leaves.png',6),(94,'fresh_salad',100,107,'fresh_salad.png',6),(95,'grilled_steak',100,108,'grilled_steak.png',6),(96,'tomato_slices',100,109,'tomato_slices.png',6),(97,'baked_potato',100,110,'baked_potato.png',6),(98,'grilled_ham',100,111,'grilled_ham.png',6),(99,'Tomato',50,9,'tomato.png',6),(100,'TintoBerry',50,10,'tintoberry.png',6),(101,'Sweet Potato',50,11,'sweet_potato.png',6),(102,'White Eggplant',50,12,'white_eggplant.png',6),(103,'Pumpkin',50,13,'pumpkin.png',6),(104,'Umbrella Cabbage',50,14,'umbrella_cabbage.png',6),(105,'Turnip',50,15,'turnip.png',6),(106,'Snow Berry',50,16,'snowberry.png',6),(107,'Rhubarb',50,17,'rhubarb.png',6),(108,'Red Bellpepper',50,18,'red_bellpepper.png',6),(109,'Radish',50,19,'radish.png',6),(110,'Potato',50,20,'potato.png',6),(111,'Pork ribs',50,21,'pork_ribs.png',6),(112,'Pumpkin Fruit',50,134,'pumpkin_fruit.png',1),(113,'Pineapple Fruit',50,135,'pineapple_fruit.png',1),(114,'Onion Fruit',50,136,'onion_fruit.png',1),(115,'Green Eggplant Fruit',50,137,'green_eggplant_fruit.png',1),(116,'grape_fruit',50,138,'grape_fruit.png',1),(117,'cauliflower_fruit',10,139,'cauliflower_fruit.png',1),(118,'chili_fruit',10,140,'chili_fruit.png',1),(120,'broccoli_fruit',10,142,'broccoli_fruit.png',1),(121,'beetroot_fruit',10,143,'beetroot_fruit.png',1),(122,'bean_fruit',10,144,'bean_fruit.png',1),(123,'Wheat Seed',10,145,'wheat_seed.png',4),(124,'Sunflower Seed',10,121,'sunflower_seed.png',4),(125,'Pumpkin Seed',10,147,'pumpkin_seed.png',4),(126,'Pineapple Seed',10,148,'pineapple_seed.png',4),(127,'Watering Can',10,149,'Watering_Can.png',3),(128,'banana_tree1',0,150,'banana_tree1.png',5),(129,'banana_tree2',0,151,'banana_tree2.png',5),(130,'bean_plant1',0,152,'bean_plant1.png',5),(131,'bean_plant2',0,153,'bean_plant2.png',5),(132,'bean_plant3',0,153,'bean_plant3.png',5),(133,'bean_plant4',0,153,'bean_plant4.png',5),(134,'beetroot_plant1',0,153,'beetroot_plant1.png',5),(135,'beetroot_plant2',0,153,'beetroot_plant2.png',5),(136,'beetroot_plant3',0,153,'beetroot_plant3.png',5),(137,'beetroot_plant4',0,153,'beetroot_plant4.png',5),(138,'blue_tree1',0,153,'blue_tree1.png',5),(139,'blue_tree2',0,153,'blue_tree2.png',5),(140,'broccoli_plant1',0,153,'broccoli_plant1.png',5),(141,'broccoli_plant2',0,153,'broccoli_plant2.png',5),(142,'broccoli_plant3',0,153,'broccoli_plant3.png',5),(143,'broccoli_plant4',0,153,'broccoli_plant4.png',5),(144,'carrot_plant1',0,153,'carrot_plant1.png',5),(145,'carrot_plant2',0,153,'carrot_plant2.png',5),(146,'carrot_plant3',0,153,'carrot_plant3.png',5),(147,'carrot_plant4',0,153,'carrot_plant4.png',5),(148,'cauliflower_plant1',0,153,'cauliflower_plant1.png',5),(149,'cauliflower_plant2',0,153,'cauliflower_plant2.png',5),(150,'cauliflower_plant3',0,153,'cauliflower_plant3.png',5),(151,'cauliflower_plant4',0,153,'cauliflower_plant4.png',5),(152,'chili_plant1',0,153,'chili_plant1.png',5),(153,'chili_plant2',0,153,'chili_plant2.png',5),(154,'chili_plant3',0,153,'chili_plant3.png',5),(155,'chili_plant4',0,153,'chili_plant4.png',5),(156,'coconut_tree1',0,153,'coconut_tree1.png',5),(157,'coconut_tree2',0,153,'coconut_tree2.png',5),(158,'cucumber_plant1',0,153,'cucumber_plant1.png',5),(159,'cucumber_plant2',0,153,'cucumber_plant2.png',5),(160,'cucumber_plant3',0,153,'cucumber_plant3.png',5),(161,'cucumber_plant4',0,153,'cucumber_plant4.png',5),(162,'grape_plant1',0,153,'grape_plant1.png',5),(163,'grape_plant2',0,153,'grape_plant2.png',5),(164,'grape_plant3',0,153,'grape_plant3.png',5),(165,'grape_plant4',0,153,'grape_plant4.png',5),(166,'green_eggplant_plant1',0,153,'green_eggplant_plant1.png',5),(167,'green_eggplant_plant2',0,153,'green_eggplant_plant2.png',5),(168,'green_eggplant_plant3',0,153,'green_eggplant_plant3.png',5),(169,'green_eggplant_plant4',0,153,'green_eggplant_plant4.png',5),(170,'mushroom_brown1',0,153,'mushroom_brown1.png',5),(171,'mushroom_brown2',0,153,'mushroom_brown2.png',5),(172,'mushroom_brown3',0,153,'mushroom_brown3.png',5),(173,'mushroom_brown4',0,153,'mushroom_brown4.png',5),(174,'mushroom_white1',0,153,'mushroom_white1.png',5),(175,'mushroom_white2',0,153,'mushroom_white2.png',5),(176,'mushroom_white3',0,153,'mushroom_white3.png',5),(177,'mushroom_white4',0,153,'mushroom_white4.png',5),(178,'pineapple_plant1',0,153,'pineapple_plant1.png',5),(179,'pineapple_plant2',0,153,'pineapple_plant2.png',5),(180,'pineapple_plant3',0,153,'pineapple_plant3.png',5),(181,'pineapple_plant4',0,153,'pineapple_plant4.png',5),(182,'pumpkin_plant1',0,153,'pumpkin_plant1.png',5),(183,'pumpkin_plant2',0,153,'pumpkin_plant2.png',5),(184,'pumpkin_plant3',0,153,'pumpkin_plant3.png',5),(185,'pumpkin_plant4',0,153,'pumpkin_plant4.png',5),(186,'red_tree1',0,153,'red_tree1.png',5),(187,'red_tree2',0,153,'red_tree2.png',5),(188,'sunflower_plant1',0,153,'sunflower_plant1.png',5),(189,'sunflower_plant2',0,153,'sunflower_plant2.png',5),(190,'sunflower_plant3',0,153,'sunflower_plant3.png',5),(191,'sunflower_plant4',0,153,'sunflower_plant4.png',5),(192,'tree_stumb',0,153,'tree_stumb.png',5),(193,'wheat_plant1',0,153,'wheat_plant1.png',5),(194,'wheat_plant2',0,153,'wheat_plant2.png',5),(195,'wheat_plant3',0,153,'wheat_plant3.png',5),(196,'wheat_plant4',0,153,'wheat_plant4.png',5),(197,'yellow_tree1',0,153,'yellow_tree1.png',5),(198,'yellow_tree2',0,153,'yellow_tree2.png',5);
+INSERT INTO `items` VALUES (199,'tree_log',10,153,'tree_log.png',6),(200,'blue_fruit',50,153,'blue_fruit.png',1),(201,'red_fruit',50,153,'red_fruit.png',1),(202,'yellow_fruit',50,153,'yellow_fruit.png',1);
 /*!40000 ALTER TABLE `items` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -603,6 +604,8 @@ DROP PROCEDURE IF EXISTS ensure_application_schema;
 DROP PROCEDURE IF EXISTS ensure_chicken_corn_soup_deluxe;
 DROP PROCEDURE IF EXISTS ensure_saved_unlocked_recipe_table;
 DROP PROCEDURE IF EXISTS ensure_saved_farm_plot_defaults;
+DROP PROCEDURE IF EXISTS ensure_saved_tree_resource_table;
+DROP PROCEDURE IF EXISTS ensure_saved_tree_drop_table;
 
 DELIMITER $$
 
@@ -615,6 +618,161 @@ BEGIN
     CONSTRAINT fk_saved_unlocked_recipe_save
       FOREIGN KEY (saved_id) REFERENCES save_game (saved_id) ON DELETE CASCADE
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+END $$
+
+CREATE PROCEDURE ensure_saved_tree_resource_table()
+BEGIN
+  DECLARE v_missing_max_hp INT DEFAULT 0;
+  DECLARE v_missing_drop_rate_pity INT DEFAULT 0;
+  DECLARE v_missing_drops_this_life INT DEFAULT 0;
+  DECLARE v_missing_damage_since_last_drop_roll INT DEFAULT 0;
+  DECLARE v_missing_last_hp_growth_total_seconds INT DEFAULT 0;
+  DECLARE v_tree_type_len INT DEFAULT 0;
+
+  CREATE TABLE IF NOT EXISTS saved_tree_resource (
+    saved_id INT NOT NULL,
+    map_key VARCHAR(50) NOT NULL,
+    tree_id VARCHAR(50) NOT NULL,
+    tree_type VARCHAR(50) NOT NULL,
+    current_stage INT NOT NULL DEFAULT '2',
+    lived_days INT NOT NULL DEFAULT '0',
+    hp INT NOT NULL DEFAULT '0',
+    max_hp INT NOT NULL DEFAULT '0',
+    vit INT NOT NULL DEFAULT '0',
+    drop_rate_pity INT NOT NULL DEFAULT '0',
+    drops_this_life INT NOT NULL DEFAULT '0',
+    damage_since_last_drop_roll INT NOT NULL DEFAULT '0',
+    last_hp_growth_total_seconds DOUBLE NOT NULL DEFAULT '-1',
+    respawn_at_total_seconds DOUBLE NOT NULL DEFAULT '-1',
+    last_updated_day_number INT NOT NULL DEFAULT '1',
+    PRIMARY KEY (saved_id, map_key, tree_id),
+    CONSTRAINT fk_saved_tree_resource_save
+      FOREIGN KEY (saved_id) REFERENCES save_game (saved_id) ON DELETE CASCADE
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+  SELECT COALESCE(CHARACTER_MAXIMUM_LENGTH, 0)
+    INTO v_tree_type_len
+    FROM information_schema.columns
+   WHERE table_schema = DATABASE()
+     AND table_name = 'saved_tree_resource'
+     AND column_name = 'tree_type'
+   LIMIT 1;
+  IF v_tree_type_len IS NULL OR v_tree_type_len < 50 THEN
+    ALTER TABLE saved_tree_resource
+      MODIFY COLUMN tree_type VARCHAR(50) NOT NULL;
+  END IF;
+
+  SELECT COUNT(*)
+    INTO v_missing_max_hp
+    FROM information_schema.columns
+   WHERE table_schema = DATABASE()
+     AND table_name = 'saved_tree_resource'
+     AND column_name = 'max_hp';
+  IF v_missing_max_hp = 0 THEN
+    ALTER TABLE saved_tree_resource
+      ADD COLUMN max_hp INT NOT NULL DEFAULT '0' AFTER hp;
+  END IF;
+
+  SELECT COUNT(*)
+    INTO v_missing_drop_rate_pity
+    FROM information_schema.columns
+   WHERE table_schema = DATABASE()
+     AND table_name = 'saved_tree_resource'
+     AND column_name = 'drop_rate_pity';
+  IF v_missing_drop_rate_pity = 0 THEN
+    ALTER TABLE saved_tree_resource
+      ADD COLUMN drop_rate_pity INT NOT NULL DEFAULT '0' AFTER vit;
+  END IF;
+
+  SELECT COUNT(*)
+    INTO v_missing_drops_this_life
+    FROM information_schema.columns
+   WHERE table_schema = DATABASE()
+     AND table_name = 'saved_tree_resource'
+     AND column_name = 'drops_this_life';
+  IF v_missing_drops_this_life = 0 THEN
+    ALTER TABLE saved_tree_resource
+      ADD COLUMN drops_this_life INT NOT NULL DEFAULT '0' AFTER drop_rate_pity;
+  END IF;
+
+  SELECT COUNT(*)
+    INTO v_missing_damage_since_last_drop_roll
+    FROM information_schema.columns
+   WHERE table_schema = DATABASE()
+     AND table_name = 'saved_tree_resource'
+     AND column_name = 'damage_since_last_drop_roll';
+  IF v_missing_damage_since_last_drop_roll = 0 THEN
+    ALTER TABLE saved_tree_resource
+      ADD COLUMN damage_since_last_drop_roll INT NOT NULL DEFAULT '0' AFTER drops_this_life;
+  END IF;
+
+  SELECT COUNT(*)
+    INTO v_missing_last_hp_growth_total_seconds
+    FROM information_schema.columns
+   WHERE table_schema = DATABASE()
+     AND table_name = 'saved_tree_resource'
+     AND column_name = 'last_hp_growth_total_seconds';
+  IF v_missing_last_hp_growth_total_seconds = 0 THEN
+    ALTER TABLE saved_tree_resource
+      ADD COLUMN last_hp_growth_total_seconds DOUBLE NOT NULL DEFAULT '-1' AFTER damage_since_last_drop_roll;
+  END IF;
+END $$
+
+CREATE PROCEDURE ensure_saved_tree_drop_table()
+BEGIN
+    DECLARE v_missing_quantity INT DEFAULT 0;
+    DECLARE v_missing_spawned_at_total_seconds INT DEFAULT 0;
+    DECLARE v_missing_expires_at_total_seconds INT DEFAULT 0;
+
+    CREATE TABLE IF NOT EXISTS saved_tree_drop (
+        saved_id INT NOT NULL,
+        map_key VARCHAR(50) NOT NULL,
+        tree_id VARCHAR(50) NOT NULL,
+        drop_slot INT NOT NULL,
+        item_id INT NOT NULL,
+        quantity INT NOT NULL DEFAULT '1',
+        spawned_at_total_seconds DOUBLE NOT NULL DEFAULT '0',
+        expires_at_total_seconds DOUBLE NOT NULL DEFAULT '0',
+        PRIMARY KEY (saved_id, map_key, tree_id, drop_slot),
+        KEY idx_saved_tree_drop_item_id (item_id),
+        CONSTRAINT fk_saved_tree_drop_save
+            FOREIGN KEY (saved_id) REFERENCES save_game (saved_id) ON DELETE CASCADE,
+        CONSTRAINT fk_saved_tree_drop_item
+            FOREIGN KEY (item_id) REFERENCES items (item_id) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+    SELECT COUNT(*)
+      INTO v_missing_quantity
+      FROM information_schema.columns
+     WHERE table_schema = DATABASE()
+       AND table_name = 'saved_tree_drop'
+       AND column_name = 'quantity';
+    IF v_missing_quantity = 0 THEN
+        ALTER TABLE saved_tree_drop
+            ADD COLUMN quantity INT NOT NULL DEFAULT '1' AFTER item_id;
+    END IF;
+
+    SELECT COUNT(*)
+      INTO v_missing_spawned_at_total_seconds
+      FROM information_schema.columns
+     WHERE table_schema = DATABASE()
+       AND table_name = 'saved_tree_drop'
+       AND column_name = 'spawned_at_total_seconds';
+    IF v_missing_spawned_at_total_seconds = 0 THEN
+        ALTER TABLE saved_tree_drop
+            ADD COLUMN spawned_at_total_seconds DOUBLE NOT NULL DEFAULT '0' AFTER quantity;
+    END IF;
+
+    SELECT COUNT(*)
+      INTO v_missing_expires_at_total_seconds
+      FROM information_schema.columns
+     WHERE table_schema = DATABASE()
+       AND table_name = 'saved_tree_drop'
+       AND column_name = 'expires_at_total_seconds';
+    IF v_missing_expires_at_total_seconds = 0 THEN
+        ALTER TABLE saved_tree_drop
+            ADD COLUMN expires_at_total_seconds DOUBLE NOT NULL DEFAULT '0' AFTER spawned_at_total_seconds;
+    END IF;
 END $$
 
 CREATE PROCEDURE ensure_saved_farm_plot_defaults()
@@ -684,6 +842,8 @@ END $$
 CREATE PROCEDURE ensure_application_schema()
 BEGIN
   CALL ensure_saved_unlocked_recipe_table();
+  CALL ensure_saved_tree_resource_table();
+  CALL ensure_saved_tree_drop_table();
   CALL ensure_saved_farm_plot_defaults();
   CALL ensure_chicken_corn_soup_deluxe();
 END $$

@@ -6,9 +6,15 @@ import game.GameTimeManager;
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
+import javafx.geometry.Bounds;
 import javafx.scene.Group;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -16,11 +22,19 @@ import javafx.scene.control.Slider;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
+import java.util.Locale;
+import java.util.concurrent.ThreadLocalRandom;
+import model.CollisionRegistry;
+import model.ItemDatabase;
+import model.TreeMapState;
+import model.item;
+import util.AppDialogs;
 import util.SceneManager;
 import util.SpawnTag;
 /**
@@ -29,6 +43,33 @@ import util.SpawnTag;
  * @author MITUSER-1
  */
 public class Left_mapController extends BaseMapController {
+
+    private static final String MAIN_TREE_ID = "tree";
+    // Respawn time while in stage 1: half an in-game day (12 hours).
+    private static final double TREE_RESPAWN_SECONDS = 12.0 * 60.0 * 60.0;
+
+    private static final double TREE_DROP_TTL_SECONDS = 12.0 * 60.0 * 60.0;
+    private static final int TREE_STARTING_MAX_HP = 10;
+    private static final int TREE_MAX_DROPS_PER_LIFE = 10;
+    private static final int TREE_STAGE2_MAX_ALIVE_DROPS = 9;
+    private static final int TREE_STAGE3_MAX_ALIVE_DROPS = 8;
+    private static final int TREE_DROP_ROLL_HP_CHUNK = 10;
+    // HP growth uses GameTimeManager.totalSeconds (in-game seconds).
+    // GameTimeManager runs at ~24 in-game seconds per real second, so scale values accordingly.
+    private static final double TREE_HP_REGEN_SECONDS = 48.0;       // ~2 real seconds
+    private static final double TREE_HP_CAP_GROW_SECONDS = 1440.0;  // ~1 real minute
+
+    // Growth rules (tunable). Stage 2 = day 1, stage 3 = day >= 2.
+    private static final int TREE_STAGE3_AFTER_LIVED_DAYS = 1;
+
+    private TreeMapState.TreeData mainTreeData;
+    private String renderedTreeVisualKey = null;
+    private String renderedTreeDropsKey = null;
+
+    private int treeLogItemId = -1;
+    private int treeStumpItemId = -1;
+
+    private List<String> cachedValidTreeTypeKeys = null;
 
     @FXML
     private StackPane view;
@@ -380,6 +421,26 @@ public class Left_mapController extends BaseMapController {
     private ImageView equip_img;
     @FXML
     private Rectangle spawn_from_right;
+    @FXML
+    private Rectangle exit_right;
+    @FXML
+    private Rectangle human_hitbox_left;
+    @FXML
+    private Rectangle human_hitbox_up;
+    @FXML
+    private Rectangle human_hitbox_down;
+    @FXML
+    private Rectangle human_hitbox_right;
+    @FXML
+    private Group tree;
+    @FXML
+    private ImageView tree_img;
+    @FXML
+    private ImageView drops_img;
+    @FXML
+    private Rectangle tree_hitbox;
+    @FXML
+    private Rectangle tree_hitbox_wall;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -389,6 +450,705 @@ public class Left_mapController extends BaseMapController {
         bindSettingControls();
         refreshStatusAllocationUi();
         refreshMenuState();
+        setupTreeSystemIfPresent();
+    }
+
+    private void setupTreeSystemIfPresent() {
+        if (tree_img == null || tree_hitbox == null) {
+            return;
+        }
+
+        if (gameState == null) {
+            gameState = GameState.get();
+        }
+
+        TreeMapState mapTrees = gameState.getTreeState(mapKey());
+        mainTreeData = mapTrees.getTree(MAIN_TREE_ID);
+
+        int currentDay = GameTimeManager.get().dayNumberProperty().get();
+        double nowSeconds = GameTimeManager.get().totalSecondsProperty().get();
+        initializeTreeDefaults(mainTreeData, currentDay, nowSeconds);
+
+        if (player != null) {
+            player.setOnAttackStarted(this::handlePlayerAttackStarted);
+        }
+
+        // Tree hitboxes are used for intersection/collision only, not input.
+        tree_hitbox.setMouseTransparent(true);
+        if (tree_hitbox_wall != null) {
+            tree_hitbox_wall.setMouseTransparent(true);
+        }
+
+        // Ensure the tree wall participates in player collision on this map.
+        if (player != null && tree_hitbox_wall != null) {
+            List<Rectangle> colliders = new ArrayList<>();
+            if (super.walls != null) {
+                colliders.addAll(CollisionRegistry.collectWalls(super.walls));
+            }
+            colliders.add(tree_hitbox_wall);
+            player.setWalls(colliders);
+        }
+
+        // Render once immediately.
+        renderTreeVisual();
+        renderTreeDrops();
+    }
+
+    private void initializeTreeDefaults(TreeMapState.TreeData data, int currentDay, double nowSeconds) {
+        if (data == null) return;
+
+        if (data.typeKey == null || data.typeKey.isBlank() || !isValidTreeTypeKey(data.typeKey)) {
+            data.typeKey = randomTreeTypeKey();
+        }
+
+        if (data.lastUpdatedDayNumber <= 0) {
+            data.lastUpdatedDayNumber = Math.max(1, currentDay);
+        }
+
+        if (data.livedDays < 0) data.livedDays = 0;
+
+        if (data.currentStage < 1 || data.currentStage > 3) {
+            data.currentStage = 2;
+        }
+
+        if (data.dropRatePity < 0) data.dropRatePity = 0;
+        if (data.dropsThisLife < 0) data.dropsThisLife = 0;
+        if (data.damageSinceLastDropRoll < 0) data.damageSinceLastDropRoll = 0;
+        if (data.damageSinceLastDropRoll >= TREE_DROP_ROLL_HP_CHUNK) {
+            data.damageSinceLastDropRoll %= TREE_DROP_ROLL_HP_CHUNK;
+        }
+
+        if (data.currentStage == 1) {
+            data.hp = 0;
+            data.maxHp = 0;
+            data.vit = 0;
+            data.lastHpGrowthTotalSeconds = -1;
+            if (data.respawnAtTotalSeconds < 0) {
+                data.respawnAtTotalSeconds = nowSeconds + TREE_RESPAWN_SECONDS;
+            }
+        } else {
+            data.currentStage = stageFromLivedDays(data.livedDays);
+            data.vit = vitFor(data.livedDays);
+
+            if (data.maxHp <= 0) {
+                data.maxHp = TREE_STARTING_MAX_HP;
+            }
+            if (data.maxHp < TREE_STARTING_MAX_HP) {
+                data.maxHp = TREE_STARTING_MAX_HP;
+            }
+            if (data.hp <= 0) {
+                data.hp = data.maxHp;
+            }
+            if (data.hp > data.maxHp) data.hp = data.maxHp;
+            if (data.hp < 0) data.hp = 0;
+
+            if (data.lastHpGrowthTotalSeconds < 0 || data.lastHpGrowthTotalSeconds > nowSeconds) {
+                data.lastHpGrowthTotalSeconds = nowSeconds;
+            }
+            data.respawnAtTotalSeconds = -1;
+        }
+    }
+
+    private String randomTreeTypeKey() {
+        List<String> keys = getValidTreeTypeKeys();
+        if (keys.isEmpty()) {
+            return "blue";
+        }
+        return keys.get(ThreadLocalRandom.current().nextInt(keys.size()));
+    }
+
+    private List<String> getValidTreeTypeKeys() {
+        if (cachedValidTreeTypeKeys != null) {
+            return cachedValidTreeTypeKeys;
+        }
+
+        ItemDatabase.loadItems();
+
+        Set<String> keys = new HashSet<>();
+        for (item itm : ItemDatabase.getAllItems()) {
+            if (itm == null) continue;
+            String name = itm.getItem_name();
+            if (name == null || name.isBlank()) continue;
+
+            String normalized = name.trim().toLowerCase(Locale.ROOT);
+            if (!normalized.endsWith("_tree1")) {
+                continue;
+            }
+
+            String base = normalized.substring(0, normalized.length() - "_tree1".length());
+            if (base.isBlank()) continue;
+            if (isValidTreeTypeKey(base)) {
+                keys.add(base);
+            }
+        }
+
+        List<String> list = new ArrayList<>(keys);
+        Collections.sort(list);
+        cachedValidTreeTypeKeys = list;
+        return cachedValidTreeTypeKeys;
+    }
+
+    private boolean isValidTreeTypeKey(String typeKey) {
+        if (typeKey == null || typeKey.isBlank()) return false;
+        String base = typeKey.trim().toLowerCase(Locale.ROOT);
+
+        item tree1 = ItemDatabase.getItemByName(base + "_tree1");
+        item tree2 = ItemDatabase.getItemByName(base + "_tree2");
+        item fruit = ItemDatabase.getItemByName(base + "_fruit");
+        if (tree1 == null || tree2 == null || fruit == null) {
+            return false;
+        }
+
+        return ItemDatabase.isDisplayableItem(tree1.getItem_id())
+            && ItemDatabase.isDisplayableItem(tree2.getItem_id())
+            && ItemDatabase.isDisplayableItem(fruit.getItem_id());
+    }
+
+    @Override
+    protected void onGameLoopUpdate(Bounds playerBounds) {
+        syncDirectionalHitboxes();
+        updateTreeState();
+    }
+
+    private void syncDirectionalHitboxes() {
+        if (player == null) return;
+        var facing = player.getFacingDirection();
+
+        setDirectionalHitboxActive(human_hitbox_left, facing == model.Player.FacingDirection.LEFT);
+        setDirectionalHitboxActive(human_hitbox_right, facing == model.Player.FacingDirection.RIGHT);
+        setDirectionalHitboxActive(human_hitbox_up, facing == model.Player.FacingDirection.UP);
+        setDirectionalHitboxActive(human_hitbox_down, facing == model.Player.FacingDirection.DOWN);
+    }
+
+    private void setDirectionalHitboxActive(Rectangle hitbox, boolean active) {
+        if (hitbox == null) return;
+        hitbox.setDisable(!active);
+        hitbox.setVisible(active);
+        hitbox.setManaged(active);
+    }
+
+    private Rectangle resolveActiveAttackHitbox() {
+        if (player == null) return null;
+        return switch (player.getFacingDirection()) {
+            case LEFT -> human_hitbox_left;
+            case RIGHT -> human_hitbox_right;
+            case UP -> human_hitbox_up;
+            case DOWN -> human_hitbox_down;
+        };
+    }
+
+    private void handlePlayerAttackStarted() {
+        if (mainTreeData == null || tree_hitbox == null) return;
+        if (mainTreeData.currentStage == 1) return; // stage 1 cannot receive damage
+
+        Rectangle attackHitbox = resolveActiveAttackHitbox();
+        if (attackHitbox == null) return;
+
+        Bounds attackBounds = attackHitbox.localToScene(attackHitbox.getBoundsInLocal());
+        Bounds treeBounds = tree_hitbox.localToScene(tree_hitbox.getBoundsInLocal());
+        if (!attackBounds.intersects(treeBounds)) {
+            return;
+        }
+
+        GameTimeManager time = GameTimeManager.get();
+        int currentDay = time.dayNumberProperty().get();
+        double nowSeconds = time.totalSecondsProperty().get();
+
+        // Keep vit and HP growth up-to-date even if this map wasn't ticking.
+        applyTreeDailyGrowthIfNeeded(mainTreeData, currentDay);
+        applyTreeHpGrowthIfNeeded(mainTreeData, nowSeconds);
+        // Pause natural regeneration while the tree is actively being attacked.
+        mainTreeData.lastHpGrowthTotalSeconds = nowSeconds;
+        mainTreeData.currentStage = stageFromLivedDays(mainTreeData.livedDays);
+        mainTreeData.vit = vitFor(mainTreeData.livedDays);
+
+        int baseDamage = calculatePlayerBaseDamage();
+        int treeVit = Math.max(0, mainTreeData.vit);
+        int receivedDamage = Math.max(0, baseDamage - treeVit);
+        int reducedDamage = Math.max(0, baseDamage - receivedDamage);
+
+        int hpBefore = Math.max(0, mainTreeData.hp);
+        int maxHp = Math.max(0, mainTreeData.maxHp);
+        int actualDamage = Math.min(receivedDamage, hpBefore);
+        int hpAfter = Math.max(0, hpBefore - actualDamage);
+
+        System.out.println(
+            "[TREE] HP " + hpBefore + "/" + maxHp +
+            ", VIT " + treeVit +
+            " | PlayerDamage " + baseDamage +
+            " | Reduced " + reducedDamage +
+            " | Received " + actualDamage +
+            " | HP -> " + hpAfter + "/" + maxHp
+        );
+
+        if (actualDamage <= 0) {
+            return;
+        }
+
+        mainTreeData.hp = hpAfter;
+        applyTreeDropRollsForDamage(mainTreeData, actualDamage, nowSeconds);
+        if (mainTreeData.hp <= 0) {
+            killTree(mainTreeData, currentDay, nowSeconds);
+        }
+
+        renderTreeVisual();
+        renderTreeDrops();
+    }
+
+    private int calculatePlayerBaseDamage() {
+        if (playerState == null) return 0;
+
+        int playerStr = Math.max(0, playerState.getStr());
+        int damage = playerStr;
+        if (isAxeEquipped()) {
+            damage += 1;
+        }
+        return Math.max(0, damage);
+    }
+
+    private boolean isAxeEquipped() {
+        if (player == null) return false;
+        int equippedId = player.getEquippedItemId();
+        if (equippedId <= 0) return false;
+        String name = ItemDatabase.getItemName(equippedId);
+        if (name == null || name.isBlank()) return false;
+
+        String normalized = name.trim().toLowerCase(Locale.ROOT);
+        if (normalized.equals("axe")) return true;
+
+        // Be defensive for future item naming like "Stone Axe". Avoid matching pickaxes.
+        if (normalized.contains("pickaxe") || normalized.contains("pick axe")) return false;
+        return normalized.contains("axe");
+    }
+
+    private void killTree(TreeMapState.TreeData tree, int currentDay, double nowSeconds) {
+        if (tree == null) return;
+        if (tree.currentStage == 1) return;
+
+        int stageAtDeath = tree.currentStage;
+        applyGuaranteedDeathDrops(tree, stageAtDeath, nowSeconds);
+
+        tree.currentStage = 1;
+        tree.hp = 0;
+        tree.maxHp = 0;
+        tree.vit = 0;
+        tree.respawnAtTotalSeconds = nowSeconds + TREE_RESPAWN_SECONDS;
+        tree.livedDays = 0;
+        tree.lastUpdatedDayNumber = Math.max(1, currentDay);
+        tree.lastHpGrowthTotalSeconds = -1;
+
+        tree.dropRatePity = 0;
+        tree.damageSinceLastDropRoll = 0;
+    }
+
+    private void respawnTree(TreeMapState.TreeData tree, int currentDay, double nowSeconds) {
+        if (tree == null) return;
+
+        tree.typeKey = randomTreeTypeKey();
+        tree.currentStage = 2;
+        tree.livedDays = 0;
+        tree.vit = vitFor(0);
+        tree.maxHp = TREE_STARTING_MAX_HP;
+        tree.hp = TREE_STARTING_MAX_HP;
+        tree.respawnAtTotalSeconds = -1;
+        tree.lastUpdatedDayNumber = Math.max(1, currentDay);
+        tree.lastHpGrowthTotalSeconds = nowSeconds;
+
+        tree.dropRatePity = 0;
+        tree.dropsThisLife = 0;
+        tree.damageSinceLastDropRoll = 0;
+    }
+
+    private void applyTreeDropRollsForDamage(TreeMapState.TreeData tree, int hpLost, double nowSeconds) {
+        if (tree == null) return;
+        if (tree.currentStage != 2 && tree.currentStage != 3) return;
+        if (hpLost <= 0) return;
+
+        tree.damageSinceLastDropRoll = Math.max(0, tree.damageSinceLastDropRoll) + hpLost;
+
+        while (tree.damageSinceLastDropRoll >= TREE_DROP_ROLL_HP_CHUNK && canSpawnAliveDrop(tree)) {
+            tree.damageSinceLastDropRoll -= TREE_DROP_ROLL_HP_CHUNK;
+
+            int roll = rollTreeDropNumber(tree);
+            if (roll == 0) {
+                continue;
+            }
+            if (roll == 10) {
+                tree.dropRatePity = 0;
+                spawnAliveTreeDropForStage(tree, nowSeconds);
+                continue;
+            }
+
+            tree.dropRatePity = Math.min(10, Math.max(0, tree.dropRatePity) + roll);
+            if (tree.dropRatePity >= 10) {
+                tree.dropRatePity = 0;
+                spawnAliveTreeDropForStage(tree, nowSeconds);
+            }
+        }
+
+        if (tree.damageSinceLastDropRoll < 0) tree.damageSinceLastDropRoll = 0;
+        if (tree.dropRatePity < 0) tree.dropRatePity = 0;
+        if (tree.dropRatePity > 10) tree.dropRatePity = 10;
+    }
+
+    private void spawnAliveTreeDropForStage(TreeMapState.TreeData tree, double nowSeconds) {
+        if (tree == null) return;
+        if (!canSpawnAliveDrop(tree)) return;
+
+        int logId = resolveTreeLogItemId();
+        if (tree.currentStage == 2) {
+            trySpawnTreeDrop(tree, logId, nowSeconds);
+            return;
+        }
+
+        int fruitId = resolveFruitItemIdForTypeKey(tree.typeKey);
+        int chosen = chooseValidTreeDropItemId(logId, fruitId);
+        trySpawnTreeDrop(tree, chosen, nowSeconds);
+    }
+
+    private void applyGuaranteedDeathDrops(TreeMapState.TreeData tree, int stageAtDeath, double nowSeconds) {
+        if (tree == null) return;
+
+        int logId = resolveTreeLogItemId();
+        int fruitId = resolveFruitItemIdForTypeKey(tree.typeKey);
+
+        if (stageAtDeath == 2) {
+            trySpawnTreeDrop(tree, logId, nowSeconds);
+            return;
+        }
+
+        if (stageAtDeath == 3) {
+            trySpawnTreeDrop(tree, logId, nowSeconds);
+            trySpawnTreeDrop(tree, fruitId, nowSeconds);
+        }
+    }
+
+    private boolean canSpawnAliveDrop(TreeMapState.TreeData tree) {
+        if (tree == null) return false;
+
+        int aliveCap = switch (tree.currentStage) {
+            case 2 -> TREE_STAGE2_MAX_ALIVE_DROPS;
+            case 3 -> TREE_STAGE3_MAX_ALIVE_DROPS;
+            default -> 0;
+        };
+
+        return tree.dropsThisLife < aliveCap && tree.dropsThisLife < TREE_MAX_DROPS_PER_LIFE;
+    }
+
+    private int rollTreeDropNumber(TreeMapState.TreeData tree) {
+        int treeVit = Math.max(0, tree == null ? 0 : tree.vit);
+        int playerDex = Math.max(0, playerState == null ? 0 : playerState.getDex());
+
+        int zeroWeight = calculateZeroRollWeight(playerDex, treeVit);
+        int positiveWeightEach = 10; // 1..10 all remain equal to each other
+        int totalWeight = zeroWeight + (10 * positiveWeightEach);
+
+        int pick = ThreadLocalRandom.current().nextInt(totalWeight);
+
+        if (pick < zeroWeight) {
+            return 0;
+        }
+
+        return ((pick - zeroWeight) / positiveWeightEach) + 1; // 1..10
+    }
+
+    private int calculateZeroRollWeight(int playerDex, int treeVit) {
+        int safeDex = Math.max(0, playerDex);
+        int safeVit = Math.max(0, treeVit);
+
+        if (safeDex > safeVit * 2) {
+            return 0;
+        }
+
+        int baseZeroWeight = 10; // equal to each of the positive numbers at baseline
+
+        if (safeDex <= safeVit) {
+            return baseZeroWeight;
+        }
+
+        double progress = (double) (safeDex - safeVit) / Math.max(1.0, safeVit);
+        double clamped = Math.max(0.0, Math.min(1.0, progress / 2.0));
+
+        return (int) Math.round(baseZeroWeight * (1.0 - clamped));
+    }
+    
+    private int chooseValidTreeDropItemId(int logId, int fruitId) {
+        boolean hasLog = logId > 0;
+        boolean hasFruit = fruitId > 0;
+
+        if (hasLog && hasFruit) {
+            return ThreadLocalRandom.current().nextBoolean() ? logId : fruitId;
+        }
+        if (hasLog) return logId;
+        return fruitId;
+    }
+
+    private boolean trySpawnTreeDrop(TreeMapState.TreeData tree, int itemId, double nowSeconds) {
+        if (tree == null) return false;
+        if (tree.dropsThisLife >= TREE_MAX_DROPS_PER_LIFE) return false;
+        if (itemId <= 0) return false;
+
+        tree.drops.add(new TreeMapState.TreeDrop(itemId, 1, nowSeconds, nowSeconds + TREE_DROP_TTL_SECONDS));
+        tree.dropsThisLife += 1;
+        return true;
+    }
+
+    private boolean cleanupExpiredTreeDrops(TreeMapState.TreeData tree, double nowSeconds) {
+        if (tree == null || tree.drops.isEmpty()) return false;
+        int before = tree.drops.size();
+        tree.drops.removeIf(drop ->
+            drop == null ||
+            drop.itemId <= 0 ||
+            drop.quantity <= 0 ||
+            (drop.expiresAtTotalSeconds > 0 && nowSeconds >= drop.expiresAtTotalSeconds)
+        );
+        return tree.drops.size() != before;
+    }
+
+    private int resolveTreeLogItemId() {
+        if (treeLogItemId > 0) return treeLogItemId;
+        treeLogItemId = resolveItemId("tree_log");
+        return treeLogItemId;
+    }
+
+    private int resolveTreeStumpItemId() {
+        if (treeStumpItemId > 0) return treeStumpItemId;
+        treeStumpItemId = resolveItemId("tree_stumb");
+        return treeStumpItemId;
+    }
+
+    private int resolveFruitItemIdForTypeKey(String typeKey) {
+        String base = (typeKey == null) ? "" : typeKey.trim().toLowerCase(Locale.ROOT);
+        if (base.isBlank()) {
+            base = "blue";
+        }
+        return resolveItemId(base + "_fruit");
+    }
+
+    private int resolveItemId(String itemName) {
+        item itm = ItemDatabase.getItemByName(itemName);
+        return (itm == null) ? -1 : itm.getItem_id();
+    }
+
+    private void handleTreeDropClicked(TreeMapState.TreeDrop drop) {
+        if (drop == null || mainTreeData == null || player == null) return;
+        if (drop.itemId <= 0 || drop.quantity <= 0) return;
+
+        if (!player.getInventory().addItem(drop.itemId, drop.quantity)) {
+            AppDialogs.showMessageDialog(null, "Not enough inventory space to collect this drop.");
+            return;
+        }
+
+        mainTreeData.drops.remove(drop);
+        renderTreeDrops();
+    }
+
+    private void updateTreeState() {
+        if (mainTreeData == null) return;
+
+        GameTimeManager time = GameTimeManager.get();
+        int currentDay = time.dayNumberProperty().get();
+        double nowSeconds = time.totalSecondsProperty().get();
+
+        cleanupExpiredTreeDrops(mainTreeData, nowSeconds);
+
+        if (mainTreeData.currentStage == 1) {
+            mainTreeData.hp = 0;
+            mainTreeData.maxHp = 0;
+            mainTreeData.vit = 0;
+
+            if (mainTreeData.respawnAtTotalSeconds >= 0 && nowSeconds >= mainTreeData.respawnAtTotalSeconds) {
+                respawnTree(mainTreeData, currentDay, nowSeconds);
+            }
+        } else {
+            applyTreeDailyGrowthIfNeeded(mainTreeData, currentDay);
+            applyTreeHpGrowthIfNeeded(mainTreeData, nowSeconds);
+
+            mainTreeData.currentStage = stageFromLivedDays(mainTreeData.livedDays);
+            mainTreeData.vit = vitFor(mainTreeData.livedDays);
+
+            if (mainTreeData.maxHp < TREE_STARTING_MAX_HP) {
+                mainTreeData.maxHp = TREE_STARTING_MAX_HP;
+            }
+            if (mainTreeData.hp > mainTreeData.maxHp) mainTreeData.hp = mainTreeData.maxHp;
+            if (mainTreeData.hp < 0) mainTreeData.hp = 0;
+
+            if (mainTreeData.hp == 0) {
+                killTree(mainTreeData, currentDay, nowSeconds);
+            }
+        }
+
+        renderTreeVisual();
+        renderTreeDrops();
+    }
+
+    private void applyTreeDailyGrowthIfNeeded(TreeMapState.TreeData tree, int currentDay) {
+        if (tree == null) return;
+        if (tree.currentStage == 1) return;
+        int safeDay = Math.max(1, currentDay);
+        int last = tree.lastUpdatedDayNumber <= 0 ? safeDay : tree.lastUpdatedDayNumber;
+
+        if (safeDay == last) {
+            return;
+        }
+
+        if (safeDay < last) {
+            tree.lastUpdatedDayNumber = safeDay;
+            return;
+        }
+
+        int delta = safeDay - last;
+        tree.lastUpdatedDayNumber = safeDay;
+        tree.livedDays = Math.max(0, tree.livedDays + delta);
+        tree.currentStage = stageFromLivedDays(tree.livedDays);
+        tree.vit = vitFor(tree.livedDays);
+    }
+
+    private void applyTreeHpGrowthIfNeeded(TreeMapState.TreeData tree, double nowSeconds) {
+        if (tree == null) return;
+        if (tree.currentStage == 1) return;
+
+        if (tree.maxHp < TREE_STARTING_MAX_HP) {
+            tree.maxHp = TREE_STARTING_MAX_HP;
+        }
+        if (tree.hp > tree.maxHp) tree.hp = tree.maxHp;
+        if (tree.hp < 0) tree.hp = 0;
+
+        if (tree.lastHpGrowthTotalSeconds < 0 || tree.lastHpGrowthTotalSeconds > nowSeconds) {
+            tree.lastHpGrowthTotalSeconds = nowSeconds;
+            return;
+        }
+
+        double elapsed = nowSeconds - tree.lastHpGrowthTotalSeconds;
+        if (elapsed <= 0) {
+            return;
+        }
+
+        double remaining = elapsed;
+        while (true) {
+            if (tree.hp < tree.maxHp) {
+                long ticks = (long) Math.floor(remaining / TREE_HP_REGEN_SECONDS);
+                int needed = tree.maxHp - tree.hp;
+                long apply = Math.min(ticks, (long) Math.max(0, needed));
+                if (apply <= 0) {
+                    break;
+                }
+
+                tree.hp += (int) apply;
+                remaining -= apply * TREE_HP_REGEN_SECONDS;
+                continue;
+            }
+
+            long capTicks = (long) Math.floor(remaining / TREE_HP_CAP_GROW_SECONDS);
+            if (capTicks <= 0) {
+                break;
+            }
+
+            int inc = capTicks > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) capTicks;
+            tree.maxHp += inc;
+            tree.hp += inc; // stays full while growing
+            remaining -= inc * TREE_HP_CAP_GROW_SECONDS;
+        }
+
+        tree.lastHpGrowthTotalSeconds = nowSeconds - remaining;
+    }
+
+    private int stageFromLivedDays(int livedDays) {
+        return Math.max(0, livedDays) >= TREE_STAGE3_AFTER_LIVED_DAYS ? 3 : 2;
+    }
+
+    private int vitFor(int livedDays) {
+        int days = Math.max(0, livedDays);
+        return Math.max(1, days + 1);
+    }
+
+    private void renderTreeVisual() {
+        if (tree_img == null || mainTreeData == null) return;
+
+        String visualKey;
+        if (mainTreeData.currentStage == 1) {
+            visualKey = "stage:1";
+        } else {
+            visualKey = "stage:" + mainTreeData.currentStage + "#type:" + (mainTreeData.typeKey == null ? "null" : mainTreeData.typeKey);
+        }
+
+        if (visualKey.equals(renderedTreeVisualKey)) {
+            return;
+        }
+        renderedTreeVisualKey = visualKey;
+
+        tree_img.setManaged(true);
+        tree_img.setVisible(true);
+
+        if (mainTreeData.currentStage == 1) {
+            tree_img.setImage(null);
+            tree_img.setVisible(false);
+            tree_img.setManaged(false);
+            return;
+        }
+
+        String base = (mainTreeData.typeKey == null) ? "blue" : mainTreeData.typeKey.trim().toLowerCase(Locale.ROOT);
+        String spriteName = base + "_tree" + (mainTreeData.currentStage == 3 ? "2" : "1");
+        item spriteItem = ItemDatabase.getItemByName(spriteName);
+
+        if (spriteItem != null) {
+            tree_img.setImage(ItemDatabase.getImage(spriteItem.getItem_id()));
+        } else {
+            // Fallback to loading directly from resources if DB entry is missing.
+            tree_img.setImage(loadImageOrNull("/image/items/" + spriteName + ".png"));
+        }
+    }
+
+    private void renderTreeDrops() {
+        if (drops_img == null || mainTreeData == null) return;
+
+        String key = buildTreeDropsKey(mainTreeData);
+        if (key.equals(renderedTreeDropsKey)) {
+            return;
+        }
+        renderedTreeDropsKey = key;
+
+        TreeMapState.TreeDrop first = null;
+        for (TreeMapState.TreeDrop d : mainTreeData.drops) {
+            if (d == null || d.itemId <= 0 || d.quantity <= 0) continue;
+            if (ItemDatabase.getImage(d.itemId) == null) continue;
+            first = d;
+            break;
+        }
+
+        if (first == null) {
+            drops_img.setImage(null);
+            drops_img.setVisible(false);
+            drops_img.setManaged(false);
+            drops_img.setOnMouseClicked(null);
+            return;
+        }
+        final TreeMapState.TreeDrop displayedDrop = first;
+        drops_img.setImage(ItemDatabase.getImage(displayedDrop.itemId));
+        boolean show = drops_img.getImage() != null;
+        drops_img.setVisible(show);
+        drops_img.setManaged(show);
+        drops_img.setPickOnBounds(true);
+
+        drops_img.setOnMouseClicked(event -> {
+            if (event.getButton() != MouseButton.PRIMARY) return;
+            event.consume();
+            handleTreeDropClicked(displayedDrop);
+        });
+    }
+
+    private String buildTreeDropsKey(TreeMapState.TreeData tree) {
+        if (tree == null || tree.drops.isEmpty()) {
+            return "drops:none";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("drops:").append(tree.drops.size());
+        for (TreeMapState.TreeDrop d : tree.drops) {
+            if (d == null) continue;
+            sb.append('#').append(d.itemId).append('x').append(d.quantity);
+        }
+        return sb.toString();
     }
 
     private void bridgeLeftMapSharedUi() {
@@ -635,8 +1395,7 @@ public class Left_mapController extends BaseMapController {
 
     @Override
     protected void configureExits() {
-       registerExit(exit_left, "/view/home_map.fxml", SpawnTag.FROM_LEFT);
+       registerExit(exit_right, "/view/home_map.fxml", SpawnTag.FROM_LEFT);
        registerExit(exit_up, "/view/left_map_noone.fxml", SpawnTag.FROM_DOWN);
     }
-     
 }

@@ -9,10 +9,14 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 import model.FarmState;
 import model.Inventory;
 import model.ItemDatabase;
 import model.PlayerState;
+import model.RecipeCatalog;
+import model.TreeMapState;
+import model.item;
 import util.SpawnTag;
 
 public final class GameState {
@@ -24,6 +28,10 @@ public final class GameState {
     private static final int DEFAULT_RANDOM_SHOP_ITEM_COUNT = 4;
     private static final int CHEST_SLOT_CAPACITY = 42;
     private static final int NEW_GAME_STARTING_COINS = 100;
+
+    private static final int[] RECIPE_UNLOCK_SINGLE_WEIGHT_BY_LEVEL = {100, 90, 80, 70, 60, 50, 40, 30, 20, 10, 10};
+    private static final int[] RECIPE_UNLOCK_DOUBLE_WEIGHT_BY_LEVEL = {0, 9, 19, 29, 38, 47, 56, 65, 74, 82, 80};
+    private static final int[] RECIPE_UNLOCK_TRIPLE_WEIGHT_BY_LEVEL = {0, 1, 1, 1, 2, 3, 4, 5, 6, 8, 10};
 
     public enum StatusPanelGroup {
         STATUS,
@@ -116,17 +124,296 @@ public final class GameState {
     }
 
     private final PlayerSkills playerSkills = new PlayerSkills();
+    private final int maxSkillTotalExp = computeMaxSkillTotalExp();
 
     public PlayerSkills getPlayerSkills() {
         return playerSkills;
     }
 
+    private int computeMaxSkillTotalExp() {
+        int total = 0;
+        for (int level = 0; level < PlayerSkills.MAX_LEVEL; level++) {
+            total += playerSkills.getRequiredExpToAdvanceFrom(level);
+        }
+        return Math.max(0, total);
+    }
+
     public void addFarmingSkillExp(int amount) { playerSkills.addFarmingExp(amount); }
     public void addGatheringSkillExp(int amount) { playerSkills.addGatheringExp(amount); }
-    public void addCraftingSkillExp(int amount) { playerSkills.addCraftingExp(amount); }
+    public void addCraftingSkillExp(int amount) { addRecipeSkillExp(RecipeCatalog.Domain.CRAFTING, amount); }
     public void addFishingSkillExp(int amount) { playerSkills.addFishingExp(amount); }
     public void addBattlingSkillExp(int amount) { playerSkills.addBattlingExp(amount); }
-    public void addCookingSkillExp(int amount) { playerSkills.addCookingExp(amount); }
+    public void addCookingSkillExp(int amount) { addRecipeSkillExp(RecipeCatalog.Domain.COOKING, amount); }
+
+    public void ensureAutomaticRecipeUnlocks() {
+        ensureCookingRecipeUnlocksThroughLevel(playerSkills.getCookingLevel());
+        ensureCraftingRecipeUnlocksThroughLevel(playerSkills.getCraftingLevel());
+    }
+
+    private void addRecipeSkillExp(RecipeCatalog.Domain domain, int amount) {
+        if (amount <= 0 || playerState == null) {
+            return;
+        }
+
+        RecipeCatalog.Domain safeDomain = domain == null ? RecipeCatalog.Domain.COOKING : domain;
+        int storedTotal = getRecipeSkillTotalExp(safeDomain);
+        int currentTotal = Math.min(storedTotal, maxSkillTotalExp);
+        if (currentTotal != storedTotal) {
+            setRecipeSkillTotalExp(safeDomain, currentTotal);
+        }
+
+        int oldLevel = playerSkills.getLevelFromTotalExp(currentTotal);
+
+        long candidate = (long) currentTotal + (long) amount;
+        int capped = (int) Math.min(candidate, (long) maxSkillTotalExp);
+        int overflow = (int) Math.max(0L, candidate - (long) capped);
+
+        setRecipeSkillTotalExp(safeDomain, capped);
+
+        if (overflow > 0) {
+            playerState.addExp(overflow);
+        }
+
+        ItemDatabase.loadItems();
+
+        if (safeDomain == RecipeCatalog.Domain.COOKING && countUnlockedValidRecipesForDomain(RecipeCatalog.Domain.COOKING) <= 0) {
+            unlockStarterCookingRecipe();
+        }
+
+        int newLevel = playerSkills.getLevelFromTotalExp(capped);
+        for (int level = oldLevel + 1; level <= newLevel; level++) {
+            unlockRandomRecipeForDomain(safeDomain, level);
+        }
+    }
+
+    private int getRecipeSkillTotalExp(RecipeCatalog.Domain domain) {
+        return switch (domain == null ? RecipeCatalog.Domain.COOKING : domain) {
+            case COOKING -> playerSkills.getCookingExp();
+            case CRAFTING -> playerSkills.getCraftingExp();
+        };
+    }
+
+    private void setRecipeSkillTotalExp(RecipeCatalog.Domain domain, int totalExp) {
+        int safeTotal = Math.max(0, totalExp);
+        switch (domain == null ? RecipeCatalog.Domain.COOKING : domain) {
+            case COOKING -> playerSkills.setCookingExp(safeTotal);
+            case CRAFTING -> playerSkills.setCraftingExp(safeTotal);
+        }
+    }
+
+    private void ensureCookingRecipeUnlocksThroughLevel(int cookingLevel) {
+        ensureRecipeUnlocksThroughLevel(RecipeCatalog.Domain.COOKING, cookingLevel, true);
+    }
+
+    private void ensureCraftingRecipeUnlocksThroughLevel(int craftingLevel) {
+        ensureRecipeUnlocksThroughLevel(RecipeCatalog.Domain.CRAFTING, craftingLevel, false);
+    }
+
+    private void ensureRecipeUnlocksThroughLevel(RecipeCatalog.Domain domain, int skillLevel, boolean includesLevelZeroStarter) {
+        ItemDatabase.loadItems();
+
+        int totalValid = countValidRecipesForDomain(domain);
+        if (totalValid <= 0) {
+            return;
+        }
+
+        int cappedLevel = Math.max(0, Math.min(PlayerSkills.MAX_LEVEL, skillLevel));
+        int unlockedCount = countUnlockedValidRecipesForDomain(domain);
+
+        if (includesLevelZeroStarter && unlockedCount <= 0) {
+            String starter = unlockStarterCookingRecipe();
+            if (starter != null) {
+                unlockedCount++;
+            }
+        }
+
+        for (int level = 1; level <= cappedLevel && unlockedCount < totalValid; level++) {
+            int expectedAtLevel = includesLevelZeroStarter ? (level + 1) : level;
+            expectedAtLevel = Math.min(expectedAtLevel, totalValid);
+            if (unlockedCount >= expectedAtLevel) {
+                continue;
+            }
+
+            String unlocked = unlockRandomRecipeForDomain(domain, level);
+            if (unlocked == null) {
+                break;
+            }
+            unlockedCount++;
+        }
+    }
+
+    private int countValidRecipesForDomain(RecipeCatalog.Domain domain) {
+        int count = 0;
+        for (RecipeCatalog.RecipeDefinition definition : RecipeCatalog.getRecipes(domain)) {
+            if (isRecipeDefinitionValid(definition)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    private int countUnlockedValidRecipesForDomain(RecipeCatalog.Domain domain) {
+        int count = 0;
+        for (RecipeCatalog.RecipeDefinition definition : RecipeCatalog.getRecipes(domain)) {
+            if (!isRecipeDefinitionValid(definition)) {
+                continue;
+            }
+            if (isRecipeUnlocked(definition.getKey())) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    private String unlockStarterCookingRecipe() {
+        List<String> lockedSingles = new ArrayList<>();
+
+        for (RecipeCatalog.RecipeDefinition definition : RecipeCatalog.getRecipes(RecipeCatalog.Domain.COOKING)) {
+            if (!isRecipeDefinitionValid(definition)) {
+                continue;
+            }
+            if (recipeCombinationSize(definition) != 1) {
+                continue;
+            }
+            if (isRecipeUnlocked(definition.getKey())) {
+                continue;
+            }
+            lockedSingles.add(definition.getKey());
+        }
+
+        if (lockedSingles.isEmpty()) {
+            return null;
+        }
+
+        return unlockRecipeFromPool(lockedSingles);
+    }
+
+    private String unlockRandomRecipeForDomain(RecipeCatalog.Domain domain, int skillLevel) {
+        RecipeCatalog.Domain safeDomain = domain == null ? RecipeCatalog.Domain.COOKING : domain;
+
+        List<String> lockedSingles = new ArrayList<>();
+        List<String> lockedDoubles = new ArrayList<>();
+        List<String> lockedTriples = new ArrayList<>();
+        List<String> allLocked = new ArrayList<>();
+
+        for (RecipeCatalog.RecipeDefinition definition : RecipeCatalog.getRecipes(safeDomain)) {
+            if (!isRecipeDefinitionValid(definition)) {
+                continue;
+            }
+            if (isRecipeUnlocked(definition.getKey())) {
+                continue;
+            }
+
+            int comboSize = recipeCombinationSize(definition);
+            switch (comboSize) {
+                case 1 -> lockedSingles.add(definition.getKey());
+                case 2 -> lockedDoubles.add(definition.getKey());
+                default -> lockedTriples.add(definition.getKey());
+            }
+        }
+
+        allLocked.addAll(lockedSingles);
+        allLocked.addAll(lockedDoubles);
+        allLocked.addAll(lockedTriples);
+
+        if (allLocked.isEmpty()) {
+            return null;
+        }
+
+        for (int attempt = 0; attempt < 64; attempt++) {
+            int targetCombo = rollRecipeCombinationSizeForLevel(skillLevel);
+            List<String> pool = switch (targetCombo) {
+                case 1 -> lockedSingles;
+                case 2 -> lockedDoubles;
+                default -> lockedTriples;
+            };
+            if (pool.isEmpty()) {
+                continue;
+            }
+            return unlockRecipeFromPool(pool);
+        }
+
+        return unlockRecipeFromPool(allLocked);
+    }
+
+    private String unlockRecipeFromPool(List<String> pool) {
+        if (pool == null || pool.isEmpty()) {
+            return null;
+        }
+        String key = pool.get(ThreadLocalRandom.current().nextInt(pool.size()));
+        unlockRecipe(key);
+        return key;
+    }
+
+    private int rollRecipeCombinationSizeForLevel(int level) {
+        int idx = Math.max(0, Math.min(RECIPE_UNLOCK_SINGLE_WEIGHT_BY_LEVEL.length - 1, level));
+        int single = Math.max(0, RECIPE_UNLOCK_SINGLE_WEIGHT_BY_LEVEL[idx]);
+        int doubleW = Math.max(0, RECIPE_UNLOCK_DOUBLE_WEIGHT_BY_LEVEL[idx]);
+        int triple = Math.max(0, RECIPE_UNLOCK_TRIPLE_WEIGHT_BY_LEVEL[idx]);
+
+        int total = single + doubleW + triple;
+        if (total <= 0) {
+            return 1;
+        }
+
+        int roll = ThreadLocalRandom.current().nextInt(total);
+        if (roll < single) {
+            return 1;
+        }
+        roll -= single;
+        if (roll < doubleW) {
+            return 2;
+        }
+        return 3;
+    }
+
+    private int recipeCombinationSize(RecipeCatalog.RecipeDefinition definition) {
+        if (definition == null || definition.getIngredients() == null) {
+            return 1;
+        }
+
+        int count = definition.getIngredients().size();
+        if (count <= 1) {
+            return 1;
+        }
+        if (count == 2) {
+            return 2;
+        }
+        return 3;
+    }
+
+    private boolean isRecipeDefinitionValid(RecipeCatalog.RecipeDefinition definition) {
+        if (definition == null) {
+            return false;
+        }
+
+        String key = definition.getKey();
+        if (key == null || key.isBlank()) {
+            return false;
+        }
+
+        if (definition.getIngredients() == null || definition.getIngredients().isEmpty()) {
+            return false;
+        }
+
+        if (!RecipeCatalog.hasAllIngredientItems(definition)) {
+            return false;
+        }
+
+        item output = RecipeCatalog.resolveItemByAliases(definition.getOutputAliases());
+        if (output == null || !ItemDatabase.isDisplayableItem(output.getItem_id())) {
+            return false;
+        }
+
+        for (RecipeCatalog.IngredientSpec spec : definition.getIngredients()) {
+            item ingredient = RecipeCatalog.resolveItemByAliases(spec.getItemAliases());
+            if (ingredient == null || !ItemDatabase.isDisplayableItem(ingredient.getItem_id())) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 
     public static final class PlayerSkills {
         public static final int MAX_LEVEL = 10;
@@ -245,6 +532,7 @@ public final class GameState {
     private SpawnTag returnSpawn = SpawnTag.DEFAULT;
     private String activeFarmMapKey = "home_map";
     private final Map<String, FarmState> farmByMap = new HashMap<>();
+    private final Map<String, TreeMapState> treesByMap = new HashMap<>();
 
     private int shopRandomDay = -1;
     private List<Integer> dailyRandomShopItemIds = new ArrayList<>();
@@ -283,6 +571,7 @@ public final class GameState {
 
         clearFarmState(getFarmState("home_map"));
         clearFarmState(getFarmState("Home_interior"));
+        clearTreeStates();
 
         playerSkills.clear();
         activeFarmMapKey = "home_map";
@@ -307,6 +596,7 @@ public final class GameState {
 
         cookedDishEffectsByItemId.clear();
         unlockedRecipeKeys.clear();
+        ensureAutomaticRecipeUnlocks();
         activeSmeltJob = null;
         dailyRandomShopItemIds = new ArrayList<>();
         shopRandomDay = -1;
@@ -467,6 +757,21 @@ public final class GameState {
     
     public FarmState getFarmState(String mapKey) { 
         return farmByMap.computeIfAbsent(mapKey, k -> new FarmState()); 
+    }
+
+    public TreeMapState getTreeState(String mapKey) {
+        if (mapKey == null || mapKey.isBlank()) {
+            mapKey = "home_map";
+        }
+        return treesByMap.computeIfAbsent(mapKey, k -> new TreeMapState());
+    }
+
+    public Map<String, TreeMapState> getAllTreeStates() {
+        return treesByMap;
+    }
+
+    public void clearTreeStates() {
+        treesByMap.clear();
     }
     public void setReturnScene(String fxml, SpawnTag spawn) { 
         this.returnFxml = fxml; this.returnSpawn = (spawn == null) ? SpawnTag.DEFAULT : spawn; 

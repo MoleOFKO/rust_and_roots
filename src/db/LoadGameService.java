@@ -18,6 +18,9 @@ import model.FarmState;
 import model.Inventory;
 import model.ItemDatabase;
 import model.PlayerState;
+import model.RecipeCatalog;
+import model.TreeMapState;
+import model.item;
 
 public class LoadGameService {
     private static final String FARM_SLOT_WATERING_CAN = "__farm_slot_watering_can__";
@@ -44,7 +47,10 @@ public class LoadGameService {
             loadHotbar(con, gs, saveId);
             loadFarmPlots(con, gs, saveId);
             loadTime(con, saveId);
+            loadTreeResources(con, gs, saveId);
+            loadTreeDrops(con, gs, saveId);
             loadUnlockedRecipes(con, gs, saveId);
+            gs.ensureAutomaticRecipeUnlocks();
             gs.setPreferredStatusPanelGroup(GameState.StatusPanelGroup.STATUS);
 
             gs.setCurrentSaveId(saveId);
@@ -402,6 +408,114 @@ public class LoadGameService {
         clearInventoryItems(gs.getChestInventory());
         clearFarmState(gs.getFarmState("home_map"));
         clearFarmState(gs.getFarmState("Home_interior"));
+        gs.clearTreeStates();
+    }
+
+    private void loadTreeResources(Connection con, GameState gs, int saveId) throws Exception {
+        if (con == null || gs == null || saveId <= 0) return;
+        if (!hasTable(con, "saved_tree_resource")) {
+            return;
+        }
+
+        String sql = """
+            SELECT map_key,
+                   tree_id,
+                   tree_type,
+                   current_stage,
+                   lived_days,
+                   hp,
+                   max_hp,
+                   vit,
+                   drop_rate_pity,
+                   drops_this_life,
+                   damage_since_last_drop_roll,
+                   last_hp_growth_total_seconds,
+                   respawn_at_total_seconds,
+                   last_updated_day_number
+            FROM saved_tree_resource
+            WHERE saved_id = ?
+            """;
+
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, saveId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    String mapKey = rs.getString("map_key");
+                    String treeId = rs.getString("tree_id");
+                    if (mapKey == null || mapKey.isBlank() || treeId == null || treeId.isBlank()) {
+                        continue;
+                    }
+
+                    TreeMapState mapState = gs.getTreeState(mapKey);
+                    TreeMapState.TreeData tree = mapState.getTree(treeId);
+
+                    tree.typeKey = TreeMapState.normalizeTreeTypeKey(rs.getString("tree_type"), "blue");
+                    tree.currentStage = rs.getInt("current_stage");
+                    tree.livedDays = rs.getInt("lived_days");
+                    tree.hp = rs.getInt("hp");
+                    tree.maxHp = rs.getInt("max_hp");
+                    tree.vit = rs.getInt("vit");
+                    tree.dropRatePity = rs.getInt("drop_rate_pity");
+                    tree.dropsThisLife = rs.getInt("drops_this_life");
+                    tree.damageSinceLastDropRoll = rs.getInt("damage_since_last_drop_roll");
+                    tree.lastHpGrowthTotalSeconds = rs.getDouble("last_hp_growth_total_seconds");
+                    tree.respawnAtTotalSeconds = rs.getDouble("respawn_at_total_seconds");
+                    tree.lastUpdatedDayNumber = rs.getInt("last_updated_day_number");
+                    tree.drops.clear();
+                }
+            }
+        }
+    }
+
+    private void loadTreeDrops(Connection con, GameState gs, int saveId) throws Exception {
+        if (con == null || gs == null || saveId <= 0) return;
+        if (!hasTable(con, "saved_tree_drop")) {
+            return;
+        }
+
+        String sql = """
+            SELECT map_key,
+                   tree_id,
+                   drop_slot,
+                   item_id,
+                   quantity,
+                   spawned_at_total_seconds,
+                   expires_at_total_seconds
+            FROM saved_tree_drop
+            WHERE saved_id = ?
+            ORDER BY map_key, tree_id, drop_slot
+            """;
+
+        double nowSeconds = GameTimeManager.get().totalSecondsProperty().get();
+
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, saveId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    String mapKey = rs.getString("map_key");
+                    String treeId = rs.getString("tree_id");
+                    if (mapKey == null || mapKey.isBlank() || treeId == null || treeId.isBlank()) {
+                        continue;
+                    }
+
+                    int itemId = rs.getInt("item_id");
+                    int quantity = rs.getInt("quantity");
+                    double spawnedAt = rs.getDouble("spawned_at_total_seconds");
+                    double expiresAt = rs.getDouble("expires_at_total_seconds");
+                    if (itemId <= 0 || quantity <= 0) {
+                        continue;
+                    }
+                    if (expiresAt > 0 && nowSeconds >= expiresAt) {
+                        continue;
+                    }
+
+                    TreeMapState.TreeData tree = gs.getTreeState(mapKey).getTree(treeId);
+                    tree.drops.add(new TreeMapState.TreeDrop(itemId, quantity, spawnedAt, expiresAt));
+                }
+            }
+        }
     }
 
     private void loadUnlockedRecipes(Connection con, GameState gs, int saveId) throws Exception {
@@ -410,13 +524,50 @@ public class LoadGameService {
             return;
         }
 
+        ItemDatabase.loadItems();
+
         String sql = "SELECT recipe_key FROM saved_unlocked_recipe WHERE saved_id = ?";
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, saveId);
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    gs.unlockRecipe(rs.getString("recipe_key"));
+                    String recipeKey = rs.getString("recipe_key");
+                    if (recipeKey == null || recipeKey.isBlank()) {
+                        continue;
+                    }
+
+                    RecipeCatalog.RecipeDefinition definition = RecipeCatalog.findDefinitionByKey(recipeKey);
+                    if (definition == null) {
+                        System.out.println("Load warning: unknown recipe_key=\"" + recipeKey + "\" skipped.");
+                        continue;
+                    }
+
+                    if (!RecipeCatalog.hasAllIngredientItems(definition)) {
+                        System.out.println("Load warning: recipe_key=\"" + recipeKey + "\" missing ingredient items skipped.");
+                        continue;
+                    }
+
+                    item output = RecipeCatalog.resolveItemByAliases(definition.getOutputAliases());
+                    if (output == null || !ItemDatabase.isDisplayableItem(output.getItem_id())) {
+                        System.out.println("Load warning: recipe_key=\"" + recipeKey + "\" missing/invalid output item skipped.");
+                        continue;
+                    }
+
+                    boolean ingredientsValid = true;
+                    for (RecipeCatalog.IngredientSpec spec : definition.getIngredients()) {
+                        item ingredient = RecipeCatalog.resolveItemByAliases(spec.getItemAliases());
+                        if (ingredient == null || !ItemDatabase.isDisplayableItem(ingredient.getItem_id())) {
+                            ingredientsValid = false;
+                            break;
+                        }
+                    }
+                    if (!ingredientsValid) {
+                        System.out.println("Load warning: recipe_key=\"" + recipeKey + "\" missing/invalid ingredient item skipped.");
+                        continue;
+                    }
+
+                    gs.unlockRecipe(definition.getKey());
                 }
             }
         }
