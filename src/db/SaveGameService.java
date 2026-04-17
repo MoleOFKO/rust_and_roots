@@ -44,6 +44,7 @@ public class SaveGameService {
             saveHotbar(con, gs);
             saveFarmPlots(con, gs);
             saveTreeResources(con, gs);
+            saveTreeDrops(con, gs);
             saveChestItems(con, gs);
             saveTime(con, gs);
             saveUnlockedRecipes(con, gs);
@@ -300,9 +301,10 @@ public class SaveGameService {
         String sql = """
             INSERT INTO saved_tree_resource
                 (saved_id, map_key, tree_id, tree_type,
-                 current_stage, lived_days, hp, vit,
+                 current_stage, lived_days, hp, max_hp, vit,
+                 drop_rate_pity, drops_this_life, damage_since_last_drop_roll, last_hp_growth_total_seconds,
                  respawn_at_total_seconds, last_updated_day_number)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """;
 
         try (PreparedStatement ins = con.prepareStatement(sql)) {
@@ -320,7 +322,7 @@ public class SaveGameService {
                         continue;
                     }
 
-                    String type = tree.type == null ? TreeMapState.TreeType.BLUE.name() : tree.type.name();
+                    String type = TreeMapState.normalizeTreeTypeKey(tree.typeKey, "blue");
                     int stage = tree.currentStage;
                     if (stage < 1 || stage > 3) stage = 2;
 
@@ -331,10 +333,77 @@ public class SaveGameService {
                     ins.setInt(5, stage);
                     ins.setInt(6, Math.max(0, tree.livedDays));
                     ins.setInt(7, Math.max(0, tree.hp));
-                    ins.setInt(8, Math.max(0, tree.vit));
-                    ins.setDouble(9, tree.respawnAtTotalSeconds);
-                    ins.setInt(10, Math.max(1, tree.lastUpdatedDayNumber));
+                    ins.setInt(8, Math.max(0, tree.maxHp));
+                    ins.setInt(9, Math.max(0, tree.vit));
+                    ins.setInt(10, Math.max(0, tree.dropRatePity));
+                    ins.setInt(11, Math.max(0, tree.dropsThisLife));
+                    ins.setInt(12, Math.max(0, tree.damageSinceLastDropRoll));
+                    ins.setDouble(13, tree.lastHpGrowthTotalSeconds);
+                    ins.setDouble(14, tree.respawnAtTotalSeconds);
+                    ins.setInt(15, Math.max(1, tree.lastUpdatedDayNumber));
                     ins.addBatch();
+                }
+            }
+
+            ins.executeBatch();
+        }
+    }
+
+    private void saveTreeDrops(Connection con, GameState gs) throws Exception {
+        if (con == null || gs == null) return;
+        if (!hasTable(con, "saved_tree_drop")) {
+            return;
+        }
+
+        int saveId = gs.getCurrentSaveId();
+
+        try (PreparedStatement del = con.prepareStatement("DELETE FROM saved_tree_drop WHERE saved_id = ?")) {
+            del.setInt(1, saveId);
+            del.executeUpdate();
+        }
+
+        if (gs.getAllTreeStates().isEmpty()) {
+            return;
+        }
+
+        String sql = """
+            INSERT INTO saved_tree_drop
+                (saved_id, map_key, tree_id, drop_slot,
+                 item_id, quantity, spawned_at_total_seconds, expires_at_total_seconds)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """;
+
+        try (PreparedStatement ins = con.prepareStatement(sql)) {
+            for (Map.Entry<String, TreeMapState> mapEntry : gs.getAllTreeStates().entrySet()) {
+                String mapKey = mapEntry == null ? null : mapEntry.getKey();
+                TreeMapState mapState = mapEntry == null ? null : mapEntry.getValue();
+                if (mapKey == null || mapKey.isBlank() || mapState == null) {
+                    continue;
+                }
+
+                for (Map.Entry<String, TreeMapState.TreeData> treeEntry : mapState.getAllTrees().entrySet()) {
+                    String treeId = treeEntry == null ? null : treeEntry.getKey();
+                    TreeMapState.TreeData tree = treeEntry == null ? null : treeEntry.getValue();
+                    if (treeId == null || treeId.isBlank() || tree == null || tree.drops.isEmpty()) {
+                        continue;
+                    }
+
+                    int slot = 0;
+                    for (TreeMapState.TreeDrop drop : tree.drops) {
+                        if (drop == null || drop.itemId <= 0 || drop.quantity <= 0) {
+                            continue;
+                        }
+
+                        ins.setInt(1, saveId);
+                        ins.setString(2, mapKey);
+                        ins.setString(3, treeId);
+                        ins.setInt(4, slot++);
+                        ins.setInt(5, drop.itemId);
+                        ins.setInt(6, drop.quantity);
+                        ins.setDouble(7, drop.spawnedAtTotalSeconds);
+                        ins.setDouble(8, drop.expiresAtTotalSeconds);
+                        ins.addBatch();
+                    }
                 }
             }
 
@@ -535,6 +604,7 @@ public class SaveGameService {
             saveHotbar(con, gs);
             saveFarmPlots(con, gs);
             saveTreeResources(con, gs);
+            saveTreeDrops(con, gs);
             saveChestItems(con, gs);
             saveTime(con, gs);
             saveUnlockedRecipes(con, gs);
