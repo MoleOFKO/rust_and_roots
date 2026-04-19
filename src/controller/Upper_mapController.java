@@ -503,7 +503,7 @@ public class Upper_mapController extends BaseMapController {
             staticWalls,
             "/image/mob/Slime/Slime1_Idle_with_shadow.png",
             6,
-            "/image/mob/Slime/Slime1_Run_with_shadow.png",
+            "/image/mob/Slime/Slime1_Walk_with_shadow.png",
             8,
             "/image/mob/Slime/Slime1_Attack_with_shadow.png",
             10,
@@ -527,8 +527,8 @@ public class Upper_mapController extends BaseMapController {
             staticWalls,
             "/image/mob/Orc/orc1_idle_with_shadow.png",
             4,
-            "/image/mob/Orc/orc1_run_with_shadow.png",
-            8,
+            "/image/mob/Orc/orc1_walk_with_shadow.png",
+            6,
             "/image/mob/Orc/orc1_attack_with_shadow.png",
             8,
             "/image/mob/Orc/orc1_hurt_with_shadow.png",
@@ -814,12 +814,30 @@ public class Upper_mapController extends BaseMapController {
 
     private void renderSlimeDrops() {
         if (slimeMob == null) return;
+        if (slimeMob.isDead() && !slimeMob.isDeathAnimationFinished()) {
+            hideMobDropView(slime_drops_img);
+            renderedSlimeDropsKey = null;
+            return;
+        }
         renderedSlimeDropsKey = renderMobDrops(slimeMob.getData(), slime_drops_img, renderedSlimeDropsKey, this::renderSlimeDrops);
     }
 
     private void renderOrcDrops() {
         if (orcMob == null) return;
+        if (orcMob.isDead() && !orcMob.isDeathAnimationFinished()) {
+            hideMobDropView(orc_drops_img);
+            renderedOrcDropsKey = null;
+            return;
+        }
         renderedOrcDropsKey = renderMobDrops(orcMob.getData(), orc_drops_img, renderedOrcDropsKey, this::renderOrcDrops);
+    }
+
+    private void hideMobDropView(ImageView dropView) {
+        if (dropView == null) return;
+        dropView.setImage(null);
+        dropView.setVisible(false);
+        dropView.setManaged(false);
+        dropView.setOnMouseClicked(null);
     }
 
     private String renderMobDrops(MobMapState.MobData mob, ImageView dropView, String renderedKey, Runnable rerender) {
