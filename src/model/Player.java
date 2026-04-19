@@ -97,6 +97,7 @@ public class Player {
         NONE,
         AXE,
         PICKAXE,
+        SWORD,
         FISHING_ROD,
         TOOL
     }
@@ -110,6 +111,8 @@ public class Player {
         private final int runColumns;
         private final Image attackSheet;
         private final int attackColumns;
+        private final Image hurtSheet;
+        private final int hurtColumns;
         private final Image humanAttackSheet;
         private final int humanAttackColumns;
 
@@ -122,6 +125,8 @@ public class Player {
             int runColumns,
             Image attackSheet,
             int attackColumns,
+            Image hurtSheet,
+            int hurtColumns,
             Image humanAttackSheet,
             int humanAttackColumns
         ) {
@@ -133,6 +138,8 @@ public class Player {
             this.runColumns = Math.max(1, runColumns);
             this.attackSheet = attackSheet;
             this.attackColumns = Math.max(1, attackColumns);
+            this.hurtSheet = hurtSheet;
+            this.hurtColumns = Math.max(1, hurtColumns);
             this.humanAttackSheet = humanAttackSheet;
             this.humanAttackColumns = Math.max(1, humanAttackColumns);
         }
@@ -142,6 +149,7 @@ public class Player {
                 || walkSheet != null
                 || runSheet != null
                 || attackSheet != null
+                || hurtSheet != null
                 || humanAttackSheet != null;
         }
     }
@@ -683,7 +691,7 @@ public class Player {
         }
 
         EquipmentAnimationSet animationSet = equipmentAnimations.get(equippedKind);
-        if (animationSet == null || animState == AnimState.DEATH || animState == AnimState.HURT) {
+        if (animationSet == null || animState == AnimState.DEATH) {
             equipmentView.setImage(null);
             equipmentView.setVisible(false);
             equipmentView.setManaged(false);
@@ -694,6 +702,18 @@ public class Player {
         int columns;
         int equipFrame;
 
+        if (animState == AnimState.HURT) {
+            if (animationSet.hurtSheet == null) {
+                equipmentView.setImage(null);
+                equipmentView.setVisible(false);
+                equipmentView.setManaged(false);
+                return;
+            }
+
+            equipSheet = animationSet.hurtSheet;
+            columns = animationSet.hurtColumns;
+            equipFrame = frameIndex % columns;
+        } else
         if (animState == AnimState.ATTACK && animationSet.attackSheet != null) {
             equipSheet = animationSet.attackSheet;
             columns = animationSet.attackColumns;
@@ -779,6 +799,9 @@ public class Player {
         );
 
         for (Rectangle wall : walls) {
+            if (wall == null || wall.isDisable()) {
+                continue;
+            }
             Bounds wallBounds = toMovementSpace(wall.localToScene(wall.getBoundsInLocal()));
             if (movedBounds.intersects(wallBounds)) {
                 return true;
@@ -827,6 +850,8 @@ public class Player {
             RUN_COLUMNS,
             "/image/human/wood_cutting_action.png",
             ATTACK_COLUMNS,
+            "/image/human/axe_hurt.png",
+            HURT_COLUMNS,
             "/image/human/human_wood_cutting_action.png",
             ATTACK_COLUMNS
         );
@@ -840,8 +865,25 @@ public class Player {
             RUN_COLUMNS,
             "/image/human/pickaxe_action.png",
             ATTACK_COLUMNS,
+            "/image/human/pickaxe_hurt.png",
+            HURT_COLUMNS,
             "/image/human/human_pickaxe_action.png",
             ATTACK_COLUMNS
+        );
+        registerEquipmentAnimation(
+            EquipmentKind.SWORD,
+            "/image/human/sword_Idle.png",
+            IDLE_COLUMNS,
+            "/image/human/sword_walk.png",
+            WALK_COLUMNS,
+            "/image/human/sword_run.png",
+            RUN_COLUMNS,
+            "/image/human/sword_attack_action.png",
+            8,
+            "/image/human/sword_hurt.png",
+            HURT_COLUMNS,
+            "/image/human/human_attack.png",
+            8
         );
     }
 
@@ -855,6 +897,8 @@ public class Player {
         int runColumns,
         String attackResourcePath,
         int attackColumns,
+        String hurtResourcePath,
+        int hurtColumns,
         String humanAttackResourcePath,
         int humanAttackColumns
     ) {
@@ -866,9 +910,10 @@ public class Player {
         Image walkSheet = loadOptionalImage(walkResourcePath);
         Image runSheet = loadOptionalImage(runResourcePath);
         Image attackSheet = loadOptionalImage(attackResourcePath);
+        Image hurtSheet = loadOptionalImage(hurtResourcePath);
         Image humanAttackSheet = loadOptionalImage(humanAttackResourcePath);
 
-        if (idleSheet == null && walkSheet == null && runSheet == null && attackSheet == null && humanAttackSheet == null) {
+        if (idleSheet == null && walkSheet == null && runSheet == null && attackSheet == null && hurtSheet == null && humanAttackSheet == null) {
             return;
         }
 
@@ -883,6 +928,8 @@ public class Player {
                 runColumns,
                 attackSheet,
                 attackColumns,
+                hurtSheet,
+                hurtColumns,
                 humanAttackSheet,
                 humanAttackColumns
             )
@@ -989,6 +1036,9 @@ public class Player {
         }
         if (lookup.contains("axe")) {
             return EquipmentKind.AXE;
+        }
+        if (lookup.contains("sword")) {
+            return EquipmentKind.SWORD;
         }
         if (lookup.contains("fishing rod") || lookup.contains("rod")) {
             return EquipmentKind.FISHING_ROD;

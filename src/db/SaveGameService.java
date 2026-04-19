@@ -14,6 +14,7 @@ import java.sql.Statement;
 import java.util.Map;
 import model.FarmState;
 import model.Inventory;
+import model.MobMapState;
 import model.PlayerState;
 import model.TreeMapState;
 
@@ -45,6 +46,8 @@ public class SaveGameService {
             saveFarmPlots(con, gs);
             saveTreeResources(con, gs);
             saveTreeDrops(con, gs);
+            saveMobs(con, gs);
+            saveMobDrops(con, gs);
             saveChestItems(con, gs);
             saveTime(con, gs);
             saveSmeltState(con, gs);
@@ -564,6 +567,141 @@ public class SaveGameService {
                 ins.setInt(3, count);
                 ins.addBatch();
             }
+            ins.executeBatch();
+        }
+    }
+
+    private void saveMobs(Connection con, GameState gs) throws Exception {
+        if (con == null || gs == null) return;
+        if (!hasTable(con, "saved_mob")) {
+            return;
+        }
+
+        int saveId = gs.getCurrentSaveId();
+
+        try (PreparedStatement del = con.prepareStatement("DELETE FROM saved_mob WHERE saved_id = ?")) {
+            del.setInt(1, saveId);
+            del.executeUpdate();
+        }
+
+        if (gs.getAllMobStates().isEmpty()) {
+            return;
+        }
+
+        String sql = """
+            INSERT INTO saved_mob
+                (saved_id, map_key, mob_id, mob_type,
+                 lived_days,
+                 hp, max_hp, sp, max_sp,
+                 str_stat, agi_stat, vit_stat, dex_stat,
+                 dead,
+                 layout_x, layout_y,
+                 last_regen_total_seconds,
+                 last_updated_day_number)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """;
+
+        try (PreparedStatement ins = con.prepareStatement(sql)) {
+            for (Map.Entry<String, MobMapState> mapEntry : gs.getAllMobStates().entrySet()) {
+                String mapKey = mapEntry == null ? null : mapEntry.getKey();
+                MobMapState mapState = mapEntry == null ? null : mapEntry.getValue();
+                if (mapKey == null || mapKey.isBlank() || mapState == null) {
+                    continue;
+                }
+
+                for (Map.Entry<String, MobMapState.MobData> mobEntry : mapState.getAllMobs().entrySet()) {
+                    String mobId = mobEntry == null ? null : mobEntry.getKey();
+                    MobMapState.MobData mob = mobEntry == null ? null : mobEntry.getValue();
+                    if (mobId == null || mobId.isBlank() || mob == null) {
+                        continue;
+                    }
+
+                    String type = (mob.mobType == null || mob.mobType.isBlank()) ? mobId : mob.mobType;
+
+                    ins.setInt(1, saveId);
+                    ins.setString(2, mapKey);
+                    ins.setString(3, mobId);
+                    ins.setString(4, type);
+                    ins.setInt(5, Math.max(0, mob.livedDays));
+                    ins.setInt(6, Math.max(0, mob.hp));
+                    ins.setInt(7, Math.max(0, mob.maxHp));
+                    ins.setInt(8, Math.max(0, mob.sp));
+                    ins.setInt(9, Math.max(0, mob.maxSp));
+                    ins.setInt(10, Math.max(0, mob.str));
+                    ins.setInt(11, Math.max(0, mob.agi));
+                    ins.setInt(12, Math.max(0, mob.vit));
+                    ins.setInt(13, Math.max(0, mob.dex));
+                    ins.setBoolean(14, mob.dead);
+                    ins.setDouble(15, mob.layoutX);
+                    ins.setDouble(16, mob.layoutY);
+                    ins.setDouble(17, mob.lastRegenTotalSeconds);
+                    ins.setInt(18, Math.max(1, mob.lastUpdatedDayNumber));
+                    ins.addBatch();
+                }
+            }
+
+            ins.executeBatch();
+        }
+    }
+
+    private void saveMobDrops(Connection con, GameState gs) throws Exception {
+        if (con == null || gs == null) return;
+        if (!hasTable(con, "saved_mob_drop")) {
+            return;
+        }
+
+        int saveId = gs.getCurrentSaveId();
+
+        try (PreparedStatement del = con.prepareStatement("DELETE FROM saved_mob_drop WHERE saved_id = ?")) {
+            del.setInt(1, saveId);
+            del.executeUpdate();
+        }
+
+        if (gs.getAllMobStates().isEmpty()) {
+            return;
+        }
+
+        String sql = """
+            INSERT INTO saved_mob_drop
+                (saved_id, map_key, mob_id, drop_slot,
+                 item_id, quantity, spawned_at_total_seconds, expires_at_total_seconds)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """;
+
+        try (PreparedStatement ins = con.prepareStatement(sql)) {
+            for (Map.Entry<String, MobMapState> mapEntry : gs.getAllMobStates().entrySet()) {
+                String mapKey = mapEntry == null ? null : mapEntry.getKey();
+                MobMapState mapState = mapEntry == null ? null : mapEntry.getValue();
+                if (mapKey == null || mapKey.isBlank() || mapState == null) {
+                    continue;
+                }
+
+                for (Map.Entry<String, MobMapState.MobData> mobEntry : mapState.getAllMobs().entrySet()) {
+                    String mobId = mobEntry == null ? null : mobEntry.getKey();
+                    MobMapState.MobData mob = mobEntry == null ? null : mobEntry.getValue();
+                    if (mobId == null || mobId.isBlank() || mob == null || mob.drops.isEmpty()) {
+                        continue;
+                    }
+
+                    int slot = 0;
+                    for (MobMapState.MobDrop drop : mob.drops) {
+                        if (drop == null || drop.itemId <= 0 || drop.quantity <= 0) {
+                            continue;
+                        }
+
+                        ins.setInt(1, saveId);
+                        ins.setString(2, mapKey);
+                        ins.setString(3, mobId);
+                        ins.setInt(4, slot++);
+                        ins.setInt(5, drop.itemId);
+                        ins.setInt(6, drop.quantity);
+                        ins.setDouble(7, drop.spawnedAtTotalSeconds);
+                        ins.setDouble(8, drop.expiresAtTotalSeconds);
+                        ins.addBatch();
+                    }
+                }
+            }
+
             ins.executeBatch();
         }
     }

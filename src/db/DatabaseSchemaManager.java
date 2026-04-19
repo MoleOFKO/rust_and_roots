@@ -34,6 +34,8 @@ public final class DatabaseSchemaManager {
         execute(con, "DROP PROCEDURE IF EXISTS ensure_saved_farm_plot_defaults");
         execute(con, "DROP PROCEDURE IF EXISTS ensure_saved_tree_resource_table");
         execute(con, "DROP PROCEDURE IF EXISTS ensure_saved_tree_drop_table");
+        execute(con, "DROP PROCEDURE IF EXISTS ensure_saved_mob_table");
+        execute(con, "DROP PROCEDURE IF EXISTS ensure_saved_mob_drop_table");
 
         execute(con, """
             CREATE PROCEDURE ensure_chicken_corn_soup_deluxe()
@@ -242,6 +244,192 @@ public final class DatabaseSchemaManager {
             """);
 
         execute(con, """
+            CREATE PROCEDURE ensure_saved_mob_table()
+            BEGIN
+                DECLARE v_missing_max_hp INT DEFAULT 0;
+                DECLARE v_missing_max_sp INT DEFAULT 0;
+                DECLARE v_missing_dead INT DEFAULT 0;
+                DECLARE v_missing_layout_x INT DEFAULT 0;
+                DECLARE v_missing_layout_y INT DEFAULT 0;
+                DECLARE v_missing_last_regen_total_seconds INT DEFAULT 0;
+                DECLARE v_missing_last_updated_day_number INT DEFAULT 0;
+                DECLARE v_mob_type_len INT DEFAULT 0;
+
+                CREATE TABLE IF NOT EXISTS saved_mob (
+                    saved_id INT NOT NULL,
+                    map_key VARCHAR(50) NOT NULL,
+                    mob_id VARCHAR(50) NOT NULL,
+                    mob_type VARCHAR(50) NOT NULL,
+                    lived_days INT NOT NULL DEFAULT '0',
+                    hp INT NOT NULL DEFAULT '0',
+                    max_hp INT NOT NULL DEFAULT '0',
+                    sp INT NOT NULL DEFAULT '0',
+                    max_sp INT NOT NULL DEFAULT '0',
+                    str_stat INT NOT NULL DEFAULT '0',
+                    agi_stat INT NOT NULL DEFAULT '0',
+                    vit_stat INT NOT NULL DEFAULT '0',
+                    dex_stat INT NOT NULL DEFAULT '0',
+                    dead TINYINT(1) NOT NULL DEFAULT '0',
+                    layout_x DOUBLE NOT NULL DEFAULT '0',
+                    layout_y DOUBLE NOT NULL DEFAULT '0',
+                    last_regen_total_seconds DOUBLE NOT NULL DEFAULT '-1',
+                    last_updated_day_number INT NOT NULL DEFAULT '1',
+                    PRIMARY KEY (saved_id, map_key, mob_id),
+                    CONSTRAINT fk_saved_mob_save
+                        FOREIGN KEY (saved_id) REFERENCES save_game (saved_id) ON DELETE CASCADE
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+                SELECT COALESCE(CHARACTER_MAXIMUM_LENGTH, 0)
+                  INTO v_mob_type_len
+                  FROM information_schema.columns
+                 WHERE table_schema = DATABASE()
+                   AND table_name = 'saved_mob'
+                   AND column_name = 'mob_type'
+                 LIMIT 1;
+                IF v_mob_type_len IS NULL OR v_mob_type_len < 50 THEN
+                    ALTER TABLE saved_mob
+                        MODIFY COLUMN mob_type VARCHAR(50) NOT NULL;
+                END IF;
+
+                SELECT COUNT(*)
+                  INTO v_missing_max_hp
+                  FROM information_schema.columns
+                 WHERE table_schema = DATABASE()
+                   AND table_name = 'saved_mob'
+                   AND column_name = 'max_hp';
+                IF v_missing_max_hp = 0 THEN
+                    ALTER TABLE saved_mob
+                        ADD COLUMN max_hp INT NOT NULL DEFAULT '0' AFTER hp;
+                END IF;
+
+                SELECT COUNT(*)
+                  INTO v_missing_max_sp
+                  FROM information_schema.columns
+                 WHERE table_schema = DATABASE()
+                   AND table_name = 'saved_mob'
+                   AND column_name = 'max_sp';
+                IF v_missing_max_sp = 0 THEN
+                    ALTER TABLE saved_mob
+                        ADD COLUMN max_sp INT NOT NULL DEFAULT '0' AFTER sp;
+                END IF;
+
+                SELECT COUNT(*)
+                  INTO v_missing_dead
+                  FROM information_schema.columns
+                 WHERE table_schema = DATABASE()
+                   AND table_name = 'saved_mob'
+                   AND column_name = 'dead';
+                IF v_missing_dead = 0 THEN
+                    ALTER TABLE saved_mob
+                        ADD COLUMN dead TINYINT(1) NOT NULL DEFAULT '0' AFTER dex_stat;
+                END IF;
+
+                SELECT COUNT(*)
+                  INTO v_missing_layout_x
+                  FROM information_schema.columns
+                 WHERE table_schema = DATABASE()
+                   AND table_name = 'saved_mob'
+                   AND column_name = 'layout_x';
+                IF v_missing_layout_x = 0 THEN
+                    ALTER TABLE saved_mob
+                        ADD COLUMN layout_x DOUBLE NOT NULL DEFAULT '0' AFTER dead;
+                END IF;
+
+                SELECT COUNT(*)
+                  INTO v_missing_layout_y
+                  FROM information_schema.columns
+                 WHERE table_schema = DATABASE()
+                   AND table_name = 'saved_mob'
+                   AND column_name = 'layout_y';
+                IF v_missing_layout_y = 0 THEN
+                    ALTER TABLE saved_mob
+                        ADD COLUMN layout_y DOUBLE NOT NULL DEFAULT '0' AFTER layout_x;
+                END IF;
+
+                SELECT COUNT(*)
+                  INTO v_missing_last_regen_total_seconds
+                  FROM information_schema.columns
+                 WHERE table_schema = DATABASE()
+                   AND table_name = 'saved_mob'
+                   AND column_name = 'last_regen_total_seconds';
+                IF v_missing_last_regen_total_seconds = 0 THEN
+                    ALTER TABLE saved_mob
+                        ADD COLUMN last_regen_total_seconds DOUBLE NOT NULL DEFAULT '-1' AFTER layout_y;
+                END IF;
+
+                SELECT COUNT(*)
+                  INTO v_missing_last_updated_day_number
+                  FROM information_schema.columns
+                 WHERE table_schema = DATABASE()
+                   AND table_name = 'saved_mob'
+                   AND column_name = 'last_updated_day_number';
+                IF v_missing_last_updated_day_number = 0 THEN
+                    ALTER TABLE saved_mob
+                        ADD COLUMN last_updated_day_number INT NOT NULL DEFAULT '1' AFTER last_regen_total_seconds;
+                END IF;
+            END
+            """);
+
+        execute(con, """
+            CREATE PROCEDURE ensure_saved_mob_drop_table()
+            BEGIN
+                DECLARE v_missing_quantity INT DEFAULT 0;
+                DECLARE v_missing_spawned_at_total_seconds INT DEFAULT 0;
+                DECLARE v_missing_expires_at_total_seconds INT DEFAULT 0;
+
+                CREATE TABLE IF NOT EXISTS saved_mob_drop (
+                    saved_id INT NOT NULL,
+                    map_key VARCHAR(50) NOT NULL,
+                    mob_id VARCHAR(50) NOT NULL,
+                    drop_slot INT NOT NULL,
+                    item_id INT NOT NULL,
+                    quantity INT NOT NULL DEFAULT '1',
+                    spawned_at_total_seconds DOUBLE NOT NULL DEFAULT '0',
+                    expires_at_total_seconds DOUBLE NOT NULL DEFAULT '0',
+                    PRIMARY KEY (saved_id, map_key, mob_id, drop_slot),
+                    KEY idx_saved_mob_drop_item_id (item_id),
+                    CONSTRAINT fk_saved_mob_drop_save
+                        FOREIGN KEY (saved_id) REFERENCES save_game (saved_id) ON DELETE CASCADE,
+                    CONSTRAINT fk_saved_mob_drop_item
+                        FOREIGN KEY (item_id) REFERENCES items (item_id) ON DELETE CASCADE
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+                SELECT COUNT(*)
+                  INTO v_missing_quantity
+                  FROM information_schema.columns
+                 WHERE table_schema = DATABASE()
+                   AND table_name = 'saved_mob_drop'
+                   AND column_name = 'quantity';
+                IF v_missing_quantity = 0 THEN
+                    ALTER TABLE saved_mob_drop
+                        ADD COLUMN quantity INT NOT NULL DEFAULT '1' AFTER item_id;
+                END IF;
+
+                SELECT COUNT(*)
+                  INTO v_missing_spawned_at_total_seconds
+                  FROM information_schema.columns
+                 WHERE table_schema = DATABASE()
+                   AND table_name = 'saved_mob_drop'
+                   AND column_name = 'spawned_at_total_seconds';
+                IF v_missing_spawned_at_total_seconds = 0 THEN
+                    ALTER TABLE saved_mob_drop
+                        ADD COLUMN spawned_at_total_seconds DOUBLE NOT NULL DEFAULT '0' AFTER quantity;
+                END IF;
+
+                SELECT COUNT(*)
+                  INTO v_missing_expires_at_total_seconds
+                  FROM information_schema.columns
+                 WHERE table_schema = DATABASE()
+                   AND table_name = 'saved_mob_drop'
+                   AND column_name = 'expires_at_total_seconds';
+                IF v_missing_expires_at_total_seconds = 0 THEN
+                    ALTER TABLE saved_mob_drop
+                        ADD COLUMN expires_at_total_seconds DOUBLE NOT NULL DEFAULT '0' AFTER spawned_at_total_seconds;
+                END IF;
+            END
+            """);
+
+        execute(con, """
             CREATE PROCEDURE ensure_saved_farm_plot_defaults()
             BEGIN
                 DECLARE v_has_table INT DEFAULT 0;
@@ -281,6 +469,8 @@ public final class DatabaseSchemaManager {
                 CALL ensure_saved_unlocked_recipe_table();
                 CALL ensure_saved_tree_resource_table();
                 CALL ensure_saved_tree_drop_table();
+                CALL ensure_saved_mob_table();
+                CALL ensure_saved_mob_drop_table();
                 CALL ensure_saved_farm_plot_defaults();
                 CALL ensure_chicken_corn_soup_deluxe();
             END

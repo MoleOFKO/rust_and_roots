@@ -17,6 +17,7 @@ import model.FarmGrowthRules;
 import model.FarmState;
 import model.Inventory;
 import model.ItemDatabase;
+import model.MobMapState;
 import model.PlayerState;
 import model.RecipeCatalog;
 import model.TreeMapState;
@@ -51,6 +52,8 @@ public class LoadGameService {
             loadSmeltOreHistory(con, gs, saveId);
             loadTreeResources(con, gs, saveId);
             loadTreeDrops(con, gs, saveId);
+            loadMobs(con, gs, saveId);
+            loadMobDrops(con, gs, saveId);
             loadUnlockedRecipes(con, gs, saveId);
             gs.ensureAutomaticRecipeUnlocks();
             gs.setPreferredStatusPanelGroup(GameState.StatusPanelGroup.STATUS);
@@ -485,6 +488,7 @@ public class LoadGameService {
         clearFarmState(gs.getFarmState("home_map"));
         clearFarmState(gs.getFarmState("Home_interior"));
         gs.clearTreeStates();
+        gs.clearMobStates();
         gs.clearActiveSmeltJob();
         gs.resetSmeltProgressionState();
     }
@@ -591,6 +595,118 @@ public class LoadGameService {
 
                     TreeMapState.TreeData tree = gs.getTreeState(mapKey).getTree(treeId);
                     tree.drops.add(new TreeMapState.TreeDrop(itemId, quantity, spawnedAt, expiresAt));
+                }
+            }
+        }
+    }
+
+    private void loadMobs(Connection con, GameState gs, int saveId) throws Exception {
+        if (con == null || gs == null || saveId <= 0) return;
+        if (!hasTable(con, "saved_mob")) {
+            return;
+        }
+
+        String sql = """
+            SELECT map_key,
+                   mob_id,
+                   mob_type,
+                   lived_days,
+                   hp,
+                   max_hp,
+                   sp,
+                   max_sp,
+                   str_stat,
+                   agi_stat,
+                   vit_stat,
+                   dex_stat,
+                   dead,
+                   layout_x,
+                   layout_y,
+                   last_regen_total_seconds,
+                   last_updated_day_number
+            FROM saved_mob
+            WHERE saved_id = ?
+            """;
+
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, saveId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    String mapKey = rs.getString("map_key");
+                    String mobId = rs.getString("mob_id");
+                    if (mapKey == null || mapKey.isBlank() || mobId == null || mobId.isBlank()) {
+                        continue;
+                    }
+
+                    MobMapState mapState = gs.getMobState(mapKey);
+                    MobMapState.MobData mob = mapState.getMob(mobId);
+
+                    mob.mobType = rs.getString("mob_type");
+                    mob.livedDays = rs.getInt("lived_days");
+                    mob.hp = rs.getInt("hp");
+                    mob.maxHp = rs.getInt("max_hp");
+                    mob.sp = rs.getInt("sp");
+                    mob.maxSp = rs.getInt("max_sp");
+                    mob.str = rs.getInt("str_stat");
+                    mob.agi = rs.getInt("agi_stat");
+                    mob.vit = rs.getInt("vit_stat");
+                    mob.dex = rs.getInt("dex_stat");
+                    mob.dead = rs.getBoolean("dead");
+                    mob.layoutX = rs.getDouble("layout_x");
+                    mob.layoutY = rs.getDouble("layout_y");
+                    mob.lastRegenTotalSeconds = rs.getDouble("last_regen_total_seconds");
+                    mob.lastUpdatedDayNumber = rs.getInt("last_updated_day_number");
+                    mob.drops.clear();
+                }
+            }
+        }
+    }
+
+    private void loadMobDrops(Connection con, GameState gs, int saveId) throws Exception {
+        if (con == null || gs == null || saveId <= 0) return;
+        if (!hasTable(con, "saved_mob_drop")) {
+            return;
+        }
+
+        String sql = """
+            SELECT map_key,
+                   mob_id,
+                   drop_slot,
+                   item_id,
+                   quantity,
+                   spawned_at_total_seconds,
+                   expires_at_total_seconds
+            FROM saved_mob_drop
+            WHERE saved_id = ?
+            ORDER BY map_key, mob_id, drop_slot
+            """;
+
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, saveId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    String mapKey = rs.getString("map_key");
+                    String mobId = rs.getString("mob_id");
+                    if (mapKey == null || mapKey.isBlank() || mobId == null || mobId.isBlank()) {
+                        continue;
+                    }
+
+                    int itemId = rs.getInt("item_id");
+                    int qty = rs.getInt("quantity");
+                    if (itemId <= 0 || qty <= 0) {
+                        continue;
+                    }
+
+                    MobMapState mapState = gs.getMobState(mapKey);
+                    MobMapState.MobData mob = mapState.getMob(mobId);
+                    mob.drops.add(new MobMapState.MobDrop(
+                        itemId,
+                        qty,
+                        rs.getDouble("spawned_at_total_seconds"),
+                        rs.getDouble("expires_at_total_seconds")
+                    ));
                 }
             }
         }
