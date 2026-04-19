@@ -4,20 +4,15 @@
  */
 package controller;
 
-import static controller.Char_edit_btnController.copyImageToFolder;
 import db.dbcon;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -33,8 +28,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 import util.AppDialogs;
 import util.WorldScaler;
 
@@ -88,7 +81,7 @@ public class item_edit_btnController implements Initializable {
     Parent root;
     String img_name;
     @FXML
-    private ComboBox<ItemTypeOption> cbitemtype;
+    private ComboBox<ItemEditorSupport.ItemTypeOption> cbitemtype;
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -97,7 +90,7 @@ public class item_edit_btnController implements Initializable {
             con = db.getConnection();
             System.out.println("Ready...");
             lblaname.setText(LoginController.txtname);
-            loadItemTypes();
+            ItemEditorSupport.loadItemTypes(con, cbitemtype);
             inititem();
         }catch (ClassNotFoundException e){
             System.out.println("Not Connected....");
@@ -111,24 +104,12 @@ public class item_edit_btnController implements Initializable {
 
     @FXML
     private void handlebtnuploadaction(ActionEvent event) throws IOException {
-        FileChooser filechooser = new FileChooser();
-        filechooser.setTitle("Select Product Image");
-        filechooser.getExtensionFilters().add(
-        new FileChooser.ExtensionFilter("Image File", "*.png" , "*.jpg", "*.jpeg", "*.gif")
+        String selectedImage = ItemEditorSupport.choosePreviewAndCopyItemImage(
+            itemimage.getScene().getWindow(),
+            itemimage
         );
-        Stage stage = (Stage) itemimage.getScene().getWindow();
-        File selectedFile = filechooser.showOpenDialog(stage);
-        
-        if(selectedFile != null){
-            
-            //show image in ImageView
-            Image image = new Image(selectedFile.toURI().toString());
-            itemimage.setImage(image);
-            fitImageToPreviewBox();
-            
-            //show image to project folder
-            img_name = copyImageToFolder(selectedFile);
-                                       
+        if (selectedImage != null) {
+            img_name = selectedImage;
         }
     }
 
@@ -158,14 +139,14 @@ public class item_edit_btnController implements Initializable {
         } 
         else{
             try {
-                int itemTypeId = cbitemtype.getSelectionModel().getSelectedItem().id;
-                int price = parseRequiredInt(txtmobstype, "Price");
-                int str = parseRequiredInt(txtstr, "STR");
-                int agi = parseRequiredInt(txtagi, "AGI");
-                int dex = parseRequiredInt(txtdex, "DEX");
-                int vit = parseRequiredInt(txtvid, "VIT");
-                int hp = parseRequiredInt(txthp, "HP");
-                int stamina = parseRequiredInt(txtstamina, "Stamina");
+                int itemTypeId = cbitemtype.getSelectionModel().getSelectedItem().id();
+                int price = ItemEditorSupport.parseRequiredInt(txtmobstype, "Price");
+                int str = ItemEditorSupport.parseRequiredInt(txtstr, "STR");
+                int agi = ItemEditorSupport.parseRequiredInt(txtagi, "AGI");
+                int dex = ItemEditorSupport.parseRequiredInt(txtdex, "DEX");
+                int vit = ItemEditorSupport.parseRequiredInt(txtvid, "VIT");
+                int hp = ItemEditorSupport.parseRequiredInt(txthp, "HP");
+                int stamina = ItemEditorSupport.parseRequiredInt(txtstamina, "Stamina");
 
                 String sql = """
                     UPDATE items i
@@ -209,20 +190,12 @@ public class item_edit_btnController implements Initializable {
     }
     
     private void handleactionupload(ActionEvent event) throws IOException {
-        FileChooser filechooser = new FileChooser();
-        filechooser.setTitle("Select Product Image");
-        filechooser.getExtensionFilters().add(
-        new FileChooser.ExtensionFilter("Image File", "*.png" , "*.jpg", "*.jpeg", "*.gif")
+        String selectedImage = ItemEditorSupport.choosePreviewAndCopyItemImage(
+            image.getScene().getWindow(),
+            itemimage
         );
-        Stage stage = (Stage) image.getScene().getWindow();
-        File selectedFile = filechooser.showOpenDialog(stage);
-        
-        if(selectedFile != null){
-            
-            Image img = new Image(selectedFile.toURI().toString());
-            
-            itemimage.setImage(img);      // also show in the big image view
-            img_name = copyImageToFolder(selectedFile);                         
+        if (selectedImage != null) {
+            img_name = selectedImage;
         }
     }
     
@@ -250,7 +223,7 @@ public class item_edit_btnController implements Initializable {
 
     if (rs.next()) {
         this.img_name = rs.getString("image");
-        File file= new File("E:\\PJ\\rust_and_roots\\src\\image\\items\\" + this.img_name);
+        File file= new File(ItemEditorSupport.itemImagePath(this.img_name));
         Image image = new Image(file.toURI().toString());
         ImageView imgView = new ImageView(image);
         imgView.setFitHeight(50);
@@ -264,96 +237,21 @@ public class item_edit_btnController implements Initializable {
             txtvid.setText(rs.getString("vit"));
             txthp.setText(rs.getString("hp"));
             txtstamina.setText(rs.getString("stamina"));
-            File afile= new File("E:\\PJ\\rust_and_roots\\src\\image\\items\\" + this.img_name );
+            File afile= new File(ItemEditorSupport.itemImagePath(this.img_name));
            Image iimage = new Image(afile.toURI().toString());
             
 //            ImageView imgView = new ImageView(image);
             Image img = new Image(afile.toURI().toString());
             itemimage.setImage(iimage);
-            fitImageToPreviewBox();
+            ItemEditorSupport.fitImageToPreviewBox(itemimage);
 
             int selectedTypeId = rs.getInt("item_type_id");
-            selectItemTypeById(selectedTypeId);
+            ItemEditorSupport.selectItemTypeById(cbitemtype, selectedTypeId);
         
     }
 }
-    public static String copyImageToFolder(File sourceFile) throws IOException{
-       
-        //Create images folder if not exits
-        File imageDir  = new File("E:\\PJ\\rust_and_roots\\src\\image\\items\\");
-        if(!imageDir.exists()){
-            imageDir.mkdirs();
-        }
-        
-        String fileName = sourceFile.getName();
-        File destination = new File(imageDir,  fileName);
-        
-        Files.copy(
-                sourceFile.toPath(), 
-                destination.toPath(), 
-                StandardCopyOption.REPLACE_EXISTING);
-        
-        return fileName;
-    }
 
     @FXML
     private void handlecbitemboxaction(ActionEvent event) {
-    }
-
-    private void loadItemTypes() throws SQLException {
-        List<ItemTypeOption> options = new ArrayList<>();
-        String sql = "SELECT item_type_id, item_type_name FROM item_types ORDER BY item_type_name";
-        try (PreparedStatement ps = con.prepareStatement(sql);
-             ResultSet result = ps.executeQuery()) {
-            while (result.next()) {
-                options.add(new ItemTypeOption(
-                        result.getInt("item_type_id"),
-                        result.getString("item_type_name")
-                ));
-            }
-        }
-        cbitemtype.getItems().setAll(options);
-        if (!options.isEmpty()) {
-            cbitemtype.getSelectionModel().selectFirst();
-        }
-    }
-
-    private void selectItemTypeById(int itemTypeId) {
-        for (ItemTypeOption option : cbitemtype.getItems()) {
-            if (option.id == itemTypeId) {
-                cbitemtype.getSelectionModel().select(option);
-                return;
-            }
-        }
-    }
-
-    private int parseRequiredInt(TextField field, String name) {
-        try {
-            return Integer.parseInt(field.getText().trim());
-        } catch (Exception ex) {
-            throw new NumberFormatException(name + " must be a number.");
-        }
-    }
-
-    private static class ItemTypeOption {
-        private final int id;
-        private final String name;
-
-        private ItemTypeOption(int id, String name) {
-            this.id = id;
-            this.name = name;
-        }
-
-        @Override
-        public String toString() {
-            return name;
-        }
-    }
-
-    private void fitImageToPreviewBox() {
-        if (itemimage == null) return;
-        itemimage.setPreserveRatio(false);
-        itemimage.setFitWidth(itemimage.getBoundsInLocal().getWidth());
-        itemimage.setFitHeight(itemimage.getBoundsInLocal().getHeight());
     }
 }

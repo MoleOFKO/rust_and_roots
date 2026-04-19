@@ -364,11 +364,6 @@ public class Right_map_nofourController extends BaseMapController {
     private Rectangle wall811;
 
     @Override
-    public void initialize(URL url, ResourceBundle rb) {
-        super.initialize(url, rb);
-    }    
-
-    @Override
     protected String mapKey() {
         return "right_map_nofour";
     }

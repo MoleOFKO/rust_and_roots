@@ -604,6 +604,7 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
+-- codex:schema-bootstrap:start
 DROP PROCEDURE IF EXISTS ensure_application_schema;
 DROP PROCEDURE IF EXISTS ensure_chicken_corn_soup_deluxe;
 DROP PROCEDURE IF EXISTS ensure_saved_unlocked_recipe_table;
@@ -939,5 +940,6 @@ END $$
 DELIMITER ;
 
 CALL ensure_application_schema();
+-- codex:schema-bootstrap:end
 
 -- Dump completed on 2026-04-09 13:04:52
