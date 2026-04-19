@@ -16,6 +16,11 @@
                <image>
                   <Image url="@../image/crafting.png" />
                </image></ImageView>
+            <ImageView fitHeight="143.0" fitWidth="145.0" layoutX="301.0" layoutY="76.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../image/frame.png" />
+               </image>
+            </ImageView>
             <ImageView fx:id="resultitem" fitHeight="106.0" fitWidth="104.0" layoutX="325.0" layoutY="90.0" onMouseClicked="#handleresultitemaction" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../image/items/Skull4.png" />
@@ -132,16 +137,8 @@
                         <Image url="@../image/items/Skull4.png" />
                      </image>
                   </ImageView>
-                  <ImageView fx:id="ing2" fitHeight="42.0" fitWidth="42.0" layoutX="49.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../image/items/Blackened%20meat.png" />
-                     </image>
-                  </ImageView>
-                  <ImageView fx:id="ing3" fitHeight="42.0" fitWidth="42.0" layoutX="98.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../image/items/Blue%20cloth.png" />
-                     </image>
-                  </ImageView>
+                  <ImageView fx:id="ing2" fitHeight="42.0" fitWidth="42.0" layoutX="49.0" pickOnBounds="true" preserveRatio="true" />
+                  <ImageView fx:id="ing3" fitHeight="42.0" fitWidth="42.0" layoutX="98.0" pickOnBounds="true" preserveRatio="true" />
                   <ImageView fx:id="ing4" fitHeight="42.0" fitWidth="42.0" layoutX="147.0" pickOnBounds="true" preserveRatio="true">
                      <image>
                         <Image url="@../image/items/Tintoberry.png" />
@@ -191,11 +188,6 @@
                </font>
             </Label>
             <Button fx:id="btnclose" layoutX="319.0" layoutY="313.0" mnemonicParsing="false" onAction="#handlecloseaction" opacity="0.0" prefHeight="34.0" prefWidth="112.0" />
-            <ImageView fitHeight="143.0" fitWidth="145.0" layoutX="301.0" layoutY="76.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../image/frame.png" />
-               </image>
-            </ImageView>
          </children></Group>
    </children>
 </StackPane>

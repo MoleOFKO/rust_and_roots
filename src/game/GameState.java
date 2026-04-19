@@ -23,7 +23,7 @@ public final class GameState {
     private static final GameState INSTANCE = new GameState();
 
     private static final int DEFAULT_SMELT_POINT_CAP = 10;
-    private static final double DEFAULT_SMELT_POINT_REGEN_SECONDS = 15.0;
+    private static final double SMELT_POINT_FULL_REGEN_SECONDS = 6000.0; // 1% of cap per in-game minute (100 minutes to full)
     private static final int DEFAULT_FIXED_SHOP_ITEM_COUNT = 8;
     private static final int DEFAULT_RANDOM_SHOP_ITEM_COUNT = 4;
     private static final int CHEST_SLOT_CAPACITY = 42;
@@ -41,7 +41,9 @@ public final class GameState {
     private int smeltPointCap = DEFAULT_SMELT_POINT_CAP;
     private double smeltPoints = DEFAULT_SMELT_POINT_CAP;
     private double lastSmeltPointUpdateSeconds = 0.0;
-    private double smeltPointRegenSeconds = DEFAULT_SMELT_POINT_REGEN_SECONDS;
+    private final Map<Integer, Integer> smeltCompletedBySourceItemId = new LinkedHashMap<>();
+    private double smeltExpCarry = 0.0;
+    private double smeltPointCapCarry = 0.0;
     
     public static GameState get() { return INSTANCE; }
 
@@ -148,7 +150,6 @@ public final class GameState {
     public void ensureAutomaticRecipeUnlocks() {
         ensureCookingRecipeUnlocksThroughLevel(playerSkills.getCookingLevel());
         ensureCraftingRecipeUnlocksThroughLevel(playerSkills.getCraftingLevel());
-        ensureBaselineCraftRecipesUnlocked();
     }
 
     private void ensureBaselineCraftRecipesUnlocked() {
@@ -198,8 +199,8 @@ public final class GameState {
 
         ItemDatabase.loadItems();
 
-        if (safeDomain == RecipeCatalog.Domain.COOKING && countUnlockedValidRecipesForDomain(RecipeCatalog.Domain.COOKING) <= 0) {
-            unlockStarterCookingRecipe();
+        if (countUnlockedValidRecipesForDomain(safeDomain) <= 0) {
+            unlockStarterSingleRecipeForDomain(safeDomain);
         }
 
         int newLevel = playerSkills.getLevelFromTotalExp(capped);
@@ -228,7 +229,7 @@ public final class GameState {
     }
 
     private void ensureCraftingRecipeUnlocksThroughLevel(int craftingLevel) {
-        ensureRecipeUnlocksThroughLevel(RecipeCatalog.Domain.CRAFTING, craftingLevel, false);
+        ensureRecipeUnlocksThroughLevel(RecipeCatalog.Domain.CRAFTING, craftingLevel, true);
     }
 
     private void ensureRecipeUnlocksThroughLevel(RecipeCatalog.Domain domain, int skillLevel, boolean includesLevelZeroStarter) {
@@ -243,7 +244,7 @@ public final class GameState {
         int unlockedCount = countUnlockedValidRecipesForDomain(domain);
 
         if (includesLevelZeroStarter && unlockedCount <= 0) {
-            String starter = unlockStarterCookingRecipe();
+            String starter = unlockStarterSingleRecipeForDomain(domain);
             if (starter != null) {
                 unlockedCount++;
             }
@@ -287,10 +288,11 @@ public final class GameState {
         return count;
     }
 
-    private String unlockStarterCookingRecipe() {
+    private String unlockStarterSingleRecipeForDomain(RecipeCatalog.Domain domain) {
+        RecipeCatalog.Domain safeDomain = domain == null ? RecipeCatalog.Domain.COOKING : domain;
         List<String> lockedSingles = new ArrayList<>();
 
-        for (RecipeCatalog.RecipeDefinition definition : RecipeCatalog.getRecipes(RecipeCatalog.Domain.COOKING)) {
+        for (RecipeCatalog.RecipeDefinition definition : RecipeCatalog.getRecipes(safeDomain)) {
             if (!isRecipeDefinitionValid(definition)) {
                 continue;
             }
@@ -620,12 +622,25 @@ public final class GameState {
         unlockedRecipeKeys.clear();
         ensureAutomaticRecipeUnlocks();
         activeSmeltJob = null;
+
+        resetSmeltProgressionState();
+
         dailyRandomShopItemIds = new ArrayList<>();
         shopRandomDay = -1;
         shopStockDay = -1;
         dailyRemainingShopStock.clear();
         saveMenuMode = false;
         preferredStatusPanelGroup = StatusPanelGroup.STATUS;
+    }
+
+    public void resetSmeltProgressionState() {
+        double nowSeconds = GameTimeManager.get().totalSecondsProperty().get();
+        smeltCompletedBySourceItemId.clear();
+        smeltExpCarry = 0.0;
+        smeltPointCapCarry = 0.0;
+        smeltPointCap = DEFAULT_SMELT_POINT_CAP;
+        smeltPoints = DEFAULT_SMELT_POINT_CAP;
+        lastSmeltPointUpdateSeconds = Math.max(0.0, nowSeconds);
     }
 
     private void seedStarterChestBonus() {
@@ -1005,20 +1020,27 @@ public final class GameState {
     }
     public boolean hasActiveSmeltJob() { return activeSmeltJob != null; }
     public ActiveSmeltJob getActiveSmeltJob() { return activeSmeltJob; }
+    public void clearActiveSmeltJob() { activeSmeltJob = null; }
     public int getReadySmeltCount(double nowSeconds) { return activeSmeltJob == null ? 0 : activeSmeltJob.getReadyCount(nowSeconds); }
     public int collectReadySmeltedItems(double nowSeconds) {
         if (activeSmeltJob == null) return 0;
+        int sourceItemId = activeSmeltJob.getSourceItemId();
         int ready = activeSmeltJob.getReadyCount(nowSeconds);
         if (ready <= 0) return 0;
         if (!playerState.getInventory().addItem(activeSmeltJob.getResultItemId(), ready)) {
             return 0;
         }
+
+        boolean completesJob = ready >= activeSmeltJob.getQuantity();
         int remaining = activeSmeltJob.getQuantity() - ready;
         if (remaining > 0) {
             double nextStart = activeSmeltJob.getStartedAtSeconds() + (ready * activeSmeltJob.getSecondsPerOre());
             activeSmeltJob = new ActiveSmeltJob(activeSmeltJob.getSourceItemId(), activeSmeltJob.getResultItemId(), remaining, activeSmeltJob.getCostPerOre(), activeSmeltJob.getSecondsPerOre(), nextStart);
         } else {
             activeSmeltJob = null;
+        }
+        if (completesJob) {
+            applySmeltCompletionRewards(sourceItemId, nowSeconds);
         }
         return ready;
     }
@@ -1036,15 +1058,6 @@ public final class GameState {
         if (smeltPoints > smeltPointCap) {
             smeltPoints = smeltPointCap;
         }
-    }
-
-    public synchronized double getSmeltPointRegenSeconds() {
-        return smeltPointRegenSeconds;
-    }
-
-    public synchronized void setSmeltPointRegenSeconds(double regenSeconds, double nowSeconds) {
-        refreshSmeltPoints(nowSeconds);
-        smeltPointRegenSeconds = regenSeconds <= 0 ? DEFAULT_SMELT_POINT_REGEN_SECONDS : regenSeconds;
     }
 
     public synchronized int getCurrentSmeltPoints(double nowSeconds) {
@@ -1093,8 +1106,8 @@ public final class GameState {
             return;
         }
 
-        if (smeltPointRegenSeconds <= 0) {
-            smeltPoints = smeltPointCap;
+        if (smeltPointCap <= 0) {
+            smeltPoints = 0.0;
             lastSmeltPointUpdateSeconds = safeNow;
             return;
         }
@@ -1102,11 +1115,114 @@ public final class GameState {
         double elapsed = safeNow - lastSmeltPointUpdateSeconds;
         if (elapsed <= 0) return;
 
-        double regen = elapsed / smeltPointRegenSeconds;
+        double regen = (elapsed * smeltPointCap) / SMELT_POINT_FULL_REGEN_SECONDS;
         if (regen > 0) {
             smeltPoints = Math.min(smeltPointCap, smeltPoints + regen);
             lastSmeltPointUpdateSeconds = safeNow;
         }
+    }
+
+    private double computeSmeltAttemptMultiplier(int attemptNumber) {
+        if (attemptNumber <= 1) {
+            return 1.0;
+        }
+        if (attemptNumber < 10) {
+            return 0.5;
+        }
+        int decade = (attemptNumber - 10) / 10;
+        int tier = 2 + Math.max(0, decade);
+        return Math.pow(0.5, tier);
+    }
+
+    public synchronized int getCompletedSmeltCount(int sourceItemId) {
+        if (sourceItemId <= 0) return 0;
+        return smeltCompletedBySourceItemId.getOrDefault(sourceItemId, 0);
+    }
+
+    public synchronized Map<Integer, Integer> getCompletedSmeltCountsSnapshot() {
+        return new LinkedHashMap<>(smeltCompletedBySourceItemId);
+    }
+
+    public synchronized double getSmeltExpCarry() {
+        return smeltExpCarry;
+    }
+
+    public synchronized double getSmeltPointCapCarry() {
+        return smeltPointCapCarry;
+    }
+
+    public synchronized double getSmeltPointsExact(double nowSeconds) {
+        refreshSmeltPoints(nowSeconds);
+        return smeltPoints;
+    }
+
+    public synchronized double getLastSmeltPointUpdateSeconds() {
+        return lastSmeltPointUpdateSeconds;
+    }
+
+    public synchronized void loadSmeltProgressionState(
+        int pointCap,
+        double points,
+        double lastUpdateSeconds,
+        double expCarry,
+        double pointCapCarry,
+        double nowSeconds
+    ) {
+        smeltPointCap = Math.max(0, pointCap);
+        smeltPoints = Math.max(0.0, Math.min(points, (double) smeltPointCap));
+        lastSmeltPointUpdateSeconds = Math.max(0.0, Math.min(lastUpdateSeconds, Math.max(0.0, nowSeconds)));
+        smeltExpCarry = Math.max(0.0, expCarry);
+        smeltPointCapCarry = Math.max(0.0, pointCapCarry);
+    }
+
+    public synchronized void clearSmeltCounts() {
+        smeltCompletedBySourceItemId.clear();
+    }
+
+    public synchronized void setCompletedSmeltCount(int sourceItemId, int count) {
+        if (sourceItemId <= 0) return;
+        int safeCount = Math.max(0, count);
+        if (safeCount <= 0) {
+            smeltCompletedBySourceItemId.remove(sourceItemId);
+        } else {
+            smeltCompletedBySourceItemId.put(sourceItemId, safeCount);
+        }
+    }
+
+    public synchronized int computeAdjustedSmeltCostPerOre(int sourceItemId, int baseCostPerOre) {
+        int safeBase = Math.max(0, baseCostPerOre);
+        if (safeBase <= 0) return 0;
+
+        int attempt = getCompletedSmeltCount(sourceItemId) + 1;
+        double multiplier = computeSmeltAttemptMultiplier(attempt);
+        int adjusted = (int) Math.ceil(safeBase * multiplier);
+        return Math.max(1, adjusted);
+    }
+
+    public synchronized void applySmeltCompletionRewards(int sourceItemId, double nowSeconds) {
+        if (sourceItemId <= 0 || playerState == null) {
+            return;
+        }
+
+        int attempt = getCompletedSmeltCount(sourceItemId) + 1;
+        double multiplier = computeSmeltAttemptMultiplier(attempt);
+
+        smeltExpCarry += 1.0 * multiplier;
+        smeltPointCapCarry += 1.0 * multiplier;
+
+        int expToApply = (int) Math.floor(smeltExpCarry + 1e-9);
+        if (expToApply > 0) {
+            playerState.addExp(expToApply);
+            smeltExpCarry = Math.max(0.0, smeltExpCarry - expToApply);
+        }
+
+        int capToApply = (int) Math.floor(smeltPointCapCarry + 1e-9);
+        if (capToApply > 0) {
+            setSmeltPointCap(smeltPointCap + capToApply, nowSeconds);
+            smeltPointCapCarry = Math.max(0.0, smeltPointCapCarry - capToApply);
+        }
+
+        setCompletedSmeltCount(sourceItemId, getCompletedSmeltCount(sourceItemId) + 1);
     }
 
     private int currentAccountId = -1;
