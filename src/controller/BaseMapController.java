@@ -2542,7 +2542,10 @@ public abstract class BaseMapController implements Initializable, SceneControlle
                 case CRAFTING -> gameState.addCraftingSkillExp(expGain);
             }
 
-            String skillName = domain == RecipeCatalog.Domain.CRAFTING ? "Crafting" : "Cooking";
+            String skillName = switch (domain) {
+                case CRAFTING -> "Crafting";
+                default -> "Cooking";
+            };
             int rawExpAfter = playerState == null ? rawExpBefore : playerState.getExp();
             int skillExpAfter = switch (domain) {
                 case COOKING -> gameState.getPlayerSkills().getCookingExp();

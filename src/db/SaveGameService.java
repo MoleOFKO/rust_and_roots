@@ -47,6 +47,8 @@ public class SaveGameService {
             saveTreeDrops(con, gs);
             saveChestItems(con, gs);
             saveTime(con, gs);
+            saveSmeltState(con, gs);
+            saveSmeltOreHistory(con, gs);
             saveUnlockedRecipes(con, gs);
 
             con.commit();
@@ -501,6 +503,71 @@ public class SaveGameService {
         }
     }
 
+    private void saveSmeltState(Connection con, GameState gs) throws Exception {
+        if (!hasTable(con, "saved_smelt_state")) {
+            return;
+        }
+
+        int saveId = gs.getCurrentSaveId();
+        double nowSeconds = GameTimeManager.get().totalSecondsProperty().get();
+
+        String sql = """
+            INSERT INTO saved_smelt_state
+                (saved_id, point_cap, points, last_point_update_total_seconds, exp_carry, cap_carry)
+            VALUES (?, ?, ?, ?, ?, ?)
+            ON DUPLICATE KEY UPDATE
+                point_cap = VALUES(point_cap),
+                points = VALUES(points),
+                last_point_update_total_seconds = VALUES(last_point_update_total_seconds),
+                exp_carry = VALUES(exp_carry),
+                cap_carry = VALUES(cap_carry)
+            """;
+
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, saveId);
+            ps.setInt(2, gs.getSmeltPointCap());
+            ps.setDouble(3, gs.getSmeltPointsExact(nowSeconds));
+            ps.setDouble(4, gs.getLastSmeltPointUpdateSeconds());
+            ps.setDouble(5, gs.getSmeltExpCarry());
+            ps.setDouble(6, gs.getSmeltPointCapCarry());
+            ps.executeUpdate();
+        }
+    }
+
+    private void saveSmeltOreHistory(Connection con, GameState gs) throws Exception {
+        if (!hasTable(con, "saved_smelt_ore_history")) {
+            return;
+        }
+
+        int saveId = gs.getCurrentSaveId();
+
+        try (PreparedStatement del = con.prepareStatement("DELETE FROM saved_smelt_ore_history WHERE saved_id = ?")) {
+            del.setInt(1, saveId);
+            del.executeUpdate();
+        }
+
+        Map<Integer, Integer> counts = gs.getCompletedSmeltCountsSnapshot();
+        if (counts.isEmpty()) {
+            return;
+        }
+
+        String sql = "INSERT INTO saved_smelt_ore_history (saved_id, source_item_id, smelt_count) VALUES (?, ?, ?)";
+        try (PreparedStatement ins = con.prepareStatement(sql)) {
+            for (Map.Entry<Integer, Integer> entry : counts.entrySet()) {
+                int sourceItemId = entry.getKey() == null ? -1 : entry.getKey();
+                int count = entry.getValue() == null ? 0 : entry.getValue();
+                if (sourceItemId <= 0 || count <= 0) {
+                    continue;
+                }
+                ins.setInt(1, saveId);
+                ins.setInt(2, sourceItemId);
+                ins.setInt(3, count);
+                ins.addBatch();
+            }
+            ins.executeBatch();
+        }
+    }
+
     private void saveUnlockedRecipes(Connection con, GameState gs) throws Exception {
         if (!hasTable(con, "saved_unlocked_recipe")) {
             return;
@@ -607,6 +674,8 @@ public class SaveGameService {
             saveTreeDrops(con, gs);
             saveChestItems(con, gs);
             saveTime(con, gs);
+            saveSmeltState(con, gs);
+            saveSmeltOreHistory(con, gs);
             saveUnlockedRecipes(con, gs);
 
             con.commit();

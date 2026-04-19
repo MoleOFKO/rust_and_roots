@@ -429,6 +429,7 @@ public class CraftController implements Initializable, SceneController {
         int sign = success ? 1 : -1;
         double now = GameTimeManager.get().totalSecondsProperty().get();
         gameState.startCraftingJob(selectedRecipe.outputItemId, outputQty, now + getAdjustedWaitSeconds(selectedRecipe), sign * getRecipeHpDelta(selectedRecipe), sign * getRecipeStaminaDelta(selectedRecipe), success);
+        gameState.addCraftingSkillExp(ProcessingRules.computeSkillExp(selectedRecipe.ingredients.size(), success));
         updateIngredientViews();
         updateCraftingStateUi();
     }

@@ -1592,11 +1592,15 @@ public class ShopController implements Initializable, SceneController {
         LinkedHashSet<Integer> ids = new LinkedHashSet<>();
 
         List<String> candidates = List.of(
+            "sand",
             "Copper Ore",
             "Iron Ore",
             "Silver Ore",
             "Gold Ore",
-            "Coal"
+            "Mithril Ore",
+            "Adamantite Ore",
+            "Orichalcum Ore",
+            "Hihiogane Ore"
         );
 
         for (String name : candidates) {

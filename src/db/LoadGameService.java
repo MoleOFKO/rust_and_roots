@@ -47,6 +47,8 @@ public class LoadGameService {
             loadHotbar(con, gs, saveId);
             loadFarmPlots(con, gs, saveId);
             loadTime(con, saveId);
+            loadSmeltState(con, gs, saveId);
+            loadSmeltOreHistory(con, gs, saveId);
             loadTreeResources(con, gs, saveId);
             loadTreeDrops(con, gs, saveId);
             loadUnlockedRecipes(con, gs, saveId);
@@ -378,6 +380,80 @@ public class LoadGameService {
         }
     }
 
+    private void loadSmeltState(Connection con, GameState gs, int saveId) throws Exception {
+        if (!hasTable(con, "saved_smelt_state")) {
+            gs.resetSmeltProgressionState();
+            return;
+        }
+
+        String sql = """
+            SELECT point_cap,
+                   points,
+                   last_point_update_total_seconds,
+                   exp_carry,
+                   cap_carry
+              FROM saved_smelt_state
+             WHERE saved_id = ?
+            """;
+
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, saveId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (!rs.next()) {
+                    gs.resetSmeltProgressionState();
+                    return;
+                }
+
+                double nowSeconds = GameTimeManager.get().totalSecondsProperty().get();
+                gs.loadSmeltProgressionState(
+                    rs.getInt("point_cap"),
+                    rs.getDouble("points"),
+                    rs.getDouble("last_point_update_total_seconds"),
+                    rs.getDouble("exp_carry"),
+                    rs.getDouble("cap_carry"),
+                    nowSeconds
+                );
+            }
+        }
+    }
+
+    private void loadSmeltOreHistory(Connection con, GameState gs, int saveId) throws Exception {
+        if (!hasTable(con, "saved_smelt_ore_history")) {
+            gs.clearSmeltCounts();
+            return;
+        }
+
+        gs.clearSmeltCounts();
+
+        String sql = """
+            SELECT source_item_id,
+                   smelt_count
+              FROM saved_smelt_ore_history
+             WHERE saved_id = ?
+            """;
+
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, saveId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    int sourceItemId = rs.getInt("source_item_id");
+                    if (rs.wasNull()) {
+                        continue;
+                    }
+
+                    int count = rs.getInt("smelt_count");
+                    if (sourceItemId <= 0 || count <= 0) {
+                        continue;
+                    }
+
+                    gs.setCompletedSmeltCount(sourceItemId, count);
+                }
+            }
+        }
+    }
+
     private String resolveMapKey(Connection con, int mapId) throws Exception {
         String sql = "SELECT map_name FROM game_map WHERE map_id = ?";
         try (PreparedStatement ps = con.prepareStatement(sql)) {
@@ -409,6 +485,8 @@ public class LoadGameService {
         clearFarmState(gs.getFarmState("home_map"));
         clearFarmState(gs.getFarmState("Home_interior"));
         gs.clearTreeStates();
+        gs.clearActiveSmeltJob();
+        gs.resetSmeltProgressionState();
     }
 
     private void loadTreeResources(Connection con, GameState gs, int saveId) throws Exception {
