@@ -308,25 +308,32 @@ public class MeltController implements Initializable, SceneController {
         if (isSmeltStartBlocked()) return;
 
         double now = GameTimeManager.get().totalSecondsProperty().get();
-        int totalCost = getSelectedTotalCost();
+        int outputQty = computeOutputQty(selectedRule, selectedOreQuantity);
+        int usedInputQty = computeUsedInputQty(selectedRule, selectedOreQuantity);
+        int leftovers = Math.max(0, selectedOreQuantity - usedInputQty);
+        if (outputQty <= 0 || usedInputQty <= 0) return;
+
+        int adjustedCostPerOre = getAdjustedCostPerOre(selectedRule);
+        int totalCost = adjustedCostPerOre * usedInputQty;
         if (!gameState.spendSmeltPoints(totalCost, now)) {
             refreshDynamicUi();
             return;
         }
 
-        int staminaCost = getSelectedTotalStaminaCost();
+        int staminaCost = getAdjustedStaminaCost(selectedRule) * outputQty;
         if (gameState.getPlayerState().getStamina() < staminaCost) {
             refreshDynamicUi();
             return;
         }
         gameState.getPlayerState().consumeStamina(staminaCost);
 
-        int successRate = computeSuccessRate(selectedRule);
-        boolean success = ProcessingRules.rollSuccess(successRate);
-        int outputQty = success ? ProcessingRules.computeOutputAmount(selectedOreQuantity, successRate) : 0;
-        if (outputQty > 0) {
-            gameState.startSmeltJob(selectedOreItemId, selectedRule.resultItemId, outputQty, selectedRule.costPerOre, getAdjustedSecondsPerOre(selectedRule), now);
+        if (leftovers > 0) {
+            inventory.addItem(selectedOreItemId, leftovers);
         }
+
+        int costPerOutput = outputQty <= 0 ? 0 : (int) Math.ceil((double) totalCost / (double) outputQty);
+        gameState.startSmeltJob(selectedOreItemId, selectedRule.resultItemId, outputQty, costPerOutput, getAdjustedSecondsPerOre(selectedRule), now);
+
         clearSelection();
         refreshAll();
     }
@@ -366,6 +373,7 @@ public class MeltController implements Initializable, SceneController {
         double now = GameTimeManager.get().totalSecondsProperty().get();
         GameState.ActiveSmeltJob job = gameState.getActiveSmeltJob();
         int currentP = gameState.getCurrentSmeltPoints(now);
+        int capP = gameState.getSmeltPointCap();
 
         if (job != null) {
             if (selectedoreimg != null) selectedoreimg.setImage(ItemDatabase.getImage(job.getSourceItemId()));
@@ -397,8 +405,8 @@ public class MeltController implements Initializable, SceneController {
             }
 
             if (smeltmp != null) {
-                int queuedCost = job.getCostPerOre() * job.getQuantity();
-                smeltmp.setText("P : " + currentP + "(-" + queuedCost + ")");
+                int usedCost = job.getCostPerOre() * job.getQuantity();
+                smeltmp.setText("P : " + currentP + "/" + capP + "  (Used " + usedCost + ")");
             }
             if (selectedoreqtylbl != null) selectedoreqtylbl.setText("x" + job.getQuantity());
             updateSmeltButtonState(now);
@@ -407,12 +415,13 @@ public class MeltController implements Initializable, SceneController {
 
         int pendingCost = getSelectedTotalCost();
         if (selectedRule != null && selectedOreQuantity > 0) {
-            int totalSeconds = (int) Math.ceil(getAdjustedSecondsPerOre(selectedRule) * selectedOreQuantity);
+            int outputQty = computeOutputQty(selectedRule, selectedOreQuantity);
+            int totalSeconds = (int) Math.ceil(getAdjustedSecondsPerOre(selectedRule) * Math.max(0, outputQty));
             if (totalwaitingtimelbl != null) totalwaitingtimelbl.setText("Waiting time: " + totalSeconds + "s");
-            if (smeltmp != null) smeltmp.setText("P : " + currentP + "(-" + pendingCost + ")  SP:-" + getSelectedTotalStaminaCost() + "  SR:" + computeSuccessRate(selectedRule) + "%");
+            if (smeltmp != null) smeltmp.setText("P : " + currentP + "/" + capP + "(-" + pendingCost + ")  SP:-" + getSelectedTotalStaminaCost());
         } else {
             if (totalwaitingtimelbl != null) totalwaitingtimelbl.setText("Waiting time:");
-            if (smeltmp != null) smeltmp.setText("P : " + currentP + "(-0)");
+            if (smeltmp != null) smeltmp.setText("P : " + currentP + "/" + capP + "(-0)");
         }
 
         if (resultoreimg != null) {
@@ -446,17 +455,29 @@ public class MeltController implements Initializable, SceneController {
     private boolean isSmeltStartBlocked(double now) {
         if (hasActiveSmeltJob()) return true;
         if (selectedOreItemId == null || selectedRule == null || selectedOreQuantity <= 0) return true;
+        int outputQty = computeOutputQty(selectedRule, selectedOreQuantity);
+        if (outputQty <= 0) return true;
         int totalCost = getSelectedTotalCost();
         return !gameState.canAffordSmeltPoints(totalCost, now)
             || gameState.getPlayerState().getStamina() < getSelectedTotalStaminaCost();
     }
 
     private int getSelectedTotalCost() {
-        return (selectedRule == null || selectedOreQuantity <= 0) ? 0 : selectedRule.costPerOre * selectedOreQuantity;
+        if (selectedRule == null || selectedOreQuantity <= 0) return 0;
+        int usedInputQty = computeUsedInputQty(selectedRule, selectedOreQuantity);
+        if (usedInputQty <= 0) return 0;
+        return getAdjustedCostPerOre(selectedRule) * usedInputQty;
     }
 
     private int getSelectedTotalStaminaCost() {
-        return (selectedRule == null || selectedOreQuantity <= 0) ? 0 : getAdjustedStaminaCost(selectedRule) * selectedOreQuantity;
+        if (selectedRule == null || selectedOreQuantity <= 0) return 0;
+        int outputQty = computeOutputQty(selectedRule, selectedOreQuantity);
+        return outputQty <= 0 ? 0 : getAdjustedStaminaCost(selectedRule) * outputQty;
+    }
+
+    private int getAdjustedCostPerOre(SmeltRule rule) {
+        if (rule == null || gameState == null) return 0;
+        return gameState.computeAdjustedSmeltCostPerOre(rule.sourceItemId, rule.baseCostPerOre);
     }
 
     private boolean hasActiveSmeltJob() {
@@ -474,11 +495,6 @@ public class MeltController implements Initializable, SceneController {
         return itm == null ? ("Item " + itemId) : itm.getItem_name();
     }
 
-    private int computeSuccessRate(SmeltRule rule) {
-        if (rule == null || gameState == null) return 0;
-        return ProcessingRules.computeAdjustedSuccessRate(rule.baseSuccessRate, rule.dexScaling, gameState.getPlayerState().getDex());
-    }
-
     private int getAdjustedStaminaCost(SmeltRule rule) {
         if (rule == null || gameState == null) return 0;
         return ProcessingRules.computeAdjustedStaminaCost(rule.staminaCost, rule.dexScaling, gameState.getPlayerState().getDex());
@@ -486,7 +502,22 @@ public class MeltController implements Initializable, SceneController {
 
     private double getAdjustedSecondsPerOre(SmeltRule rule) {
         if (rule == null || gameState == null) return 1.0;
-        return ProcessingRules.computeAdjustedWaitSeconds((int)Math.ceil(rule.secondsPerOre), rule.dexScaling, gameState.getPlayerState().getDex());
+        return ProcessingRules.computeAdjustedWaitSeconds((int) Math.ceil(rule.secondsPerOre), rule.dexScaling, gameState.getPlayerState().getDex());
+    }
+
+    private int computeOutputQty(SmeltRule rule, int selectedInputQty) {
+        if (rule == null || selectedInputQty <= 0) return 0;
+        int required = Math.max(1, rule.requiredAmount);
+        int outputAmount = Math.max(1, rule.outputAmount);
+        int batches = selectedInputQty / required;
+        return Math.max(0, batches * outputAmount);
+    }
+
+    private int computeUsedInputQty(SmeltRule rule, int selectedInputQty) {
+        if (rule == null || selectedInputQty <= 0) return 0;
+        int required = Math.max(1, rule.requiredAmount);
+        int batches = selectedInputQty / required;
+        return Math.max(0, batches * required);
     }
 
     private SmeltRule resolveRule(item oreItem) {
@@ -505,23 +536,49 @@ public class MeltController implements Initializable, SceneController {
         item goldOre = ItemDatabase.getItemByName("Gold Ore");
         item goldIngot = ItemDatabase.getItemByName("Gold Ingot");
 
-        item coalOre = ItemDatabase.getItemByName("Coal");
-        item coalBrick = ItemDatabase.getItemByName("Coal Brick");
+        item sand = ItemDatabase.getItemByName("sand");
+        item glass = ItemDatabase.getItemByName("glass");
+
+        item mithrilOre = ItemDatabase.getItemByName("Mithril Ore");
+        item mithrilIngot = ItemDatabase.getItemByName("Mithril Ingot");
+
+        item adamantiteOre = ItemDatabase.getItemByName("Adamantite Ore");
+        item adamantiteIngot = ItemDatabase.getItemByName("Adamantite Ingot");
+
+        item orichalcumOre = ItemDatabase.getItemByName("Orichalcum Ore");
+        item orichalcumIngot = ItemDatabase.getItemByName("Orichalcum Ingot");
+
+        item hihioganeOre = ItemDatabase.getItemByName("Hihiogane Ore");
+        item hihioganeIngot = ItemDatabase.getItemByName("Hihiogane Ingot");
+
+        if (isValidSmeltPair(sand, glass) && sourceItemId == sand.getItem_id()) {
+            return new SmeltRule(sand.getItem_id(), glass.getItem_id(), 2, 10, 0, 2, 3, 1);
+        }
 
         if (isValidSmeltPair(copperOre, copperIngot) && sourceItemId == copperOre.getItem_id()) {
-            return new SmeltRule(copperOre.getItem_id(), copperIngot.getItem_id(), 3, 10, 90, 2, 2);
+            return new SmeltRule(copperOre.getItem_id(), copperIngot.getItem_id(), 3, 10, 2, 2, 2, 1);
         }
         if (isValidSmeltPair(ironOre, ironIngot) && sourceItemId == ironOre.getItem_id()) {
-            return new SmeltRule(ironOre.getItem_id(), ironIngot.getItem_id(), 4, 12, 88, 3, 3);
+            return new SmeltRule(ironOre.getItem_id(), ironIngot.getItem_id(), 4, 12, 3, 3, 2, 1);
         }
         if (isValidSmeltPair(silverOre, silverIngot) && sourceItemId == silverOre.getItem_id()) {
-            return new SmeltRule(silverOre.getItem_id(), silverIngot.getItem_id(), 6, 16, 82, 3, 4);
+            return new SmeltRule(silverOre.getItem_id(), silverIngot.getItem_id(), 6, 16, 3, 4, 2, 1);
         }
         if (isValidSmeltPair(goldOre, goldIngot) && sourceItemId == goldOre.getItem_id()) {
-            return new SmeltRule(goldOre.getItem_id(), goldIngot.getItem_id(), 8, 20, 76, 4, 5);
+            return new SmeltRule(goldOre.getItem_id(), goldIngot.getItem_id(), 8, 20, 4, 5, 2, 1);
         }
-        if (isValidSmeltPair(coalOre, coalBrick) && sourceItemId == coalOre.getItem_id()) {
-            return new SmeltRule(coalOre.getItem_id(), coalBrick.getItem_id(), 1, 6, 96, 2, 1);
+
+        if (isValidSmeltPair(hihioganeOre, hihioganeIngot) && sourceItemId == hihioganeOre.getItem_id()) {
+            return new SmeltRule(hihioganeOre.getItem_id(), hihioganeIngot.getItem_id(), 12, 24, 4, 6, 2, 1);
+        }
+        if (isValidSmeltPair(orichalcumOre, orichalcumIngot) && sourceItemId == orichalcumOre.getItem_id()) {
+            return new SmeltRule(orichalcumOre.getItem_id(), orichalcumIngot.getItem_id(), 10, 22, 4, 6, 2, 1);
+        }
+        if (isValidSmeltPair(adamantiteOre, adamantiteIngot) && sourceItemId == adamantiteOre.getItem_id()) {
+            return new SmeltRule(adamantiteOre.getItem_id(), adamantiteIngot.getItem_id(), 14, 26, 5, 7, 2, 1);
+        }
+        if (isValidSmeltPair(mithrilOre, mithrilIngot) && sourceItemId == mithrilOre.getItem_id()) {
+            return new SmeltRule(mithrilOre.getItem_id(), mithrilIngot.getItem_id(), 9, 20, 4, 6, 2, 1);
         }
 
         return null;
@@ -533,24 +590,26 @@ public class MeltController implements Initializable, SceneController {
                 && ItemDatabase.isDisplayableItem(sourceItem.getItem_id())
                 && ItemDatabase.isDisplayableItem(resultItem.getItem_id());
     }
-    
+
     private static final class SmeltRule {
         final int sourceItemId;
         final int resultItemId;
-        final int costPerOre;
+        final int baseCostPerOre;
         final double secondsPerOre;
-        final int baseSuccessRate;
         final int dexScaling;
         final int staminaCost;
+        final int requiredAmount;
+        final int outputAmount;
 
-        SmeltRule(int sourceItemId, int resultItemId, int costPerOre, double secondsPerOre, int baseSuccessRate, int dexScaling, int staminaCost) {
+        SmeltRule(int sourceItemId, int resultItemId, int baseCostPerOre, double secondsPerOre, int dexScaling, int staminaCost, int requiredAmount, int outputAmount) {
             this.sourceItemId = sourceItemId;
             this.resultItemId = resultItemId;
-            this.costPerOre = Math.max(0, costPerOre);
+            this.baseCostPerOre = Math.max(0, baseCostPerOre);
             this.secondsPerOre = Math.max(1, secondsPerOre);
-            this.baseSuccessRate = Math.max(0, baseSuccessRate);
             this.dexScaling = Math.max(0, dexScaling);
             this.staminaCost = Math.max(0, staminaCost);
+            this.requiredAmount = Math.max(1, requiredAmount);
+            this.outputAmount = Math.max(1, outputAmount);
         }
     }
 }

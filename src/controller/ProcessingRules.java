@@ -7,6 +7,12 @@ final class ProcessingRules {
 
     private ProcessingRules() {}
 
+    static int computeSkillExp(int combinationSize, boolean success) {
+        int base = Math.max(1, Math.min(4, combinationSize));
+        int exp = base * (success ? 2 : 1);
+        return Math.max(0, exp);
+    }
+
     static int computeAdjustedSuccessRate(int baseSuccessRate, int dexScaling, int dex) {
         return Math.max(0, baseSuccessRate + ((dex - DEFAULT_DEX) * dexScaling));
     }

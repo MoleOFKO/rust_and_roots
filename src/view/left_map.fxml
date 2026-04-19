@@ -85,7 +85,7 @@
                   <ImageView fx:id="tree_img" fitHeight="126.0" fitWidth="107.0" layoutX="262.0" layoutY="176.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
                   <Rectangle fx:id="tree_hitbox" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="34.0" layoutX="275.0" layoutY="236.0" stroke="RED" strokeType="INSIDE" translateX="24" translateY="28" width="35.0" />
                   <Rectangle fx:id="tree_hitbox_wall" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="34.0" layoutX="305.0" layoutY="264.0" stroke="RED" strokeType="INSIDE" width="21.0" />
-                  <ImageView fx:id="drops_img" fitHeight="28.0" fitWidth="28.0" layoutX="303.0" layoutY="267.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
+                  <ImageView fx:id="drops_img_tree" fitHeight="28.0" fitWidth="28.0" layoutX="303.0" layoutY="267.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
                </children>
             </Group>
             <Group>
@@ -897,6 +897,17 @@
                         <Button fx:id="opensetting" layoutX="375.0" layoutY="29.0" mnemonicParsing="false" onAction="#handleopensettingaction" opacity="0.0" prefHeight="25.0" prefWidth="64.0" />
                      </children>
                   </Pane>
+               </children>
+            </Group>
+            <Group fx:id="stone" layoutX="-80.0" layoutY="41.0">
+               <children>
+                  <ImageView fx:id="stone_img" fitHeight="59.0" fitWidth="59.0" layoutX="286.0" layoutY="249.0" pickOnBounds="true" preserveRatio="false" smooth="false">
+                     <image>
+                        <Image url="@../image/weapons/stone.png" />
+                     </image></ImageView>
+                  <Rectangle fx:id="stone_hitbox" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="34.0" layoutX="275.0" layoutY="236.0" stroke="RED" strokeType="INSIDE" translateX="24" translateY="28" width="35.0" />
+                  <Rectangle fx:id="stone_hitbox_wall" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="34.0" layoutX="305.0" layoutY="264.0" stroke="RED" strokeType="INSIDE" width="21.0" />
+                  <ImageView fx:id="drops_img_stone" fitHeight="28.0" fitWidth="28.0" layoutX="303.0" layoutY="267.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
                </children>
             </Group>
          </children>

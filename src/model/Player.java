@@ -32,6 +32,7 @@ public class Player {
     private static final int RUN_COLUMNS = 8;
     private static final int IDLE_COLUMNS = 12;
     private static final int ATTACK_COLUMNS = 4;
+    private static final int HURT_COLUMNS = 5;
     private static final int DEATH_COLUMNS = 7;
 
     private static final long WALK_FRAME_DELAY_NANOS = 150_000_000L;
@@ -39,6 +40,7 @@ public class Player {
     private static final long IDLE_FRAME_DELAY_NANOS = 120_000_000L;
     private static final long BASE_ATTACK_FRAME_DELAY_NANOS = 110_000_000L;
     private static final long MIN_ATTACK_FRAME_DELAY_NANOS = (long) NANOS_PER_60FPS_FRAME;
+    private static final long HURT_FRAME_DELAY_NANOS = 90_000_000L;
     private static final long DEATH_FRAME_DELAY_NANOS = 90_000_000L;
     private static final double ATTACK_SPEED_PER_AGI = 0.045;
 
@@ -83,8 +85,12 @@ public class Player {
         getClass().getResource("/image/human/human_Death.png").toExternalForm()
     );
 
+    private final Image hurtSpriteSheet = new Image(
+        getClass().getResource("/image/human/human_Hurt.png").toExternalForm()
+    );
+
     private enum AnimState {
-        IDLE, WALK, RUN, ATTACK, DEATH
+        IDLE, WALK, RUN, ATTACK, HURT, DEATH
     }
 
     private enum EquipmentKind {
@@ -96,23 +102,35 @@ public class Player {
     }
 
     private static final class EquipmentAnimationSet {
+        private final Image idleSheet;
+        private final int idleColumns;
         private final Image walkSheet;
         private final int walkColumns;
+        private final Image runSheet;
+        private final int runColumns;
         private final Image attackSheet;
         private final int attackColumns;
         private final Image humanAttackSheet;
         private final int humanAttackColumns;
 
         private EquipmentAnimationSet(
+            Image idleSheet,
+            int idleColumns,
             Image walkSheet,
             int walkColumns,
+            Image runSheet,
+            int runColumns,
             Image attackSheet,
             int attackColumns,
             Image humanAttackSheet,
             int humanAttackColumns
         ) {
+            this.idleSheet = idleSheet;
+            this.idleColumns = Math.max(1, idleColumns);
             this.walkSheet = walkSheet;
             this.walkColumns = Math.max(1, walkColumns);
+            this.runSheet = runSheet;
+            this.runColumns = Math.max(1, runColumns);
             this.attackSheet = attackSheet;
             this.attackColumns = Math.max(1, attackColumns);
             this.humanAttackSheet = humanAttackSheet;
@@ -120,7 +138,11 @@ public class Player {
         }
 
         private boolean supportsAttack() {
-            return walkSheet != null || attackSheet != null || humanAttackSheet != null;
+            return idleSheet != null
+                || walkSheet != null
+                || runSheet != null
+                || attackSheet != null
+                || humanAttackSheet != null;
         }
     }
 
@@ -140,6 +162,8 @@ public class Player {
     private boolean deathFinished = false;
     private long attackEndsAtNanos = 0L;
     private long nextAttackAvailableAtNanos = 0L;
+    private boolean hurtActive = false;
+    private long hurtEndsAtNanos = 0L;
 
     public Player(
             PlayerState state,
@@ -158,6 +182,15 @@ public class Player {
         this.baseSpeed = speed;
 
         registerDefaultEquipmentAnimations();
+
+        state.hpProperty().addListener((obs, oldValue, newValue) -> {
+            if (oldValue == null || newValue == null) {
+                return;
+            }
+            if (newValue.intValue() < oldValue.intValue() && newValue.intValue() > 0) {
+                triggerHurt();
+            }
+        });
 
         this.sprite.setImage(idleSpriteSheet);
         this.sprite.setViewport(new Rectangle2D(0, 0, FRAME_SIZE, FRAME_SIZE));
@@ -387,6 +420,8 @@ public class Player {
         moving = false;
         attackEndsAtNanos = 0L;
         nextAttackAvailableAtNanos = 0L;
+        hurtActive = false;
+        hurtEndsAtNanos = 0L;
 
         if (!deathStarted && !deathFinished) {
             setAnimState(AnimState.IDLE, true);
@@ -425,6 +460,18 @@ public class Player {
         }
 
         double dtSeconds = Math.max(0.0, dtNanos / 1_000_000_000.0);
+
+        if (hurtActive && now < hurtEndsAtNanos) {
+            moving = false;
+            state.setStaminaMode(PlayerState.StaminaMode.IDLE);
+            state.updateStaminaOverTime(dtSeconds, PlayerState.StaminaMode.IDLE);
+            setAnimState(AnimState.HURT, false);
+            return;
+        }
+        if (hurtActive) {
+            hurtActive = false;
+            hurtEndsAtNanos = 0L;
+        }
 
         if (isAttackActive(now)) {
             moving = false;
@@ -547,6 +594,7 @@ public class Player {
                 }
             }
             case ATTACK -> frameIndex = (frameIndex + frameSteps) % frameCount;
+            case HURT -> frameIndex = (frameIndex + frameSteps) % frameCount;
             case DEATH -> {
             }
         }
@@ -635,7 +683,7 @@ public class Player {
         }
 
         EquipmentAnimationSet animationSet = equipmentAnimations.get(equippedKind);
-        if (animationSet == null || animState == AnimState.DEATH) {
+        if (animationSet == null || animState == AnimState.DEATH || animState == AnimState.HURT) {
             equipmentView.setImage(null);
             equipmentView.setVisible(false);
             equipmentView.setManaged(false);
@@ -650,14 +698,26 @@ public class Player {
             equipSheet = animationSet.attackSheet;
             columns = animationSet.attackColumns;
             equipFrame = frameIndex % columns;
+        } else if (animState == AnimState.RUN && animationSet.runSheet != null) {
+            equipSheet = animationSet.runSheet;
+            columns = animationSet.runColumns;
+            equipFrame = frameIndex % columns;
+        } else if (animState == AnimState.WALK && animationSet.walkSheet != null) {
+            equipSheet = animationSet.walkSheet;
+            columns = animationSet.walkColumns;
+            equipFrame = frameIndex % columns;
+        } else if (animState == AnimState.IDLE && animationSet.idleSheet != null) {
+            equipSheet = animationSet.idleSheet;
+            columns = animationSet.idleColumns;
+            equipFrame = frameIndex % columns;
         } else if (animationSet.walkSheet != null) {
             equipSheet = animationSet.walkSheet;
             columns = animationSet.walkColumns;
-            equipFrame = switch (animState) {
-                case IDLE -> 0;
-                case WALK, RUN, ATTACK -> frameIndex % columns;
-                case DEATH -> 0;
-            };
+            equipFrame = frameIndex % columns;
+        } else if (animationSet.idleSheet != null) {
+            equipSheet = animationSet.idleSheet;
+            columns = animationSet.idleColumns;
+            equipFrame = frameIndex % columns;
         } else {
             equipmentView.setImage(null);
             equipmentView.setVisible(false);
@@ -681,6 +741,7 @@ public class Player {
             case WALK -> walkSpriteSheet;
             case RUN -> runSpriteSheet;
             case ATTACK -> getHumanAttackSheet();
+            case HURT -> hurtSpriteSheet;
             case DEATH -> deathSpriteSheet;
         };
     }
@@ -691,6 +752,7 @@ public class Player {
             case WALK -> WALK_COLUMNS;
             case RUN -> RUN_COLUMNS;
             case ATTACK -> getHumanAttackColumns();
+            case HURT -> HURT_COLUMNS;
             case DEATH -> DEATH_COLUMNS;
         };
     }
@@ -701,6 +763,7 @@ public class Player {
             case WALK -> WALK_FRAME_DELAY_NANOS;
             case RUN -> RUN_FRAME_DELAY_NANOS;
             case ATTACK -> getAttackFrameDelayNanos();
+            case HURT -> HURT_FRAME_DELAY_NANOS;
             case DEATH -> DEATH_FRAME_DELAY_NANOS;
         };
     }
@@ -756,8 +819,12 @@ public class Player {
     private void registerDefaultEquipmentAnimations() {
         registerEquipmentAnimation(
             EquipmentKind.AXE,
+            "/image/human/Axe_Idle.png",
+            IDLE_COLUMNS,
             "/image/human/axe_walk.png",
             WALK_COLUMNS,
+            "/image/human/axe_run.png",
+            RUN_COLUMNS,
             "/image/human/wood_cutting_action.png",
             ATTACK_COLUMNS,
             "/image/human/human_wood_cutting_action.png",
@@ -765,19 +832,27 @@ public class Player {
         );
         registerEquipmentAnimation(
             EquipmentKind.PICKAXE,
+            "/image/human/pickaxe_Idle.png",
+            IDLE_COLUMNS,
             "/image/human/pickaxe_walk.png",
             WALK_COLUMNS,
-            null,
+            "/image/human/pickaxe_run.png",
+            RUN_COLUMNS,
+            "/image/human/pickaxe_action.png",
             ATTACK_COLUMNS,
-            null,
+            "/image/human/human_pickaxe_action.png",
             ATTACK_COLUMNS
         );
     }
 
     private void registerEquipmentAnimation(
         EquipmentKind kind,
+        String idleResourcePath,
+        int idleColumns,
         String walkResourcePath,
         int walkColumns,
+        String runResourcePath,
+        int runColumns,
         String attackResourcePath,
         int attackColumns,
         String humanAttackResourcePath,
@@ -787,19 +862,25 @@ public class Player {
             return;
         }
 
+        Image idleSheet = loadOptionalImage(idleResourcePath);
         Image walkSheet = loadOptionalImage(walkResourcePath);
+        Image runSheet = loadOptionalImage(runResourcePath);
         Image attackSheet = loadOptionalImage(attackResourcePath);
         Image humanAttackSheet = loadOptionalImage(humanAttackResourcePath);
 
-        if (walkSheet == null && attackSheet == null && humanAttackSheet == null) {
+        if (idleSheet == null && walkSheet == null && runSheet == null && attackSheet == null && humanAttackSheet == null) {
             return;
         }
 
         equipmentAnimations.put(
             kind,
             new EquipmentAnimationSet(
+                idleSheet,
+                idleColumns,
                 walkSheet,
                 walkColumns,
+                runSheet,
+                runColumns,
                 attackSheet,
                 attackColumns,
                 humanAttackSheet,
@@ -881,6 +962,17 @@ public class Player {
         double speedScale = 1.0 / agiBonusScale;
         long computed = Math.max(1L, (long) Math.floor(BASE_ATTACK_FRAME_DELAY_NANOS * speedScale));
         return Math.max(MIN_ATTACK_FRAME_DELAY_NANOS, computed);
+    }
+
+    private void triggerHurt() {
+        if (state == null || state.isDead() || deathStarted || deathFinished) {
+            return;
+        }
+
+        long now = System.nanoTime();
+        hurtActive = true;
+        hurtEndsAtNanos = now + (HURT_COLUMNS * HURT_FRAME_DELAY_NANOS);
+        setAnimState(AnimState.HURT, true);
     }
 
     private EquipmentKind resolveEquipmentKind(int itemId) {

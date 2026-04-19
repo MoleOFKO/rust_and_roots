@@ -217,6 +217,7 @@ INSERT INTO `items` VALUES (199,'tree_log',10,153,'tree_log.png',6),(200,'blue_f
 INSERT INTO `items` VALUES (203,'plant_fiber',10,153,'plant_fiber.png',6),(204,'rope',10,153,'rope.png',6),(205,'stick',10,153,'stick.png',6);
 INSERT INTO `items` VALUES (206,'Copper Ore',20,153,'copper_ore.png',6),(207,'Copper Ingot',40,153,'copper_ingot.png',6),(208,'Iron Ore',25,153,'iron_ore.png',6),(209,'Iron Ingot',50,153,'iron_ingot.png',6),(210,'Silver Ore',30,153,'silver_ore.png',6),(211,'Silver Ingot',60,153,'silver_ingot.png',6),(212,'Gold Ore',40,153,'gold_ore.png',6),(213,'Gold Ingot',80,153,'gold_ingot.png',6),(214,'Coal',15,153,'coal.png',6),(215,'Coal Brick',25,153,'coal_brick.png',6);
 INSERT INTO `items` VALUES (216,'tomato_slices_recipe',100,153,'tomato_slices_recipe.png',2),(217,'baked_potato_recipe',100,153,'baked_potato_recipe.png',2),(218,'grilled_steak_recipe',100,153,'grilled_steak_recipe.png',2),(219,'salad_leaves_recipe',100,153,'salad_leaves_recipe.png',2),(220,'fresh_salad_recipe',100,153,'fresh_leaves_recipe.png',2),(221,'beef_potato_stew_recipe',100,153,'beef_potato_stew_recipe.png',2),(222,'pepper_steak_recipe',100,153,'pepper_steak_recipe.png',2),(223,'pork_cabbage_stir_fry_recipe',100,153,'pork_cabbage_stir_fry.png',2),(224,'chicken_corn_soup_recipe',100,153,'chicken_corn_soup_recipe.png',2),(225,'roasted_pumpkin_mash_recipe',100,153,'roasted_pumpkin_mash_recipe.png',2),(226,'spicy_eggplant_recipe',100,153,'spicy_eggplant_recipe.png',2),(227,'root_mix_recipe',100,153,'root_mix_recipe.png',2),(228,'garden_salad_recipe',100,153,'garden_salad_recipe.png',2),(229,'beef_stew_recipe',100,153,'beef_stew_recipe.png',2),(230,'steak_dinner_recipe',100,153,'steak_dinner_recipe.png',2),(231,'spicy_pork_stir_fry_recipe',100,153,'spicy_pork_stir_fry_recipe.png',2),(232,'chicken_corn_soup_deluxe_recipe',100,153,'chicken_corn_soup_dulex_recipe.png',2),(233,'roasted_harvest_plate_recipe',100,153,'roasted_havest_plate_recipe.png',2),(234,'spicy_eggplant_tomato_recipe',100,153,'spicy_eggplant_tomato_recipe.png',2),(235,'root_vegetable_beef_soup_recipe',100,153,'root_vegetable_beef_soup_recipe.png',2);
+INSERT INTO `items` VALUES (236,'Adamantite Ore',60,153,'adamantite_ore.png',6),(237,'Adamantite Ingot',120,153,'adamantite_ingot.png',6),(238,'Mithril Ore',50,153,'mithril_ore.png',6),(239,'Mithril Ingot',100,153,'mithril_ingot.png',6),(240,'Orichalcum Ore',70,153,'orichalcum_ore.png',6),(241,'Orichalcum Ingot',140,153,'orichalcum_ingot.png',6),(242,'Hihiogane Ore',90,153,'hihiogane_ore.png',6),(243,'Hihiogane Ingot',180,153,'hihiogane_ingot.png',6),(244,'sand',5,153,'sand.png',6),(245,'stone',5,153,'stone.png',6),(246,'glass',10,153,'glass.png',6),(247,'cloth_bandage_blue',15,153,'cloth_bandage_blue.png',1),(248,'cloth_bandage_red',15,153,'cloth_bandage_red.png',1),(249,'water_bottle',20,153,'water_bottle.png',1),(250,'Iron Sword',200,153,'iron_sword.png',3),(251,'Iron Spear',180,153,'iron_spear.png',3),(252,'Iron Dagger',150,153,'iron_dagger.png',3),(253,'Iron Shovel',120,153,'iron_shovel.png',3),(254,'stone_after_mined',0,153,'stone_after_mined.png',5),(255,'stone_dungeon',0,153,'Stone_dungeon.png',5),(256,'stone_dungeon_after_mined',0,153,'stone_dungeon_after_mined.png',5);
 /*!40000 ALTER TABLE `items` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -607,6 +608,8 @@ DROP PROCEDURE IF EXISTS ensure_application_schema;
 DROP PROCEDURE IF EXISTS ensure_chicken_corn_soup_deluxe;
 DROP PROCEDURE IF EXISTS ensure_saved_unlocked_recipe_table;
 DROP PROCEDURE IF EXISTS ensure_saved_farm_plot_defaults;
+DROP PROCEDURE IF EXISTS ensure_saved_smelt_state_table;
+DROP PROCEDURE IF EXISTS ensure_saved_smelt_ore_history_table;
 DROP PROCEDURE IF EXISTS ensure_saved_tree_resource_table;
 DROP PROCEDURE IF EXISTS ensure_saved_tree_drop_table;
 
@@ -778,6 +781,86 @@ BEGIN
     END IF;
 END $$
 
+CREATE PROCEDURE ensure_saved_smelt_state_table()
+BEGIN
+  DECLARE v_missing_last_point_update_total_seconds INT DEFAULT 0;
+  DECLARE v_missing_exp_carry INT DEFAULT 0;
+  DECLARE v_missing_cap_carry INT DEFAULT 0;
+
+  CREATE TABLE IF NOT EXISTS saved_smelt_state (
+    saved_id INT NOT NULL,
+    point_cap INT NOT NULL DEFAULT '10',
+    points DOUBLE NOT NULL DEFAULT '10',
+    last_point_update_total_seconds DOUBLE NOT NULL DEFAULT '0',
+    exp_carry DOUBLE NOT NULL DEFAULT '0',
+    cap_carry DOUBLE NOT NULL DEFAULT '0',
+    PRIMARY KEY (saved_id),
+    CONSTRAINT fk_saved_smelt_state_save
+      FOREIGN KEY (saved_id) REFERENCES save_game (saved_id) ON DELETE CASCADE
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+  SELECT COUNT(*)
+    INTO v_missing_last_point_update_total_seconds
+    FROM information_schema.columns
+   WHERE table_schema = DATABASE()
+     AND table_name = 'saved_smelt_state'
+     AND column_name = 'last_point_update_total_seconds';
+  IF v_missing_last_point_update_total_seconds = 0 THEN
+    ALTER TABLE saved_smelt_state
+      ADD COLUMN last_point_update_total_seconds DOUBLE NOT NULL DEFAULT '0' AFTER points;
+  END IF;
+
+  SELECT COUNT(*)
+    INTO v_missing_exp_carry
+    FROM information_schema.columns
+   WHERE table_schema = DATABASE()
+     AND table_name = 'saved_smelt_state'
+     AND column_name = 'exp_carry';
+  IF v_missing_exp_carry = 0 THEN
+    ALTER TABLE saved_smelt_state
+      ADD COLUMN exp_carry DOUBLE NOT NULL DEFAULT '0' AFTER last_point_update_total_seconds;
+  END IF;
+
+  SELECT COUNT(*)
+    INTO v_missing_cap_carry
+    FROM information_schema.columns
+   WHERE table_schema = DATABASE()
+     AND table_name = 'saved_smelt_state'
+     AND column_name = 'cap_carry';
+  IF v_missing_cap_carry = 0 THEN
+    ALTER TABLE saved_smelt_state
+      ADD COLUMN cap_carry DOUBLE NOT NULL DEFAULT '0' AFTER exp_carry;
+  END IF;
+END $$
+
+CREATE PROCEDURE ensure_saved_smelt_ore_history_table()
+BEGIN
+  DECLARE v_missing_smelt_count INT DEFAULT 0;
+
+  CREATE TABLE IF NOT EXISTS saved_smelt_ore_history (
+    saved_id INT NOT NULL,
+    source_item_id INT NOT NULL,
+    smelt_count INT NOT NULL DEFAULT '0',
+    PRIMARY KEY (saved_id, source_item_id),
+    KEY idx_saved_smelt_ore_history_source_item_id (source_item_id),
+    CONSTRAINT fk_saved_smelt_ore_history_save
+      FOREIGN KEY (saved_id) REFERENCES save_game (saved_id) ON DELETE CASCADE,
+    CONSTRAINT fk_saved_smelt_ore_history_source_item
+      FOREIGN KEY (source_item_id) REFERENCES items (item_id) ON DELETE CASCADE
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+  SELECT COUNT(*)
+    INTO v_missing_smelt_count
+    FROM information_schema.columns
+   WHERE table_schema = DATABASE()
+     AND table_name = 'saved_smelt_ore_history'
+     AND column_name = 'smelt_count';
+  IF v_missing_smelt_count = 0 THEN
+    ALTER TABLE saved_smelt_ore_history
+      ADD COLUMN smelt_count INT NOT NULL DEFAULT '0' AFTER source_item_id;
+  END IF;
+END $$
+
 CREATE PROCEDURE ensure_saved_farm_plot_defaults()
 BEGIN
   DECLARE v_has_table INT DEFAULT 0;
@@ -847,6 +930,8 @@ BEGIN
   CALL ensure_saved_unlocked_recipe_table();
   CALL ensure_saved_tree_resource_table();
   CALL ensure_saved_tree_drop_table();
+  CALL ensure_saved_smelt_state_table();
+  CALL ensure_saved_smelt_ore_history_table();
   CALL ensure_saved_farm_plot_defaults();
   CALL ensure_chicken_corn_soup_deluxe();
 END $$

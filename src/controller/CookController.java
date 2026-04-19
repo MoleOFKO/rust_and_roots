@@ -478,6 +478,7 @@ public class CookController implements Initializable, SceneController {
 
         double now = GameTimeManager.get().totalSecondsProperty().get();
         gameState.startCookingJob(selectedRecipe.outputItemId, outputQty, now + getAdjustedWaitSeconds(selectedRecipe), 0, 0, success);
+        gameState.addCookingSkillExp(ProcessingRules.computeSkillExp(selectedRecipe.ingredients.size(), success));
         updateIngredientViews();
         updateCookingStateUi();
     }
