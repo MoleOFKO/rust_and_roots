@@ -307,8 +307,12 @@ public abstract class BaseMapController implements Initializable, SceneControlle
             150_000_000L
         );
 
-        if (equip_img != null) {
-            bindPlayerEquipmentView(equip_img);
+        ImageView equipView = equip_img;
+        if (equipView == null) {
+            equipView = controllerField("equip_img", ImageView.class);
+        }
+        if (equipView != null) {
+            bindPlayerEquipmentView(equipView);
         }
 
         player.setOnToggleHotbarRequest(this::toggleHotbarVisible);

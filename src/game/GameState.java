@@ -13,6 +13,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import model.FarmState;
 import model.Inventory;
 import model.ItemDatabase;
+import model.MobMapState;
 import model.PlayerState;
 import model.RecipeCatalog;
 import model.TreeMapState;
@@ -557,6 +558,7 @@ public final class GameState {
     private String activeFarmMapKey = "home_map";
     private final Map<String, FarmState> farmByMap = new HashMap<>();
     private final Map<String, TreeMapState> treesByMap = new HashMap<>();
+    private final Map<String, MobMapState> mobsByMap = new HashMap<>();
 
     private int shopRandomDay = -1;
     private List<Integer> dailyRandomShopItemIds = new ArrayList<>();
@@ -596,6 +598,7 @@ public final class GameState {
         clearFarmState(getFarmState("home_map"));
         clearFarmState(getFarmState("Home_interior"));
         clearTreeStates();
+        clearMobStates();
 
         playerSkills.clear();
         activeFarmMapKey = "home_map";
@@ -809,6 +812,21 @@ public final class GameState {
 
     public void clearTreeStates() {
         treesByMap.clear();
+    }
+
+    public MobMapState getMobState(String mapKey) {
+        if (mapKey == null || mapKey.isBlank()) {
+            mapKey = "home_map";
+        }
+        return mobsByMap.computeIfAbsent(mapKey, k -> new MobMapState());
+    }
+
+    public Map<String, MobMapState> getAllMobStates() {
+        return mobsByMap;
+    }
+
+    public void clearMobStates() {
+        mobsByMap.clear();
     }
     public void setReturnScene(String fxml, SpawnTag spawn) { 
         this.returnFxml = fxml; this.returnSpawn = (spawn == null) ? SpawnTag.DEFAULT : spawn; 
