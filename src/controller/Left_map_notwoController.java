@@ -354,11 +354,6 @@ public class Left_map_notwoController extends BaseMapController {
     private ImageView equip_img;
 
     @Override
-    public void initialize(URL url, ResourceBundle rb) {
-        super.initialize(url, rb);
-    }    
-
-    @Override
     protected String mapKey() {
         return "left_map_notwo";
     }

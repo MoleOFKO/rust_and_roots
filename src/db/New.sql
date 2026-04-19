@@ -855,4 +855,342 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-04-19 14:55:09
+-- codex:schema-bootstrap:start
+DROP PROCEDURE IF EXISTS ensure_application_schema;
+DROP PROCEDURE IF EXISTS ensure_chicken_corn_soup_deluxe;
+DROP PROCEDURE IF EXISTS ensure_saved_unlocked_recipe_table;
+DROP PROCEDURE IF EXISTS ensure_saved_farm_plot_defaults;
+DROP PROCEDURE IF EXISTS ensure_saved_smelt_state_table;
+DROP PROCEDURE IF EXISTS ensure_saved_smelt_ore_history_table;
+DROP PROCEDURE IF EXISTS ensure_saved_tree_resource_table;
+DROP PROCEDURE IF EXISTS ensure_saved_tree_drop_table;
+
+DELIMITER $$
+
+CREATE PROCEDURE ensure_saved_unlocked_recipe_table()
+BEGIN
+  CREATE TABLE IF NOT EXISTS saved_unlocked_recipe (
+    saved_id INT NOT NULL,
+    recipe_key VARCHAR(100) NOT NULL,
+    PRIMARY KEY (saved_id, recipe_key),
+    CONSTRAINT fk_saved_unlocked_recipe_save
+      FOREIGN KEY (saved_id) REFERENCES save_game (saved_id) ON DELETE CASCADE
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+END $$
+
+CREATE PROCEDURE ensure_saved_tree_resource_table()
+BEGIN
+  DECLARE v_missing_max_hp INT DEFAULT 0;
+  DECLARE v_missing_drop_rate_pity INT DEFAULT 0;
+  DECLARE v_missing_drops_this_life INT DEFAULT 0;
+  DECLARE v_missing_damage_since_last_drop_roll INT DEFAULT 0;
+  DECLARE v_missing_last_hp_growth_total_seconds INT DEFAULT 0;
+  DECLARE v_tree_type_len INT DEFAULT 0;
+
+  CREATE TABLE IF NOT EXISTS saved_tree_resource (
+    saved_id INT NOT NULL,
+    map_key VARCHAR(50) NOT NULL,
+    tree_id VARCHAR(50) NOT NULL,
+    tree_type VARCHAR(50) NOT NULL,
+    current_stage INT NOT NULL DEFAULT '2',
+    lived_days INT NOT NULL DEFAULT '0',
+    hp INT NOT NULL DEFAULT '0',
+    max_hp INT NOT NULL DEFAULT '0',
+    vit INT NOT NULL DEFAULT '0',
+    drop_rate_pity INT NOT NULL DEFAULT '0',
+    drops_this_life INT NOT NULL DEFAULT '0',
+    damage_since_last_drop_roll INT NOT NULL DEFAULT '0',
+    last_hp_growth_total_seconds DOUBLE NOT NULL DEFAULT '-1',
+    respawn_at_total_seconds DOUBLE NOT NULL DEFAULT '-1',
+    last_updated_day_number INT NOT NULL DEFAULT '1',
+    PRIMARY KEY (saved_id, map_key, tree_id),
+    CONSTRAINT fk_saved_tree_resource_save
+      FOREIGN KEY (saved_id) REFERENCES save_game (saved_id) ON DELETE CASCADE
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+  SELECT COALESCE(CHARACTER_MAXIMUM_LENGTH, 0)
+    INTO v_tree_type_len
+    FROM information_schema.columns
+   WHERE table_schema = DATABASE()
+     AND table_name = 'saved_tree_resource'
+     AND column_name = 'tree_type'
+   LIMIT 1;
+  IF v_tree_type_len IS NULL OR v_tree_type_len < 50 THEN
+    ALTER TABLE saved_tree_resource
+      MODIFY COLUMN tree_type VARCHAR(50) NOT NULL;
+  END IF;
+
+  SELECT COUNT(*)
+    INTO v_missing_max_hp
+    FROM information_schema.columns
+   WHERE table_schema = DATABASE()
+     AND table_name = 'saved_tree_resource'
+     AND column_name = 'max_hp';
+  IF v_missing_max_hp = 0 THEN
+    ALTER TABLE saved_tree_resource
+      ADD COLUMN max_hp INT NOT NULL DEFAULT '0' AFTER hp;
+  END IF;
+
+  SELECT COUNT(*)
+    INTO v_missing_drop_rate_pity
+    FROM information_schema.columns
+   WHERE table_schema = DATABASE()
+     AND table_name = 'saved_tree_resource'
+     AND column_name = 'drop_rate_pity';
+  IF v_missing_drop_rate_pity = 0 THEN
+    ALTER TABLE saved_tree_resource
+      ADD COLUMN drop_rate_pity INT NOT NULL DEFAULT '0' AFTER vit;
+  END IF;
+
+  SELECT COUNT(*)
+    INTO v_missing_drops_this_life
+    FROM information_schema.columns
+   WHERE table_schema = DATABASE()
+     AND table_name = 'saved_tree_resource'
+     AND column_name = 'drops_this_life';
+  IF v_missing_drops_this_life = 0 THEN
+    ALTER TABLE saved_tree_resource
+      ADD COLUMN drops_this_life INT NOT NULL DEFAULT '0' AFTER drop_rate_pity;
+  END IF;
+
+  SELECT COUNT(*)
+    INTO v_missing_damage_since_last_drop_roll
+    FROM information_schema.columns
+   WHERE table_schema = DATABASE()
+     AND table_name = 'saved_tree_resource'
+     AND column_name = 'damage_since_last_drop_roll';
+  IF v_missing_damage_since_last_drop_roll = 0 THEN
+    ALTER TABLE saved_tree_resource
+      ADD COLUMN damage_since_last_drop_roll INT NOT NULL DEFAULT '0' AFTER drops_this_life;
+  END IF;
+
+  SELECT COUNT(*)
+    INTO v_missing_last_hp_growth_total_seconds
+    FROM information_schema.columns
+   WHERE table_schema = DATABASE()
+     AND table_name = 'saved_tree_resource'
+     AND column_name = 'last_hp_growth_total_seconds';
+  IF v_missing_last_hp_growth_total_seconds = 0 THEN
+    ALTER TABLE saved_tree_resource
+      ADD COLUMN last_hp_growth_total_seconds DOUBLE NOT NULL DEFAULT '-1' AFTER damage_since_last_drop_roll;
+  END IF;
+END $$
+
+CREATE PROCEDURE ensure_saved_tree_drop_table()
+BEGIN
+    DECLARE v_missing_quantity INT DEFAULT 0;
+    DECLARE v_missing_spawned_at_total_seconds INT DEFAULT 0;
+    DECLARE v_missing_expires_at_total_seconds INT DEFAULT 0;
+
+    CREATE TABLE IF NOT EXISTS saved_tree_drop (
+        saved_id INT NOT NULL,
+        map_key VARCHAR(50) NOT NULL,
+        tree_id VARCHAR(50) NOT NULL,
+        drop_slot INT NOT NULL,
+        item_id INT NOT NULL,
+        quantity INT NOT NULL DEFAULT '1',
+        spawned_at_total_seconds DOUBLE NOT NULL DEFAULT '0',
+        expires_at_total_seconds DOUBLE NOT NULL DEFAULT '0',
+        PRIMARY KEY (saved_id, map_key, tree_id, drop_slot),
+        KEY idx_saved_tree_drop_item_id (item_id),
+        CONSTRAINT fk_saved_tree_drop_save
+            FOREIGN KEY (saved_id) REFERENCES save_game (saved_id) ON DELETE CASCADE,
+        CONSTRAINT fk_saved_tree_drop_item
+            FOREIGN KEY (item_id) REFERENCES items (item_id) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+    SELECT COUNT(*)
+      INTO v_missing_quantity
+      FROM information_schema.columns
+     WHERE table_schema = DATABASE()
+       AND table_name = 'saved_tree_drop'
+       AND column_name = 'quantity';
+    IF v_missing_quantity = 0 THEN
+        ALTER TABLE saved_tree_drop
+            ADD COLUMN quantity INT NOT NULL DEFAULT '1' AFTER item_id;
+    END IF;
+
+    SELECT COUNT(*)
+      INTO v_missing_spawned_at_total_seconds
+      FROM information_schema.columns
+     WHERE table_schema = DATABASE()
+       AND table_name = 'saved_tree_drop'
+       AND column_name = 'spawned_at_total_seconds';
+    IF v_missing_spawned_at_total_seconds = 0 THEN
+        ALTER TABLE saved_tree_drop
+            ADD COLUMN spawned_at_total_seconds DOUBLE NOT NULL DEFAULT '0' AFTER quantity;
+    END IF;
+
+    SELECT COUNT(*)
+      INTO v_missing_expires_at_total_seconds
+      FROM information_schema.columns
+     WHERE table_schema = DATABASE()
+       AND table_name = 'saved_tree_drop'
+       AND column_name = 'expires_at_total_seconds';
+    IF v_missing_expires_at_total_seconds = 0 THEN
+        ALTER TABLE saved_tree_drop
+            ADD COLUMN expires_at_total_seconds DOUBLE NOT NULL DEFAULT '0' AFTER spawned_at_total_seconds;
+    END IF;
+END $$
+
+CREATE PROCEDURE ensure_saved_smelt_state_table()
+BEGIN
+  DECLARE v_missing_last_point_update_total_seconds INT DEFAULT 0;
+  DECLARE v_missing_exp_carry INT DEFAULT 0;
+  DECLARE v_missing_cap_carry INT DEFAULT 0;
+
+  CREATE TABLE IF NOT EXISTS saved_smelt_state (
+    saved_id INT NOT NULL,
+    point_cap INT NOT NULL DEFAULT '10',
+    points DOUBLE NOT NULL DEFAULT '10',
+    last_point_update_total_seconds DOUBLE NOT NULL DEFAULT '0',
+    exp_carry DOUBLE NOT NULL DEFAULT '0',
+    cap_carry DOUBLE NOT NULL DEFAULT '0',
+    PRIMARY KEY (saved_id),
+    CONSTRAINT fk_saved_smelt_state_save
+      FOREIGN KEY (saved_id) REFERENCES save_game (saved_id) ON DELETE CASCADE
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+  SELECT COUNT(*)
+    INTO v_missing_last_point_update_total_seconds
+    FROM information_schema.columns
+   WHERE table_schema = DATABASE()
+     AND table_name = 'saved_smelt_state'
+     AND column_name = 'last_point_update_total_seconds';
+  IF v_missing_last_point_update_total_seconds = 0 THEN
+    ALTER TABLE saved_smelt_state
+      ADD COLUMN last_point_update_total_seconds DOUBLE NOT NULL DEFAULT '0' AFTER points;
+  END IF;
+
+  SELECT COUNT(*)
+    INTO v_missing_exp_carry
+    FROM information_schema.columns
+   WHERE table_schema = DATABASE()
+     AND table_name = 'saved_smelt_state'
+     AND column_name = 'exp_carry';
+  IF v_missing_exp_carry = 0 THEN
+    ALTER TABLE saved_smelt_state
+      ADD COLUMN exp_carry DOUBLE NOT NULL DEFAULT '0' AFTER last_point_update_total_seconds;
+  END IF;
+
+  SELECT COUNT(*)
+    INTO v_missing_cap_carry
+    FROM information_schema.columns
+   WHERE table_schema = DATABASE()
+     AND table_name = 'saved_smelt_state'
+     AND column_name = 'cap_carry';
+  IF v_missing_cap_carry = 0 THEN
+    ALTER TABLE saved_smelt_state
+      ADD COLUMN cap_carry DOUBLE NOT NULL DEFAULT '0' AFTER exp_carry;
+  END IF;
+END $$
+
+CREATE PROCEDURE ensure_saved_smelt_ore_history_table()
+BEGIN
+  DECLARE v_missing_smelt_count INT DEFAULT 0;
+
+  CREATE TABLE IF NOT EXISTS saved_smelt_ore_history (
+    saved_id INT NOT NULL,
+    source_item_id INT NOT NULL,
+    smelt_count INT NOT NULL DEFAULT '0',
+    PRIMARY KEY (saved_id, source_item_id),
+    KEY idx_saved_smelt_ore_history_source_item_id (source_item_id),
+    CONSTRAINT fk_saved_smelt_ore_history_save
+      FOREIGN KEY (saved_id) REFERENCES save_game (saved_id) ON DELETE CASCADE,
+    CONSTRAINT fk_saved_smelt_ore_history_source_item
+      FOREIGN KEY (source_item_id) REFERENCES items (item_id) ON DELETE CASCADE
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+  SELECT COUNT(*)
+    INTO v_missing_smelt_count
+    FROM information_schema.columns
+   WHERE table_schema = DATABASE()
+     AND table_name = 'saved_smelt_ore_history'
+     AND column_name = 'smelt_count';
+  IF v_missing_smelt_count = 0 THEN
+    ALTER TABLE saved_smelt_ore_history
+      ADD COLUMN smelt_count INT NOT NULL DEFAULT '0' AFTER source_item_id;
+  END IF;
+END $$
+
+CREATE PROCEDURE ensure_saved_farm_plot_defaults()
+BEGIN
+  DECLARE v_has_table INT DEFAULT 0;
+  DECLARE v_required_columns INT DEFAULT 0;
+
+  SELECT COUNT(*)
+    INTO v_has_table
+    FROM information_schema.tables
+   WHERE table_schema = DATABASE()
+     AND table_name = 'saved_farm_plot';
+
+  IF v_has_table > 0 THEN
+    SELECT COUNT(*)
+      INTO v_required_columns
+      FROM information_schema.columns
+     WHERE table_schema = DATABASE()
+       AND table_name = 'saved_farm_plot'
+       AND column_name IN (
+         'total_growth_seconds',
+         'water_cooldown_seconds',
+         'water_reduction_seconds'
+       );
+
+    IF v_required_columns = 3 THEN
+      ALTER TABLE saved_farm_plot
+        MODIFY COLUMN total_growth_seconds DOUBLE NOT NULL DEFAULT '3600',
+        MODIFY COLUMN water_cooldown_seconds DOUBLE NOT NULL DEFAULT '900',
+        MODIFY COLUMN water_reduction_seconds DOUBLE NOT NULL DEFAULT '300';
+    END IF;
+  END IF;
+END $$
+
+CREATE PROCEDURE ensure_chicken_corn_soup_deluxe()
+BEGIN
+  DECLARE v_target_name VARCHAR(100) DEFAULT 'chicken_corn_soup_deluxe';
+  DECLARE v_existing_item_id INT DEFAULT NULL;
+  DECLARE v_new_item_stats_id INT DEFAULT NULL;
+  DECLARE v_fallback_type_id INT DEFAULT 1;
+
+  START TRANSACTION;
+
+  SELECT item_id
+    INTO v_existing_item_id
+    FROM items
+   WHERE LOWER(REPLACE(item_name, '_', ' ')) = LOWER(REPLACE(v_target_name, '_', ' '))
+   LIMIT 1;
+
+  IF v_existing_item_id IS NULL THEN
+    INSERT INTO item_stats (str_stat, agi_stat, dex_stat, vit_stat, hp, stamina)
+    VALUES (0, 0, 0, 0, 0, 0);
+
+    SET v_new_item_stats_id = LAST_INSERT_ID();
+
+    SELECT COALESCE(MIN(item_type_id), 1)
+      INTO v_fallback_type_id
+      FROM item_types;
+
+    INSERT INTO items (item_name, price, item_stats_id, image, item_type_id)
+    VALUES (v_target_name, 120, v_new_item_stats_id, 'chicken_corn_soup.png', v_fallback_type_id);
+  END IF;
+
+  COMMIT;
+END $$
+
+CREATE PROCEDURE ensure_application_schema()
+BEGIN
+  CALL ensure_saved_unlocked_recipe_table();
+  CALL ensure_saved_tree_resource_table();
+  CALL ensure_saved_tree_drop_table();
+  CALL ensure_saved_smelt_state_table();
+  CALL ensure_saved_smelt_ore_history_table();
+  CALL ensure_saved_farm_plot_defaults();
+  CALL ensure_chicken_corn_soup_deluxe();
+END $$
+
+DELIMITER ;
+
+CALL ensure_application_schema();
+-- codex:schema-bootstrap:end
+
+-- Dump completed on 2026-04-09 13:04:52

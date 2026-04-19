@@ -370,11 +370,6 @@ public class Left_map_nothree_of_oneController extends BaseMapController {
     private ImageView equip_img;
     
     @Override
-    public void initialize(URL url, ResourceBundle rb) {
-        super.initialize(url, rb);
-    }
-
-    @Override
     protected String mapKey() {
         return "left_map_nothree_of_one";
     }

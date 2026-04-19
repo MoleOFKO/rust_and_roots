@@ -4,9 +4,7 @@
  */
 package controller;
 
-import static controller.item_edit_btnController.copyImageToFolder;
 import db.dbcon;
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
@@ -14,8 +12,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -27,11 +23,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 import util.AppDialogs;
 import util.WorldScaler;
 
@@ -80,7 +73,7 @@ public class Item_add_btnController implements Initializable {
     Parent root;
     String img_name;
     @FXML
-    private ComboBox<ItemTypeOption> cbitemtype;
+    private ComboBox<ItemEditorSupport.ItemTypeOption> cbitemtype;
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -89,7 +82,7 @@ public class Item_add_btnController implements Initializable {
             con = db.getConnection();
             System.out.println("Ready...");
             lblaname.setText(LoginController.txtname);
-            loadItemTypes();
+            ItemEditorSupport.loadItemTypes(con, cbitemtype);
             
         }catch (ClassNotFoundException e){
             System.out.println("Not Connected....");
@@ -102,24 +95,12 @@ public class Item_add_btnController implements Initializable {
 
     @FXML
     private void handlebtnuploadaction(ActionEvent event) throws IOException {
-        FileChooser filechooser = new FileChooser();
-        filechooser.setTitle("Select Product Image");
-        filechooser.getExtensionFilters().add(
-        new FileChooser.ExtensionFilter("Image File", "*.png" , "*.jpg", "*.jpeg", "*.gif")
+        String selectedImage = ItemEditorSupport.choosePreviewAndCopyItemImage(
+            itemimage.getScene().getWindow(),
+            itemimage
         );
-        Stage stage = (Stage) itemimage.getScene().getWindow();
-        File selectedFile = filechooser.showOpenDialog(stage);
-        
-        if(selectedFile != null){
-            
-            //show image in ImageView
-            Image image = new Image(selectedFile.toURI().toString());
-            itemimage.setImage(image);
-            fitImageToPreviewBox();
-            
-            //show image to project folder
-            img_name = item_edit_btnController.copyImageToFolder(selectedFile);
-                                       
+        if (selectedImage != null) {
+            img_name = selectedImage;
         }
     }
 
@@ -150,14 +131,14 @@ public class Item_add_btnController implements Initializable {
         else{
            try {
                 con.setAutoCommit(false);
-                int itemTypeId = cbitemtype.getSelectionModel().getSelectedItem().id;
-                int price = parseRequiredInt(txtmobstype, "Price");
-                int str = parseRequiredInt(txtstr, "STR");
-                int agi = parseRequiredInt(txtagi, "AGI");
-                int dex = parseRequiredInt(txtdex, "DEX");
-                int vit = parseRequiredInt(txtvid, "VIT");
-                int hp = parseRequiredInt(txthp, "HP");
-                int stamina = parseRequiredInt(txtstamina, "Stamina");
+                int itemTypeId = cbitemtype.getSelectionModel().getSelectedItem().id();
+                int price = ItemEditorSupport.parseRequiredInt(txtmobstype, "Price");
+                int str = ItemEditorSupport.parseRequiredInt(txtstr, "STR");
+                int agi = ItemEditorSupport.parseRequiredInt(txtagi, "AGI");
+                int dex = ItemEditorSupport.parseRequiredInt(txtdex, "DEX");
+                int vit = ItemEditorSupport.parseRequiredInt(txtvid, "VIT");
+                int hp = ItemEditorSupport.parseRequiredInt(txthp, "HP");
+                int stamina = ItemEditorSupport.parseRequiredInt(txtstamina, "Stamina");
 
                 // 1) insert stats
                 String sqlStats = "INSERT INTO item_stats (str_stat, agi_stat, dex_stat, vit_stat, hp, stamina) VALUES (?, ?, ?, ?, ?, ?)";
@@ -216,53 +197,4 @@ public class Item_add_btnController implements Initializable {
     @FXML
     private void handlecbitemboxaction(ActionEvent event) {
     }
-
-    private void loadItemTypes() throws SQLException {
-        List<ItemTypeOption> options = new ArrayList<>();
-        String sql = "SELECT item_type_id, item_type_name FROM item_types ORDER BY item_type_name";
-        try (PreparedStatement ps = con.prepareStatement(sql);
-             ResultSet result = ps.executeQuery()) {
-            while (result.next()) {
-                options.add(new ItemTypeOption(
-                        result.getInt("item_type_id"),
-                        result.getString("item_type_name")
-                ));
-            }
-        }
-        cbitemtype.getItems().setAll(options);
-        if (!options.isEmpty()) {
-            cbitemtype.getSelectionModel().selectFirst();
-        }
-    }
-
-    private int parseRequiredInt(TextField field, String name) {
-        try {
-            return Integer.parseInt(field.getText().trim());
-        } catch (Exception ex) {
-            throw new NumberFormatException(name + " must be a number.");
-        }
-    }
-
-    private static class ItemTypeOption {
-        private final int id;
-        private final String name;
-
-        private ItemTypeOption(int id, String name) {
-            this.id = id;
-            this.name = name;
-        }
-
-        @Override
-        public String toString() {
-            return name;
-        }
-    }
-
-    private void fitImageToPreviewBox() {
-        if (itemimage == null) return;
-        itemimage.setPreserveRatio(false);
-        itemimage.setFitWidth(itemimage.getBoundsInLocal().getWidth());
-        itemimage.setFitHeight(itemimage.getBoundsInLocal().getHeight());
-    }
-    
 }
