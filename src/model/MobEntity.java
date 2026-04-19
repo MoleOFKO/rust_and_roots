@@ -31,6 +31,8 @@ public final class MobEntity {
     private static final int FRAME_SIZE = 64;
     private static final double INV_SQRT_2 = 1.0 / Math.sqrt(2.0);
     private static final double NANOS_PER_60FPS_FRAME = 1_000_000_000.0 / 60.0;
+    private static final double NORMAL_AGI = 5.0;
+    private static final double ATTACK_SPEED_PER_AGI = 0.045;
 
     // Player-like regen baseline (per real second).
     private static final double BASE_REGEN_PER_REAL_SECOND = 0.65;
@@ -43,8 +45,6 @@ public final class MobEntity {
     private static final long BASE_ATTACK_FRAME_DELAY_NANOS = 110_000_000L;
     private static final long HURT_FRAME_DELAY_NANOS = 90_000_000L;
     private static final long DEATH_FRAME_DELAY_NANOS = 90_000_000L;
-
-    private static final long ATTACK_COOLDOWN_NANOS = 250_000_000L;
 
     private final Kind kind;
     private final MobMapState.MobData data;
@@ -149,7 +149,7 @@ public final class MobEntity {
         this.bodyHitbox.setMouseTransparent(true);
         if (this.detectRange != null) this.detectRange.setMouseTransparent(true);
 
-        setAttackHitboxesEnabled(false);
+        syncAttackHitboxesEnabled(true);
         updateViewport();
     }
 
@@ -169,6 +169,10 @@ public final class MobEntity {
         return data.dead;
     }
 
+    public boolean isDeathAnimationFinished() {
+        return deathFinished;
+    }
+
     public void update(long nowNanos, int currentDay, double nowSeconds, Bounds playerBoundsScene, PlayerState playerState) {
         if (deathFinished) {
             updateDropsExpiry(nowSeconds);
@@ -181,7 +185,12 @@ public final class MobEntity {
             lastDeathFrameNanos = nowNanos;
             syncNodePositionToStateIfNeeded();
             updateDropsExpiry(nowSeconds);
-            updateViewport();
+            if (data.dead) {
+                finalizeDeathState();
+            } else {
+                syncAttackHitboxesEnabled(true);
+                updateViewport();
+            }
             return;
         }
 
@@ -204,9 +213,9 @@ public final class MobEntity {
 
         if (hurtActive && nowNanos < hurtEndsAtNanos) {
             moving = false;
-            animState = AnimState.HURT;
+            syncAttackHitboxesEnabled(false);
+            setAnimState(AnimState.HURT, false);
             updateAnimation(nowNanos);
-            setAttackHitboxesEnabled(false);
             return;
         }
         if (hurtActive) {
@@ -216,25 +225,25 @@ public final class MobEntity {
 
         if (isAttackActive(nowNanos)) {
             moving = false;
-            animState = AnimState.ATTACK;
+            syncAttackHitboxesEnabled(true);
+            setAnimState(AnimState.ATTACK, false);
+            tryApplyAttackDamage(playerBoundsScene, playerState);
             updateAnimation(nowNanos);
             return;
         }
 
         // Attack finished.
         if (animState == AnimState.ATTACK) {
-            setAttackHitboxesEnabled(false);
             attackDamageApplied = false;
-            animState = AnimState.IDLE;
-            frameIndex = 0;
-            updateViewport();
+            setAnimState(AnimState.IDLE, true);
         }
 
         boolean canChase = shouldChase(playerBoundsScene, playerState);
 
         if (canChase) {
             moveTowardTarget(dtNanos, playerBoundsScene);
-            animState = moving ? AnimState.RUN : AnimState.IDLE;
+            syncAttackHitboxesEnabled(true);
+            setAnimState(moving ? AnimState.RUN : AnimState.IDLE, false);
 
             if (shouldStartAttack(nowNanos, playerBoundsScene, playerState)) {
                 startAttack(nowNanos);
@@ -242,8 +251,8 @@ public final class MobEntity {
             }
         } else {
             moving = false;
-            setAttackHitboxesEnabled(false);
-            animState = AnimState.IDLE;
+            syncAttackHitboxesEnabled(true);
+            setAnimState(AnimState.IDLE, false);
         }
 
         updateAnimation(nowNanos);
@@ -259,10 +268,8 @@ public final class MobEntity {
 
         hurtActive = true;
         hurtEndsAtNanos = nowNanos + (long) hurtColumns * HURT_FRAME_DELAY_NANOS;
-        animState = AnimState.HURT;
-        frameIndex = 0;
+        setAnimState(AnimState.HURT, true);
         lastAnimFrameNanos = nowNanos;
-        updateViewport();
 
         if (hpAfter <= 0) {
             data.dead = true;
@@ -435,15 +442,10 @@ public final class MobEntity {
 
     private boolean shouldChase(Bounds playerBoundsScene, PlayerState playerState) {
         if (detectRange == null || playerBoundsScene == null || playerState == null) return false;
+        if (playerState.isDead()) return false;
 
         Bounds detectBounds = detectRange.localToScene(detectRange.getBoundsInLocal());
-        if (!detectBounds.intersects(playerBoundsScene)) {
-            return false;
-        }
-
-        int targetVit = Math.max(0, playerState.getVit());
-        int myStr = Math.max(0, data.str);
-        return targetVit < myStr;
+        return detectBounds.intersects(playerBoundsScene);
     }
 
     private void moveTowardTarget(long dtNanos, Bounds playerBoundsScene) {
@@ -502,10 +504,10 @@ public final class MobEntity {
     }
 
     private double getMovementSpeed() {
-        int agi = Math.max(0, data.agi);
-        double base = kind == Kind.SLIME ? 2.2 : 2.6;
-        double bonus = Math.min(2.0, agi * 0.35);
-        return Math.max(0.5, base + bonus);
+        double agiRatio = Math.max(0.0, data.agi) / NORMAL_AGI;
+        double agiModifier = 0.6 + (0.4 * agiRatio);
+        double currentSpeed = 5.0 * agiModifier;
+        return Math.max(0.5, currentSpeed);
     }
 
     private boolean move(double dx, double dy, Bounds playerBoundsInParent) {
@@ -558,7 +560,7 @@ public final class MobEntity {
         if (data.sp <= 0) return false;
 
         Rectangle active = resolveActiveAttackHitbox();
-        if (active == null) return false;
+        if (active == null || active.isDisable()) return false;
 
         Bounds attackBounds = active.localToScene(active.getBoundsInLocal());
         return attackBounds.intersects(playerBoundsScene);
@@ -567,23 +569,22 @@ public final class MobEntity {
     private void startAttack(long nowNanos) {
         long duration = (long) attackColumns * getAttackFrameDelayNanos();
         attackEndsAtNanos = nowNanos + duration;
-        nextAttackAvailableAtNanos = attackEndsAtNanos + ATTACK_COOLDOWN_NANOS;
+        nextAttackAvailableAtNanos = attackEndsAtNanos;
         attackDamageApplied = false;
 
         data.sp = Math.max(0, data.sp - 1);
 
-        setAttackHitboxesEnabled(true);
-        animState = AnimState.ATTACK;
-        frameIndex = 0;
+        moving = false;
+        syncAttackHitboxesEnabled(true);
+        setAnimState(AnimState.ATTACK, true);
         lastAnimFrameNanos = nowNanos;
-        updateViewport();
     }
 
     private void tryApplyAttackDamage(Bounds playerBoundsScene, PlayerState playerState) {
         if (playerBoundsScene == null || playerState == null) return;
         if (attackDamageApplied) return;
         Rectangle active = resolveActiveAttackHitbox();
-        if (active == null) return;
+        if (active == null || active.isDisable()) return;
 
         Bounds attackBounds = active.localToScene(active.getBoundsInLocal());
         if (!attackBounds.intersects(playerBoundsScene)) {
@@ -622,8 +623,8 @@ public final class MobEntity {
     }
 
     private long getAttackFrameDelayNanos() {
-        // Speed up slightly with AGI (similar feel to the player).
-        double agiBonusScale = 1.0 + (Math.max(0.0, data.agi - 2) * 0.05);
+        // Same attack-speed curve as the player (speeds up above NORMAL_AGI).
+        double agiBonusScale = 1.0 + (Math.max(0.0, data.agi - NORMAL_AGI) * ATTACK_SPEED_PER_AGI);
         double speedScale = 1.0 / agiBonusScale;
         long computed = Math.max(1L, (long) Math.floor(BASE_ATTACK_FRAME_DELAY_NANOS * speedScale));
         return Math.max((long) NANOS_PER_60FPS_FRAME, computed);
@@ -650,19 +651,19 @@ public final class MobEntity {
         lastAnimFrameNanos += steps * delay;
 
         int frameCount = getFrameCount(animState);
-        int frameSteps = (int) (steps % Math.max(1, frameCount));
+        int loopSteps = (int) (steps % Math.max(1, frameCount));
+        int nonLoopSteps = (int) steps;
 
         switch (animState) {
-            case IDLE -> frameIndex = (frameIndex + frameSteps) % frameCount;
+            case IDLE -> frameIndex = (frameIndex + loopSteps) % frameCount;
             case RUN -> {
                 if (moving) {
-                    frameIndex = (frameIndex + frameSteps) % frameCount;
+                    frameIndex = (frameIndex + loopSteps) % frameCount;
                 } else {
                     frameIndex = 0;
                 }
             }
-            case ATTACK -> frameIndex = (frameIndex + frameSteps) % frameCount;
-            case HURT -> frameIndex = (frameIndex + frameSteps) % frameCount;
+            case ATTACK, HURT -> frameIndex = Math.min(frameCount - 1, frameIndex + nonLoopSteps);
             case DEATH -> {
             }
         }
@@ -673,10 +674,9 @@ public final class MobEntity {
     private void updateDeathAnimation(long nowNanos) {
         if (!deathStarted) {
             deathStarted = true;
-            animState = AnimState.DEATH;
-            frameIndex = 0;
+            setAnimState(AnimState.DEATH, true);
             lastDeathFrameNanos = nowNanos;
-            setAttackHitboxesEnabled(false);
+            syncAttackHitboxesEnabled(false);
             updateViewport();
             return;
         }
@@ -689,14 +689,32 @@ public final class MobEntity {
         frameIndex++;
 
         if (frameIndex >= deathColumns) {
-            deathFinished = true;
-            spriteView.setVisible(false);
-            spriteView.setManaged(false);
-            bodyHitbox.setDisable(true);
+            finalizeDeathState();
             return;
         }
 
         updateViewport();
+    }
+
+    private void finalizeDeathState() {
+        deathFinished = true;
+        deathStarted = true;
+        setAnimState(AnimState.DEATH, false);
+
+        spriteView.setVisible(false);
+        spriteView.setManaged(false);
+
+        bodyHitbox.setDisable(true);
+        bodyHitbox.setVisible(false);
+        bodyHitbox.setManaged(false);
+
+        if (detectRange != null) {
+            detectRange.setDisable(true);
+            detectRange.setVisible(false);
+            detectRange.setManaged(false);
+        }
+
+        syncAttackHitboxesEnabled(false);
     }
 
     private long getFrameDelay(AnimState state) {
@@ -739,7 +757,7 @@ public final class MobEntity {
         spriteView.setManaged(true);
     }
 
-    private void setAttackHitboxesEnabled(boolean enabled) {
+    private void syncAttackHitboxesEnabled(boolean enabled) {
         Rectangle active = resolveActiveAttackHitbox();
         setHitboxEnabled(attackLeft, enabled && active == attackLeft);
         setHitboxEnabled(attackRight, enabled && active == attackRight);
@@ -750,9 +768,18 @@ public final class MobEntity {
     private void setHitboxEnabled(Rectangle hitbox, boolean enabled) {
         if (hitbox == null) return;
         hitbox.setDisable(!enabled);
-        hitbox.setVisible(enabled);
-        hitbox.setManaged(enabled);
+        hitbox.setVisible(false);
+        hitbox.setManaged(false);
         hitbox.setMouseTransparent(true);
+    }
+
+    private void setAnimState(AnimState newState, boolean forceReset) {
+        if (newState == null) return;
+        if (forceReset || animState != newState) {
+            animState = newState;
+            frameIndex = 0;
+            updateViewport();
+        }
     }
 
     private Image loadRequiredImage(String resourcePath) {
@@ -766,4 +793,3 @@ public final class MobEntity {
         return new Image(url.toExternalForm());
     }
 }
-
