@@ -111,6 +111,7 @@ public class MeltController implements Initializable, SceneController {
     @FXML private ImageView oreqtyminusimg;
     @FXML private ImageView oreqtyplusimg;
     @FXML private Label selectedoreqtylbl;
+    @FXML private Label selectedoreqty;
     @FXML private Label totalwaitingtimelbl;
     @FXML private Label itemreadylbl;
     @FXML private Label guide;
@@ -192,7 +193,6 @@ public class MeltController implements Initializable, SceneController {
         for (Integer itemId : inventory.itemsProperty().keySet()) {
             int count = inventory.getCount(itemId);
             if (count <= 0) continue;
-            if (selectedOreItemId != null && itemId == selectedOreItemId) continue;
             item itm = ItemDatabase.getItemById(itemId);
             SmeltRule rule = resolveRule(itm);
             if (rule != null) visibleOreItemIds.add(itemId);
@@ -244,12 +244,36 @@ public class MeltController implements Initializable, SceneController {
         SmeltRule rule = resolveRule(itm);
         if (rule == null) return;
 
+        if (selectedOreItemId != null && selectedOreQuantity > 0 && itemId != selectedOreItemId) {
+            if (!returnSelectionToInventory()) {
+                return;
+            }
+        }
+
         if (!inventory.removeItem(itemId, 1)) return;
 
-        selectedOreItemId = itemId;
-        selectedOreQuantity = 1;
-        selectedRule = rule;
+        if (selectedOreItemId != null && itemId == selectedOreItemId) {
+            selectedOreQuantity += 1;
+            selectedRule = rule;
+        } else {
+            selectedOreItemId = itemId;
+            selectedOreQuantity = 1;
+            selectedRule = rule;
+        }
         refreshAll();
+    }
+
+    private boolean returnSelectionToInventory() {
+        if (selectedOreItemId == null || selectedOreQuantity <= 0) {
+            clearSelection();
+            return true;
+        }
+        if (!inventory.addItem(selectedOreItemId, selectedOreQuantity)) {
+            AppDialogs.showMessageDialog(null, "Not enough inventory space to return the selected ore.");
+            return false;
+        }
+        clearSelection();
+        return true;
     }
 
     private void changeSelectedQty(int delta) {
@@ -273,8 +297,9 @@ public class MeltController implements Initializable, SceneController {
     @FXML
     private void handleselectedoreimgremove(MouseEvent event) {
         if (hasActiveSmeltJob() || selectedOreItemId == null || selectedOreQuantity <= 0) return;
-        gameState.cancelSmeltSelectionBackToInventory(selectedOreItemId, selectedOreQuantity);
-        clearSelection();
+        if (!returnSelectionToInventory()) {
+            return;
+        }
         refreshAll();
     }
 
@@ -294,8 +319,10 @@ public class MeltController implements Initializable, SceneController {
     @FXML
     private void handlecloseimgaction(MouseEvent event) {
         if (selectedOreItemId != null && !hasActiveSmeltJob()) {
-            gameState.cancelSmeltSelectionBackToInventory(selectedOreItemId, selectedOreQuantity);
-            clearSelection();
+            if (!returnSelectionToInventory()) {
+                refreshAll();
+                return;
+            }
         }
         stopUiTimer();
         String back = gameState.getReturnFxml();
@@ -351,9 +378,21 @@ public class MeltController implements Initializable, SceneController {
         if (selectedoreqtylbl != null) {
             if (hasActiveSmeltJob()) {
                 GameState.ActiveSmeltJob job = gameState.getActiveSmeltJob();
-                selectedoreqtylbl.setText("x" + job.getQuantity());
+                int qty = job == null ? 0 : job.getQuantity();
+                selectedoreqtylbl.setText("Qty : " + qty);
             } else {
-                selectedoreqtylbl.setText(selectedOreQuantity > 0 ? ("x" + selectedOreQuantity) : "[ Qty ]");
+                int outputQty = computeOutputQty(selectedRule, selectedOreQuantity);
+                selectedoreqtylbl.setText("Qty : " + outputQty);
+            }
+        }
+
+        if (selectedoreqty != null) {
+            if (hasActiveSmeltJob()) {
+                selectedoreqty.setText("Qty : 0/0");
+            } else {
+                int required = selectedRule == null ? 0 : Math.max(0, selectedRule.requiredAmount);
+                int current = Math.max(0, selectedOreQuantity);
+                selectedoreqty.setText("Qty : " + current + "/" + required);
             }
         }
 
@@ -406,9 +445,10 @@ public class MeltController implements Initializable, SceneController {
 
             if (smeltmp != null) {
                 int usedCost = job.getCostPerOre() * job.getQuantity();
-                smeltmp.setText("P : " + currentP + "/" + capP + "  (Used " + usedCost + ")");
+                smeltmp.setText("P : " + currentP + "/" + capP + " (- " + usedCost + ")");
             }
-            if (selectedoreqtylbl != null) selectedoreqtylbl.setText("x" + job.getQuantity());
+            if (selectedoreqtylbl != null) selectedoreqtylbl.setText("Qty : " + job.getQuantity());
+            if (selectedoreqty != null) selectedoreqty.setText("Qty : 0/0");
             updateSmeltButtonState(now);
             return;
         }
@@ -418,10 +458,10 @@ public class MeltController implements Initializable, SceneController {
             int outputQty = computeOutputQty(selectedRule, selectedOreQuantity);
             int totalSeconds = (int) Math.ceil(getAdjustedSecondsPerOre(selectedRule) * Math.max(0, outputQty));
             if (totalwaitingtimelbl != null) totalwaitingtimelbl.setText("Waiting time: " + totalSeconds + "s");
-            if (smeltmp != null) smeltmp.setText("P : " + currentP + "/" + capP + "(-" + pendingCost + ")  SP:-" + getSelectedTotalStaminaCost());
+            if (smeltmp != null) smeltmp.setText("P : " + currentP + "/" + capP + " (- " + pendingCost + ")");
         } else {
             if (totalwaitingtimelbl != null) totalwaitingtimelbl.setText("Waiting time:");
-            if (smeltmp != null) smeltmp.setText("P : " + currentP + "/" + capP + "(-0)");
+            if (smeltmp != null) smeltmp.setText("P : " + currentP + "/" + capP + " (- 0)");
         }
 
         if (resultoreimg != null) {
