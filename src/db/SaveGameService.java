@@ -11,6 +11,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.List;
 import java.util.Map;
 import model.FarmState;
 import model.Inventory;
@@ -50,6 +51,7 @@ public class SaveGameService {
             saveMobDrops(con, gs);
             saveChestItems(con, gs);
             saveTime(con, gs);
+            saveShop(con, gs);
             saveSmeltState(con, gs);
             saveSmeltOreHistory(con, gs);
             saveUnlockedRecipes(con, gs);
@@ -506,6 +508,84 @@ public class SaveGameService {
         }
     }
 
+    private void saveShop(Connection con, GameState gs) throws Exception {
+        if (con == null || gs == null) return;
+
+        int saveId = gs.getCurrentSaveId();
+        if (saveId <= 0) return;
+
+        if (hasTable(con, "saved_shop_state")) {
+            String sql = """
+                INSERT INTO saved_shop_state
+                    (saved_id, random_day, stock_day)
+                VALUES (?, ?, ?)
+                ON DUPLICATE KEY UPDATE
+                    random_day = VALUES(random_day),
+                    stock_day = VALUES(stock_day)
+                """;
+
+            try (PreparedStatement ps = con.prepareStatement(sql)) {
+                ps.setInt(1, saveId);
+                ps.setInt(2, gs.getShopRandomDay());
+                ps.setInt(3, gs.getShopStockDay());
+                ps.executeUpdate();
+            }
+        }
+
+        if (hasTable(con, "saved_shop_random_item")) {
+            try (PreparedStatement del = con.prepareStatement("DELETE FROM saved_shop_random_item WHERE saved_id = ?")) {
+                del.setInt(1, saveId);
+                del.executeUpdate();
+            }
+
+            List<Integer> ids = gs.getDailyRandomShopItemIds();
+            if (ids != null && !ids.isEmpty()) {
+                String sql = "INSERT INTO saved_shop_random_item (saved_id, slot_index, item_id) VALUES (?, ?, ?)";
+                try (PreparedStatement ins = con.prepareStatement(sql)) {
+                    for (int i = 0; i < ids.size(); i++) {
+                        Integer itemId = ids.get(i);
+                        if (itemId == null || itemId <= 0) {
+                            continue;
+                        }
+
+                        ins.setInt(1, saveId);
+                        ins.setInt(2, i);
+                        ins.setInt(3, itemId);
+                        ins.addBatch();
+                    }
+                    ins.executeBatch();
+                }
+            }
+        }
+
+        if (hasTable(con, "saved_shop_stock")) {
+            try (PreparedStatement del = con.prepareStatement("DELETE FROM saved_shop_stock WHERE saved_id = ?")) {
+                del.setInt(1, saveId);
+                del.executeUpdate();
+            }
+
+            Map<Integer, Integer> stock = gs.getDailyRemainingShopStock();
+            if (stock != null && !stock.isEmpty()) {
+                String sql = "INSERT INTO saved_shop_stock (saved_id, item_id, remaining_qty) VALUES (?, ?, ?)";
+                try (PreparedStatement ins = con.prepareStatement(sql)) {
+                    for (Map.Entry<Integer, Integer> e : stock.entrySet()) {
+                        Integer itemId = e.getKey();
+                        if (itemId == null || itemId <= 0) {
+                            continue;
+                        }
+                        int qty = (e.getValue() == null) ? 0 : Math.max(0, e.getValue());
+
+                        ins.setInt(1, saveId);
+                        ins.setInt(2, itemId);
+                        ins.setInt(3, qty);
+                        ins.addBatch();
+                    }
+                    ins.executeBatch();
+                }
+            }
+        }
+    }
+
     private void saveSmeltState(Connection con, GameState gs) throws Exception {
         if (!hasTable(con, "saved_smelt_state")) {
             return;
@@ -812,6 +892,7 @@ public class SaveGameService {
             saveTreeDrops(con, gs);
             saveChestItems(con, gs);
             saveTime(con, gs);
+            saveShop(con, gs);
             saveSmeltState(con, gs);
             saveSmeltOreHistory(con, gs);
             saveUnlockedRecipes(con, gs);

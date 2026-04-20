@@ -864,6 +864,9 @@ DROP PROCEDURE IF EXISTS ensure_saved_smelt_state_table;
 DROP PROCEDURE IF EXISTS ensure_saved_smelt_ore_history_table;
 DROP PROCEDURE IF EXISTS ensure_saved_tree_resource_table;
 DROP PROCEDURE IF EXISTS ensure_saved_tree_drop_table;
+DROP PROCEDURE IF EXISTS ensure_saved_shop_state_table;
+DROP PROCEDURE IF EXISTS ensure_saved_shop_random_item_table;
+DROP PROCEDURE IF EXISTS ensure_saved_shop_stock_table;
 
 DELIMITER $$
 
@@ -876,6 +879,105 @@ BEGIN
     CONSTRAINT fk_saved_unlocked_recipe_save
       FOREIGN KEY (saved_id) REFERENCES save_game (saved_id) ON DELETE CASCADE
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+END $$
+
+CREATE PROCEDURE ensure_saved_shop_state_table()
+BEGIN
+  DECLARE v_missing_random_day INT DEFAULT 0;
+  DECLARE v_missing_stock_day INT DEFAULT 0;
+
+  CREATE TABLE IF NOT EXISTS saved_shop_state (
+    saved_id INT NOT NULL,
+    random_day INT NOT NULL DEFAULT '-1',
+    stock_day INT NOT NULL DEFAULT '-1',
+    PRIMARY KEY (saved_id),
+    CONSTRAINT fk_saved_shop_state_save
+      FOREIGN KEY (saved_id) REFERENCES save_game (saved_id) ON DELETE CASCADE
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+  SELECT COUNT(*)
+    INTO v_missing_random_day
+    FROM information_schema.columns
+   WHERE table_schema = DATABASE()
+     AND table_name = 'saved_shop_state'
+     AND column_name = 'random_day';
+  IF v_missing_random_day = 0 THEN
+    ALTER TABLE saved_shop_state
+      ADD COLUMN random_day INT NOT NULL DEFAULT '-1' AFTER saved_id;
+  END IF;
+
+  SELECT COUNT(*)
+    INTO v_missing_stock_day
+    FROM information_schema.columns
+   WHERE table_schema = DATABASE()
+     AND table_name = 'saved_shop_state'
+     AND column_name = 'stock_day';
+  IF v_missing_stock_day = 0 THEN
+    ALTER TABLE saved_shop_state
+      ADD COLUMN stock_day INT NOT NULL DEFAULT '-1' AFTER random_day;
+  END IF;
+END $$
+
+CREATE PROCEDURE ensure_saved_shop_random_item_table()
+BEGIN
+  DECLARE v_missing_slot_index INT DEFAULT 0;
+  DECLARE v_missing_item_id INT DEFAULT 0;
+
+  CREATE TABLE IF NOT EXISTS saved_shop_random_item (
+    saved_id INT NOT NULL,
+    slot_index INT NOT NULL,
+    item_id INT NOT NULL,
+    PRIMARY KEY (saved_id, slot_index),
+    CONSTRAINT fk_saved_shop_random_item_save
+      FOREIGN KEY (saved_id) REFERENCES save_game (saved_id) ON DELETE CASCADE
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+  SELECT COUNT(*)
+    INTO v_missing_slot_index
+    FROM information_schema.columns
+   WHERE table_schema = DATABASE()
+     AND table_name = 'saved_shop_random_item'
+     AND column_name = 'slot_index';
+  IF v_missing_slot_index = 0 THEN
+    ALTER TABLE saved_shop_random_item
+      ADD COLUMN slot_index INT NOT NULL DEFAULT '0' AFTER saved_id;
+  END IF;
+
+  SELECT COUNT(*)
+    INTO v_missing_item_id
+    FROM information_schema.columns
+   WHERE table_schema = DATABASE()
+     AND table_name = 'saved_shop_random_item'
+     AND column_name = 'item_id';
+  IF v_missing_item_id = 0 THEN
+    ALTER TABLE saved_shop_random_item
+      ADD COLUMN item_id INT NOT NULL DEFAULT '0' AFTER slot_index;
+  END IF;
+END $$
+
+CREATE PROCEDURE ensure_saved_shop_stock_table()
+BEGIN
+  DECLARE v_missing_remaining_qty INT DEFAULT 0;
+
+  CREATE TABLE IF NOT EXISTS saved_shop_stock (
+    saved_id INT NOT NULL,
+    item_id INT NOT NULL,
+    remaining_qty INT NOT NULL DEFAULT '0',
+    PRIMARY KEY (saved_id, item_id),
+    CONSTRAINT fk_saved_shop_stock_save
+      FOREIGN KEY (saved_id) REFERENCES save_game (saved_id) ON DELETE CASCADE
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+  SELECT COUNT(*)
+    INTO v_missing_remaining_qty
+    FROM information_schema.columns
+   WHERE table_schema = DATABASE()
+     AND table_name = 'saved_shop_stock'
+     AND column_name = 'remaining_qty';
+  IF v_missing_remaining_qty = 0 THEN
+    ALTER TABLE saved_shop_stock
+      ADD COLUMN remaining_qty INT NOT NULL DEFAULT '0' AFTER item_id;
+  END IF;
 END $$
 
 CREATE PROCEDURE ensure_saved_tree_resource_table()
@@ -1180,6 +1282,9 @@ END $$
 CREATE PROCEDURE ensure_application_schema()
 BEGIN
   CALL ensure_saved_unlocked_recipe_table();
+  CALL ensure_saved_shop_state_table();
+  CALL ensure_saved_shop_random_item_table();
+  CALL ensure_saved_shop_stock_table();
   CALL ensure_saved_tree_resource_table();
   CALL ensure_saved_tree_drop_table();
   CALL ensure_saved_smelt_state_table();

@@ -10,7 +10,9 @@ import java.sql.DatabaseMetaData;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import model.Farm;
 import model.FarmGrowthRules;
@@ -48,6 +50,7 @@ public class LoadGameService {
             loadHotbar(con, gs, saveId);
             loadFarmPlots(con, gs, saveId);
             loadTime(con, saveId);
+            loadShopState(con, gs, saveId);
             loadSmeltState(con, gs, saveId);
             loadSmeltOreHistory(con, gs, saveId);
             loadTreeResources(con, gs, saveId);
@@ -383,6 +386,87 @@ public class LoadGameService {
         }
     }
 
+    private void loadShopState(Connection con, GameState gs, int saveId) throws Exception {
+        if (con == null || gs == null || saveId <= 0) return;
+
+        gs.setShopRandomDay(-1);
+        gs.setDailyRandomShopItemIds(List.of());
+        gs.setShopStockDay(-1);
+        gs.clearDailyRemainingShopStock();
+
+        if (!hasTable(con, "saved_shop_state")) {
+            return;
+        }
+
+        String stateSql = "SELECT random_day, stock_day FROM saved_shop_state WHERE saved_id = ?";
+        try (PreparedStatement ps = con.prepareStatement(stateSql)) {
+            ps.setInt(1, saveId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    gs.setShopRandomDay(rs.getInt("random_day"));
+                    gs.setShopStockDay(rs.getInt("stock_day"));
+                }
+            }
+        }
+
+        if (hasTable(con, "saved_shop_random_item")) {
+            String sql = """
+                SELECT slot_index,
+                       item_id
+                  FROM saved_shop_random_item
+                 WHERE saved_id = ?
+                 ORDER BY slot_index
+                """;
+
+            ArrayList<Integer> ids = new ArrayList<>();
+            try (PreparedStatement ps = con.prepareStatement(sql)) {
+                ps.setInt(1, saveId);
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        int slotIndex = rs.getInt("slot_index");
+                        int itemId = rs.getInt("item_id");
+                        if (rs.wasNull()) {
+                            continue;
+                        }
+                        if (slotIndex < 0 || itemId <= 0) {
+                            continue;
+                        }
+                        while (ids.size() <= slotIndex) {
+                            ids.add(null);
+                        }
+                        ids.set(slotIndex, itemId);
+                    }
+                }
+            }
+            gs.setDailyRandomShopItemIds(ids);
+        }
+
+        if (hasTable(con, "saved_shop_stock")) {
+            String sql = """
+                SELECT item_id,
+                       remaining_qty
+                  FROM saved_shop_stock
+                 WHERE saved_id = ?
+                """;
+
+            Map<Integer, Integer> stock = new LinkedHashMap<>();
+            try (PreparedStatement ps = con.prepareStatement(sql)) {
+                ps.setInt(1, saveId);
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        int itemId = rs.getInt("item_id");
+                        if (rs.wasNull() || itemId <= 0) {
+                            continue;
+                        }
+                        int qty = rs.getInt("remaining_qty");
+                        stock.put(itemId, Math.max(0, qty));
+                    }
+                }
+            }
+            gs.setDailyRemainingShopStock(stock);
+        }
+    }
+
     private void loadSmeltState(Connection con, GameState gs, int saveId) throws Exception {
         if (!hasTable(con, "saved_smelt_state")) {
             gs.resetSmeltProgressionState();
@@ -491,6 +575,11 @@ public class LoadGameService {
         gs.clearMobStates();
         gs.clearActiveSmeltJob();
         gs.resetSmeltProgressionState();
+
+        gs.setShopRandomDay(-1);
+        gs.setDailyRandomShopItemIds(List.of());
+        gs.setShopStockDay(-1);
+        gs.clearDailyRemainingShopStock();
     }
 
     private void loadTreeResources(Connection con, GameState gs, int saveId) throws Exception {
