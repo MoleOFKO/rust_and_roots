@@ -19,7 +19,7 @@ public final class AppDialogs {
     private static final Color BG = new Color(28, 31, 38);
     private static final Color FG = new Color(238, 241, 245);
     private static final Color BTN_BG = new Color(64, 122, 214);
-    private static final Color BTN_FG = Color.WHITE;
+    private static final Color BTN_FG = Color.BLACK;
     private static boolean initialized;
 
     private AppDialogs() {}
