@@ -54,6 +54,7 @@ import javafx.animation.TranslateTransition;
 import javafx.util.Duration;
 import javafx.geometry.Bounds;
 import javafx.animation.FadeTransition;
+import javafx.scene.control.ProgressBar;
 
 /**
  * FXML Controller class
@@ -860,6 +861,24 @@ public class Home_interiorController extends BaseMapController {
     private ImageView meltdialogimg;
     @FXML
     private ImageView sleepingdialogimg;
+    @FXML
+    private ImageView equip_img;
+    @FXML
+    private Group daynightnavgroup;
+    @FXML
+    private Label day;
+    @FXML
+    private ImageView daynightcircleimg;
+    @FXML
+    private Label time;
+    @FXML
+    private Label name;
+    @FXML
+    private Label coin;
+    @FXML
+    private ProgressBar hpbar;
+    @FXML
+    private ProgressBar spbar;
 
     private void bindSettingControls() {
         GameTimeManager time = GameTimeManager.get();
@@ -1086,6 +1105,7 @@ public class Home_interiorController extends BaseMapController {
 //        setupMenuTabs();
 //        bindStatusLabels();
         bindSettingControls();
+        
 
         if (btncook != null) btncook.setOnAction(this::handlecookaction);
         if (btncraft != null) btncraft.setOnAction(this::handlecraftaction);
