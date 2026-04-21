@@ -63,6 +63,19 @@ public final class PlayerState {
     private StaminaMode staminaMode = StaminaMode.IDLE;
     private boolean sleeping = false;
 
+    // ---- Base regen (world timeline) ----
+    // 1 in-game minute (GameTimeManager.totalSeconds is in-game seconds).
+    private static final double BASE_REGEN_INTERVAL_SECONDS = 60.0;
+    // Base regen amount: 1% of max HP/SP per interval.
+    private static final double BASE_REGEN_PERCENT = 0.01;
+    // VIT modifiers (kept intentionally mild).
+    private static final double REGEN_AMOUNT_MULTIPLIER_PER_VIT = 0.05;
+    private static final double REGEN_SPEED_MULTIPLIER_PER_VIT = 0.02;
+
+    private double lastBaseRegenTotalSeconds = -1.0;
+    private double baseHpRegenCarry = 0.0;
+    private double baseStaminaRegenCarry = 0.0;
+
     private static final int HOTBAR_SIZE = 5;
     private static final int INVENTORY_SLOT_CAPACITY = 20;
     private final int[] hotbarItemIds = new int[HOTBAR_SIZE];
@@ -89,12 +102,14 @@ public final class PlayerState {
     public void setHotbarItemId(int index, int itemId) {
         if (index < 0 || index >= HOTBAR_SIZE) return;
 
-        if (itemId <= 0) {
+        int normalized = ItemDatabase.normalizeGameplayItemId(itemId);
+
+        if (normalized <= 0) {
             clearHotbarItem(index);
             return;
         }
 
-        hotbarItemIds[index] = itemId;
+        hotbarItemIds[index] = normalized;
         if (hotbarItemCounts[index] <= 0) {
             hotbarItemCounts[index] = 1;
         }
@@ -103,31 +118,36 @@ public final class PlayerState {
     public void setHotbarSlot(int index, int itemId, int count) {
         if (index < 0 || index >= HOTBAR_SIZE) return;
 
-        if (itemId <= 0 || count <= 0) {
+        int normalized = ItemDatabase.normalizeGameplayItemId(itemId);
+
+        if (normalized <= 0 || count <= 0) {
             clearHotbarItem(index);
             return;
         }
 
-        hotbarItemIds[index] = itemId;
-        hotbarItemCounts[index] = clampToStackLimit(itemId, count);
+        hotbarItemIds[index] = normalized;
+        hotbarItemCounts[index] = clampToStackLimit(normalized, count);
     }
 
     public boolean addHotbarItems(int index, int itemId, int amount) {
         if (index < 0 || index >= HOTBAR_SIZE) return false;
         if (itemId <= 0 || amount <= 0) return false;
 
+        int normalized = ItemDatabase.normalizeGameplayItemId(itemId);
+        if (normalized <= 0) return false;
+
         if (isHotbarSlotEmpty(index)) {
-            int maxStack = getMaxStackSize(itemId);
+            int maxStack = getMaxStackSize(normalized);
             if (amount > maxStack) return false;
-            setHotbarSlot(index, itemId, amount);
+            setHotbarSlot(index, normalized, amount);
             return amount <= maxStack;
         }
 
-        if (hotbarItemIds[index] != itemId) {
+        if (hotbarItemIds[index] != normalized) {
             return false;
         }
 
-        int maxStack = getMaxStackSize(itemId);
+        int maxStack = getMaxStackSize(normalized);
         int next = hotbarItemCounts[index] + amount;
         if (next > maxStack) {
             return false;
@@ -152,11 +172,14 @@ public final class PlayerState {
     public boolean canFitHotbarItems(int itemId, int amount) {
         if (itemId <= 0 || amount <= 0) return false;
 
+        int normalized = ItemDatabase.normalizeGameplayItemId(itemId);
+        if (normalized <= 0) return false;
+
         int remaining = amount;
-        int maxStack = getMaxStackSize(itemId);
+        int maxStack = getMaxStackSize(normalized);
 
         for (int i = 0; i < HOTBAR_SIZE && remaining > 0; i++) {
-            if (hotbarItemIds[i] == itemId && hotbarItemCounts[i] > 0 && hotbarItemCounts[i] < maxStack) {
+            if (hotbarItemIds[i] == normalized && hotbarItemCounts[i] > 0 && hotbarItemCounts[i] < maxStack) {
                 remaining -= Math.min(maxStack - hotbarItemCounts[i], remaining);
             }
         }
@@ -178,14 +201,17 @@ public final class PlayerState {
      */
     public boolean tryAddHotbarItems(int itemId, int amount) {
         if (itemId <= 0 || amount <= 0) return false;
-        if (!canFitHotbarItems(itemId, amount)) return false;
+
+        int normalized = ItemDatabase.normalizeGameplayItemId(itemId);
+        if (normalized <= 0) return false;
+        if (!canFitHotbarItems(normalized, amount)) return false;
 
         int remaining = amount;
-        int maxStack = getMaxStackSize(itemId);
+        int maxStack = getMaxStackSize(normalized);
 
         // Fill existing partial stacks of the same item.
         for (int i = 0; i < HOTBAR_SIZE && remaining > 0; i++) {
-            if (hotbarItemIds[i] != itemId || hotbarItemCounts[i] <= 0) continue;
+            if (hotbarItemIds[i] != normalized || hotbarItemCounts[i] <= 0) continue;
             int current = hotbarItemCounts[i];
             if (current >= maxStack) continue;
 
@@ -198,7 +224,7 @@ public final class PlayerState {
         for (int i = 0; i < HOTBAR_SIZE && remaining > 0; i++) {
             if (!isHotbarSlotEmpty(i)) continue;
             int put = Math.min(maxStack, remaining);
-            hotbarItemIds[i] = itemId;
+            hotbarItemIds[i] = normalized;
             hotbarItemCounts[i] = put;
             remaining -= put;
         }
@@ -208,8 +234,10 @@ public final class PlayerState {
 
     public int findHotbarSlotWithItem(int itemId) {
         if (itemId <= 0) return -1;
+        int normalized = ItemDatabase.normalizeGameplayItemId(itemId);
+        if (normalized <= 0) return -1;
         for (int i = 0; i < HOTBAR_SIZE; i++) {
-            if (hotbarItemIds[i] == itemId && hotbarItemCounts[i] > 0) {
+            if (hotbarItemIds[i] == normalized && hotbarItemCounts[i] > 0) {
                 return i;
             }
         }
@@ -238,12 +266,14 @@ public final class PlayerState {
 
     private int clampToStackLimit(int itemId, int count) {
         if (count <= 0) return 0;
-        int maxStack = getMaxStackSize(itemId);
+        int normalized = ItemDatabase.normalizeGameplayItemId(itemId);
+        int maxStack = getMaxStackSize(normalized);
         return Math.min(Math.max(1, count), maxStack);
     }
 
     private int getMaxStackSize(int itemId) {
-        int max = ItemDatabase.getMaxStackSize(itemId);
+        int normalized = ItemDatabase.normalizeGameplayItemId(itemId);
+        int max = ItemDatabase.getMaxStackSize(normalized);
         return Math.max(1, max);
     }
     
@@ -527,7 +557,8 @@ public final class PlayerState {
         StaminaMode effectiveMode = (mode == null) ? StaminaMode.IDLE : mode;
         double safeTimeFlow = Math.max(0.0, timeFlowMultiplier);
 
-        double regen = getBaseStaminaRegenPerSecond() * getModeRegenMultiplier(effectiveMode) * safeTimeFlow * seconds;
+        // Regen is handled by the world-time based base regen system (see applyBaseRegenIfNeeded).
+        double regen = 0.0;
         double drain = doesModeDrainStamina(effectiveMode)
             ? getRunDrainPerSecond() * safeTimeFlow * seconds
             : 0.0;
@@ -551,6 +582,81 @@ public final class PlayerState {
         }
 
         stamina.set(clamp((int) Math.floor(staminaPrecise + 1.0e-9), 0, getMaxStamina()));
+    }
+
+    /**
+     * Applies passive HP/SP regeneration based on the world timeline (GameTimeManager.totalSeconds).
+     *
+     * Base:
+     * - Regen speed: 1 in-game minute (60 in-game seconds)
+     * - Regen amount: 1% of max HP/SP per tick
+     *
+     * VIT modifiers:
+     * - Increases regen amount and increases regen speed slightly.
+     */
+    public void applyBaseRegenIfNeeded(double nowTotalSeconds) {
+        double nowSeconds = Math.max(0.0, nowTotalSeconds);
+
+        if (isDead()) {
+            lastBaseRegenTotalSeconds = nowSeconds;
+            baseHpRegenCarry = 0.0;
+            baseStaminaRegenCarry = 0.0;
+            return;
+        }
+
+        if (lastBaseRegenTotalSeconds < 0.0 || lastBaseRegenTotalSeconds > nowSeconds) {
+            lastBaseRegenTotalSeconds = nowSeconds;
+            baseHpRegenCarry = 0.0;
+            baseStaminaRegenCarry = 0.0;
+            return;
+        }
+
+        int vitValue = Math.max(0, getVit());
+        int vitBonus = Math.max(0, vitValue - 1);
+
+        double amountMultiplier = 1.0 + (vitBonus * REGEN_AMOUNT_MULTIPLIER_PER_VIT);
+        double speedMultiplier = 1.0 + (vitBonus * REGEN_SPEED_MULTIPLIER_PER_VIT);
+        double intervalSeconds = BASE_REGEN_INTERVAL_SECONDS / Math.max(1.0e-6, speedMultiplier);
+
+        double elapsed = nowSeconds - lastBaseRegenTotalSeconds;
+        if (elapsed < intervalSeconds) {
+            return;
+        }
+
+        long ticks = (long) Math.floor(elapsed / intervalSeconds);
+        if (ticks <= 0L) {
+            return;
+        }
+
+        int maxHpValue = Math.max(0, getMaxHp());
+        int maxSpValue = Math.max(0, getMaxStamina());
+
+        int currentHp = Math.max(0, getHp());
+        int currentSp = Math.max(0, getStamina());
+
+        if (maxHpValue > 0 && currentHp < maxHpValue) {
+            baseHpRegenCarry += (maxHpValue * BASE_REGEN_PERCENT * amountMultiplier) * ticks;
+            while (baseHpRegenCarry >= 1.0 && currentHp < maxHpValue) {
+                currentHp += 1;
+                baseHpRegenCarry -= 1.0;
+            }
+            setHp(currentHp);
+        } else {
+            baseHpRegenCarry = 0.0;
+        }
+
+        if (maxSpValue > 0 && currentSp < maxSpValue) {
+            baseStaminaRegenCarry += (maxSpValue * BASE_REGEN_PERCENT * amountMultiplier) * ticks;
+            while (baseStaminaRegenCarry >= 1.0 && currentSp < maxSpValue) {
+                currentSp += 1;
+                baseStaminaRegenCarry -= 1.0;
+            }
+            setStamina(currentSp);
+        } else {
+            baseStaminaRegenCarry = 0.0;
+        }
+
+        lastBaseRegenTotalSeconds += ticks * intervalSeconds;
     }
 
     public void applyFoodEffect(int hpDelta, int staminaDelta) {

@@ -57,27 +57,41 @@ public class Inventory {
     }
     
     public int getCount(int itemId) {
-       
-        IntegerProperty p = items.get(itemId);
+        int normalized = ItemDatabase.normalizeGameplayItemId(itemId);
+        IntegerProperty p = items.get(normalized);
         return p == null ? 0 : p.get();
     }
 
     public IntegerProperty countProperty(int itemId) {
-        return items.computeIfAbsent(itemId, id -> new SimpleIntegerProperty(0));
+        int normalized = ItemDatabase.normalizeGameplayItemId(itemId);
+        return items.computeIfAbsent(normalized, id -> new SimpleIntegerProperty(0));
     }
 
     public boolean canAddItem(int itemId, int amount) {
         if (itemId <= 0 || amount <= 0) return false;
-        return canAddItems(Map.of(itemId, amount));
+        int normalized = ItemDatabase.normalizeGameplayItemId(itemId);
+        return canAddItems(Map.of(normalized, amount));
     }
 
     public boolean canAddItems(Map<Integer, Integer> additions) {
         if (additions == null || additions.isEmpty()) return false;
 
+        Map<Integer, Integer> merged = new LinkedHashMap<>();
+        for (Map.Entry<Integer, Integer> entry : additions.entrySet()) {
+            if (entry == null) continue;
+            int itemId = entry.getKey() == null ? -1 : entry.getKey();
+            int amount = entry.getValue() == null ? 0 : entry.getValue();
+            if (itemId <= 0 || amount <= 0) continue;
+
+            int normalized = ItemDatabase.normalizeGameplayItemId(itemId);
+            if (normalized <= 0) continue;
+            merged.merge(normalized, amount, Integer::sum);
+        }
+
         int usedSlots = getUsedSlots();
         long requiredDeltaSlots = 0L;
 
-        for (Map.Entry<Integer, Integer> entry : additions.entrySet()) {
+        for (Map.Entry<Integer, Integer> entry : merged.entrySet()) {
             if (entry == null) continue;
             int itemId = entry.getKey() == null ? -1 : entry.getKey();
             int amount = entry.getValue() == null ? 0 : entry.getValue();
@@ -106,7 +120,19 @@ public class Inventory {
         if (additions == null || additions.isEmpty()) return false;
         if (!canAddItems(additions)) return false;
 
+        Map<Integer, Integer> merged = new LinkedHashMap<>();
         for (Map.Entry<Integer, Integer> entry : additions.entrySet()) {
+            if (entry == null) continue;
+            int itemId = entry.getKey() == null ? -1 : entry.getKey();
+            int amount = entry.getValue() == null ? 0 : entry.getValue();
+            if (itemId <= 0 || amount <= 0) continue;
+
+            int normalized = ItemDatabase.normalizeGameplayItemId(itemId);
+            if (normalized <= 0) continue;
+            merged.merge(normalized, amount, Integer::sum);
+        }
+
+        for (Map.Entry<Integer, Integer> entry : merged.entrySet()) {
             if (entry == null) continue;
             int itemId = entry.getKey() == null ? -1 : entry.getKey();
             int amount = entry.getValue() == null ? 0 : entry.getValue();
@@ -119,8 +145,9 @@ public class Inventory {
 
     public boolean addItem(int itemId, int amount) {
         if (itemId <= 0 || amount <= 0) return false;
-        if (!canAddItem(itemId, amount)) return false;
-        internalAdd(itemId, amount);
+        int normalized = ItemDatabase.normalizeGameplayItemId(itemId);
+        if (!canAddItem(normalized, amount)) return false;
+        internalAdd(normalized, amount);
         return true;
     }
 
@@ -132,13 +159,14 @@ public class Inventory {
     public boolean removeItem(int itemId, int amount) {
         if (itemId <= 0 || amount <= 0) return false;
 
-        IntegerProperty p = items.get(itemId);
+        int normalized = ItemDatabase.normalizeGameplayItemId(itemId);
+        IntegerProperty p = items.get(normalized);
         int have = (p == null) ? 0 : p.get();
         if (have < amount) return false;
 
         int left = have - amount;
         if (left == 0) {
-            items.remove(itemId);
+            items.remove(normalized);
         } else {
             p.set(left);
         }
