@@ -45,7 +45,7 @@ public class New_gameController implements Initializable, SceneController {
     private static final int NEW_GAME_BASE_VIT = 1;
     private static final int NEW_GAME_BASE_DEX = 1;
     private static final int NEW_GAME_BASE_AGI = 1;
-    private static final int NEW_GAME_STARTING_EXP = 100;
+    private static final int NEW_GAME_STARTING_EXP = 10;
 
     @FXML
     private TextField txtchaname;

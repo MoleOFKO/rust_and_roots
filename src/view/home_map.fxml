@@ -47,15 +47,15 @@
                   <Rectangle fx:id="spawn_default" height="10" layoutX="43.0" layoutY="69.0" opacity="0" width="10" />
                   <Rectangle fx:id="spawn_from_left" height="10" layoutX="20.0" layoutY="278.0" opacity="0" width="10" />
                   <Rectangle fx:id="spawn_from_right" height="10" layoutX="558.0" layoutY="153.0" opacity="0" width="10" />
-                  <Rectangle fx:id="spawn_from_up" height="10" layoutX="451.0" layoutY="20.0" opacity="0" width="10" />
+                  <Rectangle fx:id="spawn_from_up" height="10" layoutX="454.0" layoutY="29.0" opacity="0" width="10" />
                   <Rectangle fx:id="spawn_from_farm" height="10" layoutX="340.0" layoutY="172.0" opacity="0" width="10" />
                   <Rectangle fx:id="spawn_from_door" height="10" layoutX="186.0" layoutY="142.0" opacity="0" width="10" />
                   <Rectangle fx:id="spawn_from_shop" height="10" layoutX="456.0" layoutY="210.0" opacity="0" stroke="BLACK" width="10" />
                </children>
             </Group>
-            <Group fx:id="walls" layoutX="-6.0" layoutY="-3.0" mouseTransparent="true">
+            <Group fx:id="walls" layoutX="-6.0" layoutY="-3.0" mouseTransparent="true" visible="false">
                <children>
-            <Rectangle fx:id="wall" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="10.0" layoutX="354.0" stroke="TRANSPARENT" strokeType="INSIDE" width="252.0" />
+            <Rectangle fx:id="wall" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="6.0" layoutX="354.0" stroke="TRANSPARENT" strokeType="INSIDE" width="252.0" />
             <Rectangle fx:id="wall1" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="5.0" layoutX="3.0" layoutY="403.0" stroke="TRANSPARENT" strokeType="INSIDE" width="601.0" />
             <Rectangle fx:id="wall2" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="74.0" layoutX="3.0" layoutY="169.0" stroke="TRANSPARENT" strokeType="INSIDE" width="23.0" />
             <Rectangle fx:id="wall3" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="199.0" layoutX="600.0" layoutY="10.0" stroke="TRANSPARENT" strokeType="INSIDE" width="8.0" />
