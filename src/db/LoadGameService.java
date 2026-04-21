@@ -72,11 +72,20 @@ public class LoadGameService {
 
     private boolean loadMainRow(Connection con, GameState gs, int saveId) throws Exception {
         String sql = """
-            SELECT saved_id, character_id, world_name, current_map_id, money,
-                   saved_location_x, saved_location_y, exp,
-                   selected_hotbar_index, hotbar_visible
-            FROM save_game
-            WHERE saved_id = ?
+            SELECT sg.saved_id,
+                   sg.character_id,
+                   c.player_name,
+                   sg.world_name,
+                   sg.current_map_id,
+                   sg.money,
+                   sg.saved_location_x,
+                   sg.saved_location_y,
+                   sg.exp,
+                   sg.selected_hotbar_index,
+                   sg.hotbar_visible
+            FROM save_game sg
+            LEFT JOIN characters c ON sg.character_id = c.character_id
+            WHERE sg.saved_id = ?
             """;
 
         try (PreparedStatement ps = con.prepareStatement(sql)) {
@@ -86,6 +95,7 @@ public class LoadGameService {
                 if (!rs.next()) return false;
 
                 PlayerState psState = gs.getPlayerState();
+                String playerName = rs.getString("player_name");
 
                 gs.setCurrentSaveId(rs.getInt("saved_id"));
                 gs.setCurrentCharacterId(rs.getInt("character_id"));
@@ -93,7 +103,9 @@ public class LoadGameService {
                 gs.setPlayerX(rs.getDouble("saved_location_x"));
                 gs.setPlayerY(rs.getDouble("saved_location_y"));
                 gs.setCurrentWorldName(rs.getString("world_name"));
+                gs.setCurrentPlayerName(playerName);
 
+                psState.setPlayerName(playerName);
                 psState.setSelectedHotbarIndex(rs.getInt("selected_hotbar_index"));
                 psState.setHotbarVisible(rs.getBoolean("hotbar_visible"));
                 psState.setExp(rs.getInt("exp"));
