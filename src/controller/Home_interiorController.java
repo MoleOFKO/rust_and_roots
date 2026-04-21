@@ -1055,6 +1055,10 @@ public class Home_interiorController extends BaseMapController {
     private double sleepPreviousTimeScale = 1.0;
     private boolean sleepTimeScaleOverrideActive = false;
 
+    private static final int SLEEP_MINUTES_PER_STAMINA_POINT = 10;
+    private static final int SLEEP_MINUTES_PER_HP_POINT = 10;
+    private static final int SLEEP_MAX_ADVANCE_MINUTES = 24 * 60;
+
     @Override
     protected String mapKey() {
         return "Home_interior";
@@ -1496,35 +1500,51 @@ public class Home_interiorController extends BaseMapController {
         }
 
         playerState.startSleeping();
-        applySleepTimeScaleOverride(6.0);
+
+        // Advance game time based on how much the player needs to rest so that
+        // time/day changes correctly after sleeping (even if the day doesn't roll over).
+        int advanceMinutes = computeSleepAdvanceMinutes();
+        if (advanceMinutes > 0) {
+            GameTimeManager.get().addMinutes(advanceMinutes);
+        }
+
+        // Fully rest (HP + SP) after the time skip.
+        playerState.setHp(playerState.getMaxHp());
+        playerState.setStamina(playerState.getMaxStamina());
 
         sleepTimer = new javafx.animation.AnimationTimer() {
-            private long lastNow = 0L;
+            private long startedAt = 0L;
 
             @Override
             public void handle(long now) {
-                if (lastNow == 0L) {
-                    lastNow = now;
+                if (startedAt == 0L) {
+                    startedAt = now;
                     return;
                 }
 
-                double dtSeconds = (now - lastNow) / 1_000_000_000.0;
-                lastNow = now;
-
-                if (dtSeconds <= 0.0 || playerState == null) {
-                    return;
-                }
-
-                // Sleep uses the same base regen rules as idle; it restores faster only because time flows faster.
-                playerState.updateStaminaOverTime(dtSeconds, PlayerState.StaminaMode.SLEEP, 6.0);
-
-                if (!playerState.canSleep()) {
+                double elapsedSeconds = (now - startedAt) / 1_000_000_000.0;
+                if (elapsedSeconds >= 0.6) {
                     stopSleepSequence();
                 }
             }
         };
         sleepTimer.start();
         refreshSleepInteractionState();
+    }
+
+    private int computeSleepAdvanceMinutes() {
+        if (playerState == null) return 0;
+
+        int missingHp = Math.max(0, playerState.getMaxHp() - playerState.getHp());
+        int missingStamina = Math.max(0, playerState.getMaxStamina() - playerState.getStamina());
+
+        long hpMinutes = (long) missingHp * (long) SLEEP_MINUTES_PER_HP_POINT;
+        long staminaMinutes = (long) missingStamina * (long) SLEEP_MINUTES_PER_STAMINA_POINT;
+
+        long minutes = Math.max(hpMinutes, staminaMinutes);
+        if (minutes <= 0L) return 0;
+        if (minutes > SLEEP_MAX_ADVANCE_MINUTES) minutes = SLEEP_MAX_ADVANCE_MINUTES;
+        return (int) minutes;
     }
 
     @FXML

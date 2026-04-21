@@ -498,7 +498,7 @@ public final class PlayerState {
     }
 
     public boolean canSleep() {
-        return !isDead() && getStamina() < getMaxStamina();
+        return !isDead() && (getStamina() < getMaxStamina() || getHp() < getMaxHp());
     }
 
     public boolean isSleeping() {

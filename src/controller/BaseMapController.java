@@ -3,6 +3,7 @@ package controller;
 import db.SaveGameService;
 import java.net.URL;
 import java.lang.reflect.Field;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -117,6 +118,16 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
     // ---------- Optional shared background / day-night ----------
     @FXML protected ImageView bg;
+
+    // ---------- Optional shared HUD (day/night nav) ----------
+    @FXML protected Group daynightnavgroup;
+    @FXML protected Label day;
+    @FXML protected ImageView daynightcircleimg;
+    @FXML protected Label time;
+    @FXML protected Label name;
+    @FXML protected Label coin;
+    @FXML protected ProgressBar hpbar;
+    @FXML protected ProgressBar spbar;
 
     // ---------- Optional shared hotbar ----------
     @FXML protected HBox hotbar;
@@ -341,6 +352,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         setupFarmTimeRefreshIfPresent();
         setupSettingsTabIfPresent();
         bindSharedStatusAndSettingControlsIfPresent();
+        setupDayNightNavHudIfPresent();
 
         GameTimeManager.get().start();
         startLoop();
@@ -1470,19 +1482,49 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
     private void bindSharedStatusAndSettingControlsIfPresent() {
         if (playerState != null) {
-            playerState.playerNameProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
-            playerState.expProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
-            playerState.hpProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
-            playerState.maxHpProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
-            playerState.staminaProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
-            playerState.maxStaminaProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
-            playerState.strProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
-            playerState.vitProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
-            playerState.dexProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
-            playerState.agiProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
+            playerState.playerNameProperty().addListener((obs, o, n) -> {
+                refreshStatusAllocationUi();
+                refreshSharedHudBars();
+            });
+            playerState.expProperty().addListener((obs, o, n) -> {
+                refreshStatusAllocationUi();
+                refreshSharedHudBars();
+            });
+            playerState.hpProperty().addListener((obs, o, n) -> {
+                refreshStatusAllocationUi();
+                refreshSharedHudBars();
+            });
+            playerState.maxHpProperty().addListener((obs, o, n) -> {
+                refreshStatusAllocationUi();
+                refreshSharedHudBars();
+            });
+            playerState.staminaProperty().addListener((obs, o, n) -> {
+                refreshStatusAllocationUi();
+                refreshSharedHudBars();
+            });
+            playerState.maxStaminaProperty().addListener((obs, o, n) -> {
+                refreshStatusAllocationUi();
+                refreshSharedHudBars();
+            });
+            playerState.strProperty().addListener((obs, o, n) -> {
+                refreshStatusAllocationUi();
+                refreshSharedHudBars();
+            });
+            playerState.vitProperty().addListener((obs, o, n) -> {
+                refreshStatusAllocationUi();
+                refreshSharedHudBars();
+            });
+            playerState.dexProperty().addListener((obs, o, n) -> {
+                refreshStatusAllocationUi();
+                refreshSharedHudBars();
+            });
+            playerState.agiProperty().addListener((obs, o, n) -> {
+                refreshStatusAllocationUi();
+                refreshSharedHudBars();
+            });
         }
 
-        GameTimeManager time = GameTimeManager.get();
+        GameTimeManager timeManager = GameTimeManager.get();
         Slider timeScaleSlider = controllerField("timescaleslider", Slider.class);
         Label sliderScaleLabel = controllerField("sliderscale", Label.class);
         Label daysLabel = controllerField("lbldays", Label.class);
@@ -1493,38 +1535,39 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         Button saveExitButton = controllerField("btnsaveandexit", Button.class);
 
         if (timeScaleSlider != null) {
-            timeScaleSlider.valueProperty().unbindBidirectional(time.timeScaleProperty());
-            timeScaleSlider.valueProperty().bindBidirectional(time.timeScaleProperty());
+            timeScaleSlider.valueProperty().unbindBidirectional(timeManager.timeScaleProperty());
+            timeScaleSlider.valueProperty().bindBidirectional(timeManager.timeScaleProperty());
         }
         if (sliderScaleLabel != null) {
             sliderScaleLabel.textProperty().unbind();
             sliderScaleLabel.textProperty().bind(Bindings.createStringBinding(
-                () -> String.format("Current Time Speed : x%.1f", time.timeScaleProperty().get()),
-                time.timeScaleProperty()
+                () -> String.format("Current Time Speed : x%.1f", timeManager.timeScaleProperty().get()),
+                timeManager.timeScaleProperty()
             ));
         }
         if (daysLabel != null) {
             daysLabel.textProperty().unbind();
             daysLabel.textProperty().bind(Bindings.createStringBinding(
-                () -> "Days : " + time.dayNumberProperty().get(),
-                time.dayNumberProperty()
+                () -> "Days : " + timeManager.dayNumberProperty().get(),
+                timeManager.dayNumberProperty()
             ));
         }
         if (timeLabelNode != null) {
             timeLabelNode.textProperty().unbind();
             timeLabelNode.textProperty().bind(Bindings.createStringBinding(
-                () -> "Time : " + time.formattedProperty().get(),
-                time.formattedProperty()
+                () -> "Time : " + formatClockOnly(timeManager.timeOfDayProperty().get()),
+                timeManager.timeOfDayProperty()
             ));
         }
-        if (setDayButton != null) setDayButton.setOnAction(e -> time.setTimeOfDay(8, 0));
-        if (setNightButton != null) setNightButton.setOnAction(e -> time.setTimeOfDay(20, 0));
-        if (addHourButton != null) addHourButton.setOnAction(e -> time.addMinutes(60));
+        if (setDayButton != null) setDayButton.setOnAction(e -> timeManager.setTimeOfDay(8, 0));
+        if (setNightButton != null) setNightButton.setOnAction(e -> timeManager.setTimeOfDay(20, 0));
+        if (addHourButton != null) addHourButton.setOnAction(e -> timeManager.addMinutes(60));
         if (saveExitButton != null) {
             saveExitButton.setOnAction(this::handlesaveexitaction);
         }
 
         refreshStatusAllocationUi();
+        refreshSharedHudBars();
         refreshMenuState();
     }
 
@@ -1549,19 +1592,107 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         if (statusHpNode != null) statusHpNode.setText("HP : " + playerState.getHp() + "/" + shownMaxHp + formatPending(pendingHpPoints));
         if (statusSpNode != null) statusSpNode.setText("SP : " + playerState.getStamina() + "/" + shownMaxSp + formatPending(pendingSpPoints));
 
-        ProgressBar hpBarNode = controllerField("hpbar", ProgressBar.class);
-        ProgressBar spBarNode = controllerField("spbar", ProgressBar.class);
-        if (hpBarNode != null) {
-            hpBarNode.setProgress(Math.max(0.0, Math.min(1.0, playerState.getHp() / (double) shownMaxHp)));
-        }
-        if (spBarNode != null) {
-            spBarNode.setProgress(Math.max(0.0, Math.min(1.0, playerState.getStamina() / (double) shownMaxSp)));
-        }
+        refreshSharedHudBars();
 
         if (statusStrNode != null) statusStrNode.setText("STR : " + playerState.getStr() + formatPending(pendingStrPoints));
         if (statusVitNode != null) statusVitNode.setText("VIT : " + playerState.getVit() + formatPending(pendingVitPoints));
         if (statusDexNode != null) statusDexNode.setText("DEX : " + playerState.getDex() + formatPending(pendingDexPoints));
         if (statusAgiNode != null) statusAgiNode.setText("AGI : " + playerState.getAgi() + formatPending(pendingAgiPoints));
+    }
+
+    private void setupDayNightNavHudIfPresent() {
+        Group navGroup = daynightnavgroup != null ? daynightnavgroup : controllerField("daynightnavgroup", Group.class);
+        if (navGroup == null) {
+            return;
+        }
+
+        navGroup.setOpacity(0.45);
+        navGroup.setOnMouseEntered(e -> navGroup.setOpacity(1.0));
+        navGroup.setOnMouseExited(e -> navGroup.setOpacity(0.45));
+
+        GameTimeManager timeManager = GameTimeManager.get();
+
+        Label dayLabel = day != null ? day : controllerField("day", Label.class);
+        if (dayLabel != null) {
+            dayLabel.textProperty().unbind();
+            dayLabel.textProperty().bind(timeManager.dayNumberProperty().asString("Day: %d"));
+        }
+
+        Label timeLabel = time != null ? time : controllerField("time", Label.class);
+        if (timeLabel != null) {
+            timeLabel.textProperty().unbind();
+            timeLabel.textProperty().bind(Bindings.createStringBinding(
+                () -> "Time: " + formatClockOnly(timeManager.timeOfDayProperty().get()),
+                timeManager.timeOfDayProperty()
+            ));
+        }
+
+        Label nameLabel = name != null ? name : controllerField("name", Label.class);
+        if (nameLabel != null && playerState != null) {
+            nameLabel.textProperty().unbind();
+            nameLabel.textProperty().bind(Bindings.createStringBinding(
+                () -> "Name: " + safePlayerName(playerState.getPlayerName()),
+                playerState.playerNameProperty()
+            ));
+        }
+
+        Label coinLabel = coin != null ? coin : controllerField("coin", Label.class);
+        if (coinLabel != null && playerState != null && playerState.getInventory() != null) {
+            coinLabel.textProperty().unbind();
+            coinLabel.textProperty().bind(playerState.getInventory().coinsProperty().asString(": %d"));
+        }
+
+        ImageView circle = daynightcircleimg != null ? daynightcircleimg : controllerField("daynightcircleimg", ImageView.class);
+        if (circle != null) {
+            circle.rotateProperty().unbind();
+            circle.rotateProperty().bind(Bindings.createDoubleBinding(
+                () -> computeDayNightCircleAngle(timeManager.totalSecondsProperty().get()),
+                timeManager.totalSecondsProperty()
+            ));
+        }
+
+        refreshSharedHudBars();
+    }
+
+    private void refreshSharedHudBars() {
+        if (playerState == null) return;
+
+        ProgressBar hpBarNode = hpbar != null ? hpbar : controllerField("hpbar", ProgressBar.class);
+        ProgressBar spBarNode = spbar != null ? spbar : controllerField("spbar", ProgressBar.class);
+        if (hpBarNode == null && spBarNode == null) {
+            return;
+        }
+
+        int shownMaxHp = Math.max(1, playerState.getMaxHp() + pendingHpPoints);
+        int shownMaxSp = Math.max(1, playerState.getMaxStamina() + pendingSpPoints);
+
+        if (hpBarNode != null && !hpBarNode.progressProperty().isBound()) {
+            hpBarNode.setProgress(Math.max(0.0, Math.min(1.0, playerState.getHp() / (double) shownMaxHp)));
+        }
+        if (spBarNode != null && !spBarNode.progressProperty().isBound()) {
+            spBarNode.setProgress(Math.max(0.0, Math.min(1.0, playerState.getStamina() / (double) shownMaxSp)));
+        }
+    }
+
+    private static String formatClockOnly(LocalTime localTime) {
+        LocalTime safeTime = (localTime == null) ? LocalTime.MIDNIGHT : localTime;
+        return String.format("%02d:%02d", safeTime.getHour(), safeTime.getMinute());
+    }
+
+    private static String safePlayerName(String playerName) {
+        if (playerName == null) return "Player";
+        String trimmed = playerName.trim();
+        return trimmed.isBlank() ? "Player" : trimmed;
+    }
+
+    private static double computeDayNightCircleAngle(double totalSeconds) {
+        int secondsOfDay = (int) Math.floor(totalSeconds % (24.0 * 60.0 * 60.0));
+        if (secondsOfDay < 0) secondsOfDay += 24 * 60 * 60;
+
+        int cycleSeconds = 24 * 60 * 60;
+        int anchorAtSix = 6 * 60 * 60;
+        int elapsedFromSix = Math.floorMod(secondsOfDay - anchorAtSix, cycleSeconds);
+        return -(elapsedFromSix * (360.0 / cycleSeconds));
     }
 
     private void refreshGenericSkillsView() {
