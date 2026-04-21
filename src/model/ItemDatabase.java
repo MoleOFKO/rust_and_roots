@@ -617,6 +617,8 @@ public final class ItemDatabase {
         }
 
         List<String> candidates = List.of(
+            cropName,
+            toSpriteKey(cropName),
             cropName + " Fruit",
             toSpriteKey(cropName) + "_fruit"
         );

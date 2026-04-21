@@ -1288,13 +1288,8 @@ public class ShopController implements Initializable, SceneController {
 
         Set<Integer> unlockedCookingIngredients = buildUnlockedIngredientIds(RecipeCatalog.Domain.COOKING, shopById);
         Set<Integer> unlockedCraftingIngredients = buildUnlockedIngredientIds(RecipeCatalog.Domain.CRAFTING, shopById);
-
-        Set<Integer> unlockedAllIngredients = new LinkedHashSet<>();
-        unlockedAllIngredients.addAll(unlockedCookingIngredients);
-        unlockedAllIngredients.addAll(unlockedCraftingIngredients);
-        unlockedAllIngredients.addAll(meltIngredientPool);
-
-        Set<Integer> preferredSeedIds = buildPreferredSeedIds(seedIds, unlockedAllIngredients);
+        Set<Integer> cookableSeedIds = buildPreferredSeedIds(seedIds, new LinkedHashSet<>(cookingIngredientPool));
+        Set<Integer> preferredCookingSeedIds = buildPreferredSeedIds(seedIds, unlockedCookingIngredients);
 
         List<Integer> result = new ArrayList<>(slotCount);
         Set<Integer> used = new LinkedHashSet<>();
@@ -1335,7 +1330,9 @@ public class ShopController implements Initializable, SceneController {
                     }
                 }
             } else if (slotNumber == 3) {
-                List<Integer> preferred = preferredSeedIds.isEmpty() ? seedIds : new ArrayList<>(preferredSeedIds);
+                List<Integer> preferred = !preferredCookingSeedIds.isEmpty()
+                    ? new ArrayList<>(preferredCookingSeedIds)
+                    : (!cookableSeedIds.isEmpty() ? new ArrayList<>(cookableSeedIds) : seedIds);
                 chosenId = pickWeightedItemId(preferred, Set.of(), Set.of(), used, 1.0, 1.0);
                 if (chosenId <= 0) {
                     chosenId = pickWeightedItemId(preferred, Set.of(), Set.of(), Set.of(), 1.0, 1.0);
