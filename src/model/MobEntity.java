@@ -39,6 +39,16 @@ public final class MobEntity {
     private static final double REGEN_PER_VIT = 0.07;
     // GameTimeManager uses ~24 in-game seconds per real second at timeScale=1.
     private static final double GAME_SECONDS_PER_REAL_SECOND = 24.0;
+    private static final int SLIME_KILL_HP_WEIGHT = 24;
+    private static final int SLIME_KILL_SP_WEIGHT = 21;
+    private static final int SLIME_KILL_STR_WEIGHT = 24;
+    private static final int SLIME_KILL_AGI_WEIGHT = 20;
+    private static final int SLIME_KILL_VIT_WEIGHT = 10;
+    private static final int ORC_KILL_HP_WEIGHT = 23;
+    private static final int ORC_KILL_SP_WEIGHT = 23;
+    private static final int ORC_KILL_STR_WEIGHT = 22;
+    private static final int ORC_KILL_AGI_WEIGHT = 15;
+    private static final int ORC_KILL_VIT_WEIGHT = 15;
 
     private static final long IDLE_FRAME_DELAY_NANOS = 150_000_000L;
     private static final long RUN_FRAME_DELAY_NANOS = 90_000_000L;
@@ -305,23 +315,20 @@ public final class MobEntity {
     private KillBonusStat chooseKillBonusStat(int roll0to99) {
         int r = Math.max(0, Math.min(99, roll0to99));
 
-        // Weights sum to 100 (percent-like).
-        // Slime: HP 24%, SP 21%, STR 24%, AGI 20%, VIT 10%, DEX 1%
         if (kind == Kind.SLIME) {
-            if (r < 24) return KillBonusStat.HP;
-            if (r < 24 + 21) return KillBonusStat.SP;
-            if (r < 24 + 21 + 24) return KillBonusStat.STR;
-            if (r < 24 + 21 + 24 + 20) return KillBonusStat.AGI;
-            if (r < 24 + 21 + 24 + 20 + 10) return KillBonusStat.VIT;
+            if (r < SLIME_KILL_HP_WEIGHT) return KillBonusStat.HP;
+            if (r < SLIME_KILL_HP_WEIGHT + SLIME_KILL_SP_WEIGHT) return KillBonusStat.SP;
+            if (r < SLIME_KILL_HP_WEIGHT + SLIME_KILL_SP_WEIGHT + SLIME_KILL_STR_WEIGHT) return KillBonusStat.STR;
+            if (r < SLIME_KILL_HP_WEIGHT + SLIME_KILL_SP_WEIGHT + SLIME_KILL_STR_WEIGHT + SLIME_KILL_AGI_WEIGHT) return KillBonusStat.AGI;
+            if (r < SLIME_KILL_HP_WEIGHT + SLIME_KILL_SP_WEIGHT + SLIME_KILL_STR_WEIGHT + SLIME_KILL_AGI_WEIGHT + SLIME_KILL_VIT_WEIGHT) return KillBonusStat.VIT;
             return KillBonusStat.DEX;
         }
 
-        // Orc: HP 23%, SP 23%, STR 22%, AGI 15%, VIT 15%, DEX 2%
-        if (r < 23) return KillBonusStat.HP;
-        if (r < 23 + 23) return KillBonusStat.SP;
-        if (r < 23 + 23 + 22) return KillBonusStat.STR;
-        if (r < 23 + 23 + 22 + 15) return KillBonusStat.AGI;
-        if (r < 23 + 23 + 22 + 15 + 15) return KillBonusStat.VIT;
+        if (r < ORC_KILL_HP_WEIGHT) return KillBonusStat.HP;
+        if (r < ORC_KILL_HP_WEIGHT + ORC_KILL_SP_WEIGHT) return KillBonusStat.SP;
+        if (r < ORC_KILL_HP_WEIGHT + ORC_KILL_SP_WEIGHT + ORC_KILL_STR_WEIGHT) return KillBonusStat.STR;
+        if (r < ORC_KILL_HP_WEIGHT + ORC_KILL_SP_WEIGHT + ORC_KILL_STR_WEIGHT + ORC_KILL_AGI_WEIGHT) return KillBonusStat.AGI;
+        if (r < ORC_KILL_HP_WEIGHT + ORC_KILL_SP_WEIGHT + ORC_KILL_STR_WEIGHT + ORC_KILL_AGI_WEIGHT + ORC_KILL_VIT_WEIGHT) return KillBonusStat.VIT;
         return KillBonusStat.DEX;
     }
 
