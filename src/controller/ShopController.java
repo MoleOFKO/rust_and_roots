@@ -504,6 +504,17 @@ public class ShopController implements Initializable, SceneController {
         }
         if (!inv.canAfford(total)) return;
 
+        int confirm = AppDialogs.showConfirmDialog(
+            null,
+            "Buy " + selectedCount + " item(s) for " + total + "g?",
+            "Confirm Purchase",
+            javax.swing.JOptionPane.OK_CANCEL_OPTION,
+            javax.swing.JOptionPane.QUESTION_MESSAGE
+        );
+        if (confirm != javax.swing.JOptionPane.OK_OPTION) {
+            return;
+        }
+
         int coinsBefore = inv.getCoins();
         if (!inv.spendCoins(total)) return;
 
@@ -544,6 +555,17 @@ public class ShopController implements Initializable, SceneController {
         }
 
         int totalGain = computeSellTotal();
+        int confirm = AppDialogs.showConfirmDialog(
+            null,
+            "Sell " + selectedCount + " item(s) for " + totalGain + "g?",
+            "Confirm Sale",
+            javax.swing.JOptionPane.OK_CANCEL_OPTION,
+            javax.swing.JOptionPane.QUESTION_MESSAGE
+        );
+        if (confirm != javax.swing.JOptionPane.OK_OPTION) {
+            return;
+        }
+
         int coinsBefore = inv.getCoins();
 
         boolean removed;
@@ -572,13 +594,13 @@ public class ShopController implements Initializable, SceneController {
         refreshTableFromSellCart();
         refreshAllPanels();
 
-        int coinsAfter = inv.getCoins();
-        AppDialogs.showMessageDialog(
-            null,
-            "Sold " + selectedCount + " item(s).\nMoney: +" + totalGain + "g\nCoins: " + coinsBefore + "g -> " + coinsAfter + "g",
-            "Sale Complete",
-            javax.swing.JOptionPane.INFORMATION_MESSAGE
-        );
+//        int coinsAfter = inv.getCoins();
+//        AppDialogs.showMessageDialog(
+//            null,
+//            "Sold " + selectedCount + " item(s).\nMoney: +" + totalGain + "g\nCoins: " + coinsBefore + "g -> " + coinsAfter + "g",
+//            "Sale Complete",
+//            javax.swing.JOptionPane.INFORMATION_MESSAGE
+//        );
     }
 
     @FXML
