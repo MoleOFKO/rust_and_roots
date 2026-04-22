@@ -32,6 +32,9 @@ public class MobMapState {
 
         public boolean dead = false;
 
+        /** GameTimeManager.totalSeconds when this mob should respawn. -1 means not respawning. */
+        public double respawnAtTotalSeconds = -1.0;
+
         /** Group layout position (in parent's coordinate space). */
         public double layoutX = 0.0;
         public double layoutY = 0.0;

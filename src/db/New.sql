@@ -484,6 +484,7 @@ CREATE TABLE `saved_mob` (
   `vit_stat` int NOT NULL DEFAULT '0',
   `dex_stat` int NOT NULL DEFAULT '0',
   `dead` tinyint(1) NOT NULL DEFAULT '0',
+  `respawn_at_total_seconds` double NOT NULL DEFAULT '-1',
   `layout_x` double NOT NULL DEFAULT '0',
   `layout_y` double NOT NULL DEFAULT '0',
   `last_regen_total_seconds` double NOT NULL DEFAULT '-1',
@@ -864,6 +865,8 @@ DROP PROCEDURE IF EXISTS ensure_saved_smelt_state_table;
 DROP PROCEDURE IF EXISTS ensure_saved_smelt_ore_history_table;
 DROP PROCEDURE IF EXISTS ensure_saved_tree_resource_table;
 DROP PROCEDURE IF EXISTS ensure_saved_tree_drop_table;
+DROP PROCEDURE IF EXISTS ensure_saved_mob_table;
+DROP PROCEDURE IF EXISTS ensure_saved_mob_drop_table;
 DROP PROCEDURE IF EXISTS ensure_saved_shop_state_table;
 DROP PROCEDURE IF EXISTS ensure_saved_shop_random_item_table;
 DROP PROCEDURE IF EXISTS ensure_saved_shop_stock_table;
@@ -1135,6 +1138,104 @@ BEGIN
     END IF;
 END $$
 
+CREATE PROCEDURE ensure_saved_mob_table()
+BEGIN
+    DECLARE v_missing_respawn_at_total_seconds INT DEFAULT 0;
+
+    CREATE TABLE IF NOT EXISTS saved_mob (
+        saved_id INT NOT NULL,
+        map_key VARCHAR(50) NOT NULL,
+        mob_id VARCHAR(50) NOT NULL,
+        mob_type VARCHAR(50) NOT NULL,
+        lived_days INT NOT NULL DEFAULT '0',
+        hp INT NOT NULL DEFAULT '0',
+        max_hp INT NOT NULL DEFAULT '0',
+        sp INT NOT NULL DEFAULT '0',
+        max_sp INT NOT NULL DEFAULT '0',
+        str_stat INT NOT NULL DEFAULT '0',
+        agi_stat INT NOT NULL DEFAULT '0',
+        vit_stat INT NOT NULL DEFAULT '0',
+        dex_stat INT NOT NULL DEFAULT '0',
+        dead TINYINT(1) NOT NULL DEFAULT '0',
+        respawn_at_total_seconds DOUBLE NOT NULL DEFAULT '-1',
+        layout_x DOUBLE NOT NULL DEFAULT '0',
+        layout_y DOUBLE NOT NULL DEFAULT '0',
+        last_regen_total_seconds DOUBLE NOT NULL DEFAULT '-1',
+        last_updated_day_number INT NOT NULL DEFAULT '1',
+        PRIMARY KEY (saved_id, map_key, mob_id),
+        CONSTRAINT fk_saved_mob_save
+            FOREIGN KEY (saved_id) REFERENCES save_game (saved_id) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+    SELECT COUNT(*)
+      INTO v_missing_respawn_at_total_seconds
+      FROM information_schema.columns
+     WHERE table_schema = DATABASE()
+       AND table_name = 'saved_mob'
+       AND column_name = 'respawn_at_total_seconds';
+    IF v_missing_respawn_at_total_seconds = 0 THEN
+        ALTER TABLE saved_mob
+            ADD COLUMN respawn_at_total_seconds DOUBLE NOT NULL DEFAULT '-1' AFTER dead;
+    END IF;
+END $$
+
+CREATE PROCEDURE ensure_saved_mob_drop_table()
+BEGIN
+    DECLARE v_missing_quantity INT DEFAULT 0;
+    DECLARE v_missing_spawned_at_total_seconds INT DEFAULT 0;
+    DECLARE v_missing_expires_at_total_seconds INT DEFAULT 0;
+
+    CREATE TABLE IF NOT EXISTS saved_mob_drop (
+        saved_id INT NOT NULL,
+        map_key VARCHAR(50) NOT NULL,
+        mob_id VARCHAR(50) NOT NULL,
+        drop_slot INT NOT NULL,
+        item_id INT NOT NULL,
+        quantity INT NOT NULL DEFAULT '1',
+        spawned_at_total_seconds DOUBLE NOT NULL DEFAULT '0',
+        expires_at_total_seconds DOUBLE NOT NULL DEFAULT '0',
+        PRIMARY KEY (saved_id, map_key, mob_id, drop_slot),
+        KEY idx_saved_mob_drop_item_id (item_id),
+        CONSTRAINT fk_saved_mob_drop_item
+            FOREIGN KEY (item_id) REFERENCES items (item_id) ON DELETE CASCADE,
+        CONSTRAINT fk_saved_mob_drop_save
+            FOREIGN KEY (saved_id) REFERENCES save_game (saved_id) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+    SELECT COUNT(*)
+      INTO v_missing_quantity
+      FROM information_schema.columns
+     WHERE table_schema = DATABASE()
+       AND table_name = 'saved_mob_drop'
+       AND column_name = 'quantity';
+    IF v_missing_quantity = 0 THEN
+        ALTER TABLE saved_mob_drop
+            ADD COLUMN quantity INT NOT NULL DEFAULT '1' AFTER item_id;
+    END IF;
+
+    SELECT COUNT(*)
+      INTO v_missing_spawned_at_total_seconds
+      FROM information_schema.columns
+     WHERE table_schema = DATABASE()
+       AND table_name = 'saved_mob_drop'
+       AND column_name = 'spawned_at_total_seconds';
+    IF v_missing_spawned_at_total_seconds = 0 THEN
+        ALTER TABLE saved_mob_drop
+            ADD COLUMN spawned_at_total_seconds DOUBLE NOT NULL DEFAULT '0' AFTER quantity;
+    END IF;
+
+    SELECT COUNT(*)
+      INTO v_missing_expires_at_total_seconds
+      FROM information_schema.columns
+     WHERE table_schema = DATABASE()
+       AND table_name = 'saved_mob_drop'
+       AND column_name = 'expires_at_total_seconds';
+    IF v_missing_expires_at_total_seconds = 0 THEN
+        ALTER TABLE saved_mob_drop
+            ADD COLUMN expires_at_total_seconds DOUBLE NOT NULL DEFAULT '0' AFTER spawned_at_total_seconds;
+    END IF;
+END $$
+
 CREATE PROCEDURE ensure_saved_smelt_state_table()
 BEGIN
   DECLARE v_missing_last_point_update_total_seconds INT DEFAULT 0;
@@ -1287,6 +1388,8 @@ BEGIN
   CALL ensure_saved_shop_stock_table();
   CALL ensure_saved_tree_resource_table();
   CALL ensure_saved_tree_drop_table();
+  CALL ensure_saved_mob_table();
+  CALL ensure_saved_mob_drop_table();
   CALL ensure_saved_smelt_state_table();
   CALL ensure_saved_smelt_ore_history_table();
   CALL ensure_saved_farm_plot_defaults();

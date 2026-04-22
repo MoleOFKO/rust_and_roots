@@ -3,6 +3,7 @@ package model;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
+import game.GameTimeManager;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Bounds;
 import javafx.geometry.Rectangle2D;
@@ -10,6 +11,8 @@ import javafx.scene.Group;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.shape.Rectangle;
+import util.CombatRules;
+import util.TimeFlow;
 
 /**
  * Runtime mob controller (AI + animation) backed by {@link MobMapState.MobData}.
@@ -31,8 +34,6 @@ public final class MobEntity {
     private static final int FRAME_SIZE = 64;
     private static final double INV_SQRT_2 = 1.0 / Math.sqrt(2.0);
     private static final double NANOS_PER_60FPS_FRAME = 1_000_000_000.0 / 60.0;
-    private static final double NORMAL_AGI = 5.0;
-    private static final double ATTACK_SPEED_PER_AGI = 0.045;
 
     // Player-like regen baseline (per real second).
     private static final double BASE_REGEN_PER_REAL_SECOND = 0.65;
@@ -55,6 +56,24 @@ public final class MobEntity {
     private static final long BASE_ATTACK_FRAME_DELAY_NANOS = 110_000_000L;
     private static final long HURT_FRAME_DELAY_NANOS = 90_000_000L;
     private static final long DEATH_FRAME_DELAY_NANOS = 90_000_000L;
+
+    // Spec update: mobs respawn at 1 in-game minute minimum.
+    private static final double MOB_BASE_RESPAWN_SECONDS = 60.0;
+
+    // Spec base stats (day 1).
+    private static final int SLIME_BASE_MAX_HP = 10;
+    private static final int SLIME_BASE_MAX_SP = 30;
+    private static final int SLIME_BASE_STR = 3;
+    private static final int SLIME_BASE_VIT = 6;
+    private static final int SLIME_BASE_AGI = 2;
+    private static final int SLIME_BASE_DEX = 1;
+
+    private static final int ORC_BASE_MAX_HP = 20;
+    private static final int ORC_BASE_MAX_SP = 25;
+    private static final int ORC_BASE_STR = 4;
+    private static final int ORC_BASE_VIT = 3;
+    private static final int ORC_BASE_AGI = 3;
+    private static final int ORC_BASE_DEX = 1;
 
     private final Kind kind;
     private final MobMapState.MobData data;
@@ -89,6 +108,7 @@ public final class MobEntity {
     private long lastUpdateNanos = 0L;
     private long lastAnimFrameNanos = 0L;
     private long lastDeathFrameNanos = 0L;
+    private long simNowNanos = 0L;
 
     private boolean moving = false;
     private boolean deathStarted = false;
@@ -184,17 +204,29 @@ public final class MobEntity {
     }
 
     public void update(long nowNanos, int currentDay, double nowSeconds, Bounds playerBoundsScene, PlayerState playerState) {
+        updateDropsExpiry(nowSeconds);
+
+        if (data.dead) {
+            scheduleRespawnIfNeeded(nowSeconds);
+
+            if (deathFinished) {
+                if (tryRespawnIfReady(currentDay, nowSeconds)) {
+                    return;
+                }
+                return;
+            }
+        }
+
         if (deathFinished) {
-            updateDropsExpiry(nowSeconds);
             return;
         }
 
         if (lastUpdateNanos == 0L) {
             lastUpdateNanos = nowNanos;
-            lastAnimFrameNanos = nowNanos;
-            lastDeathFrameNanos = nowNanos;
+            simNowNanos = 0L;
+            lastAnimFrameNanos = 0L;
+            lastDeathFrameNanos = 0L;
             syncNodePositionToStateIfNeeded();
-            updateDropsExpiry(nowSeconds);
             if (data.dead) {
                 finalizeDeathState();
             } else {
@@ -207,25 +239,30 @@ public final class MobEntity {
         long dtNanos = Math.max(0L, nowNanos - lastUpdateNanos);
         lastUpdateNanos = nowNanos;
 
+        double worldDilation = GameTimeManager.get().getWorldDilation();
+        double timeFlow = TimeFlow.entityTimeFlowFromAgi(data.agi);
+        double effective = Math.max(0.0, worldDilation) * Math.max(0.0, timeFlow);
+
+        long dtSimNanos = scaleDeltaNanos(dtNanos, effective);
+        simNowNanos = safeAddNanos(simNowNanos, dtSimNanos);
+
         // Persist position each tick.
         data.layoutX = node.getLayoutX();
         data.layoutY = node.getLayoutY();
 
-        updateDropsExpiry(nowSeconds);
-
         if (data.dead) {
-            updateDeathAnimation(nowNanos);
+            updateDeathAnimation(simNowNanos);
             return;
         }
 
         applyDailyGrowthIfNeeded(currentDay);
         applyRegenIfNeeded(nowSeconds);
 
-        if (hurtActive && nowNanos < hurtEndsAtNanos) {
+        if (hurtActive && simNowNanos < hurtEndsAtNanos) {
             moving = false;
             syncAttackHitboxesEnabled(false);
             setAnimState(AnimState.HURT, false);
-            updateAnimation(nowNanos);
+            updateAnimation(simNowNanos);
             return;
         }
         if (hurtActive) {
@@ -233,12 +270,12 @@ public final class MobEntity {
             hurtEndsAtNanos = 0L;
         }
 
-        if (isAttackActive(nowNanos)) {
+        if (isAttackActive(simNowNanos)) {
             moving = false;
             syncAttackHitboxesEnabled(true);
             setAnimState(AnimState.ATTACK, false);
             tryApplyAttackDamage(playerBoundsScene, playerState);
-            updateAnimation(nowNanos);
+            updateAnimation(simNowNanos);
             return;
         }
 
@@ -248,15 +285,24 @@ public final class MobEntity {
             setAnimState(AnimState.IDLE, true);
         }
 
+        // Spec: if SP is 0, mobs can't take any actions (move/attack/etc.).
+        if (data.sp <= 0) {
+            moving = false;
+            syncAttackHitboxesEnabled(true);
+            setAnimState(AnimState.IDLE, false);
+            updateAnimation(simNowNanos);
+            return;
+        }
+
         boolean canChase = shouldChase(playerBoundsScene, playerState);
 
         if (canChase) {
-            moveTowardTarget(dtNanos, playerBoundsScene);
+            moveTowardTarget(dtSimNanos, playerBoundsScene);
             syncAttackHitboxesEnabled(true);
             setAnimState(moving ? AnimState.RUN : AnimState.IDLE, false);
 
-            if (shouldStartAttack(nowNanos, playerBoundsScene, playerState)) {
-                startAttack(nowNanos);
+            if (shouldStartAttack(simNowNanos, playerBoundsScene, playerState)) {
+                startAttack(simNowNanos);
                 tryApplyAttackDamage(playerBoundsScene, playerState);
             }
         } else {
@@ -265,21 +311,23 @@ public final class MobEntity {
             setAnimState(AnimState.IDLE, false);
         }
 
-        updateAnimation(nowNanos);
+        updateAnimation(simNowNanos);
     }
 
     public boolean applyPlayerDamage(int amount, long nowNanos) {
-        int dmg = Math.max(0, amount);
+        int raw = Math.max(0, amount);
+        int dmg = CombatRules.applyDamageReduction(raw, data.vit);
         if (dmg <= 0 || data.dead) return false;
 
         int hpBefore = Math.max(0, data.hp);
         int hpAfter = Math.max(0, hpBefore - dmg);
         data.hp = hpAfter;
 
+        long now = simNowNanos;
         hurtActive = true;
-        hurtEndsAtNanos = nowNanos + (long) hurtColumns * HURT_FRAME_DELAY_NANOS;
+        hurtEndsAtNanos = now + (long) hurtColumns * HURT_FRAME_DELAY_NANOS;
         setAnimState(AnimState.HURT, true);
-        lastAnimFrameNanos = nowNanos;
+        lastAnimFrameNanos = now;
 
         if (hpAfter <= 0) {
             data.dead = true;
@@ -386,17 +434,168 @@ public final class MobEntity {
 
         data.livedDays = Math.max(0, data.livedDays + delta);
 
-        if (kind == Kind.SLIME) {
-            data.str = Math.max(0, data.str) + delta;
-            data.agi = Math.max(0, data.agi) + delta;
-            data.maxSp = Math.max(0, data.maxSp) + delta;
-            data.sp = Math.min(data.maxSp, Math.max(0, data.sp) + delta);
-        } else {
-            data.str = Math.max(0, data.str) + delta;
-            data.vit = Math.max(0, data.vit) + delta;
-            data.maxHp = Math.max(0, data.maxHp) + delta;
-            data.hp = Math.min(data.maxHp, Math.max(0, data.hp) + delta);
+        for (int i = 0; i < delta; i++) {
+            applySingleDailyGrowthRoll();
         }
+
+        data.maxHp = Math.max(1, data.maxHp);
+        data.maxSp = Math.max(1, data.maxSp);
+        data.hp = Math.max(0, Math.min(data.maxHp, data.hp));
+        data.sp = Math.max(0, Math.min(data.maxSp, data.sp));
+    }
+
+    private void applySingleDailyGrowthRoll() {
+        int roll = ThreadLocalRandom.current().nextInt(100);
+
+        if (kind == Kind.SLIME) {
+            // Spec (slime): STR 10%, AGI 20%, MAX SP 30%, VIT 30%, MAX HP 10%.
+            if (roll < 10) {
+                data.str = Math.max(0, data.str) + 1;
+                return;
+            }
+            if (roll < 30) {
+                data.agi = Math.max(0, data.agi) + 1;
+                return;
+            }
+            if (roll < 60) {
+                data.maxSp = Math.max(1, data.maxSp) + 1;
+                data.sp = Math.min(data.maxSp, Math.max(0, data.sp) + 1);
+                return;
+            }
+            if (roll < 90) {
+                data.vit = Math.max(0, data.vit) + 1;
+                return;
+            }
+
+            data.maxHp = Math.max(1, data.maxHp) + 1;
+            data.hp = Math.min(data.maxHp, Math.max(0, data.hp) + 1);
+            return;
+        }
+
+        // Spec (orc): STR 35%, AGI 5%, MAX HP 30%, VIT 30%.
+        if (roll < 35) {
+            data.str = Math.max(0, data.str) + 1;
+            return;
+        }
+        if (roll < 40) {
+            data.agi = Math.max(0, data.agi) + 1;
+            return;
+        }
+        if (roll < 70) {
+            data.maxHp = Math.max(1, data.maxHp) + 1;
+            data.hp = Math.min(data.maxHp, Math.max(0, data.hp) + 1);
+            return;
+        }
+
+        data.vit = Math.max(0, data.vit) + 1;
+    }
+
+    private void scheduleRespawnIfNeeded(double nowSeconds) {
+        if (!data.dead) {
+            data.respawnAtTotalSeconds = -1.0;
+            return;
+        }
+
+        if (data.respawnAtTotalSeconds >= 0.0) {
+            return;
+        }
+
+        if (Double.isNaN(nowSeconds) || Double.isInfinite(nowSeconds)) {
+            data.respawnAtTotalSeconds = -1.0;
+            return;
+        }
+
+        data.respawnAtTotalSeconds = Math.max(0.0, nowSeconds + computeRespawnSeconds());
+    }
+
+    private double computeRespawnSeconds() {
+        int totalStatusPoints = 0;
+        totalStatusPoints += Math.max(0, data.maxHp);
+        totalStatusPoints += Math.max(0, data.maxSp);
+        totalStatusPoints += Math.max(0, data.str);
+        totalStatusPoints += Math.max(0, data.agi);
+        totalStatusPoints += Math.max(0, data.vit);
+        totalStatusPoints += Math.max(0, data.dex);
+        return Math.max(MOB_BASE_RESPAWN_SECONDS, (double) totalStatusPoints);
+    }
+
+    private boolean tryRespawnIfReady(int currentDay, double nowSeconds) {
+        if (!data.dead) {
+            return false;
+        }
+        if (data.respawnAtTotalSeconds < 0.0) {
+            return false;
+        }
+        if (nowSeconds < data.respawnAtTotalSeconds) {
+            return false;
+        }
+
+        respawn(currentDay, nowSeconds);
+        return true;
+    }
+
+    private void respawn(int currentDay, double nowSeconds) {
+        int day = Math.max(1, currentDay);
+
+        data.dead = false;
+        data.respawnAtTotalSeconds = -1.0;
+
+        data.livedDays = 0;
+        data.lastUpdatedDayNumber = day;
+        data.lastRegenTotalSeconds = nowSeconds;
+
+        // Reset stats to base and then apply world-day growth rolls so newly respawned mobs scale with the timeline.
+        if (kind == Kind.SLIME) {
+            data.maxHp = SLIME_BASE_MAX_HP;
+            data.maxSp = SLIME_BASE_MAX_SP;
+            data.str = SLIME_BASE_STR;
+            data.agi = SLIME_BASE_AGI;
+            data.vit = SLIME_BASE_VIT;
+            data.dex = SLIME_BASE_DEX;
+        } else {
+            data.maxHp = ORC_BASE_MAX_HP;
+            data.maxSp = ORC_BASE_MAX_SP;
+            data.str = ORC_BASE_STR;
+            data.agi = ORC_BASE_AGI;
+            data.vit = ORC_BASE_VIT;
+            data.dex = ORC_BASE_DEX;
+        }
+
+        int worldRolls = Math.max(0, day - 1);
+        for (int i = 0; i < worldRolls; i++) {
+            applySingleDailyGrowthRoll();
+        }
+
+        data.maxHp = Math.max(1, data.maxHp);
+        data.maxSp = Math.max(1, data.maxSp);
+        data.hp = data.maxHp;
+        data.sp = data.maxSp;
+
+        hpRegenCarry = 0.0;
+        spRegenCarry = 0.0;
+
+        moving = false;
+        deathStarted = false;
+        deathFinished = false;
+        hurtActive = false;
+        hurtEndsAtNanos = 0L;
+        attackEndsAtNanos = 0L;
+        nextAttackAvailableAtNanos = 0L;
+        attackDamageApplied = false;
+        frameIndex = 0;
+
+        bodyHitbox.setDisable(false);
+        if (detectRange != null) {
+            detectRange.setDisable(false);
+        }
+
+        syncAttackHitboxesEnabled(true);
+        setAnimState(AnimState.IDLE, true);
+
+        lastUpdateNanos = 0L;
+        lastAnimFrameNanos = 0L;
+        lastDeathFrameNanos = 0L;
+        simNowNanos = 0L;
     }
 
     private void applyRegenIfNeeded(double nowSeconds) {
@@ -415,20 +614,26 @@ public final class MobEntity {
             return;
         }
 
-        double regenPerGameSecond = (BASE_REGEN_PER_REAL_SECOND + (Math.max(0, data.vit) * REGEN_PER_VIT)) / GAME_SECONDS_PER_REAL_SECOND;
-        if (regenPerGameSecond <= 0.0) {
+        int maxHp = Math.max(0, data.maxHp);
+        int maxSp = Math.max(0, data.maxSp);
+
+        int vit = Math.max(0, data.vit);
+        double amountMultiplier = 1.0 + (vit * 0.02);
+        double speedMultiplier = 1.0 + (vit * 0.01);
+
+        double hpRegenPerGameSecond = (maxHp * 0.01 * amountMultiplier * speedMultiplier) / 60.0;
+        double spRegenPerGameSecond = (maxSp * 0.01 * amountMultiplier * speedMultiplier) / 60.0;
+
+        if (hpRegenPerGameSecond <= 0.0 && spRegenPerGameSecond <= 0.0) {
             data.lastRegenTotalSeconds = nowSeconds;
             return;
         }
 
-        double hpGain = regenPerGameSecond * elapsed;
-        double spGain = regenPerGameSecond * elapsed;
+        double hpGain = hpRegenPerGameSecond * elapsed;
+        double spGain = spRegenPerGameSecond * elapsed;
 
         hpRegenCarry += hpGain;
         spRegenCarry += spGain;
-
-        int maxHp = Math.max(0, data.maxHp);
-        int maxSp = Math.max(0, data.maxSp);
 
         while (hpRegenCarry >= 1.0 && data.hp < maxHp) {
             data.hp += 1;
@@ -437,6 +642,14 @@ public final class MobEntity {
         while (spRegenCarry >= 1.0 && data.sp < maxSp) {
             data.sp += 1;
             spRegenCarry -= 1.0;
+        }
+
+        // Don't stockpile regen while at full.
+        if (data.hp >= maxHp) {
+            hpRegenCarry = 0.0;
+        }
+        if (data.sp >= maxSp) {
+            spRegenCarry = 0.0;
         }
 
         if (data.hp > maxHp) data.hp = maxHp;
@@ -494,7 +707,10 @@ public final class MobEntity {
         double dirY = vy / dist;
 
         double speed = getMovementSpeed();
-        double frameScale = Math.min(0.15, dtNanos / NANOS_PER_60FPS_FRAME);
+        double frames = dtNanos / NANOS_PER_60FPS_FRAME;
+        // Cap movement steps to avoid huge jumps after stalls (15 frames @ 60fps).
+        frames = Math.min(15.0, Math.max(0.0, frames));
+        double frameScale = 0.15 * frames;
         double dx = dirX * speed * frameScale;
         double dy = dirY * speed * frameScale;
 
@@ -511,10 +727,7 @@ public final class MobEntity {
     }
 
     private double getMovementSpeed() {
-        double agiRatio = Math.max(0.0, data.agi) / NORMAL_AGI;
-        double agiModifier = 0.6 + (0.4 * agiRatio);
-        double currentSpeed = 5.0 * agiModifier;
-        return Math.max(0.5, currentSpeed);
+        return 5.0;
     }
 
     private boolean move(double dx, double dy, Bounds playerBoundsInParent) {
@@ -610,10 +823,8 @@ public final class MobEntity {
 
     private int computeDamageTo(PlayerState target) {
         if (target == null) return 0;
-        int myStr = Math.max(0, data.str);
-        int targetVit = Math.max(0, target.getVit());
-        // The chase rule ensures this is generally positive; still clamp for safety.
-        return Math.max(1, myStr - targetVit);
+        int rolled = CombatRules.rollAttackDamage(data.str, 0);
+        return CombatRules.applyDamageReduction(rolled, target.getVit());
     }
 
     private Rectangle resolveActiveAttackHitbox() {
@@ -630,11 +841,23 @@ public final class MobEntity {
     }
 
     private long getAttackFrameDelayNanos() {
-        // Same attack-speed curve as the player (speeds up above NORMAL_AGI).
-        double agiBonusScale = 1.0 + (Math.max(0.0, data.agi - NORMAL_AGI) * ATTACK_SPEED_PER_AGI);
-        double speedScale = 1.0 / agiBonusScale;
-        long computed = Math.max(1L, (long) Math.floor(BASE_ATTACK_FRAME_DELAY_NANOS * speedScale));
-        return Math.max((long) NANOS_PER_60FPS_FRAME, computed);
+        return Math.max((long) NANOS_PER_60FPS_FRAME, BASE_ATTACK_FRAME_DELAY_NANOS);
+    }
+
+    private static long scaleDeltaNanos(long dtNanos, double multiplier) {
+        if (dtNanos <= 0L) return 0L;
+        if (multiplier <= 0.0) return 0L;
+        if (Double.isNaN(multiplier) || Double.isInfinite(multiplier)) return dtNanos;
+
+        double scaled = dtNanos * multiplier;
+        if (scaled >= Long.MAX_VALUE) return Long.MAX_VALUE;
+        return (long) Math.floor(scaled);
+    }
+
+    private static long safeAddNanos(long a, long b) {
+        if (b <= 0L) return a;
+        if (a >= Long.MAX_VALUE - b) return Long.MAX_VALUE;
+        return a + b;
     }
 
     private void updateAnimation(long nowNanos) {

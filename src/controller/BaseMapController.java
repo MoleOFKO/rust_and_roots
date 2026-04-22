@@ -58,6 +58,7 @@ import model.PlayerState;
 import util.AppDialogs;
 import util.SceneManager;
 import util.SpawnTag;
+import util.TimeFlow;
 import util.WorldScaler;
 import javafx.scene.control.ToggleButton;
 
@@ -366,10 +367,11 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
     protected final void stopAndSwitchScene(String targetFxml, SpawnTag targetSpawn) {
         capturePlayerSnapshot();
-        
+         
         detachFarmTimeRefresh();
         if (gameLoop != null) gameLoop.stop();
         if (player != null) player.stop();
+        GameTimeManager.get().setWorldDilation(1.0);
         SceneManager.switchScene(targetFxml, targetSpawn);
     }
 
@@ -2119,8 +2121,11 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     private void startLoop() {
         gameLoop = new GameLoopManager(() -> {
             if (player == null || player.isRemovedFromWorld()) {
+                GameTimeManager.get().setWorldDilation(1.0);
                 return;
             }
+
+            updateWorldTimeDilationFromPlayer();
 
             Bounds playerBounds = human_hitbox.localToScene(human_hitbox.getBoundsInLocal());
 
@@ -2138,6 +2143,28 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         });
 
         gameLoop.start();
+    }
+
+    private void updateWorldTimeDilationFromPlayer() {
+        GameTimeManager time = GameTimeManager.get();
+        if (time == null) {
+            return;
+        }
+
+        double dilation = 1.0;
+
+        if (playerState != null) {
+            boolean runActive =
+                playerState.isRunToggled()
+                    && !playerState.hasStaminaExhaustedLock()
+                    && playerState.getStamina() > 0
+                    && !playerState.isDead()
+                    && !playerState.isSleeping();
+
+            dilation = TimeFlow.worldDilationForPlayerRun(playerState.getAgi(), runActive);
+        }
+
+        time.setWorldDilation(dilation);
     }
     
     protected int playerInventorySlotCapacity() {

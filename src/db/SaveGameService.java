@@ -674,11 +674,11 @@ public class SaveGameService {
                  lived_days,
                  hp, max_hp, sp, max_sp,
                  str_stat, agi_stat, vit_stat, dex_stat,
-                 dead,
+                 dead, respawn_at_total_seconds,
                  layout_x, layout_y,
                  last_regen_total_seconds,
                  last_updated_day_number)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """;
 
         try (PreparedStatement ins = con.prepareStatement(sql)) {
@@ -712,10 +712,11 @@ public class SaveGameService {
                     ins.setInt(12, Math.max(0, mob.vit));
                     ins.setInt(13, Math.max(0, mob.dex));
                     ins.setBoolean(14, mob.dead);
-                    ins.setDouble(15, mob.layoutX);
-                    ins.setDouble(16, mob.layoutY);
-                    ins.setDouble(17, mob.lastRegenTotalSeconds);
-                    ins.setInt(18, Math.max(1, mob.lastUpdatedDayNumber));
+                    ins.setDouble(15, mob.respawnAtTotalSeconds);
+                    ins.setDouble(16, mob.layoutX);
+                    ins.setDouble(17, mob.layoutY);
+                    ins.setDouble(18, mob.lastRegenTotalSeconds);
+                    ins.setInt(19, Math.max(1, mob.lastUpdatedDayNumber));
                     ins.addBatch();
                 }
             }

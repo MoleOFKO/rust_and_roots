@@ -63,6 +63,11 @@ public final class PlayerState {
     private StaminaMode staminaMode = StaminaMode.IDLE;
     private boolean sleeping = false;
 
+    // Regen tracking uses GameTimeManager.totalSeconds (in-game seconds).
+    private double lastRegenTotalSeconds = -1.0;
+    private double hpRegenCarry = 0.0;
+    private double staminaRegenCarry = 0.0;
+
     private static final int HOTBAR_SIZE = 5;
     private static final int INVENTORY_SLOT_CAPACITY = 20;
     private final int[] hotbarItemIds = new int[HOTBAR_SIZE];
@@ -527,23 +532,12 @@ public final class PlayerState {
         StaminaMode effectiveMode = (mode == null) ? StaminaMode.IDLE : mode;
         double safeTimeFlow = Math.max(0.0, timeFlowMultiplier);
 
-        double regen = getBaseStaminaRegenPerSecond() * getModeRegenMultiplier(effectiveMode) * safeTimeFlow * seconds;
         double drain = doesModeDrainStamina(effectiveMode)
             ? getRunDrainPerSecond() * safeTimeFlow * seconds
             : 0.0;
 
-        double modeRegenLimit = getModeStaminaCap(effectiveMode);
-
-        // Drain is always allowed.
         if (drain > 0.0) {
             staminaPrecise = Math.max(0.0, staminaPrecise - drain);
-        }
-
-        // Regen limit is not the same thing as the true stamina cap.
-        // If stamina is already above the current state's regen limit,
-        // keep it there and just stop regenerating higher in that state.
-        if (regen > 0.0 && staminaPrecise < modeRegenLimit) {
-            staminaPrecise = Math.min(modeRegenLimit, staminaPrecise + regen);
         }
 
         if (staminaPrecise > getMaxStamina()) {
@@ -551,6 +545,73 @@ public final class PlayerState {
         }
 
         stamina.set(clamp((int) Math.floor(staminaPrecise + 1.0e-9), 0, getMaxStamina()));
+    }
+
+    /**
+     * Applies passive HP/SP regeneration according to the world timeline.
+     *
+     * <p>Spec:
+     * <ul>
+     *   <li>Base regen amount: 1% of max HP / SP</li>
+     *   <li>Base regen speed: 1 in-game minute</li>
+     *   <li>VIT modifies regen amount and speed</li>
+     * </ul>
+     */
+    public void applyRegenIfNeeded(double nowTotalSeconds) {
+        if (isDead()) {
+            lastRegenTotalSeconds = nowTotalSeconds;
+            return;
+        }
+
+        if (Double.isNaN(nowTotalSeconds) || Double.isInfinite(nowTotalSeconds)) {
+            return;
+        }
+
+        if (lastRegenTotalSeconds < 0.0 || lastRegenTotalSeconds > nowTotalSeconds) {
+            lastRegenTotalSeconds = nowTotalSeconds;
+            return;
+        }
+
+        double elapsed = nowTotalSeconds - lastRegenTotalSeconds;
+        if (elapsed <= 0.0) {
+            return;
+        }
+
+        int maxHpValue = Math.max(0, getMaxHp());
+        int maxSpValue = Math.max(0, getMaxStamina());
+
+        int vitValue = Math.max(0, getVit());
+        double amountMultiplier = 1.0 + (vitValue * 0.02);
+        double speedMultiplier = 1.0 + (vitValue * 0.01);
+
+        double hpRegenPerGameSecond = (maxHpValue * 0.01 * amountMultiplier * speedMultiplier) / 60.0;
+        double spRegenPerGameSecond = (maxSpValue * 0.01 * amountMultiplier * speedMultiplier) / 60.0;
+
+        hpRegenCarry += hpRegenPerGameSecond * elapsed;
+        staminaRegenCarry += spRegenPerGameSecond * elapsed;
+
+        while (hpRegenCarry >= 1.0 && getHp() < maxHpValue) {
+            setHp(getHp() + 1);
+            hpRegenCarry -= 1.0;
+        }
+
+        while (staminaRegenCarry >= 1.0 && staminaPrecise < maxSpValue) {
+            staminaPrecise += 1.0;
+            staminaRegenCarry -= 1.0;
+        }
+
+        if (getHp() >= maxHpValue) {
+            hpRegenCarry = 0.0;
+        }
+        if (staminaPrecise >= maxSpValue) {
+            staminaRegenCarry = 0.0;
+        }
+
+        if (staminaPrecise > maxSpValue) staminaPrecise = maxSpValue;
+        if (staminaPrecise < 0.0) staminaPrecise = 0.0;
+        stamina.set(clamp((int) Math.floor(staminaPrecise + 1.0e-9), 0, maxSpValue));
+
+        lastRegenTotalSeconds = nowTotalSeconds;
     }
 
     public void applyFoodEffect(int hpDelta, int staminaDelta) {

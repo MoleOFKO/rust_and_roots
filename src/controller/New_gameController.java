@@ -153,6 +153,11 @@ public class New_gameController implements Initializable, SceneController {
             return;
         }
 
+        if (getPendingExpCost() > 0) {
+            AppDialogs.showMessageDialog(null, "Please click Confirm to commit your status distribution before starting the game.");
+            return;
+        }
+
         int confirm = AppDialogs.showConfirmDialog(
             null,
             "World Name: \"" + worldName + "\"\nThis name will be shown as the Save Name.\nDo you want to continue?",
@@ -164,8 +169,6 @@ public class New_gameController implements Initializable, SceneController {
         if (confirm != JOptionPane.YES_OPTION) {
             return;
         }
-
-        handleconfirmaction(null);
 
         GameState gs = GameState.get();
         gs.resetForNewGame();
@@ -489,6 +492,10 @@ public class New_gameController implements Initializable, SceneController {
 
         configureImageButton(btnConfirm, getPendingExpCost() > 0, 1.0);
         configureImageButton(btnClear, true, 1.0);
+
+        if (btnStartGame != null) {
+            btnStartGame.setDisable(getPendingExpCost() > 0);
+        }
     }
 
     private void configureImageButton(ImageView view, boolean enabled, double activeOpacity) {

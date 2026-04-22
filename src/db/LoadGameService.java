@@ -721,6 +721,7 @@ public class LoadGameService {
                    vit_stat,
                    dex_stat,
                    dead,
+                   respawn_at_total_seconds,
                    layout_x,
                    layout_y,
                    last_regen_total_seconds,
@@ -754,6 +755,7 @@ public class LoadGameService {
                     mob.vit = rs.getInt("vit_stat");
                     mob.dex = rs.getInt("dex_stat");
                     mob.dead = rs.getBoolean("dead");
+                    mob.respawnAtTotalSeconds = rs.getDouble("respawn_at_total_seconds");
                     mob.layoutX = rs.getDouble("layout_x");
                     mob.layoutY = rs.getDouble("layout_y");
                     mob.lastRegenTotalSeconds = rs.getDouble("last_regen_total_seconds");

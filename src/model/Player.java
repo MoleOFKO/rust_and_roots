@@ -16,15 +16,14 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.shape.Rectangle;
+import game.GameTimeManager;
+import util.TimeFlow;
 
 public class Player {
 
     private static final double INV_SQRT_2 = 1.0 / Math.sqrt(2.0);
     private static final double NANOS_PER_60FPS_FRAME = 16_666_666.0;
-    private static final double NORMAL_AGI = 5.0;
-    private static final double RUN_SPEED_BONUS_RATIO = 0.20;
-    private static final double MIN_RUN_SPEED_BONUS = 0.75;
-    private static final double MAX_RUN_SPEED_BONUS = 1.10;
+    private static final int WALK_AGI_CAP = TimeFlow.PLAYER_WALK_AGI_CAP;
 
     private static final int FRAME_SIZE = 64;
 
@@ -42,7 +41,6 @@ public class Player {
     private static final long MIN_ATTACK_FRAME_DELAY_NANOS = (long) NANOS_PER_60FPS_FRAME;
     private static final long HURT_FRAME_DELAY_NANOS = 90_000_000L;
     private static final long DEATH_FRAME_DELAY_NANOS = 90_000_000L;
-    private static final double ATTACK_SPEED_PER_AGI = 0.045;
 
     private final Group node;
     private final ImageView sprite;
@@ -164,6 +162,7 @@ public class Player {
     private long lastUpdateTime = 0L;
     private long lastAnimFrameTime = 0L;
     private long lastDeathFrameTime = 0L;
+    private long simNowNanos = 0L;
 
     private boolean moving = false;
     private boolean deathStarted = false;
@@ -366,8 +365,9 @@ public class Player {
             public void handle(long now) {
                 if (lastUpdateTime == 0L) {
                     lastUpdateTime = now;
-                    lastAnimFrameTime = now;
-                    lastDeathFrameTime = now;
+                    simNowNanos = 0L;
+                    lastAnimFrameTime = 0L;
+                    lastDeathFrameTime = 0L;
                     updateViewport();
                     return;
                 }
@@ -376,16 +376,48 @@ public class Player {
                     return;
                 }
 
-                long dtNanos = now - lastUpdateTime;
+                long dtNanos = Math.max(0L, now - lastUpdateTime);
                 lastUpdateTime = now;
 
+                double dtSeconds = Math.max(0.0, dtNanos / 1_000_000_000.0);
+
+                boolean runActive =
+                    state != null
+                        && state.isRunToggled()
+                        && !state.hasStaminaExhaustedLock()
+                        && state.getStamina() > 0
+                        && !state.isDead()
+                        && !state.isSleeping();
+
+                // Keep the world dilation updated as close to input as possible so the player-run
+                // effect applies immediately (BaseMapController also enforces a safe default).
+                GameTimeManager time = GameTimeManager.get();
+                double worldDilation = TimeFlow.worldDilationForPlayerRun(state == null ? 0 : state.getAgi(), runActive);
+                time.setWorldDilation(worldDilation);
+
+                int agiForPlayerFlow = state == null ? 0 : state.getAgi();
+                if (!runActive) {
+                    agiForPlayerFlow = Math.min(agiForPlayerFlow, WALK_AGI_CAP);
+                }
+                double playerFlow = TimeFlow.entityTimeFlowFromAgi(agiForPlayerFlow);
+                double effective = Math.max(0.0, worldDilation) * Math.max(0.0, playerFlow);
+
+                long dtSimNanos = scaleDeltaNanos(dtNanos, effective);
+                simNowNanos = safeAddNanos(simNowNanos, dtSimNanos);
+
+                // Passive regen is based on the world timeline (in-game seconds).
+                double nowSeconds = time.totalSecondsProperty().get();
+                if (state != null) {
+                    state.applyRegenIfNeeded(nowSeconds);
+                }
+
                 if (state.isDead()) {
-                    updateDeathAnimation(now);
+                    updateDeathAnimation(simNowNanos);
                     return;
                 }
 
-                updateMovement(dtNanos, now);
-                updateAnimation(now);
+                updateMovement(dtSeconds, dtSimNanos, simNowNanos);
+                updateAnimation(simNowNanos);
 
                 if (detectionTarget != null) {
                     if (isOverlapping(detectionTarget)) {
@@ -408,6 +440,7 @@ public class Player {
         lastUpdateTime = 0L;
         lastAnimFrameTime = 0L;
         lastDeathFrameTime = 0L;
+        simNowNanos = 0L;
 
         clearTransientInputState();
     }
@@ -452,7 +485,7 @@ public class Player {
         return moved;
     }
 
-    private void updateMovement(long dtNanos, long now) {
+    private void updateMovement(double dtRealSeconds, long dtSimNanos, long now) {
         if (state.isDead()) {
             moving = false;
             pressedKeys.clear();
@@ -467,12 +500,10 @@ public class Player {
             return;
         }
 
-        double dtSeconds = Math.max(0.0, dtNanos / 1_000_000_000.0);
-
         if (hurtActive && now < hurtEndsAtNanos) {
             moving = false;
             state.setStaminaMode(PlayerState.StaminaMode.IDLE);
-            state.updateStaminaOverTime(dtSeconds, PlayerState.StaminaMode.IDLE);
+            state.updateStaminaOverTime(dtRealSeconds, PlayerState.StaminaMode.IDLE);
             setAnimState(AnimState.HURT, false);
             return;
         }
@@ -484,7 +515,7 @@ public class Player {
         if (isAttackActive(now)) {
             moving = false;
             state.setStaminaMode(PlayerState.StaminaMode.IDLE);
-            state.updateStaminaOverTime(dtSeconds, PlayerState.StaminaMode.IDLE);
+            state.updateStaminaOverTime(dtRealSeconds, PlayerState.StaminaMode.IDLE);
             setAnimState(AnimState.ATTACK, false);
             return;
         }
@@ -496,7 +527,7 @@ public class Player {
         if (state.hasStaminaExhaustedLock()) {
             moving = false;
             state.setStaminaMode(PlayerState.StaminaMode.IDLE);
-            state.updateStaminaOverTime(dtSeconds, PlayerState.StaminaMode.IDLE);
+            state.updateStaminaOverTime(dtRealSeconds, PlayerState.StaminaMode.IDLE);
             setAnimState(AnimState.IDLE, false);
 
             if (state.getStamina() > 0) {
@@ -505,6 +536,15 @@ public class Player {
             } else {
                 return;
             }
+        }
+
+        // Spec: if SP (stamina) is 0, the player can't take any actions (move/attack/etc.).
+        if (state.getStamina() <= 0) {
+            moving = false;
+            state.setStaminaMode(PlayerState.StaminaMode.IDLE);
+            state.updateStaminaOverTime(dtRealSeconds, PlayerState.StaminaMode.IDLE);
+            setAnimState(AnimState.IDLE, false);
+            return;
         }
 
         double inputX = 0.0;
@@ -526,15 +566,18 @@ public class Player {
         if (inputX == 0.0 && inputY == 0.0) {
             moving = false;
             state.setStaminaMode(PlayerState.StaminaMode.IDLE);
-            state.updateStaminaOverTime(dtSeconds, PlayerState.StaminaMode.IDLE);
+            state.updateStaminaOverTime(dtRealSeconds, PlayerState.StaminaMode.IDLE);
             setAnimState(AnimState.IDLE, false);
             return;
         }
 
         boolean wantsRun = state.isRunToggled();
         boolean isRunning = wantsRun && state.getStamina() > 0;
-        double speed = getCurrentMovementSpeed(isRunning);
-        double frameScale = Math.min(0.15, dtNanos / NANOS_PER_60FPS_FRAME);
+        double speed = getCurrentMovementSpeed();
+        double frames = dtSimNanos <= 0L ? 0.0 : (dtSimNanos / NANOS_PER_60FPS_FRAME);
+        // Spec: cap the player's movement step to 15 frames @ 60fps for human reaction speed.
+        frames = Math.min(15.0, frames);
+        double frameScale = 0.15 * frames;
 
         double dx = inputX * speed * frameScale;
         double dy = inputY * speed * frameScale;
@@ -549,7 +592,7 @@ public class Player {
         if (moving) {
             if (isRunning) {
                 state.setStaminaMode(PlayerState.StaminaMode.RUN);
-                state.updateStaminaOverTime(dtSeconds, PlayerState.StaminaMode.RUN);
+                state.updateStaminaOverTime(dtRealSeconds, PlayerState.StaminaMode.RUN);
                 if (state.getStamina() <= 0) {
                     state.setStaminaExhaustedLock(true);
                     state.setRunToggled(false);
@@ -560,12 +603,12 @@ public class Player {
                 }
             } else {
                 state.setStaminaMode(PlayerState.StaminaMode.WALK);
-                state.updateStaminaOverTime(dtSeconds, PlayerState.StaminaMode.WALK);
+                state.updateStaminaOverTime(dtRealSeconds, PlayerState.StaminaMode.WALK);
                 setAnimState(AnimState.WALK, false);
             }
         } else {
             state.setStaminaMode(PlayerState.StaminaMode.IDLE);
-            state.updateStaminaOverTime(dtSeconds, PlayerState.StaminaMode.IDLE);
+            state.updateStaminaOverTime(dtRealSeconds, PlayerState.StaminaMode.IDLE);
             setAnimState(AnimState.IDLE, false);
         }
     }
@@ -651,12 +694,8 @@ public class Player {
         }
     }
 
-    private double getCurrentMovementSpeed(boolean running) {
-        double agiRatio = state.getAgi() / NORMAL_AGI;
-        double agiModifier = 0.6 + (0.4 * agiRatio);
-
-        double currentSpeed = baseSpeed * agiModifier;
-
+    private double getCurrentMovementSpeed() {
+        double currentSpeed = baseSpeed;
         double staminaRatio = state.getMaxStamina() <= 0
             ? 0.0
             : (double) state.getStamina() / state.getMaxStamina();
@@ -664,11 +703,6 @@ public class Player {
         if (staminaRatio < 0.30) {
             currentSpeed *= 0.65;
         }
-
-        if (running) {
-            currentSpeed += getRunSpeedBonus();
-        }
-
         return currentSpeed;
     }
 
@@ -945,14 +979,14 @@ public class Player {
         return (url == null) ? null : new Image(url.toExternalForm());
     }
 
-    private double getRunSpeedBonus() {
-        return Math.max(MIN_RUN_SPEED_BONUS, Math.min(MAX_RUN_SPEED_BONUS, baseSpeed * RUN_SPEED_BONUS_RATIO));
-    }
-
     private void triggerAttack() {
         EquipmentAnimationSet animationSet = equipmentAnimations.get(equippedKind);
-        long now = System.nanoTime();
+        long now = simNowNanos;
         if (animationSet == null || !animationSet.supportsAttack() || deathStarted || deathFinished) {
+            return;
+        }
+
+        if (state.getStamina() <= 0) {
             return;
         }
 
@@ -1005,10 +1039,7 @@ public class Player {
     }
 
     private long getAttackFrameDelayNanos() {
-        double agiBonusScale = 1.0 + (Math.max(0.0, state.getAgi() - NORMAL_AGI) * ATTACK_SPEED_PER_AGI);
-        double speedScale = 1.0 / agiBonusScale;
-        long computed = Math.max(1L, (long) Math.floor(BASE_ATTACK_FRAME_DELAY_NANOS * speedScale));
-        return Math.max(MIN_ATTACK_FRAME_DELAY_NANOS, computed);
+        return Math.max(MIN_ATTACK_FRAME_DELAY_NANOS, BASE_ATTACK_FRAME_DELAY_NANOS);
     }
 
     private void triggerHurt() {
@@ -1016,10 +1047,26 @@ public class Player {
             return;
         }
 
-        long now = System.nanoTime();
+        long now = simNowNanos;
         hurtActive = true;
         hurtEndsAtNanos = now + (HURT_COLUMNS * HURT_FRAME_DELAY_NANOS);
         setAnimState(AnimState.HURT, true);
+    }
+
+    private static long scaleDeltaNanos(long dtNanos, double multiplier) {
+        if (dtNanos <= 0L) return 0L;
+        if (multiplier <= 0.0) return 0L;
+        if (Double.isNaN(multiplier) || Double.isInfinite(multiplier)) return dtNanos;
+
+        double scaled = dtNanos * multiplier;
+        if (scaled >= Long.MAX_VALUE) return Long.MAX_VALUE;
+        return (long) Math.floor(scaled);
+    }
+
+    private static long safeAddNanos(long a, long b) {
+        if (b <= 0L) return a;
+        if (a >= Long.MAX_VALUE - b) return Long.MAX_VALUE;
+        return a + b;
     }
 
     private EquipmentKind resolveEquipmentKind(int itemId) {

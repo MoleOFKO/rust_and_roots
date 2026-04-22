@@ -16,6 +16,12 @@ public final class GameTimeManager {
 
     // ---- State ----
     private final DoubleProperty timeScale = new SimpleDoubleProperty(1.0); // debug speed
+    /**
+     * Runtime time-dilation multiplier applied on top of {@link #timeScale}. This is intended for
+     * gameplay effects (e.g. player "run" mode slowing the world) without overwriting the debug UI
+     * slider value.
+     */
+    private final DoubleProperty worldDilation = new SimpleDoubleProperty(1.0);
     private final BooleanProperty paused = new SimpleBooleanProperty(false);
 
     // total simulated seconds since day 1 start (00:00)
@@ -55,7 +61,9 @@ public final class GameTimeManager {
 
                 if (paused.get()) return;
 
-                double scaled = dt * GAME_SECONDS_PER_REAL_SECOND * Math.max(0.0, timeScale.get());
+                double scaled = dt * GAME_SECONDS_PER_REAL_SECOND
+                    * Math.max(0.0, timeScale.get())
+                    * Math.max(0.0, worldDilation.get());
                 if (scaled <= 0) return;
 
                 totalSeconds.set(totalSeconds.get() + scaled);
@@ -99,6 +107,7 @@ public final class GameTimeManager {
 
     // ---- Public properties (bind in UI) ----
     public DoubleProperty timeScaleProperty() { return timeScale; }
+    public DoubleProperty worldDilationProperty() { return worldDilation; }
     public BooleanProperty pausedProperty() { return paused; }
     public DoubleProperty totalSecondsProperty() { return totalSeconds; }
 
@@ -109,10 +118,19 @@ public final class GameTimeManager {
     public ReadOnlyDoubleProperty realWorldElapsedSecondsProperty() { return realWorldElapsedSeconds.getReadOnlyProperty(); }
 
     public boolean isNight() { return night.get(); }
+    public double getWorldDilation() { return worldDilation.get(); }
 
     // ---- Debug / manipulation API ----
     public void setPaused(boolean v) { paused.set(v); }
     public void togglePause() { paused.set(!paused.get()); }
+
+    public void setWorldDilation(double value) {
+        if (Double.isNaN(value) || Double.isInfinite(value)) {
+            worldDilation.set(1.0);
+            return;
+        }
+        worldDilation.set(Math.max(0.0, value));
+    }
 
     public void addMinutes(int minutes) {
         totalSeconds.set(Math.max(0, totalSeconds.get() + minutes * 60.0));
