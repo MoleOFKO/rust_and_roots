@@ -529,6 +529,14 @@ public class ShopController implements Initializable, SceneController {
         rebuildSellAvailabilityFromInventory();
         refreshTableFromBuyCart();
         refreshAllPanels();
+
+        int coinsAfter = inv.getCoins();
+        AppDialogs.showMessageDialog(
+            null,
+            "Bought " + selectedCount + " item(s).\nMoney: -" + total + "g\nCoins: " + coinsBefore + "g -> " + coinsAfter + "g",
+            "Purchase Complete",
+            javax.swing.JOptionPane.INFORMATION_MESSAGE
+        );
     }
 
     @FXML
@@ -585,6 +593,14 @@ public class ShopController implements Initializable, SceneController {
         rebuildSellAvailabilityFromInventory();
         refreshTableFromSellCart();
         refreshAllPanels();
+
+//        int coinsAfter = inv.getCoins();
+//        AppDialogs.showMessageDialog(
+//            null,
+//            "Sold " + selectedCount + " item(s).\nMoney: +" + totalGain + "g\nCoins: " + coinsBefore + "g -> " + coinsAfter + "g",
+//            "Sale Complete",
+//            javax.swing.JOptionPane.INFORMATION_MESSAGE
+//        );
     }
 
     @FXML
