@@ -30,6 +30,7 @@ import model.MobEntity;
 import model.MobMapState;
 import model.item;
 import util.AppDialogs;
+import util.CombatRules;
 import util.SpawnTag;
 
 /**
@@ -606,6 +607,7 @@ public class Upper_mapController extends BaseMapController {
         if (missingType || missingStats) {
             mob.mobType = mobType;
             mob.dead = false;
+            mob.respawnAtTotalSeconds = -1.0;
             mob.livedDays = 0;
 
             mob.maxHp = Math.max(1, maxHp);
@@ -618,10 +620,18 @@ public class Upper_mapController extends BaseMapController {
             mob.vit = Math.max(0, vit);
             mob.dex = Math.max(0, dex);
 
+            int safeDay = Math.max(1, currentDay);
+            int worldRolls = Math.max(0, safeDay - 1);
+            for (int i = 0; i < worldRolls; i++) {
+                applySingleMobDailyGrowthRoll(mob);
+            }
+            mob.hp = mob.maxHp;
+            mob.sp = mob.maxSp;
+
             mob.layoutX = mobNode.getLayoutX();
             mob.layoutY = mobNode.getLayoutY();
             mob.lastRegenTotalSeconds = nowSeconds;
-            mob.lastUpdatedDayNumber = Math.max(1, currentDay);
+            mob.lastUpdatedDayNumber = safeDay;
             mob.drops.clear();
             return;
         }
@@ -635,6 +645,54 @@ public class Upper_mapController extends BaseMapController {
         mob.maxSp = Math.max(1, mob.maxSp);
         mob.hp = Math.max(0, Math.min(mob.maxHp, mob.hp));
         mob.sp = Math.max(0, Math.min(mob.maxSp, mob.sp));
+    }
+
+    private void applySingleMobDailyGrowthRoll(MobMapState.MobData mob) {
+        if (mob == null) return;
+
+        String type = mob.mobType == null ? "" : mob.mobType.trim().toLowerCase(Locale.ROOT);
+        int roll = ThreadLocalRandom.current().nextInt(100);
+
+        if (type.contains("orc")) {
+            // Spec (orc): STR 35%, AGI 5%, MAX HP 30%, VIT 30%.
+            if (roll < 35) {
+                mob.str = Math.max(0, mob.str) + 1;
+                return;
+            }
+            if (roll < 40) {
+                mob.agi = Math.max(0, mob.agi) + 1;
+                return;
+            }
+            if (roll < 70) {
+                mob.maxHp = Math.max(1, mob.maxHp) + 1;
+                mob.hp = Math.min(mob.maxHp, Math.max(0, mob.hp) + 1);
+                return;
+            }
+            mob.vit = Math.max(0, mob.vit) + 1;
+            return;
+        }
+
+        // Default (slime): STR 10%, AGI 20%, MAX SP 30%, VIT 30%, MAX HP 10%.
+        if (roll < 10) {
+            mob.str = Math.max(0, mob.str) + 1;
+            return;
+        }
+        if (roll < 30) {
+            mob.agi = Math.max(0, mob.agi) + 1;
+            return;
+        }
+        if (roll < 60) {
+            mob.maxSp = Math.max(1, mob.maxSp) + 1;
+            mob.sp = Math.min(mob.maxSp, Math.max(0, mob.sp) + 1);
+            return;
+        }
+        if (roll < 90) {
+            mob.vit = Math.max(0, mob.vit) + 1;
+            return;
+        }
+
+        mob.maxHp = Math.max(1, mob.maxHp) + 1;
+        mob.hp = Math.min(mob.maxHp, Math.max(0, mob.hp) + 1);
     }
 
     @Override
@@ -762,29 +820,20 @@ public class Upper_mapController extends BaseMapController {
     private int calculatePlayerMobDamage() {
         if (playerState == null || player == null) return 0;
 
-        int damage = Math.max(0, playerState.getStr());
+        int playerStr = Math.max(0, playerState.getStr());
+        int bonus = 0;
         int equippedId = player.getEquippedItemId();
         if (equippedId > 0) {
             String name = ItemDatabase.getItemName(equippedId);
             if (name != null && !name.isBlank()) {
                 String normalized = name.trim().toLowerCase(Locale.ROOT);
                 if (normalized.contains("sword")) {
-                    damage += 2;
-                } else if (normalized.contains("pickaxe") || normalized.contains("pick axe")) {
-                    damage += 1;
-                } else if (normalized.contains("axe")) {
-                    // Avoid counting pickaxes as axes.
-                    if (!normalized.contains("pickaxe") && !normalized.contains("pick axe")) {
-                        damage += 1;
-                    }
-                } else {
-                    // Any other equipped tool/weapon provides a small bonus.
-                    damage += 1;
+                    bonus += 2;
                 }
             }
         }
 
-        return Math.max(1, damage);
+        return CombatRules.rollAttackDamage(playerStr, bonus);
     }
 
     private int resolveSandItemId() {

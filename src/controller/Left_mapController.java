@@ -35,6 +35,7 @@ import model.ItemDatabase;
 import model.TreeMapState;
 import model.item;
 import util.AppDialogs;
+import util.CombatRules;
 import util.SceneManager;
 import util.SpawnTag;
 /**
@@ -46,8 +47,8 @@ public class Left_mapController extends BaseMapController {
 
     private static final String MAIN_TREE_ID = "tree";
     private static final String MAIN_STONE_ID = "stone";
-    // Respawn time while in stage 1: half an in-game day (12 hours).
-    private static final double TREE_RESPAWN_SECONDS = 12.0 * 60.0 * 60.0;
+    // Spec: tree/stone respawn base time is 1 in-game minute (60 seconds).
+    private static final double TREE_RESPAWN_SECONDS = 60.0;
 
     private static final double TREE_DROP_TTL_SECONDS = 12.0 * 60.0 * 60.0;
     private static final int TREE_STARTING_MAX_HP = 10;
@@ -848,7 +849,7 @@ public class Left_mapController extends BaseMapController {
         resource.vit = vitFor(resource.livedDays);
 
         int resourceVit = Math.max(0, resource.vit);
-        int receivedDamage = Math.max(0, baseDamage - resourceVit);
+        int receivedDamage = CombatRules.applyDamageReduction(baseDamage, resourceVit);
         int reducedDamage = Math.max(0, baseDamage - receivedDamage);
 
         int hpBefore = Math.max(0, resource.hp);
@@ -892,22 +893,16 @@ public class Left_mapController extends BaseMapController {
         if (playerState == null) return 0;
 
         int playerStr = Math.max(0, playerState.getStr());
-        int damage = playerStr;
-        if (isAxeEquipped()) {
-            damage += 1;
-        }
-        return Math.max(0, damage);
+        int bonus = isAxeEquipped() ? 1 : 0;
+        return CombatRules.rollAttackDamage(playerStr, bonus);
     }
 
     private int calculatePlayerBaseDamageForStone() {
         if (playerState == null) return 0;
 
         int playerStr = Math.max(0, playerState.getStr());
-        int damage = playerStr;
-        if (isPickaxeEquipped()) {
-            damage += 1;
-        }
-        return Math.max(0, damage);
+        int bonus = isPickaxeEquipped() ? 1 : 0;
+        return CombatRules.rollAttackDamage(playerStr, bonus);
     }
 
     private boolean isAxeEquipped() {
@@ -941,11 +936,12 @@ public class Left_mapController extends BaseMapController {
         if (tree == null) return;
         if (tree.currentStage == 1) return;
 
+        double respawnSeconds = computeResourceRespawnSeconds(tree);
         tree.currentStage = 1;
         tree.hp = 0;
         tree.maxHp = 0;
         tree.vit = 0;
-        tree.respawnAtTotalSeconds = nowSeconds + TREE_RESPAWN_SECONDS;
+        tree.respawnAtTotalSeconds = nowSeconds + respawnSeconds;
         tree.livedDays = 0;
         tree.lastUpdatedDayNumber = Math.max(1, currentDay);
         tree.lastHpGrowthTotalSeconds = -1;
@@ -958,9 +954,9 @@ public class Left_mapController extends BaseMapController {
         if (tree == null) return;
 
         tree.typeKey = randomTreeTypeKey();
-        tree.currentStage = 2;
-        tree.livedDays = 0;
-        tree.vit = vitFor(0);
+        tree.livedDays = Math.max(0, currentDay - 1);
+        tree.currentStage = stageFromLivedDays(tree.livedDays);
+        tree.vit = vitFor(tree.livedDays);
         tree.maxHp = TREE_STARTING_MAX_HP;
         tree.hp = TREE_STARTING_MAX_HP;
         tree.respawnAtTotalSeconds = -1;
@@ -976,11 +972,12 @@ public class Left_mapController extends BaseMapController {
         if (stone == null) return;
         if (stone.currentStage == 1) return;
 
+        double respawnSeconds = computeResourceRespawnSeconds(stone);
         stone.currentStage = 1;
         stone.hp = 0;
         stone.maxHp = 0;
         stone.vit = 0;
-        stone.respawnAtTotalSeconds = nowSeconds + TREE_RESPAWN_SECONDS;
+        stone.respawnAtTotalSeconds = nowSeconds + respawnSeconds;
         stone.livedDays = 0;
         stone.lastUpdatedDayNumber = Math.max(1, currentDay);
         stone.lastHpGrowthTotalSeconds = -1;
@@ -993,9 +990,9 @@ public class Left_mapController extends BaseMapController {
         if (stone == null) return;
 
         stone.typeKey = "stone";
-        stone.currentStage = 2;
-        stone.livedDays = 0;
-        stone.vit = vitFor(0);
+        stone.livedDays = Math.max(0, currentDay - 1);
+        stone.currentStage = stageFromLivedDays(stone.livedDays);
+        stone.vit = vitFor(stone.livedDays);
         stone.maxHp = TREE_STARTING_MAX_HP;
         stone.hp = TREE_STARTING_MAX_HP;
         stone.respawnAtTotalSeconds = -1;
@@ -1005,6 +1002,18 @@ public class Left_mapController extends BaseMapController {
         stone.dropRatePity = 0;
         stone.dropsThisLife = 0;
         stone.damageSinceLastDropRoll = 0;
+    }
+
+    private double computeResourceRespawnSeconds(TreeMapState.TreeData resource) {
+        if (resource == null) {
+            return TREE_RESPAWN_SECONDS;
+        }
+
+        int totalStatusPoints = 0;
+        totalStatusPoints += Math.max(0, resource.maxHp);
+        totalStatusPoints += Math.max(0, resource.vit);
+
+        return Math.max(TREE_RESPAWN_SECONDS, (double) totalStatusPoints);
     }
 
     private void applyResourceDropRollsForDamage(
