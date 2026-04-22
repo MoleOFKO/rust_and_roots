@@ -219,6 +219,20 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     
     protected static final double MAP_EXIT_DELAY_GAME_SECONDS =0.5;
 
+    // ---------- World time flow ----------
+    // Walk speed is capped at this AGI (run uses full AGI).
+    protected static final int WALK_SPEED_AGI_CAP = 15;
+    // Minimum slowdown multiplier when running at extreme AGI values.
+    protected static final double RUN_WORLD_FLOW_MIN_SCALE = 0.35;
+    // Smooth transitions so the world doesn't "snap" when toggling run.
+    protected static final double WORLD_FLOW_SMOOTHING_PER_SECOND = 12.0;
+
+    private double smoothedWorldFlowScale = 1.0;
+    private long lastWorldFlowUpdateNanos = 0L;
+
+    private long worldSimNowNanos = 0L;
+    private long lastLoopRealNowNanos = 0L;
+
     protected final List<ImageView> hotbarImages = new ArrayList<>();
     protected final List<Label> hotbarLabels = new ArrayList<>();
     protected int hotbarAssignmentIndex = 0;
@@ -370,6 +384,14 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         detachFarmTimeRefresh();
         if (gameLoop != null) gameLoop.stop();
         if (player != null) player.stop();
+
+        // Ensure world time resumes normally when leaving a map.
+        GameTimeManager.get().worldFlowScaleProperty().set(1.0);
+        smoothedWorldFlowScale = 1.0;
+        lastWorldFlowUpdateNanos = 0L;
+        worldSimNowNanos = 0L;
+        lastLoopRealNowNanos = 0L;
+
         SceneManager.switchScene(targetFxml, targetSpawn);
     }
 
@@ -2118,7 +2140,19 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
     private void startLoop() {
         gameLoop = new GameLoopManager(() -> {
-            if (player == null || player.isRemovedFromWorld()) {
+            if (player == null) {
+                return;
+            }
+
+            updateWorldFlowScaleIfNeeded();
+            updateWorldSimClock();
+
+            double nowSeconds = GameTimeManager.get().totalSecondsProperty().get();
+            if (playerState != null) {
+                playerState.applyBaseRegenIfNeeded(nowSeconds);
+            }
+
+            if (player.isRemovedFromWorld()) {
                 return;
             }
 
@@ -2130,7 +2164,6 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
             if (farm != null) {
                 farm.updatePlayerBounds(playerBounds);
-                double nowSeconds = GameTimeManager.get().totalSecondsProperty().get();
                 farm.update(nowSeconds);
             }
 
@@ -2138,6 +2171,85 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         });
 
         gameLoop.start();
+    }
+
+    private void updateWorldSimClock() {
+        long nowReal = System.nanoTime();
+        if (lastLoopRealNowNanos == 0L) {
+            lastLoopRealNowNanos = nowReal;
+            worldSimNowNanos = 0L;
+            return;
+        }
+
+        long dtReal = Math.max(0L, nowReal - lastLoopRealNowNanos);
+        lastLoopRealNowNanos = nowReal;
+
+        double worldScale = Math.max(0.0, GameTimeManager.get().worldFlowScaleProperty().get());
+        double dtSim = dtReal * worldScale;
+        long dtSimNanos = (long) Math.floor(Math.max(0.0, dtSim));
+
+        // Avoid completely freezing the simulation clock due to rounding when the scale is small.
+        if (dtReal > 0L && worldScale > 0.0 && dtSimNanos <= 0L) {
+            dtSimNanos = 1L;
+        }
+
+        long next = worldSimNowNanos + dtSimNanos;
+        worldSimNowNanos = next < 0L ? Long.MAX_VALUE : next;
+    }
+
+    protected final long getWorldSimNowNanos() {
+        return worldSimNowNanos;
+    }
+
+    private void updateWorldFlowScaleIfNeeded() {
+        GameTimeManager time = GameTimeManager.get();
+        double targetScale = computeTargetWorldFlowScale();
+
+        long nowNanos = System.nanoTime();
+        if (lastWorldFlowUpdateNanos == 0L) {
+            lastWorldFlowUpdateNanos = nowNanos;
+            smoothedWorldFlowScale = targetScale;
+        } else {
+            double dtSeconds = Math.max(0.0, (nowNanos - lastWorldFlowUpdateNanos) / 1_000_000_000.0);
+            lastWorldFlowUpdateNanos = nowNanos;
+
+            // Exponential smoothing toward the target.
+            double alpha = 1.0 - Math.exp(-dtSeconds * WORLD_FLOW_SMOOTHING_PER_SECOND);
+            smoothedWorldFlowScale = smoothedWorldFlowScale + (targetScale - smoothedWorldFlowScale) * alpha;
+        }
+
+        time.worldFlowScaleProperty().set(smoothedWorldFlowScale);
+    }
+
+    private double computeTargetWorldFlowScale() {
+        if (playerState == null || playerState.isDead() || playerState.isSleeping()) {
+            return 1.0;
+        }
+
+        boolean wantsRun = playerState.isRunToggled()
+                && !playerState.hasStaminaExhaustedLock()
+                && playerState.getStamina() > 0;
+
+        // Only apply bullet-time while the player is actively running (moving).
+        if (!wantsRun || playerState.getStaminaMode() != PlayerState.StaminaMode.RUN) {
+            return 1.0;
+        }
+
+        int agi = Math.max(0, playerState.getAgi());
+        double cap = agiMovementMultiplier(WALK_SPEED_AGI_CAP);
+        double current = agiMovementMultiplier(agi);
+        if (current <= cap) {
+            return 1.0;
+        }
+
+        double scale = cap / current;
+        return Math.max(RUN_WORLD_FLOW_MIN_SCALE, Math.min(1.0, scale));
+    }
+
+    private static double agiMovementMultiplier(int agi) {
+        final double normalAgi = 5.0;
+        double agiRatio = Math.max(0.0, agi) / normalAgi;
+        return 0.6 + (0.4 * agiRatio);
     }
     
     protected int playerInventorySlotCapacity() {
