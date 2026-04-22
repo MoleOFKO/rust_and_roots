@@ -510,5 +510,5 @@ public class D_homemapController extends BaseMapController {
         registerExit(exit_right, "/view/left_map_notwo_of_two.fxml", SpawnTag.FROM_LEFT);
     }
 
-    
+
 }

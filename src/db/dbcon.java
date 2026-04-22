@@ -15,8 +15,8 @@ import java.sql.SQLException;
 public class dbcon {
     
     private String username="root";
-    private String password="Er05@vE1!fE5";
-    
+//    private String password="Er05@vE1!fE5";
+    private String password="111111111";
     public Connection getConnection() throws ClassNotFoundException{
         Connection con=null;
         String url="jdbc:mysql://localhost:3306/rust_and_root";

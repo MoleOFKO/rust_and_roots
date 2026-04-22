@@ -48,14 +48,11 @@ public class home_mapController extends BaseMapController {
     @FXML private Rectangle homedetect;
     @FXML private Button doorbtn;
 
-    @FXML private Rectangle leftmapdetect;
-    @FXML private Button leftmsp;
+    private Rectangle leftmapdetect;
 
-    @FXML private Rectangle rightmapdetect;
-    @FXML private Button rightmsp;
+    private Rectangle rightmapdetect;
 
-    @FXML private Rectangle uppermapdetect;
-    @FXML private Button uppermsp;
+    private Rectangle uppermapdetect;
 
     @FXML private Label statusName;
     @FXML private Label statusEXP;
@@ -266,12 +263,6 @@ public class home_mapController extends BaseMapController {
     @FXML
     private Group home;
     @FXML
-    private Group leftMap;
-    @FXML
-    private Group rightMap;
-    @FXML
-    private Group upperMap;
-    @FXML
     private HBox hotbar;
     @FXML
     private StackPane Hslot;
@@ -467,6 +458,28 @@ public class home_mapController extends BaseMapController {
     private ToggleButton slotBtn4;
     @FXML
     private ImageView equip_img;
+    @FXML
+    private Rectangle exit_left;
+    @FXML
+    private Rectangle exit_right;
+    @FXML
+    private Rectangle exit_up;
+    @FXML
+    private Group daynightnavgroup;
+    @FXML
+    private Label day;
+    @FXML
+    private ImageView daynightcircleimg;
+    @FXML
+    private Label time;
+    @FXML
+    private Label name;
+    @FXML
+    private Label coin;
+    @FXML
+    private ProgressBar hpbar;
+    @FXML
+    private ProgressBar spbar;
     
 
     @Override
@@ -486,9 +499,9 @@ public class home_mapController extends BaseMapController {
 
     @Override
     protected void configureExits() {
-        registerExit(leftmapdetect, "/view/left_map.fxml", SpawnTag.FROM_RIGHT);
-        registerExit(rightmapdetect, "/view/right_map.fxml", SpawnTag.FROM_LEFT);
-        registerExit(uppermapdetect, "/view/upper_map.fxml", SpawnTag.FROM_DOWN);
+        registerExit(exit_left, "/view/left_map.fxml", SpawnTag.FROM_RIGHT);
+        registerExit(exit_right, "/view/right_map.fxml", SpawnTag.FROM_LEFT);
+        registerExit(exit_up, "/view/upper_map.fxml", SpawnTag.FROM_DOWN);
         registerExit(homedetect, "/view/home_interior.fxml", SpawnTag.FROM_DOOR);
     }
     
@@ -597,22 +610,20 @@ public class home_mapController extends BaseMapController {
         SceneManager.switchScene("/view/home_interior.fxml", SpawnTag.FROM_DOOR);
     }
 
-    @FXML
     private void handleleftmapaction(ActionEvent event) throws IOException {
         GameState.get().setReturnScene("/view/home_map.fxml", SpawnTag.FROM_LEFT);
         SceneManager.switchScene("/view/left_map.fxml", SpawnTag.FROM_RIGHT);
     }
 
-    @FXML
     private void handlerightmapaction(ActionEvent event) throws IOException {
         GameState.get().setReturnScene("/view/home_map.fxml", SpawnTag.FROM_RIGHT);
         SceneManager.switchScene("/view/right_map.fxml", SpawnTag.FROM_LEFT);
     }
 
-    @FXML
     private void handleuppermapaction(ActionEvent event) throws IOException {
         GameState.get().setReturnScene("/view/home_map.fxml", SpawnTag.FROM_UP);
         SceneManager.switchScene("/view/upper_map.fxml", SpawnTag.FROM_DOWN);
     }
- 
+
+
 }

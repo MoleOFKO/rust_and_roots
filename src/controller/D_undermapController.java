@@ -388,6 +388,10 @@ public class D_undermapController extends BaseMapController {
     private Button openstatus;
     @FXML
     private Button opensetting;
+    @FXML
+    private Rectangle wall14;
+    @FXML
+    private Rectangle wall15;
     
 
 //    @FXML
@@ -534,5 +538,6 @@ public class D_undermapController extends BaseMapController {
         registerExit(exit_down, "/view/d_undermap_noone.fxml", SpawnTag.FROM_UP);
         registerExit(exit_up, "/view/d_homemap.fxml", SpawnTag.FROM_DOWN);
     }
-    
+
+
 }
