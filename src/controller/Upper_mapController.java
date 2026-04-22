@@ -429,6 +429,18 @@ public class Upper_mapController extends BaseMapController {
     private static final double ORC_LOOT_COMMON_WEIGHT = 70.0;
     private static final double ORC_LOOT_UNCOMMON_WEIGHT = 25.0;
     private static final double ORC_LOOT_RARE_WEIGHT = 5.0;
+    private static final int SLIME_BASE_MAX_HP = 10;
+    private static final int SLIME_BASE_MAX_SP = 30;
+    private static final int SLIME_BASE_STR = 3;
+    private static final int SLIME_BASE_AGI = 2;
+    private static final int SLIME_BASE_VIT = 6;
+    private static final int SLIME_BASE_DEX = 1;
+    private static final int ORC_BASE_MAX_HP = 20;
+    private static final int ORC_BASE_MAX_SP = 25;
+    private static final int ORC_BASE_STR = 4;
+    private static final int ORC_BASE_AGI = 3;
+    private static final int ORC_BASE_VIT = 3;
+    private static final int ORC_BASE_DEX = 1;
 
     private MobEntity slimeMob;
     private MobEntity orcMob;
@@ -482,8 +494,32 @@ public class Upper_mapController extends BaseMapController {
         MobMapState.MobData slimeData = mapMobs.getMob("slime");
         MobMapState.MobData orcData = mapMobs.getMob("orc");
 
-        initializeMobDefaultsIfNeeded(slimeData, "slime", slime, 10, 30, 3, 2, 6, 1, currentDay, nowSeconds);
-        initializeMobDefaultsIfNeeded(orcData, "orc", orc, 20, 25, 4, 3, 3, 1, currentDay, nowSeconds);
+        initializeMobDefaultsIfNeeded(
+            slimeData,
+            "slime",
+            slime,
+            SLIME_BASE_MAX_HP,
+            SLIME_BASE_MAX_SP,
+            SLIME_BASE_STR,
+            SLIME_BASE_AGI,
+            SLIME_BASE_VIT,
+            SLIME_BASE_DEX,
+            currentDay,
+            nowSeconds
+        );
+        initializeMobDefaultsIfNeeded(
+            orcData,
+            "orc",
+            orc,
+            ORC_BASE_MAX_HP,
+            ORC_BASE_MAX_SP,
+            ORC_BASE_STR,
+            ORC_BASE_AGI,
+            ORC_BASE_VIT,
+            ORC_BASE_DEX,
+            currentDay,
+            nowSeconds
+        );
 
         List<Rectangle> staticWalls = super.walls != null
             ? CollisionRegistry.collectWalls(super.walls)

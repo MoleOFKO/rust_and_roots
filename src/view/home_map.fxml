@@ -53,7 +53,7 @@
                   <Rectangle fx:id="spawn_from_shop" height="10" layoutX="456.0" layoutY="210.0" opacity="0" stroke="BLACK" width="10" />
                </children>
             </Group>
-            <Group fx:id="walls" layoutX="-6.0" layoutY="-3.0" mouseTransparent="true">
+            <Group fx:id="walls" layoutX="-6.0" layoutY="-3.0" mouseTransparent="true" visible="false">
                <children>
             <Rectangle fx:id="wall" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="7.0" layoutX="354.0" stroke="TRANSPARENT" strokeType="INSIDE" width="252.0" />
             <Rectangle fx:id="wall1" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="5.0" layoutX="3.0" layoutY="403.0" stroke="TRANSPARENT" strokeType="INSIDE" width="601.0" />

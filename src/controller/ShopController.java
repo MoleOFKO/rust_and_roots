@@ -504,6 +504,17 @@ public class ShopController implements Initializable, SceneController {
         }
         if (!inv.canAfford(total)) return;
 
+        int confirm = AppDialogs.showConfirmDialog(
+            null,
+            "Buy " + selectedCount + " item(s) for " + total + "g?",
+            "Confirm Purchase",
+            javax.swing.JOptionPane.OK_CANCEL_OPTION,
+            javax.swing.JOptionPane.QUESTION_MESSAGE
+        );
+        if (confirm != javax.swing.JOptionPane.OK_OPTION) {
+            return;
+        }
+
         int coinsBefore = inv.getCoins();
         if (!inv.spendCoins(total)) return;
 
@@ -519,13 +530,6 @@ public class ShopController implements Initializable, SceneController {
         refreshTableFromBuyCart();
         refreshAllPanels();
 
-        int coinsAfter = inv.getCoins();
-        AppDialogs.showMessageDialog(
-            null,
-            "Bought " + selectedCount + " item(s).\nMoney: -" + total + "g\nCoins: " + coinsBefore + "g -> " + coinsAfter + "g",
-            "Purchase Complete",
-            javax.swing.JOptionPane.INFORMATION_MESSAGE
-        );
     }
 
     @FXML
@@ -544,6 +548,17 @@ public class ShopController implements Initializable, SceneController {
         }
 
         int totalGain = computeSellTotal();
+        int confirm = AppDialogs.showConfirmDialog(
+            null,
+            "Sell " + selectedCount + " item(s) for " + totalGain + "g?",
+            "Confirm Sale",
+            javax.swing.JOptionPane.OK_CANCEL_OPTION,
+            javax.swing.JOptionPane.QUESTION_MESSAGE
+        );
+        if (confirm != javax.swing.JOptionPane.OK_OPTION) {
+            return;
+        }
+
         int coinsBefore = inv.getCoins();
 
         boolean removed;
@@ -572,13 +587,6 @@ public class ShopController implements Initializable, SceneController {
         refreshTableFromSellCart();
         refreshAllPanels();
 
-        int coinsAfter = inv.getCoins();
-        AppDialogs.showMessageDialog(
-            null,
-            "Sold " + selectedCount + " item(s).\nMoney: +" + totalGain + "g\nCoins: " + coinsBefore + "g -> " + coinsAfter + "g",
-            "Sale Complete",
-            javax.swing.JOptionPane.INFORMATION_MESSAGE
-        );
     }
 
     @FXML
@@ -1266,13 +1274,8 @@ public class ShopController implements Initializable, SceneController {
 
         Set<Integer> unlockedCookingIngredients = buildUnlockedIngredientIds(RecipeCatalog.Domain.COOKING, shopById);
         Set<Integer> unlockedCraftingIngredients = buildUnlockedIngredientIds(RecipeCatalog.Domain.CRAFTING, shopById);
-
-        Set<Integer> unlockedAllIngredients = new LinkedHashSet<>();
-        unlockedAllIngredients.addAll(unlockedCookingIngredients);
-        unlockedAllIngredients.addAll(unlockedCraftingIngredients);
-        unlockedAllIngredients.addAll(meltIngredientPool);
-
-        Set<Integer> preferredSeedIds = buildPreferredSeedIds(seedIds, unlockedAllIngredients);
+        Set<Integer> cookableSeedIds = buildPreferredSeedIds(seedIds, new LinkedHashSet<>(cookingIngredientPool));
+        Set<Integer> preferredCookingSeedIds = buildPreferredSeedIds(seedIds, unlockedCookingIngredients);
 
         List<Integer> result = new ArrayList<>(slotCount);
         Set<Integer> used = new LinkedHashSet<>();
@@ -1313,7 +1316,9 @@ public class ShopController implements Initializable, SceneController {
                     }
                 }
             } else if (slotNumber == 3) {
-                List<Integer> preferred = preferredSeedIds.isEmpty() ? seedIds : new ArrayList<>(preferredSeedIds);
+                List<Integer> preferred = !preferredCookingSeedIds.isEmpty()
+                    ? new ArrayList<>(preferredCookingSeedIds)
+                    : (!cookableSeedIds.isEmpty() ? new ArrayList<>(cookableSeedIds) : seedIds);
                 chosenId = pickWeightedItemId(preferred, Set.of(), Set.of(), used, 1.0, 1.0);
                 if (chosenId <= 0) {
                     chosenId = pickWeightedItemId(preferred, Set.of(), Set.of(), Set.of(), 1.0, 1.0);
