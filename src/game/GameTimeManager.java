@@ -16,13 +16,6 @@ public final class GameTimeManager {
 
     // ---- State ----
     private final DoubleProperty timeScale = new SimpleDoubleProperty(1.0); // debug speed
-    /**
-     * Gameplay-driven world-time multiplier (e.g., "bullet time").
-     * This should be kept at 1.0 for normal play and reduced (< 1.0) when the world needs to slow down.
-     *
-     * Kept separate from {@link #timeScale} so debug/sleep/farm-table speed controls remain intact.
-     */
-    private final DoubleProperty worldFlowScale = new SimpleDoubleProperty(1.0);
     private final BooleanProperty paused = new SimpleBooleanProperty(false);
 
     // total simulated seconds since day 1 start (00:00)
@@ -62,9 +55,7 @@ public final class GameTimeManager {
 
                 if (paused.get()) return;
 
-                double scaled = dt * GAME_SECONDS_PER_REAL_SECOND
-                        * Math.max(0.0, timeScale.get())
-                        * Math.max(0.0, worldFlowScale.get());
+                double scaled = dt * GAME_SECONDS_PER_REAL_SECOND * Math.max(0.0, timeScale.get());
                 if (scaled <= 0) return;
 
                 totalSeconds.set(totalSeconds.get() + scaled);
@@ -108,7 +99,6 @@ public final class GameTimeManager {
 
     // ---- Public properties (bind in UI) ----
     public DoubleProperty timeScaleProperty() { return timeScale; }
-    public DoubleProperty worldFlowScaleProperty() { return worldFlowScale; }
     public BooleanProperty pausedProperty() { return paused; }
     public DoubleProperty totalSecondsProperty() { return totalSeconds; }
 

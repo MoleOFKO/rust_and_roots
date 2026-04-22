@@ -119,53 +119,6 @@ public final class ItemDatabase {
     public static List<item> getAllItems() { return Collections.unmodifiableList(allItems); }
     public static item getItemById(int itemId) { return itemById.get(itemId); }
 
-    /**
-     * Normalizes legacy/duplicate item ids into a canonical gameplay id.
-     *
-     * Currently used to map crop "*_fruit" variants to their base crop items when the game logic
-     * expects the base crop (e.g., cooking ingredients use "Pumpkin", not "pumpkin_fruit").
-     */
-    public static int normalizeGameplayItemId(int itemId) {
-        if (itemId <= 0) return itemId;
-
-        // Ensure item name/type caches are ready.
-        loadItems();
-
-        // Legacy: Pumpkin Fruit id in the provided DB dump.
-        // Keep this mapping even if the legacy item row is removed from the DB later.
-        if (itemId == 112) {
-            item pumpkin = getItemByName("Pumpkin");
-            if (pumpkin == null) pumpkin = getItemByName("pumpkin");
-            if (pumpkin != null && pumpkin.getItem_id() > 0) {
-                return pumpkin.getItem_id();
-            }
-        }
-
-        String name = getItemName(itemId);
-        if (name == null || name.isBlank()) {
-            return itemId;
-        }
-
-        String normalized = normalizeLookupKey(name).replace(' ', '_');
-        // Canonicalize crop "*_fruit" variants back to their base crop item when present.
-        // Example: "Pumpkin Fruit" or "pumpkin_fruit" -> "Pumpkin".
-        if (normalized.endsWith("_fruit")) {
-            String baseKey = normalized.substring(0, Math.max(0, normalized.length() - 5));
-            item base = getItemByName(baseKey);
-            if (base == null) {
-                base = getItemByName(baseKey.replace('_', ' '));
-            }
-            if (base != null) {
-                int baseId = base.getItem_id();
-                if (baseId > 0 && !isSeedItem(baseId) && !isCropItem(baseId)) {
-                    return baseId;
-                }
-            }
-        }
-
-        return itemId;
-    }
-
     public static item getItemByName(String itemName) {
         if (itemName == null) return null;
         return itemByName.get(normalizeLookupKey(itemName));
@@ -350,10 +303,10 @@ public final class ItemDatabase {
 
         String cropName = normalizeSeedName(seedName);
         item harvest = findHarvestItem(cropName);
-        if (harvest != null) return normalizeGameplayItemId(harvest.getItem_id());
+        if (harvest != null) return harvest.getItem_id();
 
         harvest = findHarvestItem(normalizeCropAlias(cropName));
-        return harvest == null ? -1 : normalizeGameplayItemId(harvest.getItem_id());
+        return harvest == null ? -1 : harvest.getItem_id();
     }
 
     public static boolean hasCompleteFarmDataForSeed(int seedItemId) {

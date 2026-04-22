@@ -38,7 +38,6 @@ public class LoadGameService {
 
         try (Connection con = db.getConnection()) {
             clearRuntimeState(gs);
-            ItemDatabase.loadItems();
 
             if (!loadMainRow(con, gs, saveId)) {
                 return false;
@@ -189,7 +188,7 @@ public class LoadGameService {
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    int itemId = ItemDatabase.normalizeGameplayItemId(rs.getInt("item_id"));
+                    int itemId = rs.getInt("item_id");
                     int qty = rs.getInt("qty");
                     if (itemId > 0 && qty > 0) {
                         if (!inv.addItem(itemId, qty)) {
@@ -223,7 +222,7 @@ public class LoadGameService {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     int slotIndex = rs.getInt("slot_index");
-                    int itemId = ItemDatabase.normalizeGameplayItemId(rs.getInt("item_id"));
+                    int itemId = rs.getInt("item_id");
                     boolean itemWasNull = rs.wasNull();
                     int qty = rs.getInt("qty");
 
@@ -312,7 +311,7 @@ public class LoadGameService {
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    int itemId = ItemDatabase.normalizeGameplayItemId(rs.getInt("item_id"));
+                    int itemId = rs.getInt("item_id");
                     int qty = rs.getInt("qty");
                     if (itemId > 0 && qty > 0) {
                         if (!chest.addItem(itemId, qty)) {
@@ -437,7 +436,7 @@ public class LoadGameService {
                 try (ResultSet rs = ps.executeQuery()) {
                     while (rs.next()) {
                         int slotIndex = rs.getInt("slot_index");
-                        int itemId = ItemDatabase.normalizeGameplayItemId(rs.getInt("item_id"));
+                        int itemId = rs.getInt("item_id");
                         if (rs.wasNull()) {
                             continue;
                         }
@@ -467,7 +466,7 @@ public class LoadGameService {
                 ps.setInt(1, saveId);
                 try (ResultSet rs = ps.executeQuery()) {
                     while (rs.next()) {
-                        int itemId = ItemDatabase.normalizeGameplayItemId(rs.getInt("item_id"));
+                        int itemId = rs.getInt("item_id");
                         if (rs.wasNull() || itemId <= 0) {
                             continue;
                         }
@@ -684,7 +683,7 @@ public class LoadGameService {
                         continue;
                     }
 
-                    int itemId = ItemDatabase.normalizeGameplayItemId(rs.getInt("item_id"));
+                    int itemId = rs.getInt("item_id");
                     int quantity = rs.getInt("quantity");
                     double spawnedAt = rs.getDouble("spawned_at_total_seconds");
                     double expiresAt = rs.getDouble("expires_at_total_seconds");
@@ -795,7 +794,7 @@ public class LoadGameService {
                         continue;
                     }
 
-                    int itemId = ItemDatabase.normalizeGameplayItemId(rs.getInt("item_id"));
+                    int itemId = rs.getInt("item_id");
                     int qty = rs.getInt("quantity");
                     if (itemId <= 0 || qty <= 0) {
                         continue;

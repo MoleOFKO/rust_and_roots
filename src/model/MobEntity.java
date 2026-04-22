@@ -32,10 +32,6 @@ public final class MobEntity {
     private static final double INV_SQRT_2 = 1.0 / Math.sqrt(2.0);
     private static final double NANOS_PER_60FPS_FRAME = 1_000_000_000.0 / 60.0;
     private static final double NORMAL_AGI = 5.0;
-    private static final double BASE_MOVEMENT_SPEED = 5.0;
-    private static final double RUN_SPEED_BONUS_RATIO = 0.20;
-    private static final double MIN_RUN_SPEED_BONUS = 0.75;
-    private static final double MAX_RUN_SPEED_BONUS = 1.10;
     private static final double ATTACK_SPEED_PER_AGI = 0.045;
 
     // Player-like regen baseline (per real second).
@@ -404,60 +400,43 @@ public final class MobEntity {
     }
 
     private void applyRegenIfNeeded(double nowSeconds) {
-        double now = Math.max(0.0, nowSeconds);
-
         if (data.maxHp <= 0 && data.maxSp <= 0) {
-            data.lastRegenTotalSeconds = now;
-            hpRegenCarry = 0.0;
-            spRegenCarry = 0.0;
+            data.lastRegenTotalSeconds = nowSeconds;
             return;
         }
 
-        if (data.lastRegenTotalSeconds < 0 || data.lastRegenTotalSeconds > now) {
-            data.lastRegenTotalSeconds = now;
-            hpRegenCarry = 0.0;
-            spRegenCarry = 0.0;
+        if (data.lastRegenTotalSeconds < 0 || data.lastRegenTotalSeconds > nowSeconds) {
+            data.lastRegenTotalSeconds = nowSeconds;
             return;
         }
 
-        int vitValue = Math.max(0, data.vit);
-        int vitBonus = Math.max(0, vitValue - 1);
-
-        double amountMultiplier = 1.0 + (vitBonus * 0.05);
-        double speedMultiplier = 1.0 + (vitBonus * 0.02);
-        double intervalSeconds = 60.0 / Math.max(1.0e-6, speedMultiplier);
-
-        double elapsed = now - data.lastRegenTotalSeconds;
-        if (elapsed < intervalSeconds) {
+        double elapsed = nowSeconds - data.lastRegenTotalSeconds;
+        if (elapsed <= 0.0) {
             return;
         }
 
-        long ticks = (long) Math.floor(elapsed / intervalSeconds);
-        if (ticks <= 0L) {
+        double regenPerGameSecond = (BASE_REGEN_PER_REAL_SECOND + (Math.max(0, data.vit) * REGEN_PER_VIT)) / GAME_SECONDS_PER_REAL_SECOND;
+        if (regenPerGameSecond <= 0.0) {
+            data.lastRegenTotalSeconds = nowSeconds;
             return;
         }
+
+        double hpGain = regenPerGameSecond * elapsed;
+        double spGain = regenPerGameSecond * elapsed;
+
+        hpRegenCarry += hpGain;
+        spRegenCarry += spGain;
 
         int maxHp = Math.max(0, data.maxHp);
         int maxSp = Math.max(0, data.maxSp);
 
-        if (maxHp > 0 && data.hp < maxHp) {
-            hpRegenCarry += (maxHp * 0.01 * amountMultiplier) * ticks;
-            while (hpRegenCarry >= 1.0 && data.hp < maxHp) {
-                data.hp += 1;
-                hpRegenCarry -= 1.0;
-            }
-        } else {
-            hpRegenCarry = 0.0;
+        while (hpRegenCarry >= 1.0 && data.hp < maxHp) {
+            data.hp += 1;
+            hpRegenCarry -= 1.0;
         }
-
-        if (maxSp > 0 && data.sp < maxSp) {
-            spRegenCarry += (maxSp * 0.01 * amountMultiplier) * ticks;
-            while (spRegenCarry >= 1.0 && data.sp < maxSp) {
-                data.sp += 1;
-                spRegenCarry -= 1.0;
-            }
-        } else {
-            spRegenCarry = 0.0;
+        while (spRegenCarry >= 1.0 && data.sp < maxSp) {
+            data.sp += 1;
+            spRegenCarry -= 1.0;
         }
 
         if (data.hp > maxHp) data.hp = maxHp;
@@ -465,13 +444,12 @@ public final class MobEntity {
         if (data.hp < 0) data.hp = 0;
         if (data.sp < 0) data.sp = 0;
 
-        data.lastRegenTotalSeconds += ticks * intervalSeconds;
+        data.lastRegenTotalSeconds = nowSeconds;
     }
 
     private boolean shouldChase(Bounds playerBoundsScene, PlayerState playerState) {
         if (detectRange == null || playerBoundsScene == null || playerState == null) return false;
         if (playerState.isDead()) return false;
-        if (data.sp <= 0) return false;
 
         Bounds detectBounds = detectRange.localToScene(detectRange.getBoundsInLocal());
         return detectBounds.intersects(playerBoundsScene);
@@ -516,10 +494,9 @@ public final class MobEntity {
         double dirY = vy / dist;
 
         double speed = getMovementSpeed();
-        double dtSeconds = Math.min(0.15, Math.max(0.0, dtNanos / 1_000_000_000.0));
-        double movementScale = dtSeconds * 9.0;
-        double dx = dirX * speed * movementScale;
-        double dy = dirY * speed * movementScale;
+        double frameScale = Math.min(0.15, dtNanos / NANOS_PER_60FPS_FRAME);
+        double dx = dirX * speed * frameScale;
+        double dy = dirY * speed * frameScale;
 
         if (dx != 0.0 && dy != 0.0) {
             dx *= INV_SQRT_2;
@@ -536,12 +513,8 @@ public final class MobEntity {
     private double getMovementSpeed() {
         double agiRatio = Math.max(0.0, data.agi) / NORMAL_AGI;
         double agiModifier = 0.6 + (0.4 * agiRatio);
-        double currentSpeed = BASE_MOVEMENT_SPEED * agiModifier;
-        return Math.max(0.0, currentSpeed);
-    }
-
-    private double getRunSpeedBonus() {
-        return Math.max(MIN_RUN_SPEED_BONUS, Math.min(MAX_RUN_SPEED_BONUS, BASE_MOVEMENT_SPEED * RUN_SPEED_BONUS_RATIO));
+        double currentSpeed = 5.0 * agiModifier;
+        return Math.max(0.5, currentSpeed);
     }
 
     private boolean move(double dx, double dy, Bounds playerBoundsInParent) {
@@ -637,9 +610,10 @@ public final class MobEntity {
 
     private int computeDamageTo(PlayerState target) {
         if (target == null) return 0;
-        double attackDamage = CombatMath.computeAttackDamage(data.str, 0);
-        double reduction = CombatMath.computeDamageReduction(target.getVit());
-        return CombatMath.computeNetDamage(attackDamage, reduction);
+        int myStr = Math.max(0, data.str);
+        int targetVit = Math.max(0, target.getVit());
+        // The chase rule ensures this is generally positive; still clamp for safety.
+        return Math.max(1, myStr - targetVit);
     }
 
     private Rectangle resolveActiveAttackHitbox() {
@@ -753,19 +727,11 @@ public final class MobEntity {
     private long getFrameDelay(AnimState state) {
         return switch (state) {
             case IDLE -> IDLE_FRAME_DELAY_NANOS;
-            case RUN -> getMovementFrameDelayNanos(RUN_FRAME_DELAY_NANOS);
+            case RUN -> RUN_FRAME_DELAY_NANOS;
             case ATTACK -> getAttackFrameDelayNanos();
             case HURT -> HURT_FRAME_DELAY_NANOS;
             case DEATH -> DEATH_FRAME_DELAY_NANOS;
         };
-    }
-
-    private long getMovementFrameDelayNanos(long baseDelayNanos) {
-        double agiRatio = Math.max(0.0, data.agi) / NORMAL_AGI;
-        double agiModifier = 0.6 + (0.4 * agiRatio);
-        double speedScale = 1.0 / Math.max(0.1, agiModifier);
-        long computed = Math.max(1L, (long) Math.floor(baseDelayNanos * speedScale));
-        return Math.max((long) NANOS_PER_60FPS_FRAME, computed);
     }
 
     private int getFrameCount(AnimState state) {

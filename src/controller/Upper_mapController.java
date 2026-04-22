@@ -25,7 +25,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 import model.CollisionRegistry;
-import model.CombatMath;
 import model.ItemDatabase;
 import model.MobEntity;
 import model.MobMapState;
@@ -649,7 +648,7 @@ public class Upper_mapController extends BaseMapController {
         GameTimeManager time = GameTimeManager.get();
         int currentDay = time.dayNumberProperty().get();
         double nowSeconds = time.totalSecondsProperty().get();
-        long nowNanos = getWorldSimNowNanos();
+        long nowNanos = System.nanoTime();
 
         if (slimeMob != null) {
             slimeMob.update(nowNanos, currentDay, nowSeconds, playerBounds, playerState);
@@ -694,21 +693,21 @@ public class Upper_mapController extends BaseMapController {
         if (attackHitbox == null) return;
 
         Bounds attackBounds = attackHitbox.localToScene(attackHitbox.getBoundsInLocal());
-        long nowNanos = getWorldSimNowNanos();
+        long nowNanos = System.nanoTime();
 
         GameTimeManager time = GameTimeManager.get();
         double nowSeconds = time.totalSecondsProperty().get();
 
+        int damage = calculatePlayerMobDamage();
+        if (damage <= 0) return;
+
         if (slimeMob != null && slimeMob.getBodyHitbox() != null && !slimeMob.isDead()) {
             Bounds mobBounds = slimeMob.getBodyHitbox().localToScene(slimeMob.getBodyHitbox().getBoundsInLocal());
             if (attackBounds.intersects(mobBounds)) {
-                int damage = calculatePlayerDamageAgainst(slimeMob);
-                if (damage > 0) {
-                    boolean killed = slimeMob.applyPlayerDamage(damage, nowNanos);
-                    if (killed) {
-                        handleMobKilledByPlayer(slimeMob, nowSeconds);
-                        renderSlimeDrops();
-                    }
+                boolean killed = slimeMob.applyPlayerDamage(damage, nowNanos);
+                if (killed) {
+                    handleMobKilledByPlayer(slimeMob, nowSeconds);
+                    renderSlimeDrops();
                 }
             }
         }
@@ -716,13 +715,10 @@ public class Upper_mapController extends BaseMapController {
         if (orcMob != null && orcMob.getBodyHitbox() != null && !orcMob.isDead()) {
             Bounds mobBounds = orcMob.getBodyHitbox().localToScene(orcMob.getBodyHitbox().getBoundsInLocal());
             if (attackBounds.intersects(mobBounds)) {
-                int damage = calculatePlayerDamageAgainst(orcMob);
-                if (damage > 0) {
-                    boolean killed = orcMob.applyPlayerDamage(damage, nowNanos);
-                    if (killed) {
-                        handleMobKilledByPlayer(orcMob, nowSeconds);
-                        renderOrcDrops();
-                    }
+                boolean killed = orcMob.applyPlayerDamage(damage, nowNanos);
+                if (killed) {
+                    handleMobKilledByPlayer(orcMob, nowSeconds);
+                    renderOrcDrops();
                 }
             }
         }
@@ -763,12 +759,32 @@ public class Upper_mapController extends BaseMapController {
         return (int) Math.max(0L, raw);
     }
 
-    private int calculatePlayerDamageAgainst(MobEntity mob) {
-        if (playerState == null || mob == null || mob.getData() == null) return 0;
+    private int calculatePlayerMobDamage() {
+        if (playerState == null || player == null) return 0;
 
-        double attackDamage = CombatMath.computeAttackDamage(playerState.getStr(), 0);
-        double reduction = CombatMath.computeDamageReduction(mob.getData().vit);
-        return CombatMath.computeNetDamage(attackDamage, reduction);
+        int damage = Math.max(0, playerState.getStr());
+        int equippedId = player.getEquippedItemId();
+        if (equippedId > 0) {
+            String name = ItemDatabase.getItemName(equippedId);
+            if (name != null && !name.isBlank()) {
+                String normalized = name.trim().toLowerCase(Locale.ROOT);
+                if (normalized.contains("sword")) {
+                    damage += 2;
+                } else if (normalized.contains("pickaxe") || normalized.contains("pick axe")) {
+                    damage += 1;
+                } else if (normalized.contains("axe")) {
+                    // Avoid counting pickaxes as axes.
+                    if (!normalized.contains("pickaxe") && !normalized.contains("pick axe")) {
+                        damage += 1;
+                    }
+                } else {
+                    // Any other equipped tool/weapon provides a small bonus.
+                    damage += 1;
+                }
+            }
+        }
+
+        return Math.max(1, damage);
     }
 
     private int resolveSandItemId() {

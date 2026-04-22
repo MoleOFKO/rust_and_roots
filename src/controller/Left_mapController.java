@@ -31,7 +31,6 @@ import javafx.scene.shape.Rectangle;
 import java.util.Locale;
 import java.util.concurrent.ThreadLocalRandom;
 import model.CollisionRegistry;
-import model.CombatMath;
 import model.ItemDatabase;
 import model.TreeMapState;
 import model.item;
@@ -828,7 +827,7 @@ public class Left_mapController extends BaseMapController {
         TreeMapState.TreeData resource,
         int currentDay,
         double nowSeconds,
-        double attackDamage,
+        int baseDamage,
         int commonDropItemId,
         int uncommonDropItemId,
         double uncommonDropChancePercent,
@@ -849,19 +848,19 @@ public class Left_mapController extends BaseMapController {
         resource.vit = vitFor(resource.livedDays);
 
         int resourceVit = Math.max(0, resource.vit);
-        double reduction = CombatMath.computeDamageReduction(resourceVit);
-        int receivedDamage = CombatMath.computeNetDamage(attackDamage, reduction);
+        int receivedDamage = Math.max(0, baseDamage - resourceVit);
+        int reducedDamage = Math.max(0, baseDamage - receivedDamage);
 
         int hpBefore = Math.max(0, resource.hp);
         int maxHp = Math.max(0, resource.maxHp);
-        int actualDamage = Math.min(Math.max(0, receivedDamage), hpBefore);
+        int actualDamage = Math.min(receivedDamage, hpBefore);
         int hpAfter = Math.max(0, hpBefore - actualDamage);
 
         System.out.println(
             "[" + (debugTag == null ? "RESOURCE" : debugTag) + "] HP " + hpBefore + "/" + maxHp +
             ", VIT " + resourceVit +
-            " | PlayerAttack " + attackDamage +
-            " | DamageReduction " + reduction +
+            " | PlayerDamage " + baseDamage +
+            " | Reduced " + reducedDamage +
             " | Received " + actualDamage +
             " | HP -> " + hpAfter + "/" + maxHp
         );
@@ -889,16 +888,26 @@ public class Left_mapController extends BaseMapController {
         }
     }
 
-    private double calculatePlayerBaseDamage() {
-        if (playerState == null) return 0.0;
-        int toolBonus = isAxeEquipped() ? 1 : 0;
-        return CombatMath.computeAttackDamage(playerState.getStr(), toolBonus);
+    private int calculatePlayerBaseDamage() {
+        if (playerState == null) return 0;
+
+        int playerStr = Math.max(0, playerState.getStr());
+        int damage = playerStr;
+        if (isAxeEquipped()) {
+            damage += 1;
+        }
+        return Math.max(0, damage);
     }
 
-    private double calculatePlayerBaseDamageForStone() {
-        if (playerState == null) return 0.0;
-        int toolBonus = isPickaxeEquipped() ? 1 : 0;
-        return CombatMath.computeAttackDamage(playerState.getStr(), toolBonus);
+    private int calculatePlayerBaseDamageForStone() {
+        if (playerState == null) return 0;
+
+        int playerStr = Math.max(0, playerState.getStr());
+        int damage = playerStr;
+        if (isPickaxeEquipped()) {
+            damage += 1;
+        }
+        return Math.max(0, damage);
     }
 
     private boolean isAxeEquipped() {
