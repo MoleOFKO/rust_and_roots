@@ -372,7 +372,7 @@ public class Right_map_notwo_of_oneController extends BaseMapController {
     @Override
     protected void configureExits() {
        registerExit(exit_left, "/view/right_map_notwo.fxml", SpawnTag.FROM_RIGHT);
-       registerExit(exit_down, "/view/right_map_noone_of_one.fxml", SpawnTag.FROM_RIGHT);
+       registerExit(exit_down, "/view/right_map_noone_of_one.fxml", SpawnTag.FROM_UP);
        if (exit_right != null) {
             interactionManager.addZone(new InteractionZone(
                 exit_right,
