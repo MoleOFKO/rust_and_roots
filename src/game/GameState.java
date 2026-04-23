@@ -799,6 +799,14 @@ public final class GameState {
         return farmByMap.computeIfAbsent(mapKey, k -> new FarmState()); 
     }
 
+    public Map<String, FarmState> getAllFarmStates() {
+        return farmByMap;
+    }
+
+    public void clearFarmStates() {
+        farmByMap.clear();
+    }
+
     public TreeMapState getTreeState(String mapKey) {
         if (mapKey == null || mapKey.isBlank()) {
             mapKey = "home_map";

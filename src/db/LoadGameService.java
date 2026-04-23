@@ -29,6 +29,44 @@ public class LoadGameService {
     private static final String FARM_SLOT_WATERING_CAN = "__farm_slot_watering_can__";
     private static final String FARM_SLOT_SICKLE = "__farm_slot_sickle__";
 
+    /**
+     * Loads only the requested map-specific state (farm / trees / mobs) for the currently active save.
+     * This is used when non-current maps are evicted from memory to reduce runtime usage.
+     */
+    public void loadMapState(GameState gs, String mapKey) {
+        if (gs == null) return;
+        if (!gs.hasActiveSave()) return;
+        if (mapKey == null || mapKey.isBlank()) return;
+
+        int saveId = gs.getCurrentSaveId();
+
+        boolean needsFarm = !gs.getAllFarmStates().containsKey(mapKey);
+        boolean needsTrees = !gs.getAllTreeStates().containsKey(mapKey);
+        boolean needsMobs = !gs.getAllMobStates().containsKey(mapKey);
+        if (!needsFarm && !needsTrees && !needsMobs) {
+            return;
+        }
+
+        dbcon db = new dbcon();
+        try (Connection con = db.getConnection()) {
+            ItemDatabase.loadItems();
+
+            if (needsFarm) {
+                loadFarmPlots(con, gs, saveId, mapKey);
+            }
+            if (needsTrees) {
+                loadTreeResources(con, gs, saveId, mapKey);
+                loadTreeDrops(con, gs, saveId, mapKey);
+            }
+            if (needsMobs) {
+                loadMobs(con, gs, saveId, mapKey);
+                loadMobDrops(con, gs, saveId, mapKey);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public boolean loadGame(int saveId) {
         if (saveId <= 0) return false;
@@ -43,20 +81,24 @@ public class LoadGameService {
                 return false;
             }
 
+            ItemDatabase.loadItems();
+
+            String currentMapKey = gs.getCurrentMapKey();
+
             loadPlayerStats(con, gs, saveId);
             loadPlayerSkills(con, gs, saveId);
             loadChestItems(con, gs, saveId);
             loadPlayerInventory(con, gs, saveId);
             loadHotbar(con, gs, saveId);
-            loadFarmPlots(con, gs, saveId);
+            loadFarmPlots(con, gs, saveId, currentMapKey);
             loadTime(con, saveId);
             loadShopState(con, gs, saveId);
             loadSmeltState(con, gs, saveId);
             loadSmeltOreHistory(con, gs, saveId);
-            loadTreeResources(con, gs, saveId);
-            loadTreeDrops(con, gs, saveId);
-            loadMobs(con, gs, saveId);
-            loadMobDrops(con, gs, saveId);
+            loadTreeResources(con, gs, saveId, currentMapKey);
+            loadTreeDrops(con, gs, saveId, currentMapKey);
+            loadMobs(con, gs, saveId, currentMapKey);
+            loadMobDrops(con, gs, saveId, currentMapKey);
             loadUnlockedRecipes(con, gs, saveId);
             gs.ensureAutomaticRecipeUnlocks();
             gs.setPreferredStatusPanelGroup(GameState.StatusPanelGroup.STATUS);
@@ -323,17 +365,22 @@ public class LoadGameService {
         }
     }
 
-    private void loadFarmPlots(Connection con, GameState gs, int saveId) throws Exception {
+    private void loadFarmPlots(Connection con, GameState gs, int saveId, String mapKeyFilter) throws Exception {
+        if (con == null || gs == null || saveId <= 0) return;
+
         String sql = """
             SELECT map_key, plot_id, seed_item_id, planted_at, last_watered_at,
                    accumulated_water_reduction, total_growth_seconds,
                    water_cooldown_seconds, water_reduction_seconds
             FROM saved_farm_plot
             WHERE saved_id = ?
-            """;
+            """ + ((mapKeyFilter == null || mapKeyFilter.isBlank()) ? "" : " AND map_key = ?");
 
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, saveId);
+            if (mapKeyFilter != null && !mapKeyFilter.isBlank()) {
+                ps.setString(2, mapKeyFilter);
+            }
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -581,8 +628,7 @@ public class LoadGameService {
         gs.getPlayerSkills().clear();
         gs.clearUnlockedRecipes();
         clearInventoryItems(gs.getChestInventory());
-        clearFarmState(gs.getFarmState("home_map"));
-        clearFarmState(gs.getFarmState("Home_interior"));
+        gs.clearFarmStates();
         gs.clearTreeStates();
         gs.clearMobStates();
         gs.clearActiveSmeltJob();
@@ -594,7 +640,7 @@ public class LoadGameService {
         gs.clearDailyRemainingShopStock();
     }
 
-    private void loadTreeResources(Connection con, GameState gs, int saveId) throws Exception {
+    private void loadTreeResources(Connection con, GameState gs, int saveId, String mapKeyFilter) throws Exception {
         if (con == null || gs == null || saveId <= 0) return;
         if (!hasTable(con, "saved_tree_resource")) {
             return;
@@ -617,10 +663,13 @@ public class LoadGameService {
                    last_updated_day_number
             FROM saved_tree_resource
             WHERE saved_id = ?
-            """;
+            """ + ((mapKeyFilter == null || mapKeyFilter.isBlank()) ? "" : " AND map_key = ?");
 
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, saveId);
+            if (mapKeyFilter != null && !mapKeyFilter.isBlank()) {
+                ps.setString(2, mapKeyFilter);
+            }
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -651,7 +700,7 @@ public class LoadGameService {
         }
     }
 
-    private void loadTreeDrops(Connection con, GameState gs, int saveId) throws Exception {
+    private void loadTreeDrops(Connection con, GameState gs, int saveId, String mapKeyFilter) throws Exception {
         if (con == null || gs == null || saveId <= 0) return;
         if (!hasTable(con, "saved_tree_drop")) {
             return;
@@ -667,6 +716,7 @@ public class LoadGameService {
                    expires_at_total_seconds
             FROM saved_tree_drop
             WHERE saved_id = ?
+            """ + ((mapKeyFilter == null || mapKeyFilter.isBlank()) ? "" : " AND map_key = ?") + """
             ORDER BY map_key, tree_id, drop_slot
             """;
 
@@ -674,6 +724,9 @@ public class LoadGameService {
 
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, saveId);
+            if (mapKeyFilter != null && !mapKeyFilter.isBlank()) {
+                ps.setString(2, mapKeyFilter);
+            }
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -701,7 +754,7 @@ public class LoadGameService {
         }
     }
 
-    private void loadMobs(Connection con, GameState gs, int saveId) throws Exception {
+    private void loadMobs(Connection con, GameState gs, int saveId, String mapKeyFilter) throws Exception {
         if (con == null || gs == null || saveId <= 0) return;
         if (!hasTable(con, "saved_mob")) {
             return;
@@ -729,10 +782,13 @@ public class LoadGameService {
                    last_updated_day_number
             FROM saved_mob
             WHERE saved_id = ?
-            """;
+            """ + ((mapKeyFilter == null || mapKeyFilter.isBlank()) ? "" : " AND map_key = ?");
 
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, saveId);
+            if (mapKeyFilter != null && !mapKeyFilter.isBlank()) {
+                ps.setString(2, mapKeyFilter);
+            }
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -768,7 +824,7 @@ public class LoadGameService {
         }
     }
 
-    private void loadMobDrops(Connection con, GameState gs, int saveId) throws Exception {
+    private void loadMobDrops(Connection con, GameState gs, int saveId, String mapKeyFilter) throws Exception {
         if (con == null || gs == null || saveId <= 0) return;
         if (!hasTable(con, "saved_mob_drop")) {
             return;
@@ -784,11 +840,15 @@ public class LoadGameService {
                    expires_at_total_seconds
             FROM saved_mob_drop
             WHERE saved_id = ?
+            """ + ((mapKeyFilter == null || mapKeyFilter.isBlank()) ? "" : " AND map_key = ?") + """
             ORDER BY map_key, mob_id, drop_slot
             """;
 
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, saveId);
+            if (mapKeyFilter != null && !mapKeyFilter.isBlank()) {
+                ps.setString(2, mapKeyFilter);
+            }
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {

@@ -1,5 +1,6 @@
 package controller;
 
+import db.LoadGameService;
 import db.SaveGameService;
 import java.net.URL;
 import java.lang.reflect.Field;
@@ -14,6 +15,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.BooleanSupplier;
 
 import model.Inventory;
@@ -52,9 +57,13 @@ import model.CollisionRegistry;
 import model.Farm;
 import model.FarmGrowthRules;
 import model.FarmPlotRegistrar;
+import model.FarmState;
 import model.InteractionZone;
+import model.MapStateSnapshots;
+import model.MobMapState;
 import model.Player;
 import model.PlayerState;
+import model.TreeMapState;
 import util.AppDialogs;
 import util.SceneManager;
 import util.SpawnTag;
@@ -78,6 +87,14 @@ import javafx.scene.control.ToggleButton;
  * in its FXML. Missing nodes are handled safely.
  */
 public abstract class BaseMapController implements Initializable, SceneController {
+
+    private static final ExecutorService MAP_EVICTION_EXECUTOR = Executors.newSingleThreadExecutor(r -> {
+        Thread t = new Thread(r, "map-eviction");
+        t.setDaemon(true);
+        return t;
+    });
+
+    private static final ConcurrentHashMap<String, AtomicLong> MAP_EVICTION_VERSION_BY_KEY = new ConcurrentHashMap<>();
 
     // ---------- Required common nodes ----------
     @FXML protected StackPane view;
@@ -306,6 +323,14 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     public void initialize(URL url, ResourceBundle rb) {
         if (gameState == null) gameState = GameState.get();
 
+        String currentMap = mapKey();
+        if (gameState != null && currentMap != null && !currentMap.isBlank()) {
+            // Keep GameState in sync with the currently active map scene.
+            gameState.setCurrentMapKey(currentMap);
+            // If other maps were evicted to the DB, reload this map's state before any map logic runs.
+            new LoadGameService().loadMapState(gameState, currentMap);
+        }
+
         ItemDatabase.loadItems();
         playerState = gameState.getPlayerState();
 
@@ -363,6 +388,9 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         player.start();
 
         afterBaseInitialize();
+
+        // Evict non-current map states in the background so map switches stay smooth.
+        Platform.runLater(this::scheduleNonCurrentMapStateEvictionsIfNeeded);
     }
 
     protected final void stopAndSwitchScene(String targetFxml, SpawnTag targetSpawn) {
@@ -373,6 +401,86 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         if (player != null) player.stop();
         GameTimeManager.get().setWorldDilation(1.0);
         SceneManager.switchScene(targetFxml, targetSpawn);
+    }
+
+    private void scheduleNonCurrentMapStateEvictionsIfNeeded() {
+        if (gameState == null) return;
+        if (!gameState.hasActiveSave()) return;
+
+        String currentMapKey = mapKey();
+        if (currentMapKey == null || currentMapKey.isBlank()) return;
+
+        Set<String> evictionKeys = new LinkedHashSet<>();
+        evictionKeys.addAll(gameState.getAllFarmStates().keySet());
+        evictionKeys.addAll(gameState.getAllTreeStates().keySet());
+        evictionKeys.addAll(gameState.getAllMobStates().keySet());
+
+        for (String mapKeyToEvict : evictionKeys) {
+            if (mapKeyToEvict == null || mapKeyToEvict.isBlank()) continue;
+            if (mapKeyToEvict.equals(currentMapKey)) continue;
+            scheduleSingleMapStateEviction(mapKeyToEvict);
+        }
+    }
+
+    private void scheduleSingleMapStateEviction(String mapKeyToEvict) {
+        if (gameState == null) return;
+        if (!gameState.hasActiveSave()) return;
+        if (mapKeyToEvict == null || mapKeyToEvict.isBlank()) return;
+
+        int saveId = gameState.getCurrentSaveId();
+        if (saveId <= 0) return;
+
+        // Snapshot the per-map states on the FX thread so the background DB write can't race against re-entry.
+        FarmState farmState = gameState.getAllFarmStates().get(mapKeyToEvict);
+        final FarmState farmSnapshot = (farmState == null) ? null : MapStateSnapshots.copyFarmState(farmState);
+
+        TreeMapState treeState = gameState.getAllTreeStates().get(mapKeyToEvict);
+        final TreeMapState treeSnapshot = (treeState == null) ? null : MapStateSnapshots.copyTreeMapState(treeState);
+
+        MobMapState mobState = gameState.getAllMobStates().get(mapKeyToEvict);
+        final MobMapState mobSnapshot = (mobState == null) ? null : MapStateSnapshots.copyMobMapState(mobState);
+
+        if (farmSnapshot == null && treeSnapshot == null && mobSnapshot == null) {
+            return;
+        }
+
+        String evictionKey = saveId + ":" + mapKeyToEvict;
+        AtomicLong counter = MAP_EVICTION_VERSION_BY_KEY.computeIfAbsent(evictionKey, k -> new AtomicLong());
+        long version = counter.incrementAndGet();
+
+        MAP_EVICTION_EXECUTOR.submit(() -> {
+            boolean saved = new SaveGameService().saveMapStateSnapshot(
+                saveId,
+                mapKeyToEvict,
+                farmSnapshot,
+                treeSnapshot,
+                mobSnapshot
+            );
+
+            if (!saved) {
+                return;
+            }
+
+            Platform.runLater(() -> {
+                AtomicLong current = MAP_EVICTION_VERSION_BY_KEY.get(evictionKey);
+                if (current == null || current.get() != version) {
+                    return; // newer eviction request scheduled
+                }
+
+                if (gameState == null) {
+                    return;
+                }
+
+                // Only evict if the player is no longer on this map.
+                if (mapKeyToEvict.equals(gameState.getCurrentMapKey())) {
+                    return;
+                }
+
+                gameState.getAllFarmStates().remove(mapKeyToEvict);
+                gameState.getAllTreeStates().remove(mapKeyToEvict);
+                gameState.getAllMobStates().remove(mapKeyToEvict);
+            });
+        });
     }
 
     protected final void registerExit(Rectangle zone, String targetFxml, SpawnTag targetSpawn) {

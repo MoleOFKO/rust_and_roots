@@ -266,11 +266,24 @@ public class SaveGameService {
     }
 
     private void saveFarmPlots(Connection con, GameState gs) throws Exception {
-        int saveId = gs.getCurrentSaveId();
+        if (con == null || gs == null) return;
+        saveFarmPlotsForMaps(con, gs.getCurrentSaveId(), gs.getAllFarmStates());
+    }
 
-        try (PreparedStatement del = con.prepareStatement("DELETE FROM saved_farm_plot WHERE saved_id = ?")) {
-            del.setInt(1, saveId);
-            del.executeUpdate();
+    private void saveFarmPlotsForMaps(Connection con, int saveId, Map<String, FarmState> farms) throws Exception {
+        if (con == null || saveId <= 0 || farms == null || farms.isEmpty()) {
+            return;
+        }
+
+        try (PreparedStatement del = con.prepareStatement(
+                "DELETE FROM saved_farm_plot WHERE saved_id = ? AND map_key = ?")) {
+            for (String mapKey : farms.keySet()) {
+                if (mapKey == null || mapKey.isBlank()) continue;
+                del.setInt(1, saveId);
+                del.setString(2, mapKey);
+                del.addBatch();
+            }
+            del.executeBatch();
         }
 
         String sql = """
@@ -282,27 +295,39 @@ public class SaveGameService {
             """;
 
         try (PreparedStatement ins = con.prepareStatement(sql)) {
-            saveFarmMap(ins, saveId, "home_map", gs.getFarmState("home_map"));
-            saveFarmMap(ins, saveId, "Home_interior", gs.getFarmState("Home_interior"));
+            for (Map.Entry<String, FarmState> entry : farms.entrySet()) {
+                if (entry == null) continue;
+                String mapKey = entry.getKey();
+                FarmState farmState = entry.getValue();
+                if (mapKey == null || mapKey.isBlank() || farmState == null) continue;
+                saveFarmMap(ins, saveId, mapKey, farmState);
+            }
             ins.executeBatch();
         }
     }
 
     private void saveTreeResources(Connection con, GameState gs) throws Exception {
         if (con == null || gs == null) return;
+        saveTreeResourcesForMaps(con, gs.getCurrentSaveId(), gs.getAllTreeStates());
+    }
+
+    private void saveTreeResourcesForMaps(Connection con, int saveId, Map<String, TreeMapState> treeStates) throws Exception {
+        if (con == null || saveId <= 0 || treeStates == null || treeStates.isEmpty()) {
+            return;
+        }
         if (!hasTable(con, "saved_tree_resource")) {
             return;
         }
 
-        int saveId = gs.getCurrentSaveId();
-
-        try (PreparedStatement del = con.prepareStatement("DELETE FROM saved_tree_resource WHERE saved_id = ?")) {
-            del.setInt(1, saveId);
-            del.executeUpdate();
-        }
-
-        if (gs.getAllTreeStates().isEmpty()) {
-            return;
+        try (PreparedStatement del = con.prepareStatement(
+                "DELETE FROM saved_tree_resource WHERE saved_id = ? AND map_key = ?")) {
+            for (String mapKey : treeStates.keySet()) {
+                if (mapKey == null || mapKey.isBlank()) continue;
+                del.setInt(1, saveId);
+                del.setString(2, mapKey);
+                del.addBatch();
+            }
+            del.executeBatch();
         }
 
         String sql = """
@@ -315,7 +340,7 @@ public class SaveGameService {
             """;
 
         try (PreparedStatement ins = con.prepareStatement(sql)) {
-            for (Map.Entry<String, TreeMapState> mapEntry : gs.getAllTreeStates().entrySet()) {
+            for (Map.Entry<String, TreeMapState> mapEntry : treeStates.entrySet()) {
                 String mapKey = mapEntry == null ? null : mapEntry.getKey();
                 TreeMapState mapState = mapEntry == null ? null : mapEntry.getValue();
                 if (mapKey == null || mapKey.isBlank() || mapState == null) {
@@ -358,19 +383,26 @@ public class SaveGameService {
 
     private void saveTreeDrops(Connection con, GameState gs) throws Exception {
         if (con == null || gs == null) return;
+        saveTreeDropsForMaps(con, gs.getCurrentSaveId(), gs.getAllTreeStates());
+    }
+
+    private void saveTreeDropsForMaps(Connection con, int saveId, Map<String, TreeMapState> treeStates) throws Exception {
+        if (con == null || saveId <= 0 || treeStates == null || treeStates.isEmpty()) {
+            return;
+        }
         if (!hasTable(con, "saved_tree_drop")) {
             return;
         }
 
-        int saveId = gs.getCurrentSaveId();
-
-        try (PreparedStatement del = con.prepareStatement("DELETE FROM saved_tree_drop WHERE saved_id = ?")) {
-            del.setInt(1, saveId);
-            del.executeUpdate();
-        }
-
-        if (gs.getAllTreeStates().isEmpty()) {
-            return;
+        try (PreparedStatement del = con.prepareStatement(
+                "DELETE FROM saved_tree_drop WHERE saved_id = ? AND map_key = ?")) {
+            for (String mapKey : treeStates.keySet()) {
+                if (mapKey == null || mapKey.isBlank()) continue;
+                del.setInt(1, saveId);
+                del.setString(2, mapKey);
+                del.addBatch();
+            }
+            del.executeBatch();
         }
 
         String sql = """
@@ -381,7 +413,7 @@ public class SaveGameService {
             """;
 
         try (PreparedStatement ins = con.prepareStatement(sql)) {
-            for (Map.Entry<String, TreeMapState> mapEntry : gs.getAllTreeStates().entrySet()) {
+            for (Map.Entry<String, TreeMapState> mapEntry : treeStates.entrySet()) {
                 String mapKey = mapEntry == null ? null : mapEntry.getKey();
                 TreeMapState mapState = mapEntry == null ? null : mapEntry.getValue();
                 if (mapKey == null || mapKey.isBlank() || mapState == null) {
@@ -653,19 +685,26 @@ public class SaveGameService {
 
     private void saveMobs(Connection con, GameState gs) throws Exception {
         if (con == null || gs == null) return;
+        saveMobsForMaps(con, gs.getCurrentSaveId(), gs.getAllMobStates());
+    }
+
+    private void saveMobsForMaps(Connection con, int saveId, Map<String, MobMapState> mobStates) throws Exception {
+        if (con == null || saveId <= 0 || mobStates == null || mobStates.isEmpty()) {
+            return;
+        }
         if (!hasTable(con, "saved_mob")) {
             return;
         }
 
-        int saveId = gs.getCurrentSaveId();
-
-        try (PreparedStatement del = con.prepareStatement("DELETE FROM saved_mob WHERE saved_id = ?")) {
-            del.setInt(1, saveId);
-            del.executeUpdate();
-        }
-
-        if (gs.getAllMobStates().isEmpty()) {
-            return;
+        try (PreparedStatement del = con.prepareStatement(
+                "DELETE FROM saved_mob WHERE saved_id = ? AND map_key = ?")) {
+            for (String mapKey : mobStates.keySet()) {
+                if (mapKey == null || mapKey.isBlank()) continue;
+                del.setInt(1, saveId);
+                del.setString(2, mapKey);
+                del.addBatch();
+            }
+            del.executeBatch();
         }
 
         String sql = """
@@ -682,7 +721,7 @@ public class SaveGameService {
             """;
 
         try (PreparedStatement ins = con.prepareStatement(sql)) {
-            for (Map.Entry<String, MobMapState> mapEntry : gs.getAllMobStates().entrySet()) {
+            for (Map.Entry<String, MobMapState> mapEntry : mobStates.entrySet()) {
                 String mapKey = mapEntry == null ? null : mapEntry.getKey();
                 MobMapState mapState = mapEntry == null ? null : mapEntry.getValue();
                 if (mapKey == null || mapKey.isBlank() || mapState == null) {
@@ -728,19 +767,26 @@ public class SaveGameService {
 
     private void saveMobDrops(Connection con, GameState gs) throws Exception {
         if (con == null || gs == null) return;
+        saveMobDropsForMaps(con, gs.getCurrentSaveId(), gs.getAllMobStates());
+    }
+
+    private void saveMobDropsForMaps(Connection con, int saveId, Map<String, MobMapState> mobStates) throws Exception {
+        if (con == null || saveId <= 0 || mobStates == null || mobStates.isEmpty()) {
+            return;
+        }
         if (!hasTable(con, "saved_mob_drop")) {
             return;
         }
 
-        int saveId = gs.getCurrentSaveId();
-
-        try (PreparedStatement del = con.prepareStatement("DELETE FROM saved_mob_drop WHERE saved_id = ?")) {
-            del.setInt(1, saveId);
-            del.executeUpdate();
-        }
-
-        if (gs.getAllMobStates().isEmpty()) {
-            return;
+        try (PreparedStatement del = con.prepareStatement(
+                "DELETE FROM saved_mob_drop WHERE saved_id = ? AND map_key = ?")) {
+            for (String mapKey : mobStates.keySet()) {
+                if (mapKey == null || mapKey.isBlank()) continue;
+                del.setInt(1, saveId);
+                del.setString(2, mapKey);
+                del.addBatch();
+            }
+            del.executeBatch();
         }
 
         String sql = """
@@ -751,7 +797,7 @@ public class SaveGameService {
             """;
 
         try (PreparedStatement ins = con.prepareStatement(sql)) {
-            for (Map.Entry<String, MobMapState> mapEntry : gs.getAllMobStates().entrySet()) {
+            for (Map.Entry<String, MobMapState> mapEntry : mobStates.entrySet()) {
                 String mapKey = mapEntry == null ? null : mapEntry.getKey();
                 MobMapState mapState = mapEntry == null ? null : mapEntry.getValue();
                 if (mapKey == null || mapKey.isBlank() || mapState == null) {
@@ -835,6 +881,10 @@ public class SaveGameService {
     }
 
     private int resolveMapId(Connection con, String mapKey) throws Exception {
+        if (mapKey == null || mapKey.isBlank()) {
+            mapKey = "home_map";
+        }
+
         String sql = "SELECT map_id FROM game_map WHERE map_name = ?";
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, mapKey);
@@ -844,7 +894,25 @@ public class SaveGameService {
                 }
             }
         }
-        throw new IllegalStateException("Map not found in game_map: " + mapKey);
+
+        // Auto-register missing maps so saves work even if new maps were added to the project
+        // without updating the seed data in game_map.
+        try (PreparedStatement ins = con.prepareStatement(
+                "INSERT INTO game_map (map_name) VALUES (?) ON DUPLICATE KEY UPDATE map_name = VALUES(map_name)")) {
+            ins.setString(1, mapKey);
+            ins.executeUpdate();
+        }
+
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, mapKey);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("map_id");
+                }
+            }
+        }
+
+        throw new IllegalStateException("Map not found and could not be inserted into game_map: " + mapKey);
     }
 
     private int getStatsIdForSave(Connection con, int saveId) throws Exception {
@@ -892,6 +960,8 @@ public class SaveGameService {
             saveFarmPlots(con, gs);
             saveTreeResources(con, gs);
             saveTreeDrops(con, gs);
+            saveMobs(con, gs);
+            saveMobDrops(con, gs);
             saveChestItems(con, gs);
             saveTime(con, gs);
             saveShop(con, gs);
@@ -904,6 +974,43 @@ public class SaveGameService {
 
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * Persists only the provided map-specific state snapshots for the given save.
+     * Intended for background map eviction to reduce in-memory state.
+     */
+    public boolean saveMapStateSnapshot(int saveId, String mapKey, FarmState farmState, TreeMapState treeState, MobMapState mobState) {
+        if (saveId <= 0) return false;
+        if (mapKey == null || mapKey.isBlank()) return false;
+
+        dbcon db = new dbcon();
+
+        try (Connection con = db.getConnection()) {
+            con.setAutoCommit(false);
+
+            if (farmState != null) {
+                saveFarmPlotsForMaps(con, saveId, java.util.Collections.singletonMap(mapKey, farmState));
+            }
+
+            if (treeState != null) {
+                Map<String, TreeMapState> trees = java.util.Collections.singletonMap(mapKey, treeState);
+                saveTreeResourcesForMaps(con, saveId, trees);
+                saveTreeDropsForMaps(con, saveId, trees);
+            }
+
+            if (mobState != null) {
+                Map<String, MobMapState> mobs = java.util.Collections.singletonMap(mapKey, mobState);
+                saveMobsForMaps(con, saveId, mobs);
+                saveMobDropsForMaps(con, saveId, mobs);
+            }
+
+            con.commit();
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
     }
     

@@ -55,9 +55,11 @@ public final class PlayerState {
     private static final double RUN_DRAIN_SCALING_START = 0.75;
     private static final double RUN_DRAIN_REDUCTION_PER_VIT = 0.05;
 
-    private static final double IDLE_STAMINA_CAP_RATIO = 0.90;
-    private static final double WALK_STAMINA_CAP_RATIO = 0.80;
-    private static final double RUN_STAMINA_CAP_RATIO = 0.70;
+    // Spec: SP regen can always reach 100% max SP while idle or walking.
+    // Keep these caps at 1.0 so any cap-based logic doesn't limit passive regen by state.
+    private static final double IDLE_STAMINA_CAP_RATIO = 1.00;
+    private static final double WALK_STAMINA_CAP_RATIO = 1.00;
+    private static final double RUN_STAMINA_CAP_RATIO = 1.00;
     private static final double SLEEP_STAMINA_CAP_RATIO = 1.00;
 
     private double staminaPrecise = DEFAULT_STAMINA;
