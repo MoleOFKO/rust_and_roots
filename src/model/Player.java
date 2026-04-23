@@ -416,7 +416,14 @@ public class Player {
                     return;
                 }
 
-                updateMovement(dtSeconds, dtSimNanos, simNowNanos);
+                // Stamina drain is expressed in world time (in-game seconds).
+                double dtWorldSeconds = 0.0;
+                if (time != null && !time.pausedProperty().get()) {
+                    double timeScale = Math.max(0.0, time.timeScaleProperty().get());
+                    dtWorldSeconds = dtSeconds * 24.0 * timeScale * Math.max(0.0, worldDilation);
+                }
+
+                updateMovement(dtWorldSeconds, dtSimNanos, simNowNanos);
                 updateAnimation(simNowNanos);
 
                 if (detectionTarget != null) {
@@ -485,7 +492,7 @@ public class Player {
         return moved;
     }
 
-    private void updateMovement(double dtRealSeconds, long dtSimNanos, long now) {
+    private void updateMovement(double dtWorldSeconds, long dtSimNanos, long now) {
         if (state.isDead()) {
             moving = false;
             pressedKeys.clear();
@@ -503,7 +510,7 @@ public class Player {
         if (hurtActive && now < hurtEndsAtNanos) {
             moving = false;
             state.setStaminaMode(PlayerState.StaminaMode.IDLE);
-            state.updateStaminaOverTime(dtRealSeconds, PlayerState.StaminaMode.IDLE);
+            state.updateStaminaOverTime(dtWorldSeconds, PlayerState.StaminaMode.IDLE);
             setAnimState(AnimState.HURT, false);
             return;
         }
@@ -514,8 +521,18 @@ public class Player {
 
         if (isAttackActive(now)) {
             moving = false;
-            state.setStaminaMode(PlayerState.StaminaMode.IDLE);
-            state.updateStaminaOverTime(dtRealSeconds, PlayerState.StaminaMode.IDLE);
+
+            PlayerState.StaminaMode mode = state.isRunToggled()
+                ? PlayerState.StaminaMode.RUN
+                : PlayerState.StaminaMode.ATTACK;
+            state.setStaminaMode(mode);
+            state.updateStaminaOverTime(dtWorldSeconds, mode);
+
+            if (mode == PlayerState.StaminaMode.RUN && state.getStamina() <= 0) {
+                state.setStaminaExhaustedLock(true);
+                state.setRunToggled(false);
+            }
+
             setAnimState(AnimState.ATTACK, false);
             return;
         }
@@ -527,7 +544,7 @@ public class Player {
         if (state.hasStaminaExhaustedLock()) {
             moving = false;
             state.setStaminaMode(PlayerState.StaminaMode.IDLE);
-            state.updateStaminaOverTime(dtRealSeconds, PlayerState.StaminaMode.IDLE);
+            state.updateStaminaOverTime(dtWorldSeconds, PlayerState.StaminaMode.IDLE);
             setAnimState(AnimState.IDLE, false);
 
             if (state.getStamina() > 0) {
@@ -542,7 +559,7 @@ public class Player {
         if (state.getStamina() <= 0) {
             moving = false;
             state.setStaminaMode(PlayerState.StaminaMode.IDLE);
-            state.updateStaminaOverTime(dtRealSeconds, PlayerState.StaminaMode.IDLE);
+            state.updateStaminaOverTime(dtWorldSeconds, PlayerState.StaminaMode.IDLE);
             setAnimState(AnimState.IDLE, false);
             return;
         }
@@ -565,8 +582,20 @@ public class Player {
 
         if (inputX == 0.0 && inputY == 0.0) {
             moving = false;
-            state.setStaminaMode(PlayerState.StaminaMode.IDLE);
-            state.updateStaminaOverTime(dtRealSeconds, PlayerState.StaminaMode.IDLE);
+
+            if (state.isRunToggled()) {
+                // Spec: while in "run" state, SP drains even if the player is idle.
+                state.setStaminaMode(PlayerState.StaminaMode.RUN);
+                state.updateStaminaOverTime(dtWorldSeconds, PlayerState.StaminaMode.RUN);
+                if (state.getStamina() <= 0) {
+                    state.setStaminaExhaustedLock(true);
+                    state.setRunToggled(false);
+                }
+            } else {
+                state.setStaminaMode(PlayerState.StaminaMode.IDLE);
+                state.updateStaminaOverTime(dtWorldSeconds, PlayerState.StaminaMode.IDLE);
+            }
+
             setAnimState(AnimState.IDLE, false);
             return;
         }
@@ -592,7 +621,7 @@ public class Player {
         if (moving) {
             if (isRunning) {
                 state.setStaminaMode(PlayerState.StaminaMode.RUN);
-                state.updateStaminaOverTime(dtRealSeconds, PlayerState.StaminaMode.RUN);
+                state.updateStaminaOverTime(dtWorldSeconds, PlayerState.StaminaMode.RUN);
                 if (state.getStamina() <= 0) {
                     state.setStaminaExhaustedLock(true);
                     state.setRunToggled(false);
@@ -603,12 +632,22 @@ public class Player {
                 }
             } else {
                 state.setStaminaMode(PlayerState.StaminaMode.WALK);
-                state.updateStaminaOverTime(dtRealSeconds, PlayerState.StaminaMode.WALK);
+                state.updateStaminaOverTime(dtWorldSeconds, PlayerState.StaminaMode.WALK);
                 setAnimState(AnimState.WALK, false);
             }
         } else {
-            state.setStaminaMode(PlayerState.StaminaMode.IDLE);
-            state.updateStaminaOverTime(dtRealSeconds, PlayerState.StaminaMode.IDLE);
+            if (state.isRunToggled()) {
+                // If the player is trying to move but is blocked, treat as idle-in-run-state (still drains SP).
+                state.setStaminaMode(PlayerState.StaminaMode.RUN);
+                state.updateStaminaOverTime(dtWorldSeconds, PlayerState.StaminaMode.RUN);
+                if (state.getStamina() <= 0) {
+                    state.setStaminaExhaustedLock(true);
+                    state.setRunToggled(false);
+                }
+            } else {
+                state.setStaminaMode(PlayerState.StaminaMode.IDLE);
+                state.updateStaminaOverTime(dtWorldSeconds, PlayerState.StaminaMode.IDLE);
+            }
             setAnimState(AnimState.IDLE, false);
         }
     }
@@ -986,12 +1025,19 @@ public class Player {
             return;
         }
 
-        if (state.getStamina() <= 0) {
+        int staminaCost = state.getAttackStaminaCost();
+        if (state.getStamina() < staminaCost) {
             return;
         }
 
         if (isAttackActive(now) || now < nextAttackAvailableAtNanos) {
             return;
+        }
+
+        state.consumeStamina(staminaCost);
+        if (state.getStamina() <= 0) {
+            state.setStaminaExhaustedLock(true);
+            state.setRunToggled(false);
         }
 
         moving = false;

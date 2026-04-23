@@ -57,8 +57,8 @@ public final class MobEntity {
     private static final long HURT_FRAME_DELAY_NANOS = 90_000_000L;
     private static final long DEATH_FRAME_DELAY_NANOS = 90_000_000L;
 
-    // Spec update: mobs respawn at 1 in-game minute minimum.
-    private static final double MOB_BASE_RESPAWN_SECONDS = 60.0;
+    // Spec: slime/orc base respawn time is 30 in-game seconds.
+    private static final double MOB_BASE_RESPAWN_SECONDS = 30.0;
 
     // Spec base stats (day 1).
     private static final int SLIME_BASE_MAX_HP = 10;
@@ -622,7 +622,12 @@ public final class MobEntity {
         double speedMultiplier = 1.0 + (vit * 0.01);
 
         double hpRegenPerGameSecond = (maxHp * 0.01 * amountMultiplier * speedMultiplier) / 60.0;
-        double spRegenPerGameSecond = (maxSp * 0.01 * amountMultiplier * speedMultiplier) / 60.0;
+
+        // Spec: SP only regens while idle/walking. Mobs don't "walk", so only regen SP while idle.
+        boolean canRegenSp = (animState == AnimState.IDLE) && !moving && !isAttackActive(simNowNanos);
+        double spRegenPerGameSecond = canRegenSp
+            ? (maxSp * 0.01 * amountMultiplier * speedMultiplier) / 60.0
+            : 0.0;
 
         if (hpRegenPerGameSecond <= 0.0 && spRegenPerGameSecond <= 0.0) {
             data.lastRegenTotalSeconds = nowSeconds;
