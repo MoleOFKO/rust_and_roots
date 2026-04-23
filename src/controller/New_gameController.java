@@ -191,7 +191,7 @@ public class New_gameController implements Initializable, SceneController {
             int characterId = createCharacterIfMissing(accountId, characterName);
             gs.setCurrentCharacterId(characterId);
             gs.setCurrentSaveId(-1);
-            gs.setCurrentMapKey("home_map");
+            gs.setCurrentMapKey("Home_interior");
             gs.setSelectedSaveSlot(1);
         } catch (Exception e) {
             e.printStackTrace();
@@ -211,7 +211,7 @@ public class New_gameController implements Initializable, SceneController {
         GameTimeManager time = GameTimeManager.get();
         time.setDay(1);
         time.setTimeOfDay(6, 0);
-        SceneManager.switchScene("/view/home_map.fxml");
+        SceneManager.switchScene("/view/home_interior.fxml");
     }
 
     @FXML

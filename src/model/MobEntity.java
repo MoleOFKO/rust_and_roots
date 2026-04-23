@@ -57,8 +57,19 @@ public final class MobEntity {
     private static final long HURT_FRAME_DELAY_NANOS = 90_000_000L;
     private static final long DEATH_FRAME_DELAY_NANOS = 90_000_000L;
 
-    // Spec: slime/orc base respawn time is 30 in-game seconds.
-    private static final double MOB_BASE_RESPAWN_SECONDS = 30.0;
+    // Spec: slime/orc base respawn time is 30 in-game minutes (1,800 seconds).
+    private static final double MOB_BASE_RESPAWN_SECONDS = 30.0 * 60.0;
+
+    // Spec: special "run and attack" cooldown is 5 in-game minutes.
+    private static final double RUN_ATTACK_COOLDOWN_SECONDS = 5.0 * 60.0;
+    private static final double RUN_ATTACK_EDGE_BAND_RATIO = 0.15;
+    private static final double RUN_ATTACK_EDGE_BAND_MIN_PIXELS = 8.0;
+    private static final double RUN_ATTACK_SPEED_MULTIPLIER = 1.8;
+
+    // Special action SP cost = run + attack.
+    private static final int RUN_ATTACK_RUN_SP_COST = 1;
+    private static final int ATTACK_SP_COST = 1;
+    private static final int RUN_ATTACK_TOTAL_SP_COST = RUN_ATTACK_RUN_SP_COST + ATTACK_SP_COST;
 
     // Spec base stats (day 1).
     private static final int SLIME_BASE_MAX_HP = 10;
@@ -111,6 +122,7 @@ public final class MobEntity {
     private long simNowNanos = 0L;
 
     private boolean moving = false;
+    private boolean runAttackActive = false;
     private boolean deathStarted = false;
     private boolean deathFinished = false;
     private boolean hurtActive = false;
@@ -297,16 +309,23 @@ public final class MobEntity {
         boolean canChase = shouldChase(playerBoundsScene, playerState);
 
         if (canChase) {
-            moveTowardTarget(dtSimNanos, playerBoundsScene);
+            if (!runAttackActive && shouldStartRunAttack(nowSeconds, playerBoundsScene, playerState)) {
+                startRunAttack(nowSeconds);
+            }
+
+            double speedMultiplier = runAttackActive ? RUN_ATTACK_SPEED_MULTIPLIER : 1.0;
+            moveTowardTarget(dtSimNanos, playerBoundsScene, speedMultiplier);
             syncAttackHitboxesEnabled(true);
             setAnimState(moving ? AnimState.RUN : AnimState.IDLE, false);
 
             if (shouldStartAttack(simNowNanos, playerBoundsScene, playerState)) {
                 startAttack(simNowNanos);
                 tryApplyAttackDamage(playerBoundsScene, playerState);
+                runAttackActive = false;
             }
         } else {
             moving = false;
+            runAttackActive = false;
             syncAttackHitboxesEnabled(true);
             setAnimState(AnimState.IDLE, false);
         }
@@ -539,6 +558,8 @@ public final class MobEntity {
 
         data.dead = false;
         data.respawnAtTotalSeconds = -1.0;
+        data.runAttackCooldownUntilTotalSeconds = -1.0;
+        runAttackActive = false;
 
         data.livedDays = 0;
         data.lastUpdatedDayNumber = day;
@@ -673,7 +694,7 @@ public final class MobEntity {
         return detectBounds.intersects(playerBoundsScene);
     }
 
-    private void moveTowardTarget(long dtNanos, Bounds playerBoundsScene) {
+    private void moveTowardTarget(long dtNanos, Bounds playerBoundsScene, double speedMultiplier) {
         if (dtNanos <= 0L || playerBoundsScene == null) {
             moving = false;
             return;
@@ -711,7 +732,7 @@ public final class MobEntity {
         double dirX = vx / dist;
         double dirY = vy / dist;
 
-        double speed = getMovementSpeed();
+        double speed = getMovementSpeed() * Math.max(0.0, speedMultiplier);
         double frames = dtNanos / NANOS_PER_60FPS_FRAME;
         // Cap movement steps to avoid huge jumps after stalls (15 frames @ 60fps).
         frames = Math.min(15.0, Math.max(0.0, frames));
@@ -733,6 +754,59 @@ public final class MobEntity {
 
     private double getMovementSpeed() {
         return 5.0;
+    }
+
+    private boolean shouldStartRunAttack(double nowSeconds, Bounds playerBoundsScene, PlayerState playerState) {
+        if (detectRange == null || playerBoundsScene == null || playerState == null) return false;
+        if (data.dead) return false;
+        if (playerState.isDead()) return false;
+
+        if (Double.isNaN(nowSeconds) || Double.isInfinite(nowSeconds)) {
+            return false;
+        }
+
+        double cooldownUntil = data.runAttackCooldownUntilTotalSeconds;
+        if (!Double.isNaN(cooldownUntil)
+            && !Double.isInfinite(cooldownUntil)
+            && cooldownUntil >= 0.0
+            && nowSeconds < cooldownUntil) {
+            return false;
+        }
+
+        if (data.sp < RUN_ATTACK_TOTAL_SP_COST) {
+            return false;
+        }
+
+        Bounds detectBounds = detectRange.localToScene(detectRange.getBoundsInLocal());
+        if (!detectBounds.intersects(playerBoundsScene)) {
+            return false;
+        }
+
+        double band = Math.max(
+            RUN_ATTACK_EDGE_BAND_MIN_PIXELS,
+            Math.min(detectBounds.getWidth(), detectBounds.getHeight()) * RUN_ATTACK_EDGE_BAND_RATIO
+        );
+
+        double playerCx = playerBoundsScene.getMinX() + (playerBoundsScene.getWidth() / 2.0);
+        double playerCy = playerBoundsScene.getMinY() + (playerBoundsScene.getHeight() / 2.0);
+
+        double distLeft = playerCx - detectBounds.getMinX();
+        double distRight = detectBounds.getMaxX() - playerCx;
+        double distUp = playerCy - detectBounds.getMinY();
+        double distDown = detectBounds.getMaxY() - playerCy;
+
+        double minDist = Math.min(Math.min(distLeft, distRight), Math.min(distUp, distDown));
+        return minDist <= band;
+    }
+
+    private void startRunAttack(double nowSeconds) {
+        if (Double.isNaN(nowSeconds) || Double.isInfinite(nowSeconds)) {
+            return;
+        }
+
+        runAttackActive = true;
+        data.runAttackCooldownUntilTotalSeconds = nowSeconds + RUN_ATTACK_COOLDOWN_SECONDS;
+        data.sp = Math.max(0, data.sp - RUN_ATTACK_RUN_SP_COST);
     }
 
     private boolean move(double dx, double dy, Bounds playerBoundsInParent) {
@@ -797,7 +871,7 @@ public final class MobEntity {
         nextAttackAvailableAtNanos = attackEndsAtNanos;
         attackDamageApplied = false;
 
-        data.sp = Math.max(0, data.sp - 1);
+        data.sp = Math.max(0, data.sp - ATTACK_SP_COST);
 
         moving = false;
         syncAttackHitboxesEnabled(true);

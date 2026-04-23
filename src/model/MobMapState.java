@@ -35,6 +35,9 @@ public class MobMapState {
         /** GameTimeManager.totalSeconds when this mob should respawn. -1 means not respawning. */
         public double respawnAtTotalSeconds = -1.0;
 
+        /** GameTimeManager.totalSeconds until which the special run+attack is on cooldown. -1 means ready. */
+        public double runAttackCooldownUntilTotalSeconds = -1.0;
+
         /** Group layout position (in parent's coordinate space). */
         public double layoutX = 0.0;
         public double layoutY = 0.0;

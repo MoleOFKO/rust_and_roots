@@ -485,6 +485,7 @@ CREATE TABLE `saved_mob` (
   `dex_stat` int NOT NULL DEFAULT '0',
   `dead` tinyint(1) NOT NULL DEFAULT '0',
   `respawn_at_total_seconds` double NOT NULL DEFAULT '-1',
+  `run_attack_cooldown_until_total_seconds` double NOT NULL DEFAULT '-1',
   `layout_x` double NOT NULL DEFAULT '0',
   `layout_y` double NOT NULL DEFAULT '0',
   `last_regen_total_seconds` double NOT NULL DEFAULT '-1',
@@ -1141,6 +1142,7 @@ END $$
 CREATE PROCEDURE ensure_saved_mob_table()
 BEGIN
     DECLARE v_missing_respawn_at_total_seconds INT DEFAULT 0;
+    DECLARE v_missing_run_attack_cooldown_until_total_seconds INT DEFAULT 0;
 
     CREATE TABLE IF NOT EXISTS saved_mob (
         saved_id INT NOT NULL,
@@ -1158,6 +1160,7 @@ BEGIN
         dex_stat INT NOT NULL DEFAULT '0',
         dead TINYINT(1) NOT NULL DEFAULT '0',
         respawn_at_total_seconds DOUBLE NOT NULL DEFAULT '-1',
+        run_attack_cooldown_until_total_seconds DOUBLE NOT NULL DEFAULT '-1',
         layout_x DOUBLE NOT NULL DEFAULT '0',
         layout_y DOUBLE NOT NULL DEFAULT '0',
         last_regen_total_seconds DOUBLE NOT NULL DEFAULT '-1',
@@ -1176,6 +1179,17 @@ BEGIN
     IF v_missing_respawn_at_total_seconds = 0 THEN
         ALTER TABLE saved_mob
             ADD COLUMN respawn_at_total_seconds DOUBLE NOT NULL DEFAULT '-1' AFTER dead;
+    END IF;
+
+    SELECT COUNT(*)
+      INTO v_missing_run_attack_cooldown_until_total_seconds
+      FROM information_schema.columns
+     WHERE table_schema = DATABASE()
+       AND table_name = 'saved_mob'
+       AND column_name = 'run_attack_cooldown_until_total_seconds';
+    IF v_missing_run_attack_cooldown_until_total_seconds = 0 THEN
+        ALTER TABLE saved_mob
+            ADD COLUMN run_attack_cooldown_until_total_seconds DOUBLE NOT NULL DEFAULT '-1' AFTER respawn_at_total_seconds;
     END IF;
 END $$
 
