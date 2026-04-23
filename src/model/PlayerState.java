@@ -43,7 +43,8 @@ public final class PlayerState {
         SLEEP,
         IDLE,
         WALK,
-        RUN
+        RUN,
+        ATTACK
     }
 
     private static final double DEFAULT_STAMINA_BASE_REGEN_PER_SECOND = 0.65;
@@ -463,7 +464,7 @@ public final class PlayerState {
         return switch (mode) {
             case SLEEP, IDLE -> 1.0;
             case WALK -> WALK_REGEN_MULTIPLIER;
-            case RUN -> RUN_REGEN_MULTIPLIER;
+            case RUN, ATTACK -> 0.0;
         };
     }
 
@@ -477,7 +478,7 @@ public final class PlayerState {
             case SLEEP -> SLEEP_STAMINA_CAP_RATIO;
             case IDLE -> IDLE_STAMINA_CAP_RATIO;
             case WALK -> WALK_STAMINA_CAP_RATIO;
-            case RUN -> RUN_STAMINA_CAP_RATIO;
+            case RUN, ATTACK -> RUN_STAMINA_CAP_RATIO;
         };
     }
 
@@ -489,9 +490,38 @@ public final class PlayerState {
         return Math.max(0, Math.min(getMaxStamina(), cap));
     }
 
-    public double getRunDrainPerSecond() {
+    /**
+     * Computes the player's continuous stamina drain rate while in {@link StaminaMode#RUN}.
+     *
+     * <p>Spec (AGI scaling):
+     * <ul>
+     *   <li>AGI 20 => -1 SP per 1 game-world second</li>
+     *   <li>AGI 21 => -2 SP per 1 game-world second</li>
+     *   <li>AGI 31 => -12 SP per 1 game-world second</li>
+     * </ul>
+     *
+     * <p>For lower AGI values, a small baseline drain is retained so "run" mode still has a cost.
+     * This baseline matches the project's previous real-time drain curve converted into
+     * game-world seconds at the default time scale.
+     */
+    public double getRunDrainPerGameSecond() {
+        // Project baseline: GameTimeManager advances ~24 in-game seconds per real second.
+        final double gameSecondsPerRealSecond = 24.0;
+
         double reduction = Math.max(0.0, RUN_DRAIN_SCALING_START - (Math.max(0, getVit()) * RUN_DRAIN_REDUCTION_PER_VIT));
-        return RUN_BASE_DRAIN_PER_SECOND + reduction;
+        double baselinePerRealSecond = RUN_BASE_DRAIN_PER_SECOND + reduction;
+        double baselinePerGameSecond = baselinePerRealSecond / gameSecondsPerRealSecond;
+
+        int safeAgi = Math.max(0, getAgi());
+        double agiScaledPerGameSecond = Math.max(0.0, safeAgi - 19.0);
+
+        return Math.max(0.0, Math.max(baselinePerGameSecond, agiScaledPerGameSecond));
+    }
+
+    public int getAttackStaminaCost() {
+        int safeAgi = Math.max(0, getAgi());
+        // Attack actions cost SP and scale up strongly once AGI reaches 20+.
+        return Math.max(1, safeAgi - 19);
     }
 
     public void setStaminaMode(StaminaMode mode) {
@@ -527,13 +557,14 @@ public final class PlayerState {
     }
 
     public void updateStaminaOverTime(double seconds, StaminaMode mode, double timeFlowMultiplier) {
+        // 'seconds' is in game-world seconds (GameTimeManager.totalSeconds units).
         if (seconds <= 0.0 || isDead() || getMaxStamina() <= 0) return;
 
         StaminaMode effectiveMode = (mode == null) ? StaminaMode.IDLE : mode;
         double safeTimeFlow = Math.max(0.0, timeFlowMultiplier);
 
         double drain = doesModeDrainStamina(effectiveMode)
-            ? getRunDrainPerSecond() * safeTimeFlow * seconds
+            ? getRunDrainPerGameSecond() * safeTimeFlow * seconds
             : 0.0;
 
         if (drain > 0.0) {
@@ -555,6 +586,7 @@ public final class PlayerState {
      *   <li>Base regen amount: 1% of max HP / SP</li>
      *   <li>Base regen speed: 1 in-game minute</li>
      *   <li>VIT modifies regen amount and speed</li>
+     *   <li>SP only regens while idle/walking (no SP regen while running/attacking)</li>
      * </ul>
      */
     public void applyRegenIfNeeded(double nowTotalSeconds) {
@@ -585,7 +617,18 @@ public final class PlayerState {
         double speedMultiplier = 1.0 + (vitValue * 0.01);
 
         double hpRegenPerGameSecond = (maxHpValue * 0.01 * amountMultiplier * speedMultiplier) / 60.0;
-        double spRegenPerGameSecond = (maxSpValue * 0.01 * amountMultiplier * speedMultiplier) / 60.0;
+
+        boolean canRegenSp = switch (staminaMode) {
+            case SLEEP, IDLE, WALK -> true;
+            case RUN, ATTACK -> false;
+        };
+
+        double spRegenPerGameSecond = 0.0;
+        if (canRegenSp) {
+            // Idle (and sleep) regen is faster than walk regen.
+            double spModeMultiplier = (staminaMode == StaminaMode.WALK) ? WALK_REGEN_MULTIPLIER : 1.0;
+            spRegenPerGameSecond = (maxSpValue * 0.01 * amountMultiplier * speedMultiplier * spModeMultiplier) / 60.0;
+        }
 
         hpRegenCarry += hpRegenPerGameSecond * elapsed;
         staminaRegenCarry += spRegenPerGameSecond * elapsed;
