@@ -277,7 +277,11 @@ public class CookController implements Initializable, SceneController {
         refreshRecipeSelectionHighlight();
 
         if (selectedRecipe == null) {
-            if (selectedcook != null) selectedcook.setImage(null);
+            if (selectedcook != null) {
+                selectedcook.setImage(null);
+                selectedcook.setStyle("");
+                selectedcook.setOpacity(0.0);
+            }
             if (cookname != null) cookname.setText("Select recipe");
             if (cookeffectlbl != null) cookeffectlbl.setText("Effect:");
             if (cookwaitingtimelbl != null) cookwaitingtimelbl.setText("waiting time:");
@@ -286,9 +290,6 @@ public class CookController implements Initializable, SceneController {
             return;
         }
 
-        if (selectedcook != null) {
-            selectedcook.setImage(ItemDatabase.getImage(selectedRecipe.outputItemId));
-        }
         if (cookname != null) cookname.setText(selectedRecipe.name);
         if (cookeffectlbl != null) cookeffectlbl.setText("Effect: " + selectedRecipe.effectText);
 
@@ -396,13 +397,14 @@ public class CookController implements Initializable, SceneController {
         double now = GameTimeManager.get().totalSecondsProperty().get();
         boolean hasJob = gameState.hasActiveCookingJob();
         boolean ready = gameState.isCookingReady(now);
-        boolean currentSelectionMatchesJob = selectedRecipe != null && hasJob && selectedRecipe.outputItemId == gameState.getActiveCookingOutputItemId();
+        int jobOutputItemId = hasJob ? gameState.getActiveCookingOutputItemId() : -1;
 
-        if (ready && currentSelectionMatchesJob) {
+        if (hasJob && ready) {
             if (cookwaitingtimelbl != null) {
                 cookwaitingtimelbl.setText("Ready to collect (" + (gameState.isActiveCookingSuccess() ? "Success" : "Failure") + ")");
             }
             if (selectedcook != null) {
+                selectedcook.setImage(jobOutputItemId <= 0 ? null : ItemDatabase.getImage(jobOutputItemId));
                 selectedcook.setStyle("-fx-effect: dropshadow(gaussian, yellow, 18, 0.8, 0, 0);");
                 selectedcook.setOpacity(1.0);
             }
@@ -410,12 +412,13 @@ public class CookController implements Initializable, SceneController {
             return;
         }
 
-        if (hasJob && currentSelectionMatchesJob) {
+        if (hasJob) {
             int remaining = (int) Math.ceil(Math.max(0, gameState.getActiveCookingCompleteAtSeconds() - now));
             if (cookwaitingtimelbl != null) cookwaitingtimelbl.setText("waiting time: " + remaining + "s");
             if (selectedcook != null) {
+                selectedcook.setImage(null);
                 selectedcook.setStyle("");
-                selectedcook.setOpacity(0.9);
+                selectedcook.setOpacity(0.0);
             }
             if (startcooking != null) startcooking.setDisable(true);
             return;
@@ -426,8 +429,10 @@ public class CookController implements Initializable, SceneController {
                 cookwaitingtimelbl.setText("waiting time: " + getAdjustedWaitSeconds(selectedRecipe) + "s  SP:-" + getAdjustedStaminaCost(selectedRecipe) + "  SR:" + computeSuccessRate(selectedRecipe) + "%");
             }
             if (selectedcook != null) {
+                // Spec: only show the cooked result once the process is done.
+                selectedcook.setImage(null);
                 selectedcook.setStyle("");
-                selectedcook.setOpacity(canCook(selectedRecipe) ? 1.0 : 0.65);
+                selectedcook.setOpacity(0.0);
             }
             if (startcooking != null) startcooking.setDisable(!canCook(selectedRecipe) || hasJob);
         }
