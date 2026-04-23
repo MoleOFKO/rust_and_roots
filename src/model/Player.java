@@ -24,6 +24,7 @@ public class Player {
     private static final double INV_SQRT_2 = 1.0 / Math.sqrt(2.0);
     private static final double NANOS_PER_60FPS_FRAME = 16_666_666.0;
     private static final int WALK_AGI_CAP = TimeFlow.PLAYER_WALK_AGI_CAP;
+    private static final double RUN_SPEED_MULTIPLIER = 1.5;
 
     private static final int FRAME_SIZE = 64;
 
@@ -602,7 +603,7 @@ public class Player {
 
         boolean wantsRun = state.isRunToggled();
         boolean isRunning = wantsRun && state.getStamina() > 0;
-        double speed = getCurrentMovementSpeed();
+        double speed = getCurrentMovementSpeed(isRunning);
         double frames = dtSimNanos <= 0L ? 0.0 : (dtSimNanos / NANOS_PER_60FPS_FRAME);
         // Spec: cap the player's movement step to 15 frames @ 60fps for human reaction speed.
         frames = Math.min(15.0, frames);
@@ -733,8 +734,11 @@ public class Player {
         }
     }
 
-    private double getCurrentMovementSpeed() {
+    private double getCurrentMovementSpeed(boolean isRunning) {
         double currentSpeed = baseSpeed;
+        if (isRunning) {
+            currentSpeed *= RUN_SPEED_MULTIPLIER;
+        }
         double staminaRatio = state.getMaxStamina() <= 0
             ? 0.0
             : (double) state.getStamina() / state.getMaxStamina();

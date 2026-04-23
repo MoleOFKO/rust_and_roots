@@ -540,7 +540,7 @@ public class Upper_mapController extends BaseMapController {
             staticWalls,
             "/image/mob/Slime/Slime1_Idle_with_shadow.png",
             6,
-            "/image/mob/Slime/Slime1_Walk_with_shadow.png",
+            "/image/mob/Slime/Slime1_Run_with_shadow.png",
             8,
             "/image/mob/Slime/Slime1_Attack_with_shadow.png",
             10,
@@ -564,8 +564,8 @@ public class Upper_mapController extends BaseMapController {
             staticWalls,
             "/image/mob/Orc/orc1_idle_with_shadow.png",
             4,
-            "/image/mob/Orc/orc1_walk_with_shadow.png",
-            6,
+            "/image/mob/Orc/orc1_run_with_shadow.png",
+            8,
             "/image/mob/Orc/orc1_attack_with_shadow.png",
             8,
             "/image/mob/Orc/orc1_hurt_with_shadow.png",
@@ -608,6 +608,7 @@ public class Upper_mapController extends BaseMapController {
             mob.mobType = mobType;
             mob.dead = false;
             mob.respawnAtTotalSeconds = -1.0;
+            mob.runAttackCooldownUntilTotalSeconds = -1.0;
             mob.livedDays = 0;
 
             mob.maxHp = Math.max(1, maxHp);
@@ -645,6 +646,13 @@ public class Upper_mapController extends BaseMapController {
         mob.maxSp = Math.max(1, mob.maxSp);
         mob.hp = Math.max(0, Math.min(mob.maxHp, mob.hp));
         mob.sp = Math.max(0, Math.min(mob.maxSp, mob.sp));
+
+        if (Double.isNaN(mob.runAttackCooldownUntilTotalSeconds) || Double.isInfinite(mob.runAttackCooldownUntilTotalSeconds)) {
+            mob.runAttackCooldownUntilTotalSeconds = -1.0;
+        }
+        if (mob.runAttackCooldownUntilTotalSeconds < -1.0) {
+            mob.runAttackCooldownUntilTotalSeconds = -1.0;
+        }
     }
 
     private void applySingleMobDailyGrowthRoll(MobMapState.MobData mob) {

@@ -47,8 +47,8 @@ public class Left_mapController extends BaseMapController {
 
     private static final String MAIN_TREE_ID = "tree";
     private static final String MAIN_STONE_ID = "stone";
-    // Spec: tree/stone respawn base time is 1 in-game minute (60 seconds).
-    private static final double TREE_RESPAWN_SECONDS = 60.0;
+    // Spec: tree/stone respawn base time is 3 in-game hours (10,800 seconds).
+    private static final double TREE_RESPAWN_SECONDS = 3.0 * 60.0 * 60.0;
 
     private static final double TREE_DROP_TTL_SECONDS = 12.0 * 60.0 * 60.0;
     private static final int TREE_STARTING_MAX_HP = 10;
