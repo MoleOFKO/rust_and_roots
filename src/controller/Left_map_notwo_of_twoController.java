@@ -493,8 +493,8 @@ public class Left_map_notwo_of_twoController extends BaseMapController{
 
     @Override
     protected void configureExits() {
-        registerExit(exit_left, "/view/?.fxml", SpawnTag.FROM_RIGHT);
-       registerExit(exit_right, "/view/right_map_notwo_of_one.fxml", SpawnTag.FROM_LEFT);
+        registerExit(exit_left, "/view/d_homemap.fxml", SpawnTag.FROM_RIGHT);
+       registerExit(exit_right, "/view/left_map_notwo_of_one.fxml", SpawnTag.FROM_LEFT);
     }
     
 }
