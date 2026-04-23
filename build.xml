@@ -1,6 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?><!-- You may freely edit this file. See commented blocks below for --><!-- some examples of how to customize the build. --><!-- (If you delete it and reopen the project it will be recreated.) --><!-- By default, only the Clean and Build commands use this build script. --><project name="rust_and_roots" default="default" basedir="." xmlns:fx="javafx:com.sun.javafx.tools.ant">
     <description>Builds, tests, and runs the project rust_and_roots.</description>
     <import file="nbproject/build-impl.xml"/>
+
+    <!-- Ensure non-Java resources (FXML, images, SQL, CSS, etc.) are available when running single files. -->
+    <target name="-post-compile-single">
+        <copy todir="${build.classes.dir}" overwrite="true">
+            <fileset dir="${src.dir}" excludes="**/*.java"/>
+        </copy>
+    </target>
+
+    <!-- Keep resources in sync for full builds too (safe to re-copy). -->
+    <target name="-post-compile">
+        <copy todir="${build.classes.dir}" overwrite="true">
+            <fileset dir="${src.dir}" excludes="**/*.java"/>
+        </copy>
+    </target>
     <!--
 
     There exist several targets which are by default empty and which can be 

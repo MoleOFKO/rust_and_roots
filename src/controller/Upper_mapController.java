@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.concurrent.ThreadLocalRandom;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -70,6 +71,10 @@ public class Upper_mapController extends BaseMapController {
     private Rectangle spawn_default;
     @FXML
     private Rectangle spawn_from_up;
+    @FXML
+    private Rectangle spawn_slime;
+    @FXML
+    private Rectangle spawn_orc;
     @FXML
     private Group human;
     @FXML
@@ -495,7 +500,7 @@ public class Upper_mapController extends BaseMapController {
         MobMapState.MobData slimeData = mapMobs.getMob("slime");
         MobMapState.MobData orcData = mapMobs.getMob("orc");
 
-        initializeMobDefaultsIfNeeded(
+        boolean slimeInitialized = initializeMobDefaultsIfNeeded(
             slimeData,
             "slime",
             slime,
@@ -508,7 +513,7 @@ public class Upper_mapController extends BaseMapController {
             currentDay,
             nowSeconds
         );
-        initializeMobDefaultsIfNeeded(
+        boolean orcInitialized = initializeMobDefaultsIfNeeded(
             orcData,
             "orc",
             orc,
@@ -521,6 +526,13 @@ public class Upper_mapController extends BaseMapController {
             currentDay,
             nowSeconds
         );
+
+        if (slimeInitialized) {
+            Platform.runLater(() -> applyMobSpawn(spawn_slime, slime, slime_hitbox, slimeData));
+        }
+        if (orcInitialized) {
+            Platform.runLater(() -> applyMobSpawn(spawn_orc, orc, orc_hitbox, orcData));
+        }
 
         List<Rectangle> staticWalls = super.walls != null
             ? CollisionRegistry.collectWalls(super.walls)
@@ -587,7 +599,7 @@ public class Upper_mapController extends BaseMapController {
         renderOrcDrops();
     }
 
-    private void initializeMobDefaultsIfNeeded(
+    private boolean initializeMobDefaultsIfNeeded(
         MobMapState.MobData mob,
         String mobType,
         Group mobNode,
@@ -600,7 +612,7 @@ public class Upper_mapController extends BaseMapController {
         int currentDay,
         double nowSeconds
     ) {
-        if (mob == null || mobNode == null) return;
+        if (mob == null || mobNode == null) return false;
 
         boolean missingType = mob.mobType == null || mob.mobType.isBlank();
         boolean missingStats = mob.maxHp <= 0 || mob.maxSp <= 0;
@@ -634,7 +646,7 @@ public class Upper_mapController extends BaseMapController {
             mob.lastRegenTotalSeconds = nowSeconds;
             mob.lastUpdatedDayNumber = safeDay;
             mob.drops.clear();
-            return;
+            return true;
         }
 
         // Apply saved position.
@@ -652,6 +664,31 @@ public class Upper_mapController extends BaseMapController {
         }
         if (mob.runAttackCooldownUntilTotalSeconds < -1.0) {
             mob.runAttackCooldownUntilTotalSeconds = -1.0;
+        }
+
+        return false;
+    }
+
+    private void applyMobSpawn(Rectangle marker, Group mobNode, Rectangle mobHitbox, MobMapState.MobData mobData) {
+        if (marker == null || mobNode == null || mobHitbox == null || mobNode.getParent() == null) {
+            return;
+        }
+
+        Bounds markerScene = marker.localToScene(marker.getBoundsInLocal());
+        Bounds hitboxScene = mobHitbox.localToScene(mobHitbox.getBoundsInLocal());
+
+        Bounds markerInParent = mobNode.getParent().sceneToLocal(markerScene);
+        Bounds hitboxInParent = mobNode.getParent().sceneToLocal(hitboxScene);
+
+        double dx = markerInParent.getMinX() - hitboxInParent.getMinX();
+        double dy = markerInParent.getMinY() - hitboxInParent.getMinY();
+
+        mobNode.setLayoutX(mobNode.getLayoutX() + dx);
+        mobNode.setLayoutY(mobNode.getLayoutY() + dy);
+
+        if (mobData != null) {
+            mobData.layoutX = mobNode.getLayoutX();
+            mobData.layoutY = mobNode.getLayoutY();
         }
     }
 
@@ -717,10 +754,18 @@ public class Upper_mapController extends BaseMapController {
         long nowNanos = System.nanoTime();
 
         if (slimeMob != null) {
+            boolean wasDead = slimeMob.isDead();
             slimeMob.update(nowNanos, currentDay, nowSeconds, playerBounds, playerState);
+            if (wasDead && !slimeMob.isDead()) {
+                applyMobSpawn(spawn_slime, slime, slime_hitbox, slimeMob.getData());
+            }
         }
         if (orcMob != null) {
+            boolean wasDead = orcMob.isDead();
             orcMob.update(nowNanos, currentDay, nowSeconds, playerBounds, playerState);
+            if (wasDead && !orcMob.isDead()) {
+                applyMobSpawn(spawn_orc, orc, orc_hitbox, orcMob.getData());
+            }
         }
 
         renderSlimeDrops();

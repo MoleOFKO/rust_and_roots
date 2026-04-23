@@ -585,12 +585,17 @@ public class Player {
             moving = false;
 
             if (state.isRunToggled()) {
-                // Spec: while in "run" state, SP drains even if the player is idle.
-                state.setStaminaMode(PlayerState.StaminaMode.RUN);
-                state.updateStaminaOverTime(dtWorldSeconds, PlayerState.StaminaMode.RUN);
-                if (state.getStamina() <= 0) {
-                    state.setStaminaExhaustedLock(true);
-                    state.setRunToggled(false);
+                // Spec: while staying idle, "run" mode does not cost SP unless AGI is > 20.
+                if (state.getAgi() > 20) {
+                    state.setStaminaMode(PlayerState.StaminaMode.RUN);
+                    state.updateStaminaOverTime(dtWorldSeconds, PlayerState.StaminaMode.RUN);
+                    if (state.getStamina() <= 0) {
+                        state.setStaminaExhaustedLock(true);
+                        state.setRunToggled(false);
+                    }
+                } else {
+                    state.setStaminaMode(PlayerState.StaminaMode.IDLE);
+                    state.updateStaminaOverTime(dtWorldSeconds, PlayerState.StaminaMode.IDLE);
                 }
             } else {
                 state.setStaminaMode(PlayerState.StaminaMode.IDLE);
@@ -638,12 +643,17 @@ public class Player {
             }
         } else {
             if (state.isRunToggled()) {
-                // If the player is trying to move but is blocked, treat as idle-in-run-state (still drains SP).
-                state.setStaminaMode(PlayerState.StaminaMode.RUN);
-                state.updateStaminaOverTime(dtWorldSeconds, PlayerState.StaminaMode.RUN);
-                if (state.getStamina() <= 0) {
-                    state.setStaminaExhaustedLock(true);
-                    state.setRunToggled(false);
+                // Spec: if the player isn't actually moving, "run" mode does not cost SP unless AGI is > 20.
+                if (state.getAgi() > 20) {
+                    state.setStaminaMode(PlayerState.StaminaMode.RUN);
+                    state.updateStaminaOverTime(dtWorldSeconds, PlayerState.StaminaMode.RUN);
+                    if (state.getStamina() <= 0) {
+                        state.setStaminaExhaustedLock(true);
+                        state.setRunToggled(false);
+                    }
+                } else {
+                    state.setStaminaMode(PlayerState.StaminaMode.IDLE);
+                    state.updateStaminaOverTime(dtWorldSeconds, PlayerState.StaminaMode.IDLE);
                 }
             } else {
                 state.setStaminaMode(PlayerState.StaminaMode.IDLE);
