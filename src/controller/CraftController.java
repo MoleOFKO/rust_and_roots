@@ -205,7 +205,11 @@ public class CraftController implements Initializable, SceneController {
     private void refreshSelectionDetails() {
         refreshRecipeSelectionHighlight();
         if (selectedRecipe == null) {
-            if (resultitem != null) resultitem.setImage(null);
+            if (resultitem != null) {
+                resultitem.setImage(null);
+                resultitem.setStyle("");
+                resultitem.setOpacity(0.0);
+            }
             if (lblname != null) lblname.setText("Name :");
             if (lblwt != null) lblwt.setText("Waiting time :");
             if (lblsr != null) lblsr.setText("Success rate : --");
@@ -214,7 +218,6 @@ public class CraftController implements Initializable, SceneController {
             if (btncraftitem != null) btncraftitem.setDisable(true);
             return;
         }
-        if (resultitem != null) resultitem.setImage(ItemDatabase.getImage(selectedRecipe.outputItemId));
         if (lblname != null) lblname.setText("Name : " + selectedRecipe.name + " x" + selectedRecipe.baseOutputAmount);
         if (lblwt != null) lblwt.setText("Waiting time : " + getAdjustedWaitSeconds(selectedRecipe) + "s  SP:-" + getAdjustedStaminaCost(selectedRecipe));
         if (lblsr != null) lblsr.setText("Success rate : " + computeSuccessRate(selectedRecipe) + "%");
@@ -300,10 +303,12 @@ public class CraftController implements Initializable, SceneController {
         double now = GameTimeManager.get().totalSecondsProperty().get();
         boolean hasJob = gameState.hasActiveCraftingJob();
         boolean ready = gameState.isCraftingReady(now);
-        boolean currentSelectionMatchesJob = selectedRecipe != null && hasJob && selectedRecipe.outputItemId == gameState.getActiveCraftingOutputItemId();
-        if (ready && currentSelectionMatchesJob) {
+        int jobOutputItemId = hasJob ? gameState.getActiveCraftingOutputItemId() : -1;
+
+        if (hasJob && ready) {
             if (lblwt != null) lblwt.setText("Ready to collect (" + (gameState.isActiveCraftingSuccess() ? "Success" : "Failure") + ")");
             if (resultitem != null) {
+                resultitem.setImage(jobOutputItemId <= 0 ? null : ItemDatabase.getImage(jobOutputItemId));
                 resultitem.setStyle("-fx-effect: dropshadow(gaussian, yellow, 18, 0.8, 0, 0);");
                 resultitem.setOpacity(1.0);
             }
@@ -316,12 +321,13 @@ public class CraftController implements Initializable, SceneController {
             if (btncraftitem != null) btncraftitem.setDisable(true);
             return;
         }
-        if (hasJob && currentSelectionMatchesJob) {
+        if (hasJob) {
             int remaining = (int)Math.ceil(Math.max(0, gameState.getActiveCraftingCompleteAtSeconds() - now));
             if (lblwt != null) lblwt.setText("Waiting time : " + remaining + "s");
             if (resultitem != null) {
+                resultitem.setImage(null);
                 resultitem.setStyle("");
-                resultitem.setOpacity(0.9);
+                resultitem.setOpacity(0.0);
             }
             if (lbleffect != null) lbleffect.setText("Effect : Crafting... " + (gameState.isActiveCraftingSuccess() ? "success queued" : "failure queued"));
             if (btncraftitem != null) btncraftitem.setDisable(true);
@@ -330,8 +336,10 @@ public class CraftController implements Initializable, SceneController {
         if (selectedRecipe != null) {
             if (lblwt != null) lblwt.setText("Waiting time : " + getAdjustedWaitSeconds(selectedRecipe) + "s  SP:-" + getAdjustedStaminaCost(selectedRecipe));
             if (resultitem != null) {
+                // Spec: only show the crafted result once the process is done.
+                resultitem.setImage(null);
                 resultitem.setStyle("");
-                resultitem.setOpacity(canCraft(selectedRecipe) ? 1.0 : 0.65);
+                resultitem.setOpacity(0.0);
             }
             if (lbleffect != null) lbleffect.setText("Effect : " + buildEffectText(selectedRecipe));
             if (btncraftitem != null) btncraftitem.setDisable(!canCraft(selectedRecipe) || hasJob);

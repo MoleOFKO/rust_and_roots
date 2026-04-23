@@ -34,7 +34,7 @@ public class MeltController implements Initializable, SceneController {
     private final List<ImageView> invImages = new ArrayList<>();
     private final List<Button> invButtons = new ArrayList<>();
     private final List<Label> invLabels = new ArrayList<>();
-    private final List<Integer> visibleOreItemIds = new ArrayList<>();
+    private final List<SmeltRule> visibleSmeltRules = new ArrayList<>();
 
     private Integer selectedOreItemId = null;
     private int selectedOreQuantity = 0;
@@ -189,23 +189,58 @@ public class MeltController implements Initializable, SceneController {
     }
 
     private void refreshInventorySlots() {
-        visibleOreItemIds.clear();
+        visibleSmeltRules.clear();
+
         for (Integer itemId : inventory.itemsProperty().keySet()) {
             int count = inventory.getCount(itemId);
             if (count <= 0) continue;
+
             item itm = ItemDatabase.getItemById(itemId);
             SmeltRule rule = resolveRule(itm);
-            if (rule != null) visibleOreItemIds.add(itemId);
+            if (rule == null) continue;
+
+            int totalAvailableInput = count;
+            if (selectedRule != null && selectedRule.sourceItemId == rule.sourceItemId) {
+                totalAvailableInput += Math.max(0, selectedOreQuantity);
+            }
+            if (totalAvailableInput <= 0) continue;
+
+            boolean alreadyAdded = false;
+            for (SmeltRule existing : visibleSmeltRules) {
+                if (existing != null && existing.resultItemId == rule.resultItemId) {
+                    alreadyAdded = true;
+                    break;
+                }
+            }
+            if (!alreadyAdded) {
+                visibleSmeltRules.add(rule);
+            }
         }
 
-        visibleOreItemIds.sort(Comparator.comparing(this::itemNameSafe, String.CASE_INSENSITIVE_ORDER));
+        if (selectedRule != null) {
+            int totalAvailableInput = inventory.getCount(selectedRule.sourceItemId) + Math.max(0, selectedOreQuantity);
+            if (totalAvailableInput > 0) {
+                boolean alreadyAdded = false;
+                for (SmeltRule existing : visibleSmeltRules) {
+                    if (existing != null && existing.resultItemId == selectedRule.resultItemId) {
+                        alreadyAdded = true;
+                        break;
+                    }
+                }
+                if (!alreadyAdded) {
+                    visibleSmeltRules.add(selectedRule);
+                }
+            }
+        }
+
+        visibleSmeltRules.sort(Comparator.comparing(rule -> itemNameSafe(rule == null ? -1 : rule.resultItemId), String.CASE_INSENSITIVE_ORDER));
 
         for (int i = 0; i < MAX_INV_SLOTS; i++) {
             ImageView img = invImages.get(i);
             Label lbl = invLabels.get(i);
             Button btn = invButtons.get(i);
 
-            if (i >= visibleOreItemIds.size()) {
+            if (i >= visibleSmeltRules.size()) {
                 if (img != null) img.setImage(null);
                 if (lbl != null) lbl.setText("");
                 if (btn != null) {
@@ -215,50 +250,53 @@ public class MeltController implements Initializable, SceneController {
                 continue;
             }
 
-            int itemId = visibleOreItemIds.get(i);
-            int qty = inventory.getCount(itemId);
-            item itm = ItemDatabase.getItemById(itemId);
+            SmeltRule rule = visibleSmeltRules.get(i);
+            if (rule == null) {
+                if (img != null) img.setImage(null);
+                if (lbl != null) lbl.setText("");
+                if (btn != null) {
+                    btn.setDisable(true);
+                    btn.setText("");
+                }
+                continue;
+            }
+
+            int ownedInput = inventory.getCount(rule.sourceItemId);
+            if (selectedRule != null && selectedRule.sourceItemId == rule.sourceItemId) {
+                ownedInput += Math.max(0, selectedOreQuantity);
+            }
+            int possibleOutput = computeOutputQty(rule, ownedInput);
+            item outputItm = ItemDatabase.getItemById(rule.resultItemId);
 
             if (img != null) {
-                img.setImage(ItemDatabase.getImage(itemId));
-                boolean selected = selectedOreItemId != null && selectedOreItemId == itemId;
+                img.setImage(ItemDatabase.getImage(rule.resultItemId));
+                boolean selected = selectedRule != null && selectedRule.resultItemId == rule.resultItemId;
                 img.setStyle(selected ? "-fx-effect: dropshadow(gaussian, yellow, 12, 0.6, 0, 0);" : "");
             }
-            if (lbl != null) lbl.setText("x" + qty);
+            if (lbl != null) lbl.setText("x" + possibleOutput);
             if (btn != null) {
                 btn.setDisable(hasActiveSmeltJob());
-                btn.setText(itm == null ? "" : itm.getItem_name());
+                btn.setText(outputItm == null ? "" : outputItm.getItem_name());
             }
         }
     }
 
     private void handleInventorySelection(int index) {
         if (hasActiveSmeltJob()) return;
-        if (index < 0 || index >= visibleOreItemIds.size()) return;
+        if (index < 0 || index >= visibleSmeltRules.size()) return;
 
-        int itemId = visibleOreItemIds.get(index);
-        int available = inventory.getCount(itemId);
-        if (available <= 0) return;
-
-        item itm = ItemDatabase.getItemById(itemId);
-        SmeltRule rule = resolveRule(itm);
+        SmeltRule rule = visibleSmeltRules.get(index);
         if (rule == null) return;
 
-        if (selectedOreItemId != null && selectedOreQuantity > 0 && itemId != selectedOreItemId) {
-            if (!returnSelectionToInventory()) {
-                return;
-            }
+        boolean changedRecipe = selectedRule == null || selectedRule.resultItemId != rule.resultItemId;
+        if (changedRecipe && selectedOreItemId != null && selectedOreQuantity > 0) {
+            if (!returnSelectionToInventory()) return;
         }
 
-        if (!inventory.removeItem(itemId, 1)) return;
-
-        if (selectedOreItemId != null && itemId == selectedOreItemId) {
-            selectedOreQuantity += 1;
-            selectedRule = rule;
-        } else {
-            selectedOreItemId = itemId;
-            selectedOreQuantity = 1;
-            selectedRule = rule;
+        selectedRule = rule;
+        selectedOreItemId = rule.sourceItemId;
+        if (changedRecipe) {
+            selectedOreQuantity = 0;
         }
         refreshAll();
     }
@@ -296,7 +334,7 @@ public class MeltController implements Initializable, SceneController {
 
     @FXML
     private void handleselectedoreimgremove(MouseEvent event) {
-        if (hasActiveSmeltJob() || selectedOreItemId == null || selectedOreQuantity <= 0) return;
+        if (hasActiveSmeltJob() || selectedOreItemId == null) return;
         if (!returnSelectionToInventory()) {
             return;
         }
