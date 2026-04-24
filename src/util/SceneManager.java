@@ -3,6 +3,7 @@ package util;
 import game.GameState;
 import game.SceneController;
 import java.io.IOException;
+import java.util.Locale;
 import javafx.animation.PauseTransition;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Bounds;
@@ -11,10 +12,15 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
 public class SceneManager {
+
+    private static MediaPlayer bgmPlayer;
+    private static String currentBgmResource;
 
     public static void switchScene(String fxmlPath) {
         switchScene(fxmlPath, SpawnTag.DEFAULT);
@@ -23,6 +29,7 @@ public class SceneManager {
     public static void switchScene(String fxmlPath, SpawnTag spawnTag) {
         try {
             GameState.get().setPendingSpawn(spawnTag);
+            updateBgmForScene(fxmlPath);
 
             Stage stage = rust_and_roots.Rust_and_roots.stage;
             if (stage == null) throw new IllegalStateException("Primary stage is null");
@@ -83,6 +90,94 @@ public class SceneManager {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private enum BgmTrack {
+        ACROSS_THE_JADE_ARCHIPELAGO,
+        WHERE_THE_TIDE_SLEEPS
+    }
+
+    private static void updateBgmForScene(String fxmlPath) {
+        if (javafx.application.Platform.isFxApplicationThread()) {
+            applyBgmForScene(fxmlPath);
+        } else {
+            javafx.application.Platform.runLater(() -> applyBgmForScene(fxmlPath));
+        }
+    }
+
+    private static void applyBgmForScene(String fxmlPath) {
+        BgmTrack desiredTrack = resolveBgmTrackForScene(fxmlPath);
+        String desiredResource = switch (desiredTrack) {
+            case ACROSS_THE_JADE_ARCHIPELAGO -> "/mp3/Across_the_Jade_Archipelago.mp3";
+            case WHERE_THE_TIDE_SLEEPS -> "/mp3/Where_the_Tide_Sleeps.mp3";
+        };
+
+        if (desiredResource != null
+            && desiredResource.equals(currentBgmResource)
+            && bgmPlayer != null) {
+            // Keep current playback running across same-category scenes.
+            if (bgmPlayer.getStatus() != MediaPlayer.Status.PLAYING) {
+                bgmPlayer.play();
+            }
+            return;
+        }
+
+        stopAndDisposeBgm();
+
+        currentBgmResource = desiredResource;
+        if (desiredResource == null || desiredResource.isBlank()) {
+            return;
+        }
+
+        var url = SceneManager.class.getResource(desiredResource);
+        if (url == null) {
+            System.err.println("[SceneManager] Missing BGM resource: " + desiredResource);
+            currentBgmResource = null;
+            return;
+        }
+
+        Media music = new Media(url.toExternalForm());
+        bgmPlayer = new MediaPlayer(music);
+        bgmPlayer.setCycleCount(MediaPlayer.INDEFINITE);
+        bgmPlayer.play();
+    }
+
+    private static void stopAndDisposeBgm() {
+        if (bgmPlayer == null) {
+            return;
+        }
+
+        try {
+            bgmPlayer.stop();
+        } catch (Exception ignored) {
+        }
+        try {
+            bgmPlayer.dispose();
+        } catch (Exception ignored) {
+        }
+
+        bgmPlayer = null;
+        currentBgmResource = null;
+    }
+
+    private static BgmTrack resolveBgmTrackForScene(String fxmlPath) {
+        String normalized = (fxmlPath == null) ? "" : fxmlPath.trim().toLowerCase(Locale.ROOT);
+
+        // Program start + menus/login/signup/admin screens.
+        if (normalized.endsWith("/login.fxml")
+            || normalized.endsWith("/main_menu.fxml")
+            || normalized.endsWith("/otp.fxml")
+            || normalized.contains("/account_")
+            || normalized.endsWith("/edit_character.fxml")
+            || normalized.endsWith("/char_edit_btn.fxml")
+            || normalized.endsWith("/edit_item.fxml")
+            || normalized.endsWith("/item_add_btn.fxml")
+            || normalized.endsWith("/item_edit_btn.fxml")) {
+            return BgmTrack.ACROSS_THE_JADE_ARCHIPELAGO;
+        }
+
+        // New game, save/load, and gameplay.
+        return BgmTrack.WHERE_THE_TIDE_SLEEPS;
     }
 
     private static Parent wrapResponsiveRoot(Parent content) {

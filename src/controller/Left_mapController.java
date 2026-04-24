@@ -9,11 +9,13 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.Objects;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
+import javafx.geometry.BoundingBox;
 import javafx.geometry.Bounds;
 import javafx.scene.Group;
 import javafx.scene.control.Button;
@@ -47,6 +49,7 @@ public class Left_mapController extends BaseMapController {
 
     private static final String MAIN_TREE_ID = "tree";
     private static final String MAIN_STONE_ID = "stone";
+    private static final double AUTO_GATHER_MARGIN_PIXELS = 2.0;
     // Spec: tree/stone respawn base time is 3 in-game hours (10,800 seconds).
     private static final double TREE_RESPAWN_SECONDS = 3.0 * 60.0 * 60.0;
 
@@ -66,11 +69,14 @@ public class Left_mapController extends BaseMapController {
 
     private TreeMapState.TreeData mainTreeData;
     private String renderedTreeVisualKey = null;
+    private String renderedTreeLayerVisualKey = null;
     private String renderedTreeDropsKey = null;
+    private boolean warnedTreeInventoryFull = false;
 
     private TreeMapState.TreeData mainStoneData;
     private String renderedStoneVisualKey = null;
     private String renderedStoneDropsKey = null;
+    private boolean warnedStoneInventoryFull = false;
 
     private int treeLogItemId = -1;
     private int treeStumpItemId = -1;
@@ -460,8 +466,6 @@ public class Left_mapController extends BaseMapController {
     @FXML
     private Rectangle tree_hitbox;
     @FXML
-    private Rectangle tree_hitbox_wall;
-    @FXML
     private Group stone;
     @FXML
     private ImageView stone_img;
@@ -470,7 +474,9 @@ public class Left_mapController extends BaseMapController {
     @FXML
     private Rectangle stone_hitbox;
     @FXML
-    private Rectangle stone_hitbox_wall;
+    private Group treelayorgp;
+    @FXML
+    private ImageView treelayorimg;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -506,23 +512,15 @@ public class Left_mapController extends BaseMapController {
 
         // Tree hitboxes are used for intersection/collision only, not input.
         tree_hitbox.setMouseTransparent(true);
-        if (tree_hitbox_wall != null) {
-            tree_hitbox_wall.setMouseTransparent(true);
-        }
+        if (treelayorgp != null) treelayorgp.setMouseTransparent(true);
+        if (treelayorimg != null) treelayorimg.setMouseTransparent(true);
 
-        // Ensure the tree wall participates in player collision on this map.
-        if (player != null && tree_hitbox_wall != null) {
-            List<Rectangle> colliders = new ArrayList<>();
-            if (super.walls != null) {
-                colliders.addAll(CollisionRegistry.collectWalls(super.walls));
-            }
-            colliders.add(tree_hitbox_wall);
-            player.setWalls(colliders);
-        }
+        refreshPlayerCollisionWalls();
 
         // Render once immediately.
         renderTreeVisual();
         renderTreeDrops();
+        javafx.application.Platform.runLater(this::syncTreeLayerPosition);
     }
 
     private void setupStoneSystemIfPresent() {
@@ -549,25 +547,25 @@ public class Left_mapController extends BaseMapController {
 
         // Stone hitboxes are used for intersection/collision only, not input.
         stone_hitbox.setMouseTransparent(true);
-        if (stone_hitbox_wall != null) {
-            stone_hitbox_wall.setMouseTransparent(true);
-        }
-
-        // Ensure stone/tree walls participate in player collision on this map.
-        if (player != null && stone_hitbox_wall != null) {
-            List<Rectangle> colliders = new ArrayList<>();
-            if (super.walls != null) {
-                colliders.addAll(CollisionRegistry.collectWalls(super.walls));
-            }
-            if (tree_hitbox_wall != null) {
-                colliders.add(tree_hitbox_wall);
-            }
-            colliders.add(stone_hitbox_wall);
-            player.setWalls(colliders);
-        }
+        refreshPlayerCollisionWalls();
 
         renderStoneVisual();
         renderStoneDrops();
+    }
+
+    private void refreshPlayerCollisionWalls() {
+        if (player == null) return;
+
+        List<Rectangle> colliders = new ArrayList<>();
+        if (super.walls != null) {
+            colliders.addAll(CollisionRegistry.collectWalls(super.walls));
+        }
+
+        // Use the resource hitboxes directly as walls (toggle disable state per stage).
+        if (tree_hitbox != null) colliders.add(tree_hitbox);
+        if (stone_hitbox != null) colliders.add(stone_hitbox);
+
+        player.setWalls(colliders);
     }
 
     private void initializeTreeDefaults(TreeMapState.TreeData data, int currentDay, double nowSeconds) {
@@ -730,9 +728,17 @@ public class Left_mapController extends BaseMapController {
             return false;
         }
 
-        return ItemDatabase.isDisplayableItem(tree1.getItem_id())
-            && ItemDatabase.isDisplayableItem(tree2.getItem_id())
-            && ItemDatabase.isDisplayableItem(fruit.getItem_id());
+        if (!ItemDatabase.isDisplayableItem(tree1.getItem_id())
+            || !ItemDatabase.isDisplayableItem(tree2.getItem_id())
+            || !ItemDatabase.isDisplayableItem(fruit.getItem_id())) {
+            return false;
+        }
+
+        // Enforce that every tree sprite also has an "upper part" image variant.
+        // Spec: <base>_tree<number>.png and <base>_tree<number>up.png live under /image/items/.
+        String up1 = "/image/items/" + base + "_tree1up.png";
+        String up2 = "/image/items/" + base + "_tree2up.png";
+        return getClass().getResource(up1) != null && getClass().getResource(up2) != null;
     }
 
     @Override
@@ -740,6 +746,7 @@ public class Left_mapController extends BaseMapController {
         syncDirectionalHitboxes();
         updateTreeState();
         updateStoneState();
+        autoGatherDrops(playerBounds);
     }
 
     private void syncDirectionalHitboxes() {
@@ -1307,19 +1314,75 @@ public class Left_mapController extends BaseMapController {
         return (itm == null) ? -1 : itm.getItem_id();
     }
 
-    private void handleResourceDropClicked(TreeMapState.TreeData resource, TreeMapState.TreeDrop drop, Runnable rerender) {
-        if (drop == null || resource == null || player == null) return;
-        if (drop.itemId <= 0 || drop.quantity <= 0) return;
+    private void autoGatherDrops(Bounds playerBoundsScene) {
+        if (player == null || playerBoundsScene == null) return;
 
-        if (!player.getInventory().addItem(drop.itemId, drop.quantity)) {
-            AppDialogs.showMessageDialog(null, "Not enough inventory space to collect this drop.");
-            return;
+        warnedTreeInventoryFull = autoGatherResourceDrops(mainTreeData, tree_hitbox, playerBoundsScene, warnedTreeInventoryFull, this::renderTreeDrops);
+        warnedStoneInventoryFull = autoGatherResourceDrops(mainStoneData, stone_hitbox, playerBoundsScene, warnedStoneInventoryFull, this::renderStoneDrops);
+    }
+
+    private boolean autoGatherResourceDrops(
+        TreeMapState.TreeData resource,
+        Rectangle resourceHitbox,
+        Bounds playerBoundsScene,
+        boolean warnedInventoryFull,
+        Runnable rerender
+    ) {
+        if (resource == null || resourceHitbox == null || player == null || playerBoundsScene == null) {
+            return false;
         }
 
-        resource.drops.remove(drop);
-        if (rerender != null) {
+        boolean inside = intersectsWithMargin(playerBoundsScene, resourceHitbox, AUTO_GATHER_MARGIN_PIXELS);
+        if (!inside) {
+            return false;
+        }
+
+        if (resource.drops == null || resource.drops.isEmpty()) {
+            return warnedInventoryFull;
+        }
+
+        boolean removedAny = false;
+        Iterator<TreeMapState.TreeDrop> it = resource.drops.iterator();
+        while (it.hasNext()) {
+            TreeMapState.TreeDrop drop = it.next();
+            if (drop == null || drop.itemId <= 0 || drop.quantity <= 0) {
+                it.remove();
+                removedAny = true;
+                continue;
+            }
+
+            if (!player.getInventory().addItem(drop.itemId, drop.quantity)) {
+                if (!warnedInventoryFull) {
+                    AppDialogs.showMessageDialog(null, "Not enough inventory space to collect these drops.");
+                    warnedInventoryFull = true;
+                }
+                break;
+            }
+
+            it.remove();
+            removedAny = true;
+        }
+
+        if (removedAny && rerender != null) {
             rerender.run();
         }
+
+        return warnedInventoryFull;
+    }
+
+    private boolean intersectsWithMargin(Bounds playerBoundsScene, Rectangle targetHitbox, double marginPixels) {
+        if (playerBoundsScene == null || targetHitbox == null) return false;
+        Bounds targetBoundsScene = targetHitbox.localToScene(targetHitbox.getBoundsInLocal());
+        double margin = Math.max(0.0, marginPixels);
+
+        Bounds expanded = new BoundingBox(
+            targetBoundsScene.getMinX() - margin,
+            targetBoundsScene.getMinY() - margin,
+            targetBoundsScene.getWidth() + (margin * 2.0),
+            targetBoundsScene.getHeight() + (margin * 2.0)
+        );
+
+        return expanded.intersects(playerBoundsScene);
     }
 
     private void updateResourceState(
@@ -1470,6 +1533,8 @@ public class Left_mapController extends BaseMapController {
     private void renderTreeVisual() {
         if (tree_img == null || mainTreeData == null) return;
 
+        syncTreeLayerPosition();
+
         String visualKey;
         if (mainTreeData.currentStage == 1) {
             visualKey = "stage:1";
@@ -1477,10 +1542,7 @@ public class Left_mapController extends BaseMapController {
             visualKey = "stage:" + mainTreeData.currentStage + "#type:" + (mainTreeData.typeKey == null ? "null" : mainTreeData.typeKey);
         }
 
-        if (visualKey.equals(renderedTreeVisualKey)) {
-            return;
-        }
-        renderedTreeVisualKey = visualKey;
+        boolean visualUnchanged = visualKey.equals(renderedTreeVisualKey);
 
         tree_img.setManaged(true);
         tree_img.setVisible(true);
@@ -1489,8 +1551,15 @@ public class Left_mapController extends BaseMapController {
             tree_img.setImage(null);
             tree_img.setVisible(false);
             tree_img.setManaged(false);
+            hideTreeLayerVisual("stage:1");
+            renderedTreeVisualKey = visualKey;
             return;
         }
+
+        if (visualUnchanged) {
+            return;
+        }
+        renderedTreeVisualKey = visualKey;
 
         String base = (mainTreeData.typeKey == null) ? "blue" : mainTreeData.typeKey.trim().toLowerCase(Locale.ROOT);
         String spriteName = base + "_tree" + (mainTreeData.currentStage == 3 ? "2" : "1");
@@ -1502,6 +1571,84 @@ public class Left_mapController extends BaseMapController {
             // Fallback to loading directly from resources if DB entry is missing.
             tree_img.setImage(loadImageOrNull("/image/items/" + spriteName + ".png"));
         }
+
+        if (tree_img.getImage() == null) {
+            hideTreeLayerVisual("sprite:missing");
+        } else {
+            renderTreeLayerVisual(spriteName, visualKey);
+        }
+    }
+
+    private void renderTreeLayerVisual(String spriteName, String visualKey) {
+        if (treelayorimg == null || treelayorgp == null) {
+            return;
+        }
+
+        syncTreeLayerPosition();
+
+        String key = (visualKey == null || visualKey.isBlank())
+            ? ("sprite:" + (spriteName == null ? "null" : spriteName))
+            : ("layer:" + visualKey);
+
+        if (Objects.equals(key, renderedTreeLayerVisualKey)) {
+            return;
+        }
+        renderedTreeLayerVisualKey = key;
+
+        if (spriteName == null || spriteName.isBlank()) {
+            hideTreeLayerVisual("sprite:null");
+            return;
+        }
+
+        if (tree_img != null) {
+            treelayorimg.setFitWidth(tree_img.getFitWidth());
+            treelayorimg.setFitHeight(tree_img.getFitHeight());
+        }
+        treelayorimg.setPreserveRatio(false);
+        treelayorimg.setSmooth(false);
+        treelayorimg.setPickOnBounds(true);
+
+        var upper = loadImageOrNull("/image/items/" + spriteName + "up.png");
+        if (upper == null) {
+            hideTreeLayerVisual("sprite:missing_upper");
+            return;
+        }
+
+        treelayorimg.setImage(upper);
+        treelayorimg.setVisible(true);
+        treelayorimg.setManaged(true);
+        treelayorgp.setVisible(true);
+        treelayorgp.setManaged(true);
+    }
+
+    private void hideTreeLayerVisual(String key) {
+        if (treelayorimg == null || treelayorgp == null) {
+            renderedTreeLayerVisualKey = key;
+            return;
+        }
+
+        if (key != null && !key.isBlank()) {
+            renderedTreeLayerVisualKey = key;
+        }
+
+        treelayorimg.setImage(null);
+        treelayorimg.setVisible(false);
+        treelayorimg.setManaged(false);
+
+        treelayorgp.setVisible(false);
+        treelayorgp.setManaged(false);
+    }
+
+    private void syncTreeLayerPosition() {
+        if (treelayorgp == null || tree_img == null) return;
+        if (treelayorgp.getParent() == null) return;
+        if (tree_img.getScene() == null || treelayorgp.getScene() == null) return;
+
+        Bounds treeBoundsScene = tree_img.localToScene(tree_img.getBoundsInLocal());
+        Bounds treeBoundsInParent = treelayorgp.getParent().sceneToLocal(treeBoundsScene);
+
+        treelayorgp.setLayoutX(treeBoundsInParent.getMinX());
+        treelayorgp.setLayoutY(treeBoundsInParent.getMinY());
     }
 
     private String renderResourceDrops(
@@ -1541,12 +1688,8 @@ public class Left_mapController extends BaseMapController {
         dropView.setVisible(show);
         dropView.setManaged(show);
         dropView.setPickOnBounds(true);
-
-        dropView.setOnMouseClicked(event -> {
-            if (event.getButton() != MouseButton.PRIMARY) return;
-            event.consume();
-            handleResourceDropClicked(resource, displayedDrop, rerender);
-        });
+        dropView.setMouseTransparent(true);
+        dropView.setOnMouseClicked(null);
 
         return key;
     }
