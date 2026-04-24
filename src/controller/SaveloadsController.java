@@ -20,8 +20,6 @@ import util.SceneManager;
 import javafx.scene.image.Image;
 import java.io.InputStream;
 import javafx.scene.Group;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.MouseEvent;
@@ -31,8 +29,6 @@ import util.AppDialogs;
 import util.WorldScaler;
 
 public class SaveloadsController implements Initializable {
-
-    private MediaPlayer musicPlayer;
     
     @FXML
     private ImageView btnLoad;
@@ -80,14 +76,7 @@ public class SaveloadsController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        
-        Media music = new Media(getClass().getResource("/mp3/Where_the_Tide_Sleeps.mp3").toExternalForm());
-        musicPlayer = new MediaPlayer(music);
-        
-        // Loop the music indefinitely
-        musicPlayer.setCycleCount(MediaPlayer.INDEFINITE);
-        musicPlayer.play();
-        
+
         new WorldScaler(view, world);
         selectedSlot = GameState.get().getSelectedSaveSlot();
         refreshModeUi();

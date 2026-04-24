@@ -26,8 +26,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
 import javax.swing.JOptionPane;
 import util.AppDialogs;
 import model.PlayerState;
@@ -49,8 +47,6 @@ public class New_gameController implements Initializable, SceneController {
     private static final int NEW_GAME_BASE_AGI = 1;
     private static final int NEW_GAME_STARTING_EXP = 6;
 
-    private MediaPlayer musicPlayer;
-    
     @FXML
     private TextField txtchaname;
     @FXML
@@ -130,14 +126,7 @@ public class New_gameController implements Initializable, SceneController {
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        
-        Media music = new Media(getClass().getResource("/mp3/Where_the_Tide_Sleeps.mp3").toExternalForm());
-        musicPlayer = new MediaPlayer(music);
-        
-        // Loop the music indefinitely
-        musicPlayer.setCycleCount(MediaPlayer.INDEFINITE);
-        musicPlayer.play();
-        
+
         new WorldScaler(view, uiRoot);
         playerState = GameState.get().getPlayerState();
         resetPlayerStateToNewGameDefaults();
@@ -228,7 +217,6 @@ public class New_gameController implements Initializable, SceneController {
 
     @FXML
     private void handlebackaction(ActionEvent event) {
-        musicPlayer.stop();
         SceneManager.switchScene("/view/main_menu.fxml");
     }
 

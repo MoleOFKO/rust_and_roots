@@ -3,6 +3,7 @@ package controller;
 import game.GameTimeManager;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -11,6 +12,7 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.BoundingBox;
 import javafx.geometry.Bounds;
 import javafx.scene.Group;
 import javafx.scene.control.Button;
@@ -19,8 +21,6 @@ import javafx.scene.control.Slider;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
@@ -432,6 +432,7 @@ public class Upper_mapController extends BaseMapController {
     private Rectangle orc_detect;
 
     private static final double MOB_DROP_TTL_SECONDS = 12.0 * 60.0 * 60.0;
+    private static final double AUTO_GATHER_MARGIN_PIXELS = 2.0;
     private static final double ORC_LOOT_COMMON_WEIGHT = 70.0;
     private static final double ORC_LOOT_UNCOMMON_WEIGHT = 25.0;
     private static final double ORC_LOOT_RARE_WEIGHT = 5.0;
@@ -453,6 +454,8 @@ public class Upper_mapController extends BaseMapController {
 
     private String renderedSlimeDropsKey = null;
     private String renderedOrcDropsKey = null;
+    private boolean warnedSlimeInventoryFull = false;
+    private boolean warnedOrcInventoryFull = false;
     private int sandItemId = -1;
     private int stringyMeatItemId = -1;
     private int smallMeatChunkItemId = -1;
@@ -552,6 +555,8 @@ public class Upper_mapController extends BaseMapController {
             staticWalls,
             "/image/mob/Slime/Slime1_Idle_with_shadow.png",
             6,
+            "/image/mob/Slime/Slime1_Walk_with_shadow.png",
+            8,
             "/image/mob/Slime/Slime1_Run_with_shadow.png",
             8,
             "/image/mob/Slime/Slime1_Attack_with_shadow.png",
@@ -576,6 +581,8 @@ public class Upper_mapController extends BaseMapController {
             staticWalls,
             "/image/mob/Orc/orc1_idle_with_shadow.png",
             4,
+            "/image/mob/Orc/orc1_walk_with_shadow.png",
+            6,
             "/image/mob/Orc/orc1_run_with_shadow.png",
             8,
             "/image/mob/Orc/orc1_attack_with_shadow.png",
@@ -768,8 +775,86 @@ public class Upper_mapController extends BaseMapController {
             }
         }
 
+        autoGatherMobDrops(playerBounds);
         renderSlimeDrops();
         renderOrcDrops();
+    }
+
+    private void autoGatherMobDrops(Bounds playerBoundsScene) {
+        if (player == null || playerBoundsScene == null) return;
+
+        warnedSlimeInventoryFull = autoGatherSingleMobDrops(slimeMob, slime_hitbox, playerBoundsScene, warnedSlimeInventoryFull, this::renderSlimeDrops);
+        warnedOrcInventoryFull = autoGatherSingleMobDrops(orcMob, orc_hitbox, playerBoundsScene, warnedOrcInventoryFull, this::renderOrcDrops);
+    }
+
+    private boolean autoGatherSingleMobDrops(
+        MobEntity mob,
+        Rectangle mobHitbox,
+        Bounds playerBoundsScene,
+        boolean warnedInventoryFull,
+        Runnable rerender
+    ) {
+        if (mob == null || mobHitbox == null || player == null || playerBoundsScene == null) {
+            return false;
+        }
+
+        // Drops are rendered only after the death animation finishes; keep pickup timing consistent.
+        if (mob.isDead() && !mob.isDeathAnimationFinished()) {
+            return warnedInventoryFull;
+        }
+
+        MobMapState.MobData data = mob.getData();
+        if (data == null || data.drops == null || data.drops.isEmpty()) {
+            return warnedInventoryFull;
+        }
+
+        boolean inside = intersectsWithMargin(playerBoundsScene, mobHitbox, AUTO_GATHER_MARGIN_PIXELS);
+        if (!inside) {
+            return false;
+        }
+
+        boolean removedAny = false;
+        Iterator<MobMapState.MobDrop> it = data.drops.iterator();
+        while (it.hasNext()) {
+            MobMapState.MobDrop drop = it.next();
+            if (drop == null || drop.itemId <= 0 || drop.quantity <= 0) {
+                it.remove();
+                removedAny = true;
+                continue;
+            }
+
+            if (!player.getInventory().addItem(drop.itemId, drop.quantity)) {
+                if (!warnedInventoryFull) {
+                    AppDialogs.showMessageDialog(null, "Not enough inventory space to collect these drops.");
+                    warnedInventoryFull = true;
+                }
+                break;
+            }
+
+            it.remove();
+            removedAny = true;
+        }
+
+        if (removedAny && rerender != null) {
+            rerender.run();
+        }
+
+        return warnedInventoryFull;
+    }
+
+    private boolean intersectsWithMargin(Bounds playerBoundsScene, Rectangle targetHitbox, double marginPixels) {
+        if (playerBoundsScene == null || targetHitbox == null) return false;
+        Bounds targetBoundsScene = targetHitbox.localToScene(targetHitbox.getBoundsInLocal());
+        double margin = Math.max(0.0, marginPixels);
+
+        Bounds expanded = new BoundingBox(
+            targetBoundsScene.getMinX() - margin,
+            targetBoundsScene.getMinY() - margin,
+            targetBoundsScene.getWidth() + (margin * 2.0),
+            targetBoundsScene.getHeight() + (margin * 2.0)
+        );
+
+        return expanded.intersects(playerBoundsScene);
     }
 
     private void syncDirectionalHitboxes() {
@@ -1010,12 +1095,8 @@ public class Upper_mapController extends BaseMapController {
         dropView.setVisible(show);
         dropView.setManaged(show);
         dropView.setPickOnBounds(true);
-
-        dropView.setOnMouseClicked(event -> {
-            if (event.getButton() != MouseButton.PRIMARY) return;
-            event.consume();
-            handleMobDropClicked(mob, displayedDrop, rerender);
-        });
+        dropView.setMouseTransparent(true);
+        dropView.setOnMouseClicked(null);
 
         return key;
     }
@@ -1032,21 +1113,6 @@ public class Upper_mapController extends BaseMapController {
             sb.append('#').append(d.itemId).append('x').append(d.quantity);
         }
         return sb.toString();
-    }
-
-    private void handleMobDropClicked(MobMapState.MobData mob, MobMapState.MobDrop drop, Runnable rerender) {
-        if (drop == null || mob == null || player == null) return;
-        if (drop.itemId <= 0 || drop.quantity <= 0) return;
-
-        if (!player.getInventory().addItem(drop.itemId, drop.quantity)) {
-            AppDialogs.showMessageDialog(null, "Not enough inventory space to collect this drop.");
-            return;
-        }
-
-        mob.drops.remove(drop);
-        if (rerender != null) {
-            rerender.run();
-        }
     }
 
     @Override

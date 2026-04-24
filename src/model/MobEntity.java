@@ -28,7 +28,7 @@ public final class MobEntity {
     }
 
     private enum AnimState {
-        IDLE, RUN, ATTACK, HURT, DEATH
+        IDLE, WALK, RUN, ATTACK, HURT, DEATH
     }
 
     private static final int FRAME_SIZE = 64;
@@ -52,6 +52,7 @@ public final class MobEntity {
     private static final int ORC_KILL_VIT_WEIGHT = 15;
 
     private static final long IDLE_FRAME_DELAY_NANOS = 150_000_000L;
+    private static final long WALK_FRAME_DELAY_NANOS = 130_000_000L;
     private static final long RUN_FRAME_DELAY_NANOS = 90_000_000L;
     private static final long BASE_ATTACK_FRAME_DELAY_NANOS = 110_000_000L;
     private static final long HURT_FRAME_DELAY_NANOS = 90_000_000L;
@@ -64,7 +65,7 @@ public final class MobEntity {
     private static final double RUN_ATTACK_COOLDOWN_SECONDS = 5.0 * 60.0;
     private static final double RUN_ATTACK_EDGE_BAND_RATIO = 0.15;
     private static final double RUN_ATTACK_EDGE_BAND_MIN_PIXELS = 8.0;
-    private static final double RUN_ATTACK_SPEED_MULTIPLIER = 1.8;
+    private static final double RUN_ATTACK_SPEED_MULTIPLIER = 2.4;
 
     // Special action SP cost = run + attack.
     private static final int RUN_ATTACK_RUN_SP_COST = 1;
@@ -102,6 +103,8 @@ public final class MobEntity {
 
     private final Image idleSheet;
     private final int idleColumns;
+    private final Image walkSheet;
+    private final int walkColumns;
     private final Image runSheet;
     private final int runColumns;
     private final Image attackSheet;
@@ -148,6 +151,8 @@ public final class MobEntity {
         List<Rectangle> walls,
         String idleSheetPath,
         int idleColumns,
+        String walkSheetPath,
+        int walkColumns,
         String runSheetPath,
         int runColumns,
         String attackSheetPath,
@@ -173,6 +178,8 @@ public final class MobEntity {
 
         this.idleSheet = loadRequiredImage(idleSheetPath);
         this.idleColumns = Math.max(1, idleColumns);
+        this.walkSheet = loadRequiredImage(walkSheetPath);
+        this.walkColumns = Math.max(1, walkColumns);
         this.runSheet = loadRequiredImage(runSheetPath);
         this.runColumns = Math.max(1, runColumns);
         this.attackSheet = loadRequiredImage(attackSheetPath);
@@ -316,7 +323,11 @@ public final class MobEntity {
             double speedMultiplier = runAttackActive ? RUN_ATTACK_SPEED_MULTIPLIER : 1.0;
             moveTowardTarget(dtSimNanos, playerBoundsScene, speedMultiplier);
             syncAttackHitboxesEnabled(true);
-            setAnimState(moving ? AnimState.RUN : AnimState.IDLE, false);
+            if (moving) {
+                setAnimState(runAttackActive ? AnimState.RUN : AnimState.WALK, false);
+            } else {
+                setAnimState(AnimState.IDLE, false);
+            }
 
             if (shouldStartAttack(simNowNanos, playerBoundsScene, playerState)) {
                 startAttack(simNowNanos);
@@ -644,8 +655,10 @@ public final class MobEntity {
 
         double hpRegenPerGameSecond = (maxHp * 0.01 * amountMultiplier * speedMultiplier) / 60.0;
 
-        // Spec: SP only regens while idle/walking. Mobs don't "walk", so only regen SP while idle.
-        boolean canRegenSp = (animState == AnimState.IDLE) && !moving && !isAttackActive(simNowNanos);
+        // Spec: SP only regens while idle/walking.
+        boolean canRegenSp = !runAttackActive
+            && (animState == AnimState.IDLE || animState == AnimState.WALK)
+            && !isAttackActive(simNowNanos);
         double spRegenPerGameSecond = canRegenSp
             ? (maxSp * 0.01 * amountMultiplier * speedMultiplier) / 60.0
             : 0.0;
@@ -965,7 +978,7 @@ public final class MobEntity {
 
         switch (animState) {
             case IDLE -> frameIndex = (frameIndex + loopSteps) % frameCount;
-            case RUN -> {
+            case WALK, RUN -> {
                 if (moving) {
                     frameIndex = (frameIndex + loopSteps) % frameCount;
                 } else {
@@ -1029,6 +1042,7 @@ public final class MobEntity {
     private long getFrameDelay(AnimState state) {
         return switch (state) {
             case IDLE -> IDLE_FRAME_DELAY_NANOS;
+            case WALK -> WALK_FRAME_DELAY_NANOS;
             case RUN -> RUN_FRAME_DELAY_NANOS;
             case ATTACK -> getAttackFrameDelayNanos();
             case HURT -> HURT_FRAME_DELAY_NANOS;
@@ -1039,6 +1053,7 @@ public final class MobEntity {
     private int getFrameCount(AnimState state) {
         return switch (state) {
             case IDLE -> idleColumns;
+            case WALK -> walkColumns;
             case RUN -> runColumns;
             case ATTACK -> attackColumns;
             case HURT -> hurtColumns;
@@ -1049,6 +1064,7 @@ public final class MobEntity {
     private void updateViewport() {
         Image sheet = switch (animState) {
             case IDLE -> idleSheet;
+            case WALK -> walkSheet;
             case RUN -> runSheet;
             case ATTACK -> attackSheet;
             case HURT -> hurtSheet;
