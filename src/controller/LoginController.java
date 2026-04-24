@@ -46,6 +46,8 @@ import javafx.scene.layout.StackPane;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.util.Duration;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javax.swing.JOptionPane;
 import util.AppDialogs;
 import model.AccMg;
@@ -62,6 +64,8 @@ public class LoginController implements Initializable {
     Connection con;
     ResultSet rs;
     PreparedStatement pst;
+    
+    private MediaPlayer musicPlayer;
     
     @FXML
     private Group login_pane;
@@ -125,7 +129,14 @@ public class LoginController implements Initializable {
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // TODO
+        
+        Media music = new Media(getClass().getResource("/mp3/Across_the_Jade_Archipelago.mp3").toExternalForm());
+        musicPlayer = new MediaPlayer(music);
+        
+        // Loop the music indefinitely
+        musicPlayer.setCycleCount(MediaPlayer.INDEFINITE);
+        musicPlayer.play();
+        
         dbcon db=new dbcon();
         try{
             con=db.getConnection();
@@ -201,6 +212,7 @@ public class LoginController implements Initializable {
         }
         switch (temp) {
             case "admin" -> {
+                musicPlayer.stop();
                 util.SceneManager.switchScene("/view/account_view.fxml");
             }
             case "user" -> {
@@ -241,6 +253,7 @@ public class LoginController implements Initializable {
                 }
             }
             case "owner" -> {
+                musicPlayer.stop();
                 util.SceneManager.switchScene("/view/account_view.fxml");
             }
             default -> AppDialogs.showMessageDialog(null, "Unable to determine account role.");
@@ -582,6 +595,7 @@ public class LoginController implements Initializable {
 
     @FXML
     private void handleforgetpwdaction(ActionEvent event) {
+        musicPlayer.stop();
         util.SceneManager.switchScene("/view/OTP.fxml");
     }
 

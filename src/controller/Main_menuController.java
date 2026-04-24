@@ -15,6 +15,8 @@ import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import util.WorldScaler;
 
 /**
@@ -24,6 +26,8 @@ import util.WorldScaler;
  */
 public class Main_menuController implements Initializable {
 
+    private MediaPlayer musicPlayer;
+    
     @FXML
     private Button btnloadg;
     @FXML
@@ -43,6 +47,14 @@ public class Main_menuController implements Initializable {
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        
+        Media music = new Media(getClass().getResource("/mp3/Where_the_Tide_Sleeps.mp3").toExternalForm());
+        musicPlayer = new MediaPlayer(music);
+        
+        // Loop the music indefinitely
+        musicPlayer.setCycleCount(MediaPlayer.INDEFINITE);
+        musicPlayer.play();
+        
         new WorldScaler(view, uiRoot);
     }    
 
@@ -50,6 +62,7 @@ public class Main_menuController implements Initializable {
     private void handlebtnloadgaction(ActionEvent event) {
         game.GameState.get().setSaveMenuMode(false);
         game.GameState.get().setReturnScene("/view/main_menu.fxml", util.SpawnTag.DEFAULT);
+        musicPlayer.stop();
         util.SceneManager.switchScene("/view/saveloads.fxml");
     }
 
@@ -60,11 +73,13 @@ public class Main_menuController implements Initializable {
 
     @FXML
     private void handlebtnnewgaction(ActionEvent event) {
+        musicPlayer.stop();
         util.SceneManager.switchScene("/view/new_game.fxml");
     }
 
     @FXML
     private void handlebtnlogoutaction(ActionEvent event) {
+        musicPlayer.stop();
         util.SceneManager.switchScene("/view/login.fxml");
     }
     

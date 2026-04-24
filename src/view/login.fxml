@@ -51,7 +51,7 @@
                      </Pane>
                   </children>
                </Group>
-               <Group fx:id="sign_inpane" visible="false">
+               <Group fx:id="sign_inpane">
                   <children>
                      <ImageView fitHeight="400.0" fitWidth="600.0" pickOnBounds="true" preserveRatio="true">
                         <image>
@@ -60,7 +60,7 @@
                      </ImageView>
                      <Pane layoutX="336.0" layoutY="28.0" prefHeight="365.0" prefWidth="240.0">
                         <children>
-                           <TextField fx:id="txtsname" layoutX="50.0" layoutY="95.0" promptText="Username" style="-fx-font-weight: bold;" styleClass="inputbox" stylesheets="@../css/style.css" />
+                           <TextField fx:id="txtsname" layoutX="50.0" layoutY="58.0" promptText="Username" style="-fx-font-weight: bold;" styleClass="inputbox" stylesheets="@../css/style.css" />
                            <PasswordField fx:id="txtspassword" layoutX="50.0" layoutY="169.0" promptText="Password" style="-fx-font-weight: bold;" styleClass="inputbox" stylesheets="@../css/style.css" />
                            <Hyperlink fx:id="lghl" layoutX="58.0" layoutY="239.0" onAction="#handlelghlaction" text="Already have an account?" textFill="#9a5000">
                               <font>
@@ -68,7 +68,7 @@
                               </font>
                            </Hyperlink>
                            <PasswordField fx:id="txtscpassword" layoutX="50.0" layoutY="206.0" promptText="Confirm Password" style="-fx-font-weight: bold;" styleClass="inputbox" stylesheets="@../css/style.css" />
-                           <TextField fx:id="txtsgmail" layoutX="50.0" layoutY="58.0" promptText="Gmail Address" style="-fx-font-weight: bold;" styleClass="inputbox" stylesheets="@../css/style.css" />
+                           <TextField fx:id="txtsgmail" layoutX="50.0" layoutY="95.0" promptText="Gmail Address" style="-fx-font-weight: bold;" styleClass="inputbox" stylesheets="@../css/style.css" />
                            <ImageView fitHeight="107.0" fitWidth="191.0" layoutX="46.0" layoutY="256.0" pickOnBounds="true" preserveRatio="true">
                               <image>
                                  <Image url="@../image/SignInbtn.png" />
