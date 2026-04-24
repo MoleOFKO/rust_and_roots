@@ -68,6 +68,105 @@
                   <Rectangle fx:id="human_hitbox_right" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="299.0" layoutY="199.0" stroke="RED" strokeType="INSIDE" width="14.0" />
                </children>
             </Group>
+            <Group fx:id="stone_dungeon" layoutX="-152.0" layoutY="35.0">
+               <children>
+                  <ImageView fx:id="stone_dungeon_img" fitHeight="32.0" fitWidth="32.0" layoutX="286.0" layoutY="249.0" pickOnBounds="true" preserveRatio="false" smooth="false">
+                     <image>
+                        <Image url="@../image/weapons/Stone_dungeon.png" />
+                     </image>
+                  </ImageView>
+                  <Rectangle fx:id="stone_dungeon_hitbox" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="20.0" layoutX="266.0" layoutY="226.0" stroke="RED" strokeType="INSIDE" translateX="24" translateY="28" width="25.0" />
+                  <ImageView fx:id="drops_img_stone_dungeon" fitHeight="28.0" fitWidth="28.0" layoutX="303.0" layoutY="267.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
+               </children>
+            </Group>
+            <Group fx:id="adamantite" layoutY="-177.0">
+               <children>
+                  <ImageView fx:id="adamantite_img" fitHeight="32.0" fitWidth="32.0" layoutX="286.0" layoutY="249.0" pickOnBounds="true" preserveRatio="false" smooth="false">
+                     <image>
+                        <Image url="@../image/weapons/adamantite_ore.png" />
+                     </image>
+                  </ImageView>
+                  <Rectangle fx:id="adamantite_hitbox" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="20.0" layoutX="266.0" layoutY="226.0" stroke="RED" strokeType="INSIDE" translateX="24" translateY="28" width="25.0" />
+                  <ImageView fx:id="drops_img_adamantite" fitHeight="28.0" fitWidth="28.0" layoutX="303.0" layoutY="267.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
+               </children>
+            </Group>
+            <Group fx:id="silver" layoutX="-87.0" layoutY="-145.0">
+               <children>
+                  <ImageView fx:id="silver_img" fitHeight="32.0" fitWidth="32.0" layoutX="286.0" layoutY="249.0" pickOnBounds="true" preserveRatio="false" smooth="false">
+                     <image>
+                        <Image url="@../image/weapons/silver_ore.png" />
+                     </image>
+                  </ImageView>
+                  <Rectangle fx:id="silver_hitbox" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="20.0" layoutX="266.0" layoutY="226.0" stroke="RED" strokeType="INSIDE" translateX="24" translateY="28" width="25.0" />
+                  <ImageView fx:id="drops_img_silver" fitHeight="28.0" fitWidth="28.0" layoutX="303.0" layoutY="267.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
+               </children>
+            </Group>
+            <Group fx:id="orichalcum" layoutX="224.0" layoutY="-134.0">
+               <children>
+                  <ImageView fx:id="orichalcum_img" fitHeight="32.0" fitWidth="32.0" layoutX="286.0" layoutY="249.0" pickOnBounds="true" preserveRatio="false" smooth="false">
+                     <image>
+                        <Image url="@../image/weapons/orichalcum_ore.png" />
+                     </image>
+                  </ImageView>
+                  <Rectangle fx:id="orichalcum_hitbox" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="20.0" layoutX="266.0" layoutY="226.0" stroke="RED" strokeType="INSIDE" translateX="24" translateY="28" width="25.0" />
+                  <ImageView fx:id="drops_img_orichalcum" fitHeight="28.0" fitWidth="28.0" layoutX="303.0" layoutY="267.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
+               </children>
+            </Group>
+            <Group fx:id="iron" layoutX="98.0" layoutY="-124.0">
+               <children>
+                  <ImageView fx:id="iron_img" fitHeight="32.0" fitWidth="32.0" layoutX="286.0" layoutY="249.0" pickOnBounds="true" preserveRatio="false" smooth="false">
+                     <image>
+                        <Image url="@../image/weapons/iron_ore.png" />
+                     </image>
+                  </ImageView>
+                  <Rectangle fx:id="iron_hitbox" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="20.0" layoutX="266.0" layoutY="226.0" stroke="RED" strokeType="INSIDE" translateX="24" translateY="28" width="25.0" />
+                  <ImageView fx:id="drops_img_iron" fitHeight="28.0" fitWidth="28.0" layoutX="303.0" layoutY="267.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
+               </children>
+            </Group>
+            <Group fx:id="mithril" layoutX="108.0" layoutY="40.0">
+               <children>
+                  <ImageView fx:id="mithril_img" fitHeight="32.0" fitWidth="32.0" layoutX="286.0" layoutY="249.0" pickOnBounds="true" preserveRatio="false" smooth="false">
+                     <image>
+                        <Image url="@../image/weapons/mithril_ore.png" />
+                     </image>
+                  </ImageView>
+                  <Rectangle fx:id="mithril_hitbox" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="20.0" layoutX="266.0" layoutY="226.0" stroke="RED" strokeType="INSIDE" translateX="24" translateY="28" width="25.0" />
+                  <ImageView fx:id="drops_img_mithril" fitHeight="28.0" fitWidth="28.0" layoutX="303.0" layoutY="267.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
+               </children>
+            </Group>
+            <Group fx:id="copper" layoutX="-217.0" layoutY="-37.0">
+               <children>
+                  <ImageView fx:id="copper_img" fitHeight="32.0" fitWidth="32.0" layoutX="286.0" layoutY="249.0" pickOnBounds="true" preserveRatio="false" smooth="false">
+                     <image>
+                        <Image url="@../image/weapons/copper_ore.png" />
+                     </image>
+                  </ImageView>
+                  <Rectangle fx:id="copper_hitbox" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="20.0" layoutX="266.0" layoutY="226.0" stroke="RED" strokeType="INSIDE" translateX="24" translateY="28" width="25.0" />
+                  <ImageView fx:id="drops_img_copper" fitHeight="28.0" fitWidth="28.0" layoutX="303.0" layoutY="267.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
+               </children>
+            </Group>
+            <Group fx:id="gold" layoutX="-207.0" layoutY="-120.0">
+               <children>
+                  <ImageView fx:id="gold_img" fitHeight="32.0" fitWidth="32.0" layoutX="286.0" layoutY="249.0" pickOnBounds="true" preserveRatio="false" smooth="false">
+                     <image>
+                        <Image url="@../image/weapons/gold_ore.png" />
+                     </image>
+                  </ImageView>
+                  <Rectangle fx:id="gold_hitbox" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="20.0" layoutX="266.0" layoutY="226.0" stroke="RED" strokeType="INSIDE" translateX="24" translateY="28" width="25.0" />
+                  <ImageView fx:id="drops_img_gold" fitHeight="28.0" fitWidth="28.0" layoutX="303.0" layoutY="267.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
+               </children>
+            </Group>
+            <Group fx:id="hihiogane" layoutX="-119.0" layoutY="-50.0">
+               <children>
+                  <ImageView fx:id="hihiogane_img" fitHeight="32.0" fitWidth="32.0" layoutX="286.0" layoutY="249.0" pickOnBounds="true" preserveRatio="false" smooth="false">
+                     <image>
+                        <Image url="@../image/weapons/hihiogane_ore.png" />
+                     </image>
+                  </ImageView>
+                  <Rectangle fx:id="hihiogane_hitbox" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="20.0" layoutX="266.0" layoutY="226.0" stroke="RED" strokeType="INSIDE" translateX="24" translateY="28" width="25.0" />
+                  <ImageView fx:id="drops_img_hihiogane" fitHeight="28.0" fitWidth="28.0" layoutX="303.0" layoutY="267.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
+               </children>
+            </Group>
             <Group>
                <children>
                   <HBox fx:id="hotbar" alignment="CENTER" layoutX="148.0" layoutY="352.0" opacity="0.81" prefHeight="47.0" prefWidth="294.0" styleClass="hbox" stylesheets="@../css/style.css">
