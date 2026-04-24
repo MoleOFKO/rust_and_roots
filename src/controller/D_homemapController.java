@@ -364,141 +364,79 @@ public class D_homemapController extends BaseMapController {
     private Rectangle wall4;
     @FXML
     private Rectangle wall5;
-
-   
-
-//    @FXML
-//    private void handleusepointaction(MouseEvent event) {
-//    }
-//
-//    @FXML
-//    private void handleconfirmaction(MouseEvent event) {
-//    }
-//
-//    @FXML
-//    private void handlebtnskillacion(MouseEvent event) {
-//    }
-//
-//    @FXML
-//    private void handleHPminusaction(MouseEvent event) {
-//    }
-//
-//    @FXML
-//    private void handleHPplusaction(MouseEvent event) {
-//    }
-//
-//    @FXML
-//    private void handleSPminusaction(MouseEvent event) {
-//    }
-//
-//    @FXML
-//    private void handleSTRminusaction(MouseEvent event) {
-//    }
-//
-//    @FXML
-//    private void handleVITminusaction(MouseEvent event) {
-//    }
-//
-//    @FXML
-//    private void handleDEXminusaction(MouseEvent event) {
-//    }
-//
-//    @FXML
-//    private void handleAGIminusaction(MouseEvent event) {
-//    }
-//
-//    @FXML
-//    private void handleSPplusaction(MouseEvent event) {
-//    }
-//
-//    @FXML
-//    private void handleSTRplusaction(MouseEvent event) {
-//    }
-//
-//    @FXML
-//    private void handleVITplusaction(MouseEvent event) {
-//    }
-//
-//    @FXML
-//    private void handleDEXplusaction(MouseEvent event) {
-//    }
-//
-//    @FXML
-//    private void handleAGIplusaction(MouseEvent event) {
-//    }
-//
-//    @FXML
-//    private void handlebtnstatusaction(MouseEvent event) {
-//    }
-//
-//    @FXML
-//    private void handlefarmingminusaction(MouseEvent event) {
-//    }
-//
-//    @FXML
-//    private void handlefarmingplusaction(MouseEvent event) {
-//    }
-//
-//    @FXML
-//    private void handlegatheringminusaction(MouseEvent event) {
-//    }
-//
-//    @FXML
-//    private void handlecraftingminusaction(MouseEvent event) {
-//    }
-//
-//    @FXML
-//    private void handlefishingminusaction(MouseEvent event) {
-//    }
-//
-//    @FXML
-//    private void handlecookingminusaction(MouseEvent event) {
-//    }
-//
-//    @FXML
-//    private void handlegatheringplusaction(MouseEvent event) {
-//    }
-//
-//    @FXML
-//    private void handlecraftingplusaction(MouseEvent event) {
-//    }
-//
-//    @FXML
-//    private void handlefishingplusaction(MouseEvent event) {
-//    }
-//
-//    @FXML
-//    private void handlecookingplusaction(MouseEvent event) {
-//    }
-//
-//    @FXML
-//    private void handlesaveexitaction(ActionEvent event) {
-//    }
-//
-//    @FXML
-//    private void handlesave(ActionEvent event) {
-//    }
-//
-//    @FXML
-//    private void handleload(ActionEvent event) {
-//    }
-//
-//    @FXML
-//    private void handleopenInventoryaction(ActionEvent event) {
-//    }
-//
-//    @FXML
-//    private void handlecloseaction(MouseEvent event) {
-//    }
-//
-//    @FXML
-//    private void handleopenstatusaction(ActionEvent event) {
-//    }
-//
-//    @FXML
-//    private void handleopensettingaction(ActionEvent event) {
-//    }
-
+    @FXML
+    private Group stone_dungeon;
+    @FXML
+    private ImageView stone_dungeon_img;
+    @FXML
+    private Rectangle stone_dungeon_hitbox;
+    @FXML
+    private ImageView drops_img_stone_dungeon;
+    @FXML
+    private Group adamantite;
+    @FXML
+    private ImageView adamantite_img;
+    @FXML
+    private Rectangle adamantite_hitbox;
+    @FXML
+    private ImageView drops_img_adamantite;
+    @FXML
+    private Group silver;
+    @FXML
+    private ImageView silver_img;
+    @FXML
+    private Rectangle silver_hitbox;
+    @FXML
+    private ImageView drops_img_silver;
+    @FXML
+    private Group orichalcum;
+    @FXML
+    private ImageView orichalcum_img;
+    @FXML
+    private Rectangle orichalcum_hitbox;
+    @FXML
+    private ImageView drops_img_orichalcum;
+    @FXML
+    private Group iron;
+    @FXML
+    private ImageView iron_img;
+    @FXML
+    private Rectangle iron_hitbox;
+    @FXML
+    private ImageView drops_img_iron;
+    @FXML
+    private Group mithril;
+    @FXML
+    private ImageView mithril_img;
+    @FXML
+    private Rectangle mithril_hitbox;
+    @FXML
+    private ImageView drops_img_mithril;
+    @FXML
+    private Group copper;
+    @FXML
+    private ImageView copper_img;
+    @FXML
+    private Rectangle copper_hitbox;
+    @FXML
+    private ImageView drops_img_copper;
+    @FXML
+    private Group gold;
+    @FXML
+    private ImageView gold_img;
+    @FXML
+    private Rectangle gold_hitbox;
+    @FXML
+    private ImageView drops_img_gold;
+    @FXML
+    private Group hihiogane;
+    @FXML
+    private ImageView hihiogane_img;
+    @FXML
+    private Rectangle hihiogane_hitbox;
+    @FXML
+    private ImageView drops_img_hihiogane;
+    
     @Override
     protected String mapKey() {
         return "d_homemap";
@@ -509,6 +447,4 @@ public class D_homemapController extends BaseMapController {
         registerExit(exit_down, "/view/d_undermap.fxml", SpawnTag.FROM_UP);
         registerExit(exit_right, "/view/left_map_notwo_of_two.fxml", SpawnTag.FROM_LEFT);
     }
-
-
 }
