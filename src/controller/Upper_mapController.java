@@ -43,7 +43,7 @@ import util.SpawnTag;
 public class Upper_mapController extends BaseMapController {
 
     private static final String DAY_BG_PATH = "/image/maps/upper_map_no.1.png";
-    private static final String NIGHT_BG_PATH = "";
+    private static final String NIGHT_BG_PATH = "/image/NightMap/upper_map_no.1night.png";
 
     @Override
     protected String dayBackgroundPath() {

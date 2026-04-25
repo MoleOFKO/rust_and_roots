@@ -410,6 +410,7 @@ public class Player {
                 double nowSeconds = time.totalSecondsProperty().get();
                 if (state != null) {
                     state.applyRegenIfNeeded(nowSeconds);
+                    state.applyDebuffsIfNeeded(nowSeconds);
                 }
 
                 if (state.isDead()) {
