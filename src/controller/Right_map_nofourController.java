@@ -26,6 +26,19 @@ import util.SpawnTag;
  */
 public class Right_map_nofourController extends BaseMapController {
 
+    private static final String DAY_BG_PATH = "/image/maps/rightmap_no.4.png";
+    private static final String NIGHT_BG_PATH = "";
+
+    @Override
+    protected String dayBackgroundPath() {
+        return DAY_BG_PATH;
+    }
+
+    @Override
+    protected String nightBackgroundPath() {
+        return NIGHT_BG_PATH;
+    }
+
     @FXML
     private StackPane view;
     @FXML
@@ -305,7 +318,7 @@ public class Right_map_nofourController extends BaseMapController {
     @FXML
     private Label crafting;
     @FXML
-    private Label fishing;
+    private Label combat;
     @FXML
     private Label cooking;
     @FXML
@@ -317,7 +330,7 @@ public class Right_map_nofourController extends BaseMapController {
     @FXML
     private ImageView btncraftingminus1;
     @FXML
-    private ImageView btnfishingminus1;
+    private ImageView btncombatminus1;
     @FXML
     private ImageView btncookingminus1;
     @FXML
@@ -325,7 +338,7 @@ public class Right_map_nofourController extends BaseMapController {
     @FXML
     private ImageView btncraftingplus1;
     @FXML
-    private ImageView btnfishingplus1;
+    private ImageView btncombatplus1;
     @FXML
     private ImageView btncookingplus1;
     @FXML

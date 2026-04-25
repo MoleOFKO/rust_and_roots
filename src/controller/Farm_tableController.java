@@ -32,6 +32,7 @@ import model.ItemDatabase;
 import model.NodeCollectors;
 import util.AppDialogs;
 import util.SceneManager;
+import util.SkillModifiers;
 import util.SpawnTag;
 
 public class Farm_tableController implements Initializable, SceneController {
@@ -279,7 +280,7 @@ public class Farm_tableController implements Initializable, SceneController {
         gameState.getPlayerState().consumeStamina(staminaCost);
 
         if (pendingFarmingExp > 0) {
-            gameState.getPlayerSkills().addFarmingExp(pendingFarmingExp);
+            gameState.addFarmingSkillExp(pendingFarmingExp);
         }
 
         tempPlots.forEach((plotId, temp) -> temp.applyTo(realFarm.getPlot(plotId)));
@@ -673,6 +674,7 @@ public class Farm_tableController implements Initializable, SceneController {
                 pd.lastWateredAt = -1;
                 pd.accumulatedWaterReduction = 0;
                 applySeedGrowthProfile(pd, selectedSeedItemId);
+                pendingFarmingExp++;
             }
 
             case WATER -> {
@@ -1376,7 +1378,11 @@ public class Farm_tableController implements Initializable, SceneController {
     private int computeHarvestOutputCount(Integer seedItemId) {
         if (seedItemId == null || seedItemId <= 0) return 0;
         int farmingLevel = getEffectiveFarmingLevel();
-        return 1 + (farmingLevel / 5);
+        int chancePercent = SkillModifiers.farmingDoubleHarvestChancePercent(farmingLevel);
+        if (chancePercent <= 0) {
+            return 1;
+        }
+        return ThreadLocalRandom.current().nextDouble(100.0) < chancePercent ? 2 : 1;
     }
 
     private int getEffectiveFarmingLevel() {

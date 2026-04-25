@@ -21,7 +21,7 @@
    <children>
       <Group fx:id="world">
          <children>
-            <ImageView fitHeight="401.0" fitWidth="602.0" pickOnBounds="true">
+            <ImageView fx:id="bg" fitHeight="401.0" fitWidth="602.0" pickOnBounds="true">
                <image>
                   <Image url="@../image/dungeon/d_undermap_left.png" />
                </image>
@@ -729,7 +729,7 @@
                                           <DropShadow />
                                        </effect>
                                     </Label>
-                                    <Label fx:id="fishing" layoutX="-296.0" layoutY="143.0" prefHeight="21.0" prefWidth="277.0" text="Fishing :" textFill="WHITE">
+                                    <Label fx:id="combat" layoutX="-296.0" layoutY="143.0" prefHeight="21.0" prefWidth="277.0" text="Combat :" textFill="WHITE">
                                        <font>
                                           <Font name="System Bold" size="15.0" />
                                        </font>
@@ -781,7 +781,7 @@
                                           <DropShadow />
                                        </effect>
                                     </ImageView>
-                                    <ImageView fx:id="btnfishingminus1" fitHeight="22.0" fitWidth="23.0" layoutX="-12.0" layoutY="143.0" managed="false" onMouseClicked="#handlefishingminusaction" pickOnBounds="true" preserveRatio="true">
+                                    <ImageView fx:id="btncombatminus1" fitHeight="22.0" fitWidth="23.0" layoutX="-12.0" layoutY="143.0" managed="false" onMouseClicked="#handlecombatminusaction" pickOnBounds="true" preserveRatio="true">
                                        <image>
                                           <Image url="@../image/tools/-.png" />
                                        </image>
@@ -813,7 +813,7 @@
                                           <DropShadow />
                                        </effect>
                                     </ImageView>
-                                    <ImageView fx:id="btnfishingplus1" fitHeight="22.0" fitWidth="23.0" layoutX="28.0" layoutY="143.0" managed="false" onMouseClicked="#handlefishingplusaction" pickOnBounds="true" preserveRatio="true">
+                                    <ImageView fx:id="btncombatplus1" fitHeight="22.0" fitWidth="23.0" layoutX="28.0" layoutY="143.0" managed="false" onMouseClicked="#handlecombatplusaction" pickOnBounds="true" preserveRatio="true">
                                        <image>
                                           <Image url="@../image/tools/+.png" />
                                        </image>

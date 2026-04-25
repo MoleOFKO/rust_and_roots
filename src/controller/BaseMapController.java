@@ -254,7 +254,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     protected int pendingFarmingSkillExp = 0;
     protected int pendingGatheringSkillExp = 0;
     protected int pendingCraftingSkillExp = 0;
-    protected int pendingFishingSkillExp = 0;
+    protected int pendingCombatSkillExp = 0;
     protected int pendingCookingSkillExp = 0;
     
     protected enum MenuTab { INVENTORY, STATUS, SETTINGS }
@@ -1013,7 +1013,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         pendingCookingSkillExp = 0;
         pendingCraftingSkillExp = 0;
         pendingFarmingSkillExp = 0;
-        pendingFishingSkillExp = 0;
+        pendingCombatSkillExp = 0;
         pendingGatheringSkillExp = 0;
     }
 
@@ -1022,7 +1022,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
             case "farming" -> pendingFarmingSkillExp;
             case "gathering" -> pendingGatheringSkillExp;
             case "crafting" -> pendingCraftingSkillExp;
-            case "fishing" -> pendingFishingSkillExp;
+            case "combat" -> pendingCombatSkillExp;
             case "cooking" -> pendingCookingSkillExp;
             default -> 0;
         };
@@ -1034,7 +1034,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
             case "farming" -> pendingFarmingSkillExp = nextValue;
             case "gathering" -> pendingGatheringSkillExp = nextValue;
             case "crafting" -> pendingCraftingSkillExp = nextValue;
-            case "fishing" -> pendingFishingSkillExp = nextValue;
+            case "combat" -> pendingCombatSkillExp = nextValue;
             case "cooking" -> pendingCookingSkillExp = nextValue;
             default -> {
             }
@@ -1045,7 +1045,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         return pendingFarmingSkillExp
             + pendingGatheringSkillExp
             + pendingCraftingSkillExp
-            + pendingFishingSkillExp
+            + pendingCombatSkillExp
             + pendingCookingSkillExp;
     }
 
@@ -1065,7 +1065,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
             case "farming" -> skills.getFarmingExp();
             case "gathering" -> skills.getGatheringExp();
             case "crafting" -> skills.getCraftingExp();
-            case "fishing" -> skills.getFishingExp();
+            case "combat" -> skills.getCombatExp();
             case "cooking" -> skills.getCookingExp();
             default -> -1;
         };
@@ -1111,7 +1111,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         if (pendingFarmingSkillExp > 0) gameState.addFarmingSkillExp(pendingFarmingSkillExp);
         if (pendingGatheringSkillExp > 0) gameState.addGatheringSkillExp(pendingGatheringSkillExp);
         if (pendingCraftingSkillExp > 0) gameState.addCraftingSkillExp(pendingCraftingSkillExp);
-        if (pendingFishingSkillExp > 0) gameState.addFishingSkillExp(pendingFishingSkillExp);
+        if (pendingCombatSkillExp > 0) gameState.addCombatSkillExp(pendingCombatSkillExp);
         if (pendingCookingSkillExp > 0) gameState.addCookingSkillExp(pendingCookingSkillExp);
 
         skillAllocationMode = false;
@@ -1157,8 +1157,8 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     protected void onSkillGatheringPlus() { changePendingSkill("gathering", 1); }
     protected void onSkillCraftingMinus() { changePendingSkill("crafting", -1); }
     protected void onSkillCraftingPlus() { changePendingSkill("crafting", 1); }
-    protected void onSkillFishingMinus() { changePendingSkill("fishing", -1); }
-    protected void onSkillFishingPlus() { changePendingSkill("fishing", 1); }
+    protected void onSkillCombatMinus() { changePendingSkill("combat", -1); }
+    protected void onSkillCombatPlus() { changePendingSkill("combat", 1); }
     protected void onSkillCookingMinus() { changePendingSkill("cooking", -1); }
     protected void onSkillCookingPlus() { changePendingSkill("cooking", 1); }
 
@@ -1382,10 +1382,10 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     protected void handlecraftingplusaction(MouseEvent event) { onSkillCraftingPlus(); }
 
     @FXML
-    protected void handlefishingminusaction(MouseEvent event) { onSkillFishingMinus(); }
+    protected void handlecombatminusaction(MouseEvent event) { onSkillCombatMinus(); }
 
     @FXML
-    protected void handlefishingplusaction(MouseEvent event) { onSkillFishingPlus(); }
+    protected void handlecombatplusaction(MouseEvent event) { onSkillCombatPlus(); }
 
     @FXML
     protected void handlecookingminusaction(MouseEvent event) { onSkillCookingMinus(); }
@@ -1584,8 +1584,8 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         bindMouse("btngatheringplus1", ImageView.class, e -> onSkillGatheringPlus());
         bindMouse("btncraftingminus1", ImageView.class, e -> onSkillCraftingMinus());
         bindMouse("btncraftingplus1", ImageView.class, e -> onSkillCraftingPlus());
-        bindMouse("btnfishingminus1", ImageView.class, e -> onSkillFishingMinus());
-        bindMouse("btnfishingplus1", ImageView.class, e -> onSkillFishingPlus());
+        bindMouse("btncombatminus1", ImageView.class, e -> onSkillCombatMinus());
+        bindMouse("btncombatplus1", ImageView.class, e -> onSkillCombatPlus());
         bindMouse("btncookingminus1", ImageView.class, e -> onSkillCookingMinus());
         bindMouse("btncookingplus1", ImageView.class, e -> onSkillCookingPlus());
     }
@@ -1812,13 +1812,13 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         Label farmingNode = controllerField("farming", Label.class);
         Label gatheringNode = controllerField("gathering", Label.class);
         Label craftingNode = controllerField("crafting", Label.class);
-        Label fishingNode = controllerField("fishing", Label.class);
+        Label combatNode = controllerField("combat", Label.class);
         Label cookingNode = controllerField("cooking", Label.class);
 
         if (farmingNode != null) farmingNode.setText(appendPendingSkillCost(skills.getFarmingDisplay(), pendingFarmingSkillExp));
         if (gatheringNode != null) gatheringNode.setText(appendPendingSkillCost(skills.getGatheringDisplay(), pendingGatheringSkillExp));
         if (craftingNode != null) craftingNode.setText(appendPendingSkillCost(skills.getCraftingDisplay(), pendingCraftingSkillExp));
-        if (fishingNode != null) fishingNode.setText(appendPendingSkillCost(skills.getFishingDisplay(), pendingFishingSkillExp));
+        if (combatNode != null) combatNode.setText(appendPendingSkillCost(skills.getCombatDisplay(), pendingCombatSkillExp));
         if (cookingNode != null) cookingNode.setText(appendPendingSkillCost(skills.getCookingDisplay(), pendingCookingSkillExp));
     }
 
@@ -1833,12 +1833,12 @@ public abstract class BaseMapController implements Initializable, SceneControlle
             configureImageButton(controllerField("btnfarmingplus1", ImageView.class), canIncreaseSkill("farming"), skillAllocationMode, 1.0);
             configureImageButton(controllerField("btngatheringplus1", ImageView.class), canIncreaseSkill("gathering"), skillAllocationMode, 1.0);
             configureImageButton(controllerField("btncraftingplus1", ImageView.class), canIncreaseSkill("crafting"), skillAllocationMode, 1.0);
-            configureImageButton(controllerField("btnfishingplus1", ImageView.class), canIncreaseSkill("fishing"), skillAllocationMode, 1.0);
+            configureImageButton(controllerField("btncombatplus1", ImageView.class), canIncreaseSkill("combat"), skillAllocationMode, 1.0);
             configureImageButton(controllerField("btncookingplus1", ImageView.class), canIncreaseSkill("cooking"), skillAllocationMode, 1.0);
             configureImageButton(controllerField("btnfarmingminus1", ImageView.class), skillAllocationMode && pendingFarmingSkillExp > 0, skillAllocationMode, 1.0);
             configureImageButton(controllerField("btngatheringminus1", ImageView.class), skillAllocationMode && pendingGatheringSkillExp > 0, skillAllocationMode, 1.0);
             configureImageButton(controllerField("btncraftingminus1", ImageView.class), skillAllocationMode && pendingCraftingSkillExp > 0, skillAllocationMode, 1.0);
-            configureImageButton(controllerField("btnfishingminus1", ImageView.class), skillAllocationMode && pendingFishingSkillExp > 0, skillAllocationMode, 1.0);
+            configureImageButton(controllerField("btncombatminus1", ImageView.class), skillAllocationMode && pendingCombatSkillExp > 0, skillAllocationMode, 1.0);
             configureImageButton(controllerField("btncookingminus1", ImageView.class), skillAllocationMode && pendingCookingSkillExp > 0, skillAllocationMode, 1.0);
             disableStatusButtons();
             return;
@@ -1881,12 +1881,12 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         configureImageButton(controllerField("btnfarmingplus1", ImageView.class), false, false, 1.0);
         configureImageButton(controllerField("btngatheringplus1", ImageView.class), false, false, 1.0);
         configureImageButton(controllerField("btncraftingplus1", ImageView.class), false, false, 1.0);
-        configureImageButton(controllerField("btnfishingplus1", ImageView.class), false, false, 1.0);
+        configureImageButton(controllerField("btncombatplus1", ImageView.class), false, false, 1.0);
         configureImageButton(controllerField("btncookingplus1", ImageView.class), false, false, 1.0);
         configureImageButton(controllerField("btnfarmingminus1", ImageView.class), false, false, 1.0);
         configureImageButton(controllerField("btngatheringminus1", ImageView.class), false, false, 1.0);
         configureImageButton(controllerField("btncraftingminus1", ImageView.class), false, false, 1.0);
-        configureImageButton(controllerField("btnfishingminus1", ImageView.class), false, false, 1.0);
+        configureImageButton(controllerField("btncombatminus1", ImageView.class), false, false, 1.0);
         configureImageButton(controllerField("btncookingminus1", ImageView.class), false, false, 1.0);
     }
 
@@ -2119,31 +2119,31 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     }
 
     private void setupDayNightBindingIfConfigured() {
+        ImageView background = bg != null ? bg : controllerField("bg", ImageView.class);
+        if (background == null) return;
+
         String dayPath = dayBackgroundPath();
+        if (dayPath == null || dayPath.isBlank()) return;
+
         String nightPath = nightBackgroundPath();
-        if (bg == null || dayPath == null || nightPath == null) return;
 
         dayBg = loadImageOrNull(dayPath);
         nightBg = loadImageOrNull(nightPath);
-
-        if (dayBg != null && bg.getImage() == null) {
-            bg.setImage(dayBg);
-        }
+        if (dayBg == null) return;
 
         GameTimeManager time = GameTimeManager.get();
         nightListener = (obs, wasNight, isNight) -> {
-            if (bg == null) return;
             if (isNight) {
-                if (nightBg != null) bg.setImage(nightBg);
-            } else {
-                if (dayBg != null) bg.setImage(dayBg);
+                background.setImage(nightBg != null ? nightBg : dayBg);
+                return;
             }
+            background.setImage(dayBg);
         };
 
         time.nightProperty().addListener(nightListener);
         nightListener.changed(time.nightProperty(), !time.isNight(), time.isNight());
 
-        bg.sceneProperty().addListener((o, oldScene, newScene) -> {
+        background.sceneProperty().addListener((o, oldScene, newScene) -> {
             if (newScene == null && nightListener != null) {
                 time.nightProperty().removeListener(nightListener);
                 nightListener = null;
@@ -2187,6 +2187,9 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     }
 
     protected Image loadImageOrNull(String path) {
+        if (path == null || path.isBlank()) {
+            return null;
+        }
         var url = getClass().getResource(path);
         if (url == null) {
             System.err.println("[BaseMapController] Missing resource: " + path);

@@ -190,7 +190,7 @@ public class LoadGameService {
 
     private void loadPlayerSkills(Connection con, GameState gs, int saveId) throws Exception {
         String sql = """
-            SELECT skill_type_id, skill_level
+            SELECT skill_type_id, skill_level, skill_carry
             FROM player_skills
             WHERE saved_id = ?
             """;
@@ -205,13 +205,16 @@ public class LoadGameService {
                 while (rs.next()) {
                     int skillTypeId = rs.getInt("skill_type_id");
                     int skillLevel = rs.getInt("skill_level");
+                    double skillCarry = rs.getDouble("skill_carry");
 
                     switch (skillTypeId) {
                         case 1 -> skills.setFarmingExp(skillLevel);
-                        case 2 -> skills.setGatheringExp(skillLevel);
+                        case 2 -> {
+                            skills.setGatheringExp(skillLevel);
+                            skills.setGatheringExpCarry(skillCarry);
+                        }
                         case 3 -> skills.setCraftingExp(skillLevel);
-                        case 4 -> skills.setFishingExp(skillLevel);
-                        case 5 -> skills.setBattlingExp(skillLevel);
+                        case 4 -> skills.setCombatExp(skillLevel);
                         case 6 -> skills.setCookingExp(skillLevel);
                     }
                 }

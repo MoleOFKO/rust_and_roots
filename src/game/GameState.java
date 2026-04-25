@@ -141,14 +141,68 @@ public final class GameState {
         return Math.max(0, total);
     }
 
-    public void addFarmingSkillExp(int amount) { playerSkills.addFarmingExp(amount); }
-    public void addGatheringSkillExp(int amount) { playerSkills.addGatheringExp(amount); }
+    public void addFarmingSkillExp(int amount) { addSimpleSkillExp(SimpleSkill.FARMING, amount); }
+    public void addGatheringSkillExp(int amount) { addSimpleSkillExp(SimpleSkill.GATHERING, amount); }
     public void addCraftingSkillExp(int amount) { addRecipeSkillExp(RecipeCatalog.Domain.CRAFTING, amount); }
-    public void addFishingSkillExp(int amount) { playerSkills.addFishingExp(amount); }
-    public void addBattlingSkillExp(int amount) { playerSkills.addBattlingExp(amount); }
+    public void addCombatSkillExp(int amount) { addSimpleSkillExp(SimpleSkill.COMBAT, amount); }
     public void addCookingSkillExp(int amount) { addRecipeSkillExp(RecipeCatalog.Domain.COOKING, amount); }
 
+    public void addGatheringExpFromCollectedItems(int itemCount) {
+        if (itemCount <= 0) {
+            return;
+        }
+        double fractional = Math.max(0.0, itemCount) * 0.1;
+        int wholeExpToApply = playerSkills.consumeGatheringFractionalExp(fractional);
+        if (wholeExpToApply > 0) {
+            addGatheringSkillExp(wholeExpToApply);
+        }
+    }
+
+    private enum SimpleSkill {
+        FARMING,
+        GATHERING,
+        COMBAT
+    }
+
+    private void addSimpleSkillExp(SimpleSkill skill, int amount) {
+        if (amount <= 0 || playerState == null) {
+            return;
+        }
+
+        SimpleSkill safeSkill = skill == null ? SimpleSkill.FARMING : skill;
+
+        int storedTotal = switch (safeSkill) {
+            case FARMING -> playerSkills.getFarmingExp();
+            case GATHERING -> playerSkills.getGatheringExp();
+            case COMBAT -> playerSkills.getCombatExp();
+        };
+
+        int currentTotal = Math.min(storedTotal, maxSkillTotalExp);
+        if (currentTotal != storedTotal) {
+            switch (safeSkill) {
+                case FARMING -> playerSkills.setFarmingExp(currentTotal);
+                case GATHERING -> playerSkills.setGatheringExp(currentTotal);
+                case COMBAT -> playerSkills.setCombatExp(currentTotal);
+            }
+        }
+
+        long candidate = (long) currentTotal + (long) amount;
+        int capped = (int) Math.min(candidate, (long) maxSkillTotalExp);
+        int overflow = (int) Math.max(0L, candidate - (long) capped);
+
+        switch (safeSkill) {
+            case FARMING -> playerSkills.setFarmingExp(capped);
+            case GATHERING -> playerSkills.setGatheringExp(capped);
+            case COMBAT -> playerSkills.setCombatExp(capped);
+        }
+
+        if (overflow > 0) {
+            playerState.addExp(overflow);
+        }
+    }
+
     public void ensureAutomaticRecipeUnlocks() {
+        ensureBaselineCraftRecipesUnlocked();
         ensureCookingRecipeUnlocksThroughLevel(playerSkills.getCookingLevel());
         ensureCraftingRecipeUnlocksThroughLevel(playerSkills.getCraftingLevel());
     }
@@ -157,6 +211,7 @@ public final class GameState {
         ItemDatabase.loadItems();
         unlockRecipeIfDefinitionValid("rope");
         unlockRecipeIfDefinitionValid("stick");
+        unlockRecipeIfDefinitionValid("water_bottle");
     }
 
     private void unlockRecipeIfDefinitionValid(String recipeKey) {
@@ -446,17 +501,18 @@ public final class GameState {
         private int farmingExp;
         private int gatheringExp;
         private int craftingExp;
-        private int fishingExp;
-        private int battlingExp;
+        private int combatExp;
         private int cookingExp;
+
+        private double gatheringExpCarry = 0.0;
 
         public void clear() {
             farmingExp = 0;
             gatheringExp = 0;
             craftingExp = 0;
-            fishingExp = 0;
-            battlingExp = 0;
+            combatExp = 0;
             cookingExp = 0;
+            gatheringExpCarry = 0.0;
         }
 
         public int getFarmingExp() { return Math.max(0, farmingExp); }
@@ -466,18 +522,38 @@ public final class GameState {
         public int getGatheringExp() { return Math.max(0, gatheringExp); }
         public void setGatheringExp(int value) { gatheringExp = Math.max(0, value); }
         public void addGatheringExp(int value) { if (value > 0) gatheringExp += value; }
+        public double getGatheringExpCarry() { return gatheringExpCarry; }
+        public void setGatheringExpCarry(double value) {
+            if (!Double.isFinite(value)) {
+                gatheringExpCarry = 0.0;
+                return;
+            }
+            gatheringExpCarry = Math.max(0.0, Math.min(0.999, value));
+        }
+
+        private int consumeGatheringFractionalExp(double expToAdd) {
+            double safe = Double.isFinite(expToAdd) ? Math.max(0.0, expToAdd) : 0.0;
+            if (safe <= 0.0) {
+                return 0;
+            }
+
+            gatheringExpCarry += safe;
+            int whole = (int) Math.floor(gatheringExpCarry + 1e-9);
+            if (whole <= 0) {
+                return 0;
+            }
+
+            gatheringExpCarry = Math.max(0.0, gatheringExpCarry - whole);
+            return whole;
+        }
 
         public int getCraftingExp() { return Math.max(0, craftingExp); }
         public void setCraftingExp(int value) { craftingExp = Math.max(0, value); }
         public void addCraftingExp(int value) { if (value > 0) craftingExp += value; }
 
-        public int getFishingExp() { return Math.max(0, fishingExp); }
-        public void setFishingExp(int value) { fishingExp = Math.max(0, value); }
-        public void addFishingExp(int value) { if (value > 0) fishingExp += value; }
-
-        public int getBattlingExp() { return Math.max(0, battlingExp); }
-        public void setBattlingExp(int value) { battlingExp = Math.max(0, value); }
-        public void addBattlingExp(int value) { if (value > 0) battlingExp += value; }
+        public int getCombatExp() { return Math.max(0, combatExp); }
+        public void setCombatExp(int value) { combatExp = Math.max(0, value); }
+        public void addCombatExp(int value) { if (value > 0) combatExp += value; }
 
         public int getCookingExp() { return Math.max(0, cookingExp); }
         public void setCookingExp(int value) { cookingExp = Math.max(0, value); }
@@ -520,25 +596,36 @@ public final class GameState {
         public int getFarmingLevel() { return getLevelFromTotalExp(getFarmingExp()); }
         public int getGatheringLevel() { return getLevelFromTotalExp(getGatheringExp()); }
         public int getCraftingLevel() { return getLevelFromTotalExp(getCraftingExp()); }
-        public int getFishingLevel() { return getLevelFromTotalExp(getFishingExp()); }
-        public int getBattlingLevel() { return getLevelFromTotalExp(getBattlingExp()); }
+        public int getCombatLevel() { return getLevelFromTotalExp(getCombatExp()); }
         public int getCookingLevel() { return getLevelFromTotalExp(getCookingExp()); }
 
-        public String getFarmingDisplay() { return buildDisplay("Farming", getFarmingExp()); }
-        public String getGatheringDisplay() { return buildDisplay("Gathering", getGatheringExp()); }
-        public String getCraftingDisplay() { return buildDisplay("Crafting", getCraftingExp()); }
-        public String getFishingDisplay() { return buildDisplay("Fishing", getFishingExp()); }
-        public String getBattlingDisplay() { return buildDisplay("Battling", getBattlingExp()); }
-        public String getCookingDisplay() { return buildDisplay("Cooking", getCookingExp()); }
+        public String getFarmingDisplay() { return buildDisplay("Farming", getFarmingExp(), 0.0); }
+        public String getGatheringDisplay() { return buildDisplay("Gathering", getGatheringExp(), gatheringExpCarry); }
+        public String getCraftingDisplay() { return buildDisplay("Crafting", getCraftingExp(), 0.0); }
+        public String getCombatDisplay() { return buildDisplay("Combat", getCombatExp(), 0.0); }
+        public String getCookingDisplay() { return buildDisplay("Cooking", getCookingExp(), 0.0); }
 
-        private String buildDisplay(String name, int totalExp) {
+        private String buildDisplay(String name, int totalExp, double progressCarry) {
             int level = getLevelFromTotalExp(totalExp);
             if (level >= MAX_LEVEL) {
-                return name + " : " + level + "(MAX)";
+                int lastReq = getRequiredExpToAdvanceFrom(MAX_LEVEL - 1);
+                return name + " : level" + MAX_LEVEL + " (" + lastReq + "/" + lastReq + ")";
             }
-            int progress = getProgressFromTotalExp(totalExp);
+
+            double safeCarry = Double.isFinite(progressCarry) ? Math.max(0.0, Math.min(0.999, progressCarry)) : 0.0;
+            int progressBase = getProgressFromTotalExp(totalExp);
             int required = getRequiredExpToNextLevelFromTotalExp(totalExp);
-            return name + " : " + level + "(" + progress + "/" + required + ")";
+            double progress = progressBase + safeCarry;
+            return name + " : level" + level + " (" + formatExp(progress) + "/" + required + ")";
+        }
+
+        private String formatExp(double value) {
+            double safe = Double.isFinite(value) ? Math.max(0.0, value) : 0.0;
+            double rounded = Math.round(safe * 10.0) / 10.0;
+            if (Math.abs(rounded - Math.rint(rounded)) < 1e-9) {
+                return Integer.toString((int) Math.rint(rounded));
+            }
+            return Double.toString(rounded);
         }
 
         private int getRequiredExpToAdvanceFrom(int currentLevel) {

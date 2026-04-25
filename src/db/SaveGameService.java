@@ -195,22 +195,22 @@ public class SaveGameService {
             del.executeUpdate();
         }
 
-        String sql = "INSERT INTO player_skills (saved_id, skill_type_id, skill_level) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO player_skills (saved_id, skill_type_id, skill_level, skill_carry) VALUES (?, ?, ?, ?)";
         try (PreparedStatement ps = con.prepareStatement(sql)) {
-            insertSkill(ps, saveId, 1, skills.getFarmingExp());
-            insertSkill(ps, saveId, 2, skills.getGatheringExp());
-            insertSkill(ps, saveId, 3, skills.getCraftingExp());
-            insertSkill(ps, saveId, 4, skills.getFishingExp());
-            insertSkill(ps, saveId, 5, skills.getBattlingExp());
-            insertSkill(ps, saveId, 6, skills.getCookingExp());
+            insertSkill(ps, saveId, 1, skills.getFarmingExp(), 0.0);
+            insertSkill(ps, saveId, 2, skills.getGatheringExp(), skills.getGatheringExpCarry());
+            insertSkill(ps, saveId, 3, skills.getCraftingExp(), 0.0);
+            insertSkill(ps, saveId, 4, skills.getCombatExp(), 0.0);
+            insertSkill(ps, saveId, 6, skills.getCookingExp(), 0.0);
             ps.executeBatch();
         }
     }
 
-    private void insertSkill(PreparedStatement ps, int saveId, int skillTypeId, int skillLevel) throws Exception {
+    private void insertSkill(PreparedStatement ps, int saveId, int skillTypeId, int skillLevel, double skillCarry) throws Exception {
         ps.setInt(1, saveId);
         ps.setInt(2, skillTypeId);
         ps.setInt(3, skillLevel);
+        ps.setDouble(4, Double.isFinite(skillCarry) ? Math.max(0.0, Math.min(0.999, skillCarry)) : 0.0);
         ps.addBatch();
     }
     

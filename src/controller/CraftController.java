@@ -27,6 +27,7 @@ import model.RecipeCatalog;
 import model.item;
 import util.AppDialogs;
 import util.SceneManager;
+import util.SkillModifiers;
 import util.SpawnTag;
 
 public class CraftController implements Initializable, SceneController {
@@ -357,7 +358,12 @@ public class CraftController implements Initializable, SceneController {
 
     private int computeSuccessRate(Recipe recipe) {
         if (recipe == null || gameState == null) return 0;
-        return ProcessingRules.computeAdjustedSuccessRate(recipe.baseSuccessRate, recipe.dexScaling, gameState.getPlayerState().getDex());
+        int base = ProcessingRules.computeAdjustedSuccessRate(recipe.baseSuccessRate, recipe.dexScaling, gameState.getPlayerState().getDex());
+        GameState.PlayerSkills skills = gameState.getPlayerSkills();
+        int craftingLevel = (skills == null) ? 0 : Math.max(0, skills.getCraftingLevel());
+        int comboSize = (recipe.ingredients == null) ? 1 : recipe.ingredients.size();
+        int bonus = SkillModifiers.craftingSuccessBonusPercent(craftingLevel, comboSize);
+        return Math.max(0, base + bonus);
     }
 
     private int getAdjustedWaitSeconds(Recipe recipe) {
@@ -437,7 +443,9 @@ public class CraftController implements Initializable, SceneController {
         int sign = success ? 1 : -1;
         double now = GameTimeManager.get().totalSecondsProperty().get();
         gameState.startCraftingJob(selectedRecipe.outputItemId, outputQty, now + getAdjustedWaitSeconds(selectedRecipe), sign * getRecipeHpDelta(selectedRecipe), sign * getRecipeStaminaDelta(selectedRecipe), success);
-        gameState.addCraftingSkillExp(ProcessingRules.computeSkillExp(selectedRecipe.ingredients.size(), success));
+        if (outputQty > 0) {
+            gameState.addCraftingSkillExp(outputQty);
+        }
         updateIngredientViews();
         updateCraftingStateUi();
     }

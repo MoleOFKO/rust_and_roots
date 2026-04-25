@@ -63,6 +63,19 @@ import javafx.scene.control.ProgressBar;
  */
 public class Home_interiorController extends BaseMapController {
 
+    private static final String DAY_BG_PATH = "/image/inhousedesign.png";
+    private static final String NIGHT_BG_PATH = "";
+
+    @Override
+    protected String dayBackgroundPath() {
+        return DAY_BG_PATH;
+    }
+
+    @Override
+    protected String nightBackgroundPath() {
+        return NIGHT_BG_PATH;
+    }
+
     @FXML
     private Group walls;
     @FXML
@@ -810,7 +823,7 @@ public class Home_interiorController extends BaseMapController {
     @FXML
     private Label crafting;
     @FXML
-    private Label fishing;
+    private Label combat;
     @FXML
     private Label cooking;
     @FXML
@@ -822,7 +835,7 @@ public class Home_interiorController extends BaseMapController {
     @FXML
     private ImageView btncraftingminus1;
     @FXML
-    private ImageView btnfishingminus1;
+    private ImageView btncombatminus1;
     @FXML
     private ImageView btncookingminus1;
     @FXML
@@ -830,7 +843,7 @@ public class Home_interiorController extends BaseMapController {
     @FXML
     private ImageView btncraftingplus1;
     @FXML
-    private ImageView btnfishingplus1;
+    private ImageView btncombatplus1;
     @FXML
     private ImageView btncookingplus1;
     @FXML
@@ -983,7 +996,7 @@ public class Home_interiorController extends BaseMapController {
         if (farming != null) farming.setText(appendPendingSkillCost(skills.getFarmingDisplay(), pendingFarmingSkillExp));
         if (gathering != null) gathering.setText(appendPendingSkillCost(skills.getGatheringDisplay(), pendingGatheringSkillExp));
         if (crafting != null) crafting.setText(appendPendingSkillCost(skills.getCraftingDisplay(), pendingCraftingSkillExp));
-        if (fishing != null) fishing.setText(appendPendingSkillCost(skills.getFishingDisplay(), pendingFishingSkillExp));
+        if (combat != null) combat.setText(appendPendingSkillCost(skills.getCombatDisplay(), pendingCombatSkillExp));
         if (cooking != null) cooking.setText(appendPendingSkillCost(skills.getCookingDisplay(), pendingCookingSkillExp));
     }
 
@@ -999,13 +1012,13 @@ public class Home_interiorController extends BaseMapController {
             configureImageButton(btnfarmingplus1, canIncreaseSkill("farming"), skillAllocationMode, 1.0);
             configureImageButton(btngatheringplus1, canIncreaseSkill("gathering"), skillAllocationMode, 1.0);
             configureImageButton(btncraftingplus1, canIncreaseSkill("crafting"), skillAllocationMode, 1.0);
-            configureImageButton(btnfishingplus1, canIncreaseSkill("fishing"), skillAllocationMode, 1.0);
+            configureImageButton(btncombatplus1, canIncreaseSkill("combat"), skillAllocationMode, 1.0);
             configureImageButton(btncookingplus1, canIncreaseSkill("cooking"), skillAllocationMode, 1.0);
 
             configureImageButton(btnfarmingminus1, skillAllocationMode && pendingFarmingSkillExp > 0, skillAllocationMode, 1.0);
             configureImageButton(btngatheringminus1, skillAllocationMode && pendingGatheringSkillExp > 0, skillAllocationMode, 1.0);
             configureImageButton(btncraftingminus1, skillAllocationMode && pendingCraftingSkillExp > 0, skillAllocationMode, 1.0);
-            configureImageButton(btnfishingminus1, skillAllocationMode && pendingFishingSkillExp > 0, skillAllocationMode, 1.0);
+            configureImageButton(btncombatminus1, skillAllocationMode && pendingCombatSkillExp > 0, skillAllocationMode, 1.0);
             configureImageButton(btncookingminus1, skillAllocationMode && pendingCookingSkillExp > 0, skillAllocationMode, 1.0);
 
             configureImageButton(btnHPplus, false, false, 1.0);
@@ -1043,12 +1056,12 @@ public class Home_interiorController extends BaseMapController {
             configureImageButton(btnfarmingplus1, false, false, 1.0);
             configureImageButton(btngatheringplus1, false, false, 1.0);
             configureImageButton(btncraftingplus1, false, false, 1.0);
-            configureImageButton(btnfishingplus1, false, false, 1.0);
+            configureImageButton(btncombatplus1, false, false, 1.0);
             configureImageButton(btncookingplus1, false, false, 1.0);
             configureImageButton(btnfarmingminus1, false, false, 1.0);
             configureImageButton(btngatheringminus1, false, false, 1.0);
             configureImageButton(btncraftingminus1, false, false, 1.0);
-            configureImageButton(btnfishingminus1, false, false, 1.0);
+            configureImageButton(btncombatminus1, false, false, 1.0);
             configureImageButton(btncookingminus1, false, false, 1.0);
         }
     }

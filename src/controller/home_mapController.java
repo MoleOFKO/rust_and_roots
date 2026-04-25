@@ -39,7 +39,7 @@ public class home_mapController extends BaseMapController {
     private InteractionZone merchantZone;
 
     private static final String DAY_BG_PATH = "/image/maps/home_map_withoutshop.png";
-    private static final String NIGHT_BG_PATH = "/image/homemapuse_night.png";
+    private static final String NIGHT_BG_PATH = "/image/NightMap/home_map_night.png";
 
     @FXML private Rectangle merchantdetect;
     @FXML private ImageView merchantImage;
@@ -92,17 +92,17 @@ public class home_mapController extends BaseMapController {
     @FXML private Label farming;
     @FXML private Label gathering;
     @FXML private Label crafting;
-    @FXML private Label fishing;
+    @FXML private Label combat;
     @FXML private Label cooking;
     @FXML private ImageView btnfarmingminus1;
     @FXML private ImageView btnfarmingplus1;
     @FXML private ImageView btngatheringminus1;
     @FXML private ImageView btncraftingminus1;
-    @FXML private ImageView btnfishingminus1;
+    @FXML private ImageView btncombatminus1;
     @FXML private ImageView btncookingminus1;
     @FXML private ImageView btngatheringplus1;
     @FXML private ImageView btncraftingplus1;
-    @FXML private ImageView btnfishingplus1;
+    @FXML private ImageView btncombatplus1;
     @FXML private ImageView btncookingplus1;
     @FXML
     private StackPane view;

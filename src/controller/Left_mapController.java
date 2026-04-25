@@ -39,6 +39,7 @@ import model.item;
 import util.AppDialogs;
 import util.CombatRules;
 import util.SceneManager;
+import util.SkillModifiers;
 import util.SpawnTag;
 /**
  * FXML Controller class
@@ -46,6 +47,19 @@ import util.SpawnTag;
  * @author MITUSER-1
  */
 public class Left_mapController extends BaseMapController {
+
+    private static final String DAY_BG_PATH = "/image/maps/leftmap.png";
+    private static final String NIGHT_BG_PATH = "/image/NightMap/leftmapnight.png";
+
+    @Override
+    protected String dayBackgroundPath() {
+        return DAY_BG_PATH;
+    }
+
+    @Override
+    protected String nightBackgroundPath() {
+        return NIGHT_BG_PATH;
+    }
 
     private static final String MAIN_TREE_ID = "tree";
     private static final String MAIN_STONE_ID = "stone";
@@ -390,7 +404,7 @@ public class Left_mapController extends BaseMapController {
     @FXML
     private Label crafting;
     @FXML
-    private Label fishing;
+    private Label combat;
     @FXML
     private Label cooking;
     @FXML
@@ -402,7 +416,7 @@ public class Left_mapController extends BaseMapController {
     @FXML
     private ImageView btncraftingminus1;
     @FXML
-    private ImageView btnfishingminus1;
+    private ImageView btncombatminus1;
     @FXML
     private ImageView btncookingminus1;
     @FXML
@@ -410,7 +424,7 @@ public class Left_mapController extends BaseMapController {
     @FXML
     private ImageView btncraftingplus1;
     @FXML
-    private ImageView btnfishingplus1;
+    private ImageView btncombatplus1;
     @FXML
     private ImageView btncookingplus1;
     @FXML
@@ -1036,6 +1050,14 @@ public class Left_mapController extends BaseMapController {
         if (resource.currentStage != 2 && resource.currentStage != 3) return;
         if (hpLost <= 0) return;
 
+        int gatheringLevel = 0;
+        if (gameState != null && gameState.getPlayerSkills() != null) {
+            gatheringLevel = Math.max(0, gameState.getPlayerSkills().getGatheringLevel());
+        }
+        int commonBonus = SkillModifiers.gatheringCommonBonusPercent(gatheringLevel);
+        int uncommonBonus = SkillModifiers.gatheringUncommonBonusPercent(gatheringLevel);
+        double adjustedUncommonChancePercent = Math.max(0.0, Math.min(100.0, uncommonDropChancePercent + uncommonBonus));
+
         int remainderBefore = Math.max(0, resource.damageSinceLastDropRoll);
         int hpAfterCall = Math.max(0, resource.hp);
         int hpBeforeCall = hpAfterCall + hpLost;
@@ -1058,17 +1080,18 @@ public class Left_mapController extends BaseMapController {
 
             if (hpAfterChunk < 20) {
                 trySpawnTreeDrop(resource, commonDropItemId, nowSeconds);
+                trySpawnGatheringCommonBonusDrop(resource, commonDropItemId, nowSeconds, commonBonus);
                 if (uncommonDropItemId > 0
-                    && uncommonDropChancePercent > 0.0
-                    && ThreadLocalRandom.current().nextDouble(100.0) < uncommonDropChancePercent) {
+                    && adjustedUncommonChancePercent > 0.0
+                    && ThreadLocalRandom.current().nextDouble(100.0) < adjustedUncommonChancePercent) {
                     trySpawnTreeDrop(resource, uncommonDropItemId, nowSeconds);
                 }
                 continue;
             }
 
             if (uncommonDropItemId > 0
-                && uncommonDropChancePercent > 0.0
-                && ThreadLocalRandom.current().nextDouble(100.0) < uncommonDropChancePercent) {
+                && adjustedUncommonChancePercent > 0.0
+                && ThreadLocalRandom.current().nextDouble(100.0) < adjustedUncommonChancePercent) {
                 trySpawnTreeDrop(resource, uncommonDropItemId, nowSeconds);
             }
 
@@ -1105,12 +1128,14 @@ public class Left_mapController extends BaseMapController {
         int logId = resolveTreeLogItemId();
         if (tree.currentStage == 2) {
             trySpawnTreeDrop(tree, logId, nowSeconds);
+            trySpawnGatheringCommonBonusDrop(tree, logId, nowSeconds, SkillModifiers.gatheringCommonBonusPercent(getGatheringLevel()));
             return;
         }
 
         int fruitId = resolveFruitItemIdForTypeKey(tree.typeKey);
         int chosen = chooseValidTreeDropItemId(logId, fruitId);
         trySpawnTreeDrop(tree, chosen, nowSeconds);
+        trySpawnGatheringCommonBonusDrop(tree, chosen, nowSeconds, SkillModifiers.gatheringCommonBonusPercent(getGatheringLevel()));
     }
 
     private void spawnAliveStoneDropForStage(TreeMapState.TreeData stone, double nowSeconds) {
@@ -1119,6 +1144,7 @@ public class Left_mapController extends BaseMapController {
 
         int stoneId = resolveStoneItemId();
         trySpawnTreeDrop(stone, stoneId, nowSeconds);
+        trySpawnGatheringCommonBonusDrop(stone, stoneId, nowSeconds, SkillModifiers.gatheringCommonBonusPercent(getGatheringLevel()));
     }
 
     private void applyGuaranteedDeathDrops(TreeMapState.TreeData tree, int stageAtDeath, double nowSeconds) {
@@ -1127,16 +1153,20 @@ public class Left_mapController extends BaseMapController {
         int logId = resolveTreeLogItemId();
         int fruitId = resolveFruitItemIdForTypeKey(tree.typeKey);
         int fiberId = resolvePlantFiberItemId();
+        int commonBonus = SkillModifiers.gatheringCommonBonusPercent(getGatheringLevel());
 
         if (stageAtDeath == 2) {
             trySpawnTreeDrop(tree, logId, nowSeconds);
+            trySpawnGatheringCommonBonusDrop(tree, logId, nowSeconds, commonBonus);
             trySpawnPlantFiberDrop(tree, fiberId, nowSeconds);
             return;
         }
 
         if (stageAtDeath == 3) {
             trySpawnTreeDrop(tree, logId, nowSeconds);
+            trySpawnGatheringCommonBonusDrop(tree, logId, nowSeconds, commonBonus);
             trySpawnTreeDrop(tree, fruitId, nowSeconds);
+            trySpawnGatheringCommonBonusDrop(tree, fruitId, nowSeconds, commonBonus);
             trySpawnPlantFiberDrop(tree, fiberId, nowSeconds);
         }
     }
@@ -1146,8 +1176,14 @@ public class Left_mapController extends BaseMapController {
 
         int stoneId = resolveStoneItemId();
         int sandId = resolveSandItemId();
-        int chosen = chooseStoneDropItemId(stoneId, sandId);
-        trySpawnTreeDrop(stone, chosen, nowSeconds);
+        trySpawnTreeDrop(stone, stoneId, nowSeconds);
+        trySpawnGatheringCommonBonusDrop(stone, stoneId, nowSeconds, SkillModifiers.gatheringCommonBonusPercent(getGatheringLevel()));
+
+        int gatheringLevel = getGatheringLevel();
+        double sandChance = 49.0 + SkillModifiers.gatheringUncommonBonusPercent(gatheringLevel);
+        if (sandId > 0 && sandChance > 0.0 && ThreadLocalRandom.current().nextDouble(100.0) < Math.min(100.0, sandChance)) {
+            trySpawnTreeDrop(stone, sandId, nowSeconds);
+        }
     }
 
     private boolean canSpawnAliveDrop(TreeMapState.TreeData tree) {
@@ -1272,7 +1308,7 @@ public class Left_mapController extends BaseMapController {
 
     private int resolveStoneItemId() {
         if (stoneItemId > 0) return stoneItemId;
-        stoneItemId = resolveItemId("stone");
+        stoneItemId = resolveItemId("stone_drop_item");
         return stoneItemId;
     }
 
@@ -1290,15 +1326,31 @@ public class Left_mapController extends BaseMapController {
 
     private double computePlantFiberDropChancePercent(TreeMapState.TreeData tree) {
         int playerDex = Math.max(0, playerState == null ? 0 : playerState.getDex());
-        int gatheringLevel = 0;
-        if (gameState != null && gameState.getPlayerSkills() != null) {
-            gatheringLevel = Math.max(0, gameState.getPlayerSkills().getGatheringLevel());
-        }
+        int gatheringLevel = getGatheringLevel();
 
         int stage = tree == null ? 0 : tree.currentStage;
         double base = stage >= 3 ? 12.0 : 9.0;
-        double chance = base + (playerDex * 0.20) + (gatheringLevel * 0.75);
+        double chance = base
+            + (playerDex * 0.20)
+            + SkillModifiers.gatheringUncommonBonusPercent(gatheringLevel)
+            + SkillModifiers.gatheringRareBonusPercent(gatheringLevel);
         return Math.max(0.0, Math.min(35.0, chance));
+    }
+
+    private int getGatheringLevel() {
+        if (gameState == null || gameState.getPlayerSkills() == null) {
+            return 0;
+        }
+        return Math.max(0, gameState.getPlayerSkills().getGatheringLevel());
+    }
+
+    private void trySpawnGatheringCommonBonusDrop(TreeMapState.TreeData resource, int itemId, double nowSeconds, int bonusPercent) {
+        if (resource == null || itemId <= 0) return;
+        int chance = Math.max(0, Math.min(100, bonusPercent));
+        if (chance <= 0) return;
+        if (ThreadLocalRandom.current().nextDouble(100.0) < chance) {
+            trySpawnTreeDrop(resource, itemId, nowSeconds);
+        }
     }
 
     private int resolveFruitItemIdForTypeKey(String typeKey) {
@@ -1357,6 +1409,10 @@ public class Left_mapController extends BaseMapController {
                     warnedInventoryFull = true;
                 }
                 break;
+            }
+
+            if (gameState != null) {
+                gameState.addGatheringExpFromCollectedItems(drop.quantity);
             }
 
             it.remove();
@@ -1546,6 +1602,9 @@ public class Left_mapController extends BaseMapController {
 
         tree_img.setManaged(true);
         tree_img.setVisible(true);
+        if (tree_hitbox != null) {
+            tree_hitbox.setDisable(mainTreeData.currentStage == 1);
+        }
 
         if (mainTreeData.currentStage == 1) {
             tree_img.setImage(null);
@@ -1712,6 +1771,9 @@ public class Left_mapController extends BaseMapController {
 
         stone_img.setManaged(true);
         stone_img.setVisible(true);
+        if (stone_hitbox != null) {
+            stone_hitbox.setDisable(mainStoneData.currentStage == 1);
+        }
 
         if (mainStoneData.currentStage == 1) {
             stone_img.setImage(null);
@@ -1899,7 +1961,7 @@ public class Left_mapController extends BaseMapController {
         if (farming != null) farming.setText(appendPendingSkillCost(skills.getFarmingDisplay(), pendingFarmingSkillExp));
         if (gathering != null) gathering.setText(appendPendingSkillCost(skills.getGatheringDisplay(), pendingGatheringSkillExp));
         if (crafting != null) crafting.setText(appendPendingSkillCost(skills.getCraftingDisplay(), pendingCraftingSkillExp));
-        if (fishing != null) fishing.setText(appendPendingSkillCost(skills.getFishingDisplay(), pendingFishingSkillExp));
+        if (combat != null) combat.setText(appendPendingSkillCost(skills.getCombatDisplay(), pendingCombatSkillExp));
         if (cooking != null) cooking.setText(appendPendingSkillCost(skills.getCookingDisplay(), pendingCookingSkillExp));
     }
 
@@ -1915,13 +1977,13 @@ public class Left_mapController extends BaseMapController {
             configureImageButton(btnfarmingplus1, canIncreaseSkill("farming"), skillAllocationMode, 1.0);
             configureImageButton(btngatheringplus1, canIncreaseSkill("gathering"), skillAllocationMode, 1.0);
             configureImageButton(btncraftingplus1, canIncreaseSkill("crafting"), skillAllocationMode, 1.0);
-            configureImageButton(btnfishingplus1, canIncreaseSkill("fishing"), skillAllocationMode, 1.0);
+            configureImageButton(btncombatplus1, canIncreaseSkill("combat"), skillAllocationMode, 1.0);
             configureImageButton(btncookingplus1, canIncreaseSkill("cooking"), skillAllocationMode, 1.0);
 
             configureImageButton(btnfarmingminus1, skillAllocationMode && pendingFarmingSkillExp > 0, skillAllocationMode, 1.0);
             configureImageButton(btngatheringminus1, skillAllocationMode && pendingGatheringSkillExp > 0, skillAllocationMode, 1.0);
             configureImageButton(btncraftingminus1, skillAllocationMode && pendingCraftingSkillExp > 0, skillAllocationMode, 1.0);
-            configureImageButton(btnfishingminus1, skillAllocationMode && pendingFishingSkillExp > 0, skillAllocationMode, 1.0);
+            configureImageButton(btncombatminus1, skillAllocationMode && pendingCombatSkillExp > 0, skillAllocationMode, 1.0);
             configureImageButton(btncookingminus1, skillAllocationMode && pendingCookingSkillExp > 0, skillAllocationMode, 1.0);
 
             configureImageButton(btnHPplus, false, false, 1.0);
@@ -1959,12 +2021,12 @@ public class Left_mapController extends BaseMapController {
             configureImageButton(btnfarmingplus1, false, false, 1.0);
             configureImageButton(btngatheringplus1, false, false, 1.0);
             configureImageButton(btncraftingplus1, false, false, 1.0);
-            configureImageButton(btnfishingplus1, false, false, 1.0);
+            configureImageButton(btncombatplus1, false, false, 1.0);
             configureImageButton(btncookingplus1, false, false, 1.0);
             configureImageButton(btnfarmingminus1, false, false, 1.0);
             configureImageButton(btngatheringminus1, false, false, 1.0);
             configureImageButton(btncraftingminus1, false, false, 1.0);
-            configureImageButton(btnfishingminus1, false, false, 1.0);
+            configureImageButton(btncombatminus1, false, false, 1.0);
             configureImageButton(btncookingminus1, false, false, 1.0);
         }
     }
