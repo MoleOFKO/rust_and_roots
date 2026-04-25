@@ -223,30 +223,30 @@ public class item_edit_btnController implements Initializable {
 
     if (rs.next()) {
         this.img_name = rs.getString("image");
-        File file= new File(ItemEditorSupport.itemImagePath(this.img_name));
-        Image image = new Image(file.toURI().toString());
-        ImageView imgView = new ImageView(image);
-        imgView.setFitHeight(50);
-        imgView.setFitWidth(50);
-        imgView.setPreserveRatio(true);
-            txtmname.setText(rs.getString("item_name"));
-            txtmobstype.setText(rs.getString("price"));
-            txtstr.setText(rs.getString("str"));
-            txtagi.setText(rs.getString("agi"));
-            txtdex.setText(rs.getString("dex"));
-            txtvid.setText(rs.getString("vit"));
-            txthp.setText(rs.getString("hp"));
-            txtstamina.setText(rs.getString("stamina"));
-            File afile= new File(ItemEditorSupport.itemImagePath(this.img_name));
-           Image iimage = new Image(afile.toURI().toString());
-            
-//            ImageView imgView = new ImageView(image);
-            Image img = new Image(afile.toURI().toString());
-            itemimage.setImage(iimage);
-            ItemEditorSupport.fitImageToPreviewBox(itemimage);
+        txtmname.setText(rs.getString("item_name"));
+        txtmobstype.setText(rs.getString("price"));
+        txtstr.setText(rs.getString("str"));
+        txtagi.setText(rs.getString("agi"));
+        txtdex.setText(rs.getString("dex"));
+        txtvid.setText(rs.getString("vit"));
+        txthp.setText(rs.getString("hp"));
+        txtstamina.setText(rs.getString("stamina"));
 
-            int selectedTypeId = rs.getInt("item_type_id");
-            ItemEditorSupport.selectItemTypeById(cbitemtype, selectedTypeId);
+        if (this.img_name != null && !this.img_name.isBlank()) {
+            Image image = ItemEditorSupport.loadItemImage(this.img_name);
+            if (image != null) {
+                itemimage.setImage(image);
+                ItemEditorSupport.fitImageToPreviewBox(itemimage);
+            } else {
+                itemimage.setImage(null);
+                System.out.println("Missing item image: " + this.img_name);
+            }
+        } else {
+            itemimage.setImage(null);
+        }
+
+        int selectedTypeId = rs.getInt("item_type_id");
+        ItemEditorSupport.selectItemTypeById(cbitemtype, selectedTypeId);
         
     }
 }

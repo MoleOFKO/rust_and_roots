@@ -20,6 +20,13 @@ import javafx.stage.Window;
 final class ItemEditorSupport {
 
     private static final String ITEM_IMAGE_DIRECTORY = "E:\\PJ\\rust_and_roots\\src\\image\\items\\";
+    private static final String[] ITEM_IMAGE_DIRECTORIES = {
+        "E:\\PJ\\rust_and_roots\\src\\image\\items\\",
+        "E:\\PJ\\rust_and_roots\\src\\image\\crops\\",
+        "E:\\PJ\\rust_and_roots\\src\\image\\recipe\\",
+        "E:\\PJ\\rust_and_roots\\src\\image\\weapons\\",
+        "E:\\PJ\\rust_and_roots\\src\\image\\"
+    };
 
     private ItemEditorSupport() {
     }
@@ -93,12 +100,46 @@ final class ItemEditorSupport {
             return;
         }
         preview.setPreserveRatio(false);
-        preview.setFitWidth(preview.getBoundsInLocal().getWidth());
-        preview.setFitHeight(preview.getBoundsInLocal().getHeight());
+        if (preview.getFitWidth() <= 0) {
+            preview.setFitWidth(preview.getBoundsInLocal().getWidth());
+        }
+        if (preview.getFitHeight() <= 0) {
+            preview.setFitHeight(preview.getBoundsInLocal().getHeight());
+        }
     }
 
     static String itemImagePath(String fileName) {
         return ITEM_IMAGE_DIRECTORY + fileName;
+    }
+
+    static Image loadItemImage(String fileName) {
+        if (fileName == null || fileName.isBlank()) {
+            return null;
+        }
+
+        for (String candidate : buildImageCandidates(fileName)) {
+            for (String directory : ITEM_IMAGE_DIRECTORIES) {
+                File imageFile = new File(directory + candidate);
+                if (imageFile.exists() && imageFile.isFile()) {
+                    return new Image(imageFile.toURI().toString());
+                }
+            }
+        }
+        return null;
+    }
+
+    private static List<String> buildImageCandidates(String fileName) {
+        List<String> candidates = new ArrayList<>();
+        candidates.add(fileName);
+
+        if (fileName.endsWith("_fruit.png")) {
+            candidates.add(fileName.replace("_fruit.png", ".png"));
+        }
+        if (fileName.endsWith("_brick.png")) {
+            candidates.add(fileName.replace("_brick.png", ".png"));
+        }
+
+        return candidates;
     }
 
     record ItemTypeOption(int id, String name) {

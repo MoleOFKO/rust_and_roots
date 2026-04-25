@@ -185,9 +185,9 @@ public class Edit_itemController implements Initializable {
            
             while(rs.next()){
             String img_name = rs.getString("image");
-            File file= new File("E:\\PJ\\rust_and_roots\\src\\image\\items\\"+img_name );
-            Image image = new Image(file.toURI().toString());
-            ImageView imgView = new ImageView(image);
+            Image image = ItemEditorSupport.loadItemImage(img_name);
+            ImageView imgView = new ImageView();
+            imgView.setImage(image);
             imgView.setFitHeight(75);
             imgView.setFitWidth(75);
             imgView.setPreserveRatio(true);
@@ -231,9 +231,9 @@ public class Edit_itemController implements Initializable {
         while(rs.next()){
             item_id = rs.getInt("item_id");
             String img_name = rs.getString("image");
-            File file= new File("E:\\PJ\\rust_and_roots\\src\\image\\items\\"+img_name );
-            Image image = new Image(file.toURI().toString());
-            ImageView imgView = new ImageView(image);
+            Image image = ItemEditorSupport.loadItemImage(img_name);
+            ImageView imgView = new ImageView();
+            imgView.setImage(image);
             imgView.setFitHeight(50);
             imgView.setFitWidth(50);
             imgView.setPreserveRatio(true);
@@ -306,6 +306,7 @@ public class Edit_itemController implements Initializable {
         if(i==null)
             AppDialogs.showMessageDialog(null, "Please Select one Product You Want to Edit!");
         else{
+            item_id = i.getItem_id();
             itemname = i.getItem_name();
             Stage stage = Rust_and_roots.stage;
             util.SceneManager.switchScene("/view/item_edit_btn.fxml");
