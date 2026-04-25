@@ -1,6 +1,7 @@
 package model;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 import game.GameState;
@@ -88,6 +89,42 @@ public final class MobEntity {
     private static final int ORC_BASE_VIT = 3;
     private static final int ORC_BASE_AGI = 3;
     private static final int ORC_BASE_DEX = 1;
+
+    private int getBaseStatMultiplier() {
+        if (data == null || data.mobType == null) return 1;
+        String normalized = data.mobType.trim().toLowerCase(Locale.ROOT);
+        return switch (normalized) {
+            case "poison_slime", "lava_slime" -> 2;
+            case "orcb" -> 3;
+            default -> 1;
+        };
+    }
+
+    private void tryApplyOnHitStatusEffect(PlayerState target) {
+        if (target == null || target.isDead() || data == null || data.mobType == null) {
+            return;
+        }
+
+        String normalized = data.mobType.trim().toLowerCase(Locale.ROOT);
+        boolean poison = normalized.equals("poison_slime");
+        boolean burn = normalized.equals("lava_slime");
+        if (!poison && !burn) {
+            return;
+        }
+
+        // 10% chance on each successful attack hit.
+        if (ThreadLocalRandom.current().nextInt(100) >= 10) {
+            return;
+        }
+
+        GameTimeManager time = GameTimeManager.get();
+        double nowSeconds = (time == null) ? 0.0 : time.totalSecondsProperty().get();
+        if (poison) {
+            target.applyPoisonDebuff(nowSeconds);
+        } else {
+            target.applyBurnDebuff(nowSeconds);
+        }
+    }
 
     private final Kind kind;
     private final MobMapState.MobData data;
@@ -591,20 +628,21 @@ public final class MobEntity {
         data.lastRegenTotalSeconds = nowSeconds;
 
         // Reset stats to base and then apply world-day growth rolls so newly respawned mobs scale with the timeline.
+        int baseMultiplier = Math.max(1, getBaseStatMultiplier());
         if (kind == Kind.SLIME) {
-            data.maxHp = SLIME_BASE_MAX_HP;
-            data.maxSp = SLIME_BASE_MAX_SP;
-            data.str = SLIME_BASE_STR;
-            data.agi = SLIME_BASE_AGI;
-            data.vit = SLIME_BASE_VIT;
-            data.dex = SLIME_BASE_DEX;
+            data.maxHp = SLIME_BASE_MAX_HP * baseMultiplier;
+            data.maxSp = SLIME_BASE_MAX_SP * baseMultiplier;
+            data.str = SLIME_BASE_STR * baseMultiplier;
+            data.agi = SLIME_BASE_AGI * baseMultiplier;
+            data.vit = SLIME_BASE_VIT * baseMultiplier;
+            data.dex = SLIME_BASE_DEX * baseMultiplier;
         } else {
-            data.maxHp = ORC_BASE_MAX_HP;
-            data.maxSp = ORC_BASE_MAX_SP;
-            data.str = ORC_BASE_STR;
-            data.agi = ORC_BASE_AGI;
-            data.vit = ORC_BASE_VIT;
-            data.dex = ORC_BASE_DEX;
+            data.maxHp = ORC_BASE_MAX_HP * baseMultiplier;
+            data.maxSp = ORC_BASE_MAX_SP * baseMultiplier;
+            data.str = ORC_BASE_STR * baseMultiplier;
+            data.agi = ORC_BASE_AGI * baseMultiplier;
+            data.vit = ORC_BASE_VIT * baseMultiplier;
+            data.dex = ORC_BASE_DEX * baseMultiplier;
         }
 
         int worldRolls = Math.max(0, day - 1);
@@ -920,6 +958,9 @@ public final class MobEntity {
         boolean wasAlive = !playerState.isDead();
         int dmg = computeDamageTo(playerState);
         playerState.damageHp(dmg);
+        if (wasAlive && !playerState.isDead()) {
+            tryApplyOnHitStatusEffect(playerState);
+        }
         attackDamageApplied = true;
 
         if (wasAlive && playerState.isDead()) {

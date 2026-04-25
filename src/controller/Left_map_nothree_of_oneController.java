@@ -27,7 +27,7 @@ import util.SpawnTag;
 public class Left_map_nothree_of_oneController extends BaseMapController {
 
     private static final String DAY_BG_PATH = "/image/maps/leftmap_no.3(1).png";
-    private static final String NIGHT_BG_PATH = "";
+    private static final String NIGHT_BG_PATH = "/image/NightMap/leftmap_no.3(1)night.png";
 
     @Override
     protected String dayBackgroundPath() {

@@ -78,6 +78,15 @@ public final class PlayerState {
     private int pendingFoodStaminaRecovery = 0;
     private double pendingFoodStaminaExpiresAtTotalSeconds = -1.0;
 
+    // Status effects (in-game seconds).
+    private static final double POISON_DURATION_SECONDS = 5.0 * 60.0;
+    private static final double BURN_DURATION_SECONDS = 5.0 * 60.0;
+    private static final double STATUS_TICK_SECONDS = 60.0; // 1 in-game-world minute
+    private double poisonExpiresAtTotalSeconds = -1.0;
+    private double poisonLastTickTotalSeconds = -1.0;
+    private double burnExpiresAtTotalSeconds = -1.0;
+    private double burnLastTickTotalSeconds = -1.0;
+
     private static final int HOTBAR_SIZE = 5;
     private static final int INVENTORY_SLOT_CAPACITY = 20;
     private final int[] hotbarItemIds = new int[HOTBAR_SIZE];
@@ -667,6 +676,110 @@ public final class PlayerState {
         stamina.set(clamp((int) Math.floor(staminaPrecise + 1.0e-9), 0, maxSpValue));
 
         lastRegenTotalSeconds = nowTotalSeconds;
+    }
+
+    public void applyPoisonDebuff(double nowTotalSeconds) {
+        if (isDead()) {
+            clearDebuffs();
+            return;
+        }
+
+        double now = Double.isFinite(nowTotalSeconds) ? Math.max(0.0, nowTotalSeconds) : 0.0;
+        poisonExpiresAtTotalSeconds = now + POISON_DURATION_SECONDS;
+        poisonLastTickTotalSeconds = now;
+    }
+
+    public void applyBurnDebuff(double nowTotalSeconds) {
+        if (isDead()) {
+            clearDebuffs();
+            return;
+        }
+
+        double now = Double.isFinite(nowTotalSeconds) ? Math.max(0.0, nowTotalSeconds) : 0.0;
+        burnExpiresAtTotalSeconds = now + BURN_DURATION_SECONDS;
+        burnLastTickTotalSeconds = now;
+    }
+
+    public void applyDebuffsIfNeeded(double nowTotalSeconds) {
+        if (Double.isNaN(nowTotalSeconds) || Double.isInfinite(nowTotalSeconds)) {
+            return;
+        }
+
+        if (isDead()) {
+            clearDebuffs();
+            return;
+        }
+
+        tickPoison(nowTotalSeconds);
+        tickBurn(nowTotalSeconds);
+    }
+
+    private void clearDebuffs() {
+        poisonExpiresAtTotalSeconds = -1.0;
+        poisonLastTickTotalSeconds = -1.0;
+        burnExpiresAtTotalSeconds = -1.0;
+        burnLastTickTotalSeconds = -1.0;
+    }
+
+    private void tickPoison(double nowTotalSeconds) {
+        if (poisonExpiresAtTotalSeconds < 0.0) {
+            poisonLastTickTotalSeconds = -1.0;
+            return;
+        }
+
+        double now = Math.max(0.0, nowTotalSeconds);
+        double end = Math.min(now, poisonExpiresAtTotalSeconds);
+
+        if (poisonLastTickTotalSeconds < 0.0 || poisonLastTickTotalSeconds > end) {
+            poisonLastTickTotalSeconds = now;
+            if (now >= poisonExpiresAtTotalSeconds) {
+                poisonExpiresAtTotalSeconds = -1.0;
+                poisonLastTickTotalSeconds = -1.0;
+            }
+            return;
+        }
+
+        int ticks = (int) Math.floor((end - poisonLastTickTotalSeconds) / STATUS_TICK_SECONDS);
+        if (ticks > 0) {
+            damageHp(ticks);
+            consumeStamina(ticks);
+            poisonLastTickTotalSeconds += ticks * STATUS_TICK_SECONDS;
+        }
+
+        if (now >= poisonExpiresAtTotalSeconds) {
+            poisonExpiresAtTotalSeconds = -1.0;
+            poisonLastTickTotalSeconds = -1.0;
+        }
+    }
+
+    private void tickBurn(double nowTotalSeconds) {
+        if (burnExpiresAtTotalSeconds < 0.0) {
+            burnLastTickTotalSeconds = -1.0;
+            return;
+        }
+
+        double now = Math.max(0.0, nowTotalSeconds);
+        double end = Math.min(now, burnExpiresAtTotalSeconds);
+
+        if (burnLastTickTotalSeconds < 0.0 || burnLastTickTotalSeconds > end) {
+            burnLastTickTotalSeconds = now;
+            if (now >= burnExpiresAtTotalSeconds) {
+                burnExpiresAtTotalSeconds = -1.0;
+                burnLastTickTotalSeconds = -1.0;
+            }
+            return;
+        }
+
+        int ticks = (int) Math.floor((end - burnLastTickTotalSeconds) / STATUS_TICK_SECONDS);
+        if (ticks > 0) {
+            damageHp(ticks * 2);
+            burnLastTickTotalSeconds += ticks * STATUS_TICK_SECONDS;
+        }
+
+        if (now >= burnExpiresAtTotalSeconds) {
+            burnExpiresAtTotalSeconds = -1.0;
+            burnLastTickTotalSeconds = -1.0;
+        }
     }
 
     public void clearTransientFoodEffects() {
