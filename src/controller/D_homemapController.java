@@ -535,7 +535,7 @@ public class D_homemapController extends BaseMapController {
         ItemDatabase.loadItems();
 
         oreNodes.clear();
-        oreNodes.add(new OreNode("stone_dungeon", "stone_dungeon_after_mined", stone_dungeon_img, stone_dungeon_hitbox, drops_img_stone_dungeon));
+        oreNodes.add(new OreNode("stone_dungeon", "stone_dungeon_drop_item", stone_dungeon_img, stone_dungeon_hitbox, drops_img_stone_dungeon));
         oreNodes.add(new OreNode("iron", "iron_drop_item", iron_img, iron_hitbox, drops_img_iron));
         oreNodes.add(new OreNode("copper", "copper_drop_item", copper_img, copper_hitbox, drops_img_copper));
         oreNodes.add(new OreNode("silver", "silver_drop_item", silver_img, silver_hitbox, drops_img_silver));

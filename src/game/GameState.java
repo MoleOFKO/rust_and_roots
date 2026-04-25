@@ -675,6 +675,7 @@ public final class GameState {
     }
 
     public void resetForNewGame() {
+        playerState.clearTransientFoodEffects();
         clearInventoryItems(playerState.getInventory());
         replaceCoins(playerState.getInventory(), NEW_GAME_STARTING_COINS);
         playerState.clearAllHotbarItems();

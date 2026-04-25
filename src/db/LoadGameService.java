@@ -621,6 +621,7 @@ public class LoadGameService {
     private void clearRuntimeState(GameState gs) {
         PlayerState psState = gs.getPlayerState();
 
+        psState.clearTransientFoodEffects();
         clearInventoryItems(psState.getInventory());
         replaceCoins(psState.getInventory(), 0);
 
