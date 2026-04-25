@@ -32,6 +32,7 @@ import model.MobMapState;
 import model.item;
 import util.AppDialogs;
 import util.CombatRules;
+import util.SkillModifiers;
 import util.SpawnTag;
 
 /**
@@ -40,6 +41,19 @@ import util.SpawnTag;
  * @author Kaung Zin
  */
 public class Upper_mapController extends BaseMapController {
+
+    private static final String DAY_BG_PATH = "/image/maps/upper_map_no.1.png";
+    private static final String NIGHT_BG_PATH = "";
+
+    @Override
+    protected String dayBackgroundPath() {
+        return DAY_BG_PATH;
+    }
+
+    @Override
+    protected String nightBackgroundPath() {
+        return NIGHT_BG_PATH;
+    }
 
     @FXML
     private StackPane view;
@@ -320,7 +334,7 @@ public class Upper_mapController extends BaseMapController {
     @FXML
     private Label crafting;
     @FXML
-    private Label fishing;
+    private Label combat;
     @FXML
     private Label cooking;
     @FXML
@@ -332,7 +346,7 @@ public class Upper_mapController extends BaseMapController {
     @FXML
     private ImageView btncraftingminus1;
     @FXML
-    private ImageView btnfishingminus1;
+    private ImageView btncombatminus1;
     @FXML
     private ImageView btncookingminus1;
     @FXML
@@ -340,7 +354,7 @@ public class Upper_mapController extends BaseMapController {
     @FXML
     private ImageView btncraftingplus1;
     @FXML
-    private ImageView btnfishingplus1;
+    private ImageView btncombatplus1;
     @FXML
     private ImageView btncookingplus1;
     @FXML
@@ -928,6 +942,10 @@ public class Upper_mapController extends BaseMapController {
             playerState.addExp(expGain);
         }
 
+        if (gameState != null) {
+            gameState.addCombatSkillExp(1);
+        }
+
         int dropItemId = -1;
         if (mob.getKind() == MobEntity.Kind.ORC) {
             dropItemId = chooseOrcLootItemId();
@@ -971,7 +989,16 @@ public class Upper_mapController extends BaseMapController {
             }
         }
 
-        return CombatRules.rollAttackDamage(playerStr, bonus);
+        int rolled = CombatRules.rollAttackDamage(playerStr, bonus);
+        int combatBonus = SkillModifiers.combatBonusDamage(getCombatLevel());
+        return Math.max(0, rolled + combatBonus);
+    }
+
+    private int getCombatLevel() {
+        if (gameState == null || gameState.getPlayerSkills() == null) {
+            return 0;
+        }
+        return Math.max(0, gameState.getPlayerSkills().getCombatLevel());
     }
 
     private int resolveSandItemId() {

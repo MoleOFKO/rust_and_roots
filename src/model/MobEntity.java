@@ -3,6 +3,7 @@ package model;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
+import game.GameState;
 import game.GameTimeManager;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Bounds;
@@ -12,6 +13,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.shape.Rectangle;
 import util.CombatRules;
+import util.SkillModifiers;
 import util.TimeFlow;
 
 /**
@@ -361,6 +363,10 @@ public final class MobEntity {
 
         if (hpAfter <= 0) {
             data.dead = true;
+            bodyHitbox.setDisable(true);
+            if (detectRange != null) {
+                detectRange.setDisable(true);
+            }
             return true;
         }
         return false;
@@ -916,7 +922,16 @@ public final class MobEntity {
     private int computeDamageTo(PlayerState target) {
         if (target == null) return 0;
         int rolled = CombatRules.rollAttackDamage(data.str, 0);
-        return CombatRules.applyDamageReduction(rolled, target.getVit());
+        int reduced = CombatRules.applyDamageReduction(rolled, target.getVit());
+
+        int combatReduction = 0;
+        GameState gs = GameState.get();
+        if (gs != null && gs.getPlayerSkills() != null) {
+            int combatLevel = Math.max(0, gs.getPlayerSkills().getCombatLevel());
+            combatReduction = SkillModifiers.combatReceivedDamageReduction(combatLevel);
+        }
+
+        return Math.max(0, reduced - Math.max(0, combatReduction));
     }
 
     private Rectangle resolveActiveAttackHitbox() {

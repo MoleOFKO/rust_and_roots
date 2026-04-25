@@ -396,6 +396,8 @@ public final class RecipeCatalog {
         recipes.add(new RecipeDefinition(Domain.CRAFTING, "fruit_mix", new String[]{"Fruit Mix"}, null,
             new IngredientSpec(new String[]{"blue_fruit"}, 1),
             new IngredientSpec(new String[]{"red_fruit"}, 1)));
+        recipes.add(new RecipeDefinition(Domain.CRAFTING, "water_bottle", new String[]{"water_bottle", "Water Bottle"}, null,
+            new IngredientSpec(new String[]{"glass"}, 1)));
 
         return Collections.unmodifiableList(recipes);
     }

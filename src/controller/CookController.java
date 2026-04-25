@@ -25,6 +25,7 @@ import model.RecipeCatalog;
 import model.item;
 import util.AppDialogs;
 import util.SceneManager;
+import util.SkillModifiers;
 import util.SpawnTag;
 
 public class CookController implements Initializable, SceneController {
@@ -450,7 +451,12 @@ public class CookController implements Initializable, SceneController {
 
     private int computeSuccessRate(Recipe recipe) {
         if (recipe == null || gameState == null) return 0;
-        return ProcessingRules.computeAdjustedSuccessRate(recipe.baseSuccessRate, recipe.dexScaling, gameState.getPlayerState().getDex());
+        int base = ProcessingRules.computeAdjustedSuccessRate(recipe.baseSuccessRate, recipe.dexScaling, gameState.getPlayerState().getDex());
+        GameState.PlayerSkills skills = gameState.getPlayerSkills();
+        int cookingLevel = (skills == null) ? 0 : Math.max(0, skills.getCookingLevel());
+        int comboSize = (recipe.ingredients == null) ? 1 : recipe.ingredients.size();
+        int bonus = SkillModifiers.cookingSuccessBonusPercent(cookingLevel, comboSize);
+        return Math.max(0, base + bonus);
     }
 
     private int getAdjustedWaitSeconds(Recipe recipe) {
@@ -483,7 +489,9 @@ public class CookController implements Initializable, SceneController {
 
         double now = GameTimeManager.get().totalSecondsProperty().get();
         gameState.startCookingJob(selectedRecipe.outputItemId, outputQty, now + getAdjustedWaitSeconds(selectedRecipe), 0, 0, success);
-        gameState.addCookingSkillExp(ProcessingRules.computeSkillExp(selectedRecipe.ingredients.size(), success));
+        if (outputQty > 0) {
+            gameState.addCookingSkillExp(outputQty);
+        }
         updateIngredientViews();
         updateCookingStateUi();
     }

@@ -602,31 +602,31 @@ public class MeltController implements Initializable, SceneController {
         if (oreItem == null) return null;
         int sourceItemId = oreItem.getItem_id();
 
-        item copperOre = ItemDatabase.getItemByName("Copper Ore");
+        item copperOre = ItemDatabase.getItemByName("copper_drop_item");
         item copperIngot = ItemDatabase.getItemByName("Copper Ingot");
 
-        item ironOre = ItemDatabase.getItemByName("Iron Ore");
+        item ironOre = ItemDatabase.getItemByName("iron_drop_item");
         item ironIngot = ItemDatabase.getItemByName("Iron Ingot");
 
-        item silverOre = ItemDatabase.getItemByName("Silver Ore");
+        item silverOre = ItemDatabase.getItemByName("silver_drop_item");
         item silverIngot = ItemDatabase.getItemByName("Silver Ingot");
 
-        item goldOre = ItemDatabase.getItemByName("Gold Ore");
+        item goldOre = ItemDatabase.getItemByName("gold_drop_item");
         item goldIngot = ItemDatabase.getItemByName("Gold Ingot");
 
         item sand = ItemDatabase.getItemByName("sand");
         item glass = ItemDatabase.getItemByName("glass");
 
-        item mithrilOre = ItemDatabase.getItemByName("Mithril Ore");
+        item mithrilOre = ItemDatabase.getItemByName("mithril_drop_item");
         item mithrilIngot = ItemDatabase.getItemByName("Mithril Ingot");
 
-        item adamantiteOre = ItemDatabase.getItemByName("Adamantite Ore");
+        item adamantiteOre = ItemDatabase.getItemByName("adamantite_drop_item");
         item adamantiteIngot = ItemDatabase.getItemByName("Adamantite Ingot");
 
-        item orichalcumOre = ItemDatabase.getItemByName("Orichalcum Ore");
+        item orichalcumOre = ItemDatabase.getItemByName("orichalcum_drop_item");
         item orichalcumIngot = ItemDatabase.getItemByName("Orichalcum Ingot");
 
-        item hihioganeOre = ItemDatabase.getItemByName("Hihiogane Ore");
+        item hihioganeOre = ItemDatabase.getItemByName("hihiogane_drop_item");
         item hihioganeIngot = ItemDatabase.getItemByName("Hihiogane Ingot");
 
         if (isValidSmeltPair(sand, glass) && sourceItemId == sand.getItem_id()) {
