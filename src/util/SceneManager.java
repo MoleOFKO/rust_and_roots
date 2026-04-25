@@ -28,7 +28,14 @@ public class SceneManager {
 
     public static void switchScene(String fxmlPath, SpawnTag spawnTag) {
         try {
-            GameState.get().setPendingSpawn(spawnTag);
+            GameState gs = GameState.get();
+            String normalized = (fxmlPath == null) ? "" : fxmlPath.trim().toLowerCase(Locale.ROOT);
+            if (normalized.endsWith("/main_menu.fxml") && gs.getPlayerState() != null) {
+                // Spec: abstained food recovery effects are not persisted across exiting the game.
+                gs.getPlayerState().clearTransientFoodEffects();
+            }
+
+            gs.setPendingSpawn(spawnTag);
             updateBgmForScene(fxmlPath);
 
             Stage stage = rust_and_roots.Rust_and_roots.stage;

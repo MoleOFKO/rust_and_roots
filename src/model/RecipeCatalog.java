@@ -158,6 +158,36 @@ public final class RecipeCatalog {
         return false;
     }
 
+    /**
+     * Returns the minimum number of ingredient specs required to cook the given output item.
+     *
+     * <p>Returns 0 if the item is not produced by any cooking recipe.
+     */
+    public static int getMinCookingIngredientCountForOutputItem(int itemId) {
+        if (itemId <= 0) {
+            return 0;
+        }
+
+        int min = Integer.MAX_VALUE;
+        for (RecipeDefinition definition : COOKING_RECIPES) {
+            if (definition == null) {
+                continue;
+            }
+
+            item output = resolveItemByAliases(definition.getOutputAliases());
+            if (output == null || output.getItem_id() != itemId) {
+                continue;
+            }
+
+            int count = definition.getIngredients() == null ? 0 : definition.getIngredients().size();
+            if (count > 0) {
+                min = Math.min(min, count);
+            }
+        }
+
+        return (min == Integer.MAX_VALUE) ? 0 : min;
+    }
+
     public static RecipeDefinition findDefinitionByKey(String recipeKey) {
         if (recipeKey == null || recipeKey.isBlank()) {
             return null;

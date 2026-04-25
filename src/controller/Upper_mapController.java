@@ -966,11 +966,23 @@ public class Upper_mapController extends BaseMapController {
     private int computeExpGain(MobMapState.MobData mob) {
         if (mob == null || playerState == null) return 0;
 
-        int mobTotal = Math.max(0, mob.str) + Math.max(0, mob.agi) + Math.max(0, mob.vit) + Math.max(0, mob.dex);
-        int playerTotal = Math.max(0, playerState.getStr()) + Math.max(0, playerState.getAgi()) + Math.max(0, playerState.getVit()) + Math.max(0, playerState.getDex());
+        // Spec:
+        // - Raw EXP uses mob total status (including HP + SP) vs player total status (excluding HP + SP).
+        // - Raw EXP = max(1, player_total - mob_total).
+        int mobTotal = Math.max(0, mob.maxHp)
+            + Math.max(0, mob.maxSp)
+            + Math.max(0, mob.str)
+            + Math.max(0, mob.agi)
+            + Math.max(0, mob.vit)
+            + Math.max(0, mob.dex);
 
-        long raw = (long) mobTotal - (long) playerTotal + 1L;
-        return (int) Math.max(0L, raw);
+        int playerTotal = Math.max(0, playerState.getStr())
+            + Math.max(0, playerState.getAgi())
+            + Math.max(0, playerState.getVit())
+            + Math.max(0, playerState.getDex());
+
+        long raw = (long) playerTotal - (long) mobTotal;
+        return (int) Math.max(1L, raw);
     }
 
     private int calculatePlayerMobDamage() {

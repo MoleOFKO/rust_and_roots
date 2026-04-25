@@ -349,6 +349,14 @@ public final class MobEntity {
     public boolean applyPlayerDamage(int amount, long nowNanos) {
         int raw = Math.max(0, amount);
         int dmg = CombatRules.applyDamageReduction(raw, data.vit);
+
+        // Night scaling: mobs take reduced damage from the player as days progress.
+        // Day 1 => -1, Day 2 => -2, ...
+        GameTimeManager timeManager = GameTimeManager.get();
+        if (dmg > 0 && timeManager != null && timeManager.isNight()) {
+            int day = Math.max(1, timeManager.dayNumberProperty().get());
+            dmg = Math.max(0, dmg - day);
+        }
         if (dmg <= 0 || data.dead) return false;
 
         int hpBefore = Math.max(0, data.hp);
@@ -923,6 +931,15 @@ public final class MobEntity {
         if (target == null) return 0;
         int rolled = CombatRules.rollAttackDamage(data.str, 0);
         int reduced = CombatRules.applyDamageReduction(rolled, target.getVit());
+
+        // Night scaling: mobs deal bonus damage to the player as days progress.
+        // Day 1 => +1, Day 2 => +2, ...
+        GameTimeManager timeManager = GameTimeManager.get();
+        if (timeManager != null && timeManager.isNight()) {
+            int day = Math.max(1, timeManager.dayNumberProperty().get());
+            long boosted = (long) reduced + (long) day;
+            reduced = (int) Math.min((long) Integer.MAX_VALUE, Math.max(0L, boosted));
+        }
 
         int combatReduction = 0;
         GameState gs = GameState.get();

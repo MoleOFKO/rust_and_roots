@@ -15,10 +15,10 @@ public final class PlayerState {
 
     private static final int DEFAULT_HP = 45;
     private static final int DEFAULT_STAMINA = 50;
-    private static final int DEFAULT_AGI = 5;
-    private static final int DEFAULT_DEX = 5;
-    private static final int DEFAULT_STR = 5;
-    private static final int DEFAULT_VIT = 5;
+    private static final int DEFAULT_AGI = 3;
+    private static final int DEFAULT_DEX = 3;
+    private static final int DEFAULT_STR = 3;
+    private static final int DEFAULT_VIT = 3;
     private static final String DEFAULT_NAME = "Player";
 
     private final Inventory inventory;
@@ -70,6 +70,13 @@ public final class PlayerState {
     private double lastRegenTotalSeconds = -1.0;
     private double hpRegenCarry = 0.0;
     private double staminaRegenCarry = 0.0;
+
+    // Food recovery abstain window (in-game seconds): 5 in-game-world minutes.
+    private static final double FOOD_ABSTAIN_SECONDS = 5.0 * 60.0;
+    private int pendingFoodHpRecovery = 0;
+    private double pendingFoodHpExpiresAtTotalSeconds = -1.0;
+    private int pendingFoodStaminaRecovery = 0;
+    private double pendingFoodStaminaExpiresAtTotalSeconds = -1.0;
 
     private static final int HOTBAR_SIZE = 5;
     private static final int INVENTORY_SLOT_CAPACITY = 20;
@@ -592,14 +599,17 @@ public final class PlayerState {
      * </ul>
      */
     public void applyRegenIfNeeded(double nowTotalSeconds) {
+        if (Double.isNaN(nowTotalSeconds) || Double.isInfinite(nowTotalSeconds)) {
+            return;
+        }
+
         if (isDead()) {
+            clearTransientFoodEffects();
             lastRegenTotalSeconds = nowTotalSeconds;
             return;
         }
 
-        if (Double.isNaN(nowTotalSeconds) || Double.isInfinite(nowTotalSeconds)) {
-            return;
-        }
+        applyPendingFoodRecoveryIfPossible(nowTotalSeconds);
 
         if (lastRegenTotalSeconds < 0.0 || lastRegenTotalSeconds > nowTotalSeconds) {
             lastRegenTotalSeconds = nowTotalSeconds;
@@ -659,17 +669,72 @@ public final class PlayerState {
         lastRegenTotalSeconds = nowTotalSeconds;
     }
 
-    public void applyFoodEffect(int hpDelta, int staminaDelta) {
+    public void clearTransientFoodEffects() {
+        pendingFoodHpRecovery = 0;
+        pendingFoodHpExpiresAtTotalSeconds = -1.0;
+        pendingFoodStaminaRecovery = 0;
+        pendingFoodStaminaExpiresAtTotalSeconds = -1.0;
+    }
+
+    public void applyFoodEffectWithAbstain(int hpDelta, int staminaDelta, double nowTotalSeconds) {
+        if (isDead()) {
+            return;
+        }
+
+        double now = Double.isFinite(nowTotalSeconds) ? Math.max(0.0, nowTotalSeconds) : 0.0;
+
         if (hpDelta > 0) {
-            healHp(hpDelta);
+            boolean hpFull = getHp() >= getMaxHp();
+            if (hpFull) {
+                pendingFoodHpRecovery = Math.max(0, hpDelta);
+                pendingFoodHpExpiresAtTotalSeconds = now + FOOD_ABSTAIN_SECONDS;
+            } else {
+                healHp(hpDelta);
+            }
         } else if (hpDelta < 0) {
             damageHp(-hpDelta);
         }
 
         if (staminaDelta > 0) {
-            restoreStamina(staminaDelta);
+            boolean spFull = getStamina() >= getMaxStamina();
+            if (spFull) {
+                pendingFoodStaminaRecovery = Math.max(0, staminaDelta);
+                pendingFoodStaminaExpiresAtTotalSeconds = now + FOOD_ABSTAIN_SECONDS;
+            } else {
+                restoreStamina(staminaDelta);
+            }
         } else if (staminaDelta < 0) {
             consumeStamina(-staminaDelta);
+        }
+    }
+
+    private void applyPendingFoodRecoveryIfPossible(double nowTotalSeconds) {
+        if (!Double.isFinite(nowTotalSeconds)) {
+            return;
+        }
+
+        double now = Math.max(0.0, nowTotalSeconds);
+
+        if (pendingFoodHpRecovery > 0) {
+            if (pendingFoodHpExpiresAtTotalSeconds >= 0.0 && now >= pendingFoodHpExpiresAtTotalSeconds) {
+                pendingFoodHpRecovery = 0;
+                pendingFoodHpExpiresAtTotalSeconds = -1.0;
+            } else if (getHp() < getMaxHp()) {
+                healHp(pendingFoodHpRecovery);
+                pendingFoodHpRecovery = 0;
+                pendingFoodHpExpiresAtTotalSeconds = -1.0;
+            }
+        }
+
+        if (pendingFoodStaminaRecovery > 0) {
+            if (pendingFoodStaminaExpiresAtTotalSeconds >= 0.0 && now >= pendingFoodStaminaExpiresAtTotalSeconds) {
+                pendingFoodStaminaRecovery = 0;
+                pendingFoodStaminaExpiresAtTotalSeconds = -1.0;
+            } else if (getStamina() < getMaxStamina()) {
+                restoreStamina(pendingFoodStaminaRecovery);
+                pendingFoodStaminaRecovery = 0;
+                pendingFoodStaminaExpiresAtTotalSeconds = -1.0;
+            }
         }
     }
 

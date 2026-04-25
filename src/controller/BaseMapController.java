@@ -2667,7 +2667,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     }
 
     protected FoodEffectData resolveFoodEffectData(int itemId) {
-        if (itemId <= 0 || gameState == null) return null;
+        if (itemId <= 0 || gameState == null || playerState == null) return null;
 
         GameState.FoodEffectOutcome cookedOutcome = gameState.pollCookedDishEffect(itemId);
         if (cookedOutcome != null) {
@@ -2685,31 +2685,54 @@ public abstract class BaseMapController implements Initializable, SceneControlle
             return null;
         }
 
-        Object itm = ItemDatabase.getItemById(itemId);
-        if (itm == null) return null;
+        // Spec:
+        // - Raw food (not obtainable via cooking): +1% SP.
+        // - Single-combo cooking (1 ingredient): +1% HP, +2% SP.
+        // - Double-combo cooking (2+ ingredients): +5% HP, +10% SP.
+        int comboCount = RecipeCatalog.getMinCookingIngredientCountForOutputItem(itemId);
 
-        int hpDelta = extractItemStat(itm, "getHp");
-        int staminaDelta = extractItemStat(itm, "getStamina", "getStamana", "getStimana", "getMp");
-        int strDelta = extractItemStat(itm, "getStr");
-        int vitDelta = extractItemStat(itm, "getVit", "getVid");
-        int dexDelta = extractItemStat(itm, "getDex");
-        int agiDelta = extractItemStat(itm, "getAgi");
-
-        if (hpDelta == 0 && staminaDelta == 0 && strDelta == 0 && vitDelta == 0 && dexDelta == 0 && agiDelta == 0) {
-            return new FoodEffectData(1, 2, 0, 0, 0, 0);
+        double hpPercent;
+        double spPercent;
+        if (comboCount <= 0) {
+            hpPercent = 0.0;
+            spPercent = 0.01;
+        } else if (comboCount == 1) {
+            hpPercent = 0.01;
+            spPercent = 0.02;
+        } else {
+            hpPercent = 0.05;
+            spPercent = 0.10;
         }
 
-        return new FoodEffectData(hpDelta, staminaDelta, strDelta, vitDelta, dexDelta, agiDelta);
+        int hpDelta = percentOfMaxToDelta(playerState.getMaxHp(), hpPercent);
+        int staminaDelta = percentOfMaxToDelta(playerState.getMaxStamina(), spPercent);
+        return new FoodEffectData(hpDelta, staminaDelta, 0, 0, 0, 0);
     }
 
     protected void applyFoodEffectData(FoodEffectData effectData) {
         if (playerState == null || effectData == null) return;
 
-        playerState.applyFoodEffect(effectData.hpDelta, effectData.staminaDelta);
+        double nowSeconds = game.GameTimeManager.get().totalSecondsProperty().get();
+        playerState.applyFoodEffectWithAbstain(effectData.hpDelta, effectData.staminaDelta, nowSeconds);
         applyPersistentStatDelta("getStr", new String[]{"setStr"}, effectData.strDelta);
         applyPersistentStatDelta("getVit", new String[]{"setVit", "setVid"}, effectData.vitDelta);
         applyPersistentStatDelta("getDex", new String[]{"setDex"}, effectData.dexDelta);
         applyPersistentStatDelta("getAgi", new String[]{"setAgi"}, effectData.agiDelta);
+    }
+
+    private int percentOfMaxToDelta(int maxValue, double percent) {
+        if (percent <= 0.0 || !Double.isFinite(percent)) {
+            return 0;
+        }
+
+        int max = Math.max(0, maxValue);
+        if (max <= 0) {
+            return 0;
+        }
+
+        double raw = max * percent;
+        int amount = (int) Math.ceil(raw);
+        return Math.max(1, amount);
     }
 
 

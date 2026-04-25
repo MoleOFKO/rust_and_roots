@@ -12,7 +12,7 @@ package util;
 public final class TimeFlow {
 
     public static final int PLAYER_WALK_AGI_CAP = 15;
-    public static final double NORMAL_AGI = 5.0;
+    public static final double NORMAL_AGI = 3.0;
 
     private TimeFlow() {
     }
@@ -56,4 +56,3 @@ public final class TimeFlow {
         return Math.max(0.0, capped / full);
     }
 }
-
