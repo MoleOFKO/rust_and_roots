@@ -474,11 +474,10 @@ public class RightMapController extends BaseMapController {
     private int smallMeatChunkItemId = -1;
     private int steakItemId = -1;
 
-    @Override
-    protected void afterBaseInitialize() {
-        setupCombatIfPresent();
-        setupMobsIfPresent();
-    }
+	    @Override
+	    protected void afterBaseInitialize() {
+	        // Mobs/combat are handled by the shared FXML-driven MapMobSystem in BaseMapController.
+	    }
 
     private void setupCombatIfPresent() {
         if (player != null) {
@@ -778,26 +777,10 @@ public class RightMapController extends BaseMapController {
         mob.hp = Math.min(mob.maxHp, Math.max(0, mob.hp) + 1);
     }
 
-    @Override
-    protected void onGameLoopUpdate(Bounds playerBounds) {
-        if (playerBounds == null || playerState == null) {
-            return;
-        }
-
-        GameTimeManager time = GameTimeManager.get();
-        int currentDay = time.dayNumberProperty().get();
-        double nowSeconds = time.totalSecondsProperty().get();
-        long nowNanos = System.nanoTime();
-
-        updateSingleMob(poisonSlimeMob, poison_slime, currentDay, nowSeconds, nowNanos, playerBounds, poisonSlimeSpawnX, poisonSlimeSpawnY);
-        updateSingleMob(lavaSlimeMob, lava_slime, currentDay, nowSeconds, nowNanos, playerBounds, lavaSlimeSpawnX, lavaSlimeSpawnY);
-        updateSingleMob(orcbMob, orcb, currentDay, nowSeconds, nowNanos, playerBounds, orcbSpawnX, orcbSpawnY);
-
-        autoGatherMobDrops(playerBounds);
-        renderPoisonSlimeDrops();
-        renderLavaSlimeDrops();
-        renderOrcbDrops();
-    }
+	    @Override
+	    protected void onGameLoopUpdate(Bounds playerBounds) {
+	        // Map-specific tick work (if any) goes here. Mob updates are handled by BaseMapController.
+	    }
 
     private void updateSingleMob(
         MobEntity mob,

@@ -475,11 +475,10 @@ public class Upper_mapController extends BaseMapController {
     private int smallMeatChunkItemId = -1;
     private int steakItemId = -1;
 
-    @Override
-    protected void afterBaseInitialize() {
-        setupCombatIfPresent();
-        setupMobsIfPresent();
-    }
+	    @Override
+	    protected void afterBaseInitialize() {
+	        // Mobs/combat are handled by the shared FXML-driven MapMobSystem in BaseMapController.
+	    }
 
     private void setupCombatIfPresent() {
         if (player != null) {
@@ -761,38 +760,10 @@ public class Upper_mapController extends BaseMapController {
         mob.hp = Math.min(mob.maxHp, Math.max(0, mob.hp) + 1);
     }
 
-    @Override
-    protected void onGameLoopUpdate(Bounds playerBounds) {
-        syncDirectionalHitboxes();
-
-        if (playerBounds == null || playerState == null) {
-            return;
-        }
-
-        GameTimeManager time = GameTimeManager.get();
-        int currentDay = time.dayNumberProperty().get();
-        double nowSeconds = time.totalSecondsProperty().get();
-        long nowNanos = System.nanoTime();
-
-        if (slimeMob != null) {
-            boolean wasDead = slimeMob.isDead();
-            slimeMob.update(nowNanos, currentDay, nowSeconds, playerBounds, playerState);
-            if (wasDead && !slimeMob.isDead()) {
-                applyMobSpawn(spawn_slime, slime, slime_hitbox, slimeMob.getData());
-            }
-        }
-        if (orcMob != null) {
-            boolean wasDead = orcMob.isDead();
-            orcMob.update(nowNanos, currentDay, nowSeconds, playerBounds, playerState);
-            if (wasDead && !orcMob.isDead()) {
-                applyMobSpawn(spawn_orc, orc, orc_hitbox, orcMob.getData());
-            }
-        }
-
-        autoGatherMobDrops(playerBounds);
-        renderSlimeDrops();
-        renderOrcDrops();
-    }
+	    @Override
+	    protected void onGameLoopUpdate(Bounds playerBounds) {
+	        // Map-specific tick work (if any) goes here. Mob updates are handled by BaseMapController.
+	    }
 
     private void autoGatherMobDrops(Bounds playerBoundsScene) {
         if (player == null || playerBoundsScene == null) return;

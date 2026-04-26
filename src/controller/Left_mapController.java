@@ -518,11 +518,11 @@ public class Left_mapController extends BaseMapController {
 
         int currentDay = GameTimeManager.get().dayNumberProperty().get();
         double nowSeconds = GameTimeManager.get().totalSecondsProperty().get();
-        initializeTreeDefaults(mainTreeData, currentDay, nowSeconds);
+	        initializeTreeDefaults(mainTreeData, currentDay, nowSeconds);
 
-        if (player != null) {
-            player.setOnAttackStarted(this::handlePlayerAttackStarted);
-        }
+	        if (player != null) {
+	            registerPlayerAttackHandler("resources", this::handlePlayerAttackStarted);
+	        }
 
         // Tree hitboxes are used for intersection/collision only, not input.
         tree_hitbox.setMouseTransparent(true);
@@ -553,11 +553,11 @@ public class Left_mapController extends BaseMapController {
 
         int currentDay = GameTimeManager.get().dayNumberProperty().get();
         double nowSeconds = GameTimeManager.get().totalSecondsProperty().get();
-        initializeStoneDefaults(mainStoneData, currentDay, nowSeconds);
+	        initializeStoneDefaults(mainStoneData, currentDay, nowSeconds);
 
-        if (player != null) {
-            player.setOnAttackStarted(this::handlePlayerAttackStarted);
-        }
+	        if (player != null) {
+	            registerPlayerAttackHandler("resources", this::handlePlayerAttackStarted);
+	        }
 
         // Stone hitboxes are used for intersection/collision only, not input.
         stone_hitbox.setMouseTransparent(true);
@@ -567,20 +567,13 @@ public class Left_mapController extends BaseMapController {
         renderStoneDrops();
     }
 
-    private void refreshPlayerCollisionWalls() {
-        if (player == null) return;
-
-        List<Rectangle> colliders = new ArrayList<>();
-        if (super.walls != null) {
-            colliders.addAll(CollisionRegistry.collectWalls(super.walls));
-        }
-
-        // Use the resource hitboxes directly as walls (toggle disable state per stage).
-        if (tree_hitbox != null) colliders.add(tree_hitbox);
-        if (stone_hitbox != null) colliders.add(stone_hitbox);
-
-        player.setWalls(colliders);
-    }
+	    private void refreshPlayerCollisionWalls() {
+	        List<Rectangle> colliders = new ArrayList<>();
+	        if (tree_hitbox != null) colliders.add(tree_hitbox);
+	        if (stone_hitbox != null) colliders.add(stone_hitbox);
+	        registerPlayerCollisionRectangles(colliders);
+	        rebuildPlayerCollisionWalls();
+	    }
 
     private void initializeTreeDefaults(TreeMapState.TreeData data, int currentDay, double nowSeconds) {
         if (data == null) return;
