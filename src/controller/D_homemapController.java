@@ -561,8 +561,8 @@ public class D_homemapController extends BaseMapController {
             }
         }
 
-        player.setOnAttackStarted(this::handlePlayerAttackStarted);
-        refreshPlayerCollisionWalls();
+	        registerPlayerAttackHandler("ores", this::handlePlayerAttackStarted);
+	        refreshPlayerCollisionWalls();
 
         for (OreNode node : oreNodes) {
             renderOreVisual(node);
@@ -572,24 +572,16 @@ public class D_homemapController extends BaseMapController {
         oresInitialized = true;
     }
 
-    private void refreshPlayerCollisionWalls() {
-        if (player == null) {
-            return;
-        }
-
-        List<Rectangle> colliders = new ArrayList<>();
-        if (walls != null) {
-            colliders.addAll(CollisionRegistry.collectWalls(walls));
-        }
-
-        for (OreNode node : oreNodes) {
-            if (node != null && node.hitbox != null) {
-                colliders.add(node.hitbox);
-            }
-        }
-
-        player.setWalls(colliders);
-    }
+	    private void refreshPlayerCollisionWalls() {
+	        List<Rectangle> colliders = new ArrayList<>();
+	        for (OreNode node : oreNodes) {
+	            if (node != null && node.hitbox != null) {
+	                colliders.add(node.hitbox);
+	            }
+	        }
+	        registerPlayerCollisionRectangles(colliders);
+	        rebuildPlayerCollisionWalls();
+	    }
 
     private void initializeOreDefaults(TreeMapState.TreeData data, int currentDay, double nowSeconds) {
         if (data == null) {

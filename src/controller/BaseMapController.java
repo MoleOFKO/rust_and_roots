@@ -215,17 +215,28 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     protected Integer selectedPlayerInventoryItemId = null;
     protected int selectedPlayerInventorySlotIndex = -1;
     
-    // ---------- Runtime ----------
-    protected GameState gameState;
-    protected Player player;
-    protected PlayerState playerState;
-    protected Farm farm;
-    protected InteractionManager interactionManager;
-    protected GameLoopManager gameLoop;
-    
-    protected final List<StackPane> hotbarSlots = new ArrayList<>();
-    protected final List<ToggleButton> hotbarSlotButtons = new ArrayList<>();
-    protected int selectedHotbarIndex = -1;
+	    // ---------- Runtime ----------
+	    protected GameState gameState;
+	    protected Player player;
+	    protected PlayerState playerState;
+	    protected Farm farm;
+	    protected InteractionManager interactionManager;
+	    protected GameLoopManager gameLoop;
+
+	    // ---------- Shared attack dispatch ----------
+	    private final LinkedHashMap<String, Runnable> attackHandlers = new LinkedHashMap<>();
+	    private boolean attackDispatcherBound = false;
+
+	    // ---------- Shared collision registry ----------
+	    private final List<Rectangle> registeredCollisionRects = new ArrayList<>();
+	    private List<Rectangle> cachedStaticWalls = List.of();
+
+	    // ---------- Shared mob system (FXML-driven) ----------
+	    private MapMobSystem mobSystem;
+	    
+	    protected final List<StackPane> hotbarSlots = new ArrayList<>();
+	    protected final List<ToggleButton> hotbarSlotButtons = new ArrayList<>();
+	    protected int selectedHotbarIndex = -1;
 
     protected Image dayBg;
     protected Image nightBg;
@@ -287,15 +298,79 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         return null;
     }
 
-    /** Hook for subclasses after shared systems are ready. */
-    protected void afterBaseInitialize() {
-        // default: do nothing
-    }
+	    /** Hook for subclasses after shared systems are ready. */
+	    protected void afterBaseInitialize() {
+	        // default: do nothing
+	    }
 
-    /** Hook for subclasses during the shared game loop tick (called every frame). */
-    protected void onGameLoopUpdate(Bounds playerBounds) {
-        // default: do nothing
-    }
+	    protected final void registerPlayerAttackHandler(String key, Runnable handler) {
+	        if (key == null || key.isBlank()) {
+	            return;
+	        }
+	        if (handler == null) {
+	            attackHandlers.remove(key);
+	            return;
+	        }
+	        attackHandlers.put(key, handler);
+	        bindAttackDispatcherIfNeeded();
+	    }
+
+	    private void bindAttackDispatcherIfNeeded() {
+	        if (attackDispatcherBound) {
+	            return;
+	        }
+	        if (player == null) {
+	            return;
+	        }
+	        player.setOnAttackStarted(this::dispatchPlayerAttackStarted);
+	        attackDispatcherBound = true;
+	    }
+
+	    private void dispatchPlayerAttackStarted() {
+	        if (attackHandlers.isEmpty()) {
+	            return;
+	        }
+
+	        for (Runnable handler : new ArrayList<>(attackHandlers.values())) {
+	            if (handler == null) continue;
+	            try {
+	                handler.run();
+	            } catch (Exception e) {
+	                e.printStackTrace();
+	            }
+	        }
+	    }
+
+	    protected final void registerPlayerCollisionRectangle(Rectangle rect) {
+	        if (rect == null) return;
+	        if (!registeredCollisionRects.contains(rect)) {
+	            registeredCollisionRects.add(rect);
+	        }
+	    }
+
+	    protected final void registerPlayerCollisionRectangles(Collection<Rectangle> rects) {
+	        if (rects == null || rects.isEmpty()) return;
+	        for (Rectangle r : rects) {
+	            registerPlayerCollisionRectangle(r);
+	        }
+	    }
+
+	    protected final void rebuildPlayerCollisionWalls() {
+	        if (player == null) return;
+	        List<Rectangle> colliders = new ArrayList<>();
+	        if (cachedStaticWalls != null && !cachedStaticWalls.isEmpty()) {
+	            colliders.addAll(cachedStaticWalls);
+	        }
+	        if (!registeredCollisionRects.isEmpty()) {
+	            colliders.addAll(registeredCollisionRects);
+	        }
+	        player.setWalls(colliders);
+	    }
+
+	    /** Hook for subclasses during the shared game loop tick (called every frame). */
+	    protected void onGameLoopUpdate(Bounds playerBounds) {
+	        // default: do nothing
+	    }
 
     @Override
     public void init(GameState gs) {
@@ -364,9 +439,8 @@ public abstract class BaseMapController implements Initializable, SceneControlle
             }
         });
 
-        if (walls != null) {
-            player.setWalls(CollisionRegistry.collectWalls(walls));
-        }
+	        cachedStaticWalls = (walls != null) ? CollisionRegistry.collectWalls(walls) : List.of();
+	        rebuildPlayerCollisionWalls();
 
         interactionManager = new InteractionManager();
         configureExits();
@@ -376,12 +450,27 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         setupHotbarIfPresent();
         setupDayNightBindingIfConfigured();
         setupFarmTimeRefreshIfPresent();
-        setupSettingsTabIfPresent();
-        bindSharedStatusAndSettingControlsIfPresent();
-        setupDayNightNavHudIfPresent();
+	        setupSettingsTabIfPresent();
+	        bindSharedStatusAndSettingControlsIfPresent();
+	        setupDayNightNavHudIfPresent();
 
-        GameTimeManager.get().start();
-        startLoop();
+	        mobSystem = MapMobSystem.tryCreate(
+	            gameState,
+	            mapKey(),
+	            world,
+	            walls,
+	            player,
+	            playerState,
+	            human_hitbox
+	        );
+	        if (mobSystem != null) {
+	            registerPlayerAttackHandler("mobs", mobSystem::handlePlayerAttackStarted);
+	            registerPlayerCollisionRectangles(mobSystem.mobHitboxesForPlayerCollision());
+	            rebuildPlayerCollisionWalls();
+	        }
+
+	        GameTimeManager.get().start();
+	        startLoop();
 
         new WorldScaler(view, world);
         disableKeyboardActivationRecursive(view);
@@ -2244,14 +2333,18 @@ public abstract class BaseMapController implements Initializable, SceneControlle
                 interactionManager.updateAll(playerBounds);
             }
 
-            if (farm != null) {
-                farm.updatePlayerBounds(playerBounds);
-                double nowSeconds = GameTimeManager.get().totalSecondsProperty().get();
-                farm.update(nowSeconds);
-            }
+	            if (farm != null) {
+	                farm.updatePlayerBounds(playerBounds);
+	                double nowSeconds = GameTimeManager.get().totalSecondsProperty().get();
+	                farm.update(nowSeconds);
+	            }
 
-            onGameLoopUpdate(playerBounds);
-        });
+	            if (mobSystem != null) {
+	                mobSystem.update(playerBounds);
+	            }
+
+	            onGameLoopUpdate(playerBounds);
+	        });
 
         gameLoop.start();
     }
