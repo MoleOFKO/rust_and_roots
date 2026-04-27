@@ -1,5 +1,6 @@
 package controller;
 
+import db.MobDefinitionRepository;
 import game.GameState;
 import game.GameTimeManager;
 import java.util.ArrayList;
@@ -26,6 +27,7 @@ import model.MobMapState;
 import model.Player;
 import model.PlayerState;
 import model.item;
+import model.mobs;
 import util.AppDialogs;
 import util.CombatRules;
 import util.SkillModifiers;
@@ -162,6 +164,7 @@ final class MapMobSystem {
     private int stringyMeatItemId = -1;
     private int smallMeatChunkItemId = -1;
     private int steakItemId = -1;
+    private final Map<String, mobs> mobDefinitionsByType = new HashMap<>();
 
     static MapMobSystem tryCreate(
         GameState gameState,
@@ -212,6 +215,7 @@ final class MapMobSystem {
         if (playerAttackUp != null) playerAttackUp.setMouseTransparent(true);
         if (playerAttackDown != null) playerAttackDown.setMouseTransparent(true);
 
+        loadMobDefinitions();
         setupMobsFromWorld();
     }
 
@@ -339,13 +343,14 @@ final class MapMobSystem {
 
             MobEntity.Kind kind = mobType.contains("orc") ? MobEntity.Kind.ORC : MobEntity.Kind.SLIME;
 
+            mobs definition = findMobDefinition(mobType);
             int multiplier = baseStatMultiplier(mobType);
-            int maxHp = (kind == MobEntity.Kind.ORC ? ORC_BASE_MAX_HP : SLIME_BASE_MAX_HP) * multiplier;
-            int maxSp = (kind == MobEntity.Kind.ORC ? ORC_BASE_MAX_SP : SLIME_BASE_MAX_SP) * multiplier;
-            int str = (kind == MobEntity.Kind.ORC ? ORC_BASE_STR : SLIME_BASE_STR) * multiplier;
-            int agi = (kind == MobEntity.Kind.ORC ? ORC_BASE_AGI : SLIME_BASE_AGI) * multiplier;
-            int vit = (kind == MobEntity.Kind.ORC ? ORC_BASE_VIT : SLIME_BASE_VIT) * multiplier;
-            int dex = (kind == MobEntity.Kind.ORC ? ORC_BASE_DEX : SLIME_BASE_DEX) * multiplier;
+            int maxHp = definition != null ? Math.max(1, definition.getHp()) : (kind == MobEntity.Kind.ORC ? ORC_BASE_MAX_HP : SLIME_BASE_MAX_HP) * multiplier;
+            int maxSp = definition != null ? Math.max(1, definition.getStimana()) : (kind == MobEntity.Kind.ORC ? ORC_BASE_MAX_SP : SLIME_BASE_MAX_SP) * multiplier;
+            int str = definition != null ? Math.max(0, definition.getStr()) : (kind == MobEntity.Kind.ORC ? ORC_BASE_STR : SLIME_BASE_STR) * multiplier;
+            int agi = definition != null ? Math.max(0, definition.getAgi()) : (kind == MobEntity.Kind.ORC ? ORC_BASE_AGI : SLIME_BASE_AGI) * multiplier;
+            int vit = definition != null ? Math.max(0, definition.getVid()) : (kind == MobEntity.Kind.ORC ? ORC_BASE_VIT : SLIME_BASE_VIT) * multiplier;
+            int dex = definition != null ? Math.max(0, definition.getDex()) : (kind == MobEntity.Kind.ORC ? ORC_BASE_DEX : SLIME_BASE_DEX) * multiplier;
 
             // Fallback respawn location when no spawn marker is defined.
             // Capture before applying any saved position so respawns stay consistent.
@@ -871,6 +876,14 @@ final class MapMobSystem {
             return true;
         }
 
+        mob.mobType = mobType;
+        mob.maxHp = Math.max(1, maxHp);
+        mob.maxSp = Math.max(1, maxSp);
+        mob.str = Math.max(0, str);
+        mob.agi = Math.max(0, agi);
+        mob.vit = Math.max(0, vit);
+        mob.dex = Math.max(0, dex);
+
         // Apply saved position.
         mobNode.setLayoutX(mob.layoutX);
         mobNode.setLayoutY(mob.layoutY);
@@ -889,6 +902,22 @@ final class MapMobSystem {
         }
 
         return false;
+    }
+
+    private void loadMobDefinitions() {
+        mobDefinitionsByType.clear();
+        try {
+            mobDefinitionsByType.putAll(new MobDefinitionRepository().findAllByTypeKey());
+        } catch (Exception e) {
+            System.out.println("Mob definition load fallback: " + e.getMessage());
+        }
+    }
+
+    private mobs findMobDefinition(String mobType) {
+        if (mobType == null || mobType.isBlank()) {
+            return null;
+        }
+        return mobDefinitionsByType.get(MobDefinitionRepository.normalizeType(mobType));
     }
 
     private void applySingleMobDailyGrowthRoll(MobMapState.MobData mob) {

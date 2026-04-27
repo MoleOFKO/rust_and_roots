@@ -4,12 +4,10 @@
  */
 package controller;
 
+import db.MobDefinitionRepository;
 import db.dbcon;
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -19,24 +17,16 @@ import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Group;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
-import javax.swing.JOptionPane;
 import util.AppDialogs;
-import rust_and_roots.Rust_and_roots;
-import static rust_and_roots.Rust_and_roots.stage;
+import model.mobs;
 import util.WorldScaler;
 
 /**
@@ -80,8 +70,8 @@ public class Char_edit_btnController implements Initializable {
     ResultSet rs;
     PreparedStatement pst;
     Statement st;
-    Parent root;
     String img_name;
+    private final MobDefinitionRepository mobRepository = new MobDefinitionRepository();
     
     
     @FXML
@@ -105,119 +95,128 @@ public class Char_edit_btnController implements Initializable {
 
     @FXML
     private void handlebtnuploadaction(ActionEvent event) throws IOException {
-//        FileChooser filechooser = new FileChooser();
-//        filechooser.setTitle("Select Product Image");
-//        filechooser.getExtensionFilters().add(
-//        new FileChooser.ExtensionFilter("Image File", "*.png" , "*.jpg", "*.jpeg", "*.gif")
-//        );
-//        Stage stage = (Stage) mobimg.getScene().getWindow();
-//        File selectedFile = filechooser.showOpenDialog(stage);
-//        
-//        if(selectedFile != null){
-//            
-//            //show image in ImageView
-//            Image image = new Image(selectedFile.toURI().toString());
-//            mobimg.setImage(image);
-//            
-//            //show image to project folder
-//            img_name = copyImageToFolder(selectedFile);
-                                       
-//        }
+        String selectedImage = MobEditorSupport.choosePreviewAndCopyMobImage(
+            mobimg.getScene().getWindow(),
+            mobimg
+        );
+        if (selectedImage != null) {
+            img_name = selectedImage;
+        }
     }
 
     @FXML
     private void handlebtnsaveaction(ActionEvent event) throws SQLException, IOException {
-//        if(txtmname.getText().isEmpty()){
-//            AppDialogs.showMessageDialog(null, "Please Enter Mobs Name");
-//        }else if(txtmobstype.getText().isEmpty()){
-//            AppDialogs.showMessageDialog(null, "Please Enter Mobs Type");
-//        } else if(txtstr.getText().isEmpty()){
-//            AppDialogs.showMessageDialog(null, "Please Enter STR");
-//        }else if(txtagi.getText().isEmpty()){
-//            AppDialogs.showMessageDialog(null, "Please Enter AGI");
-//        }else if(txtdex.getText().isEmpty()){
-//            AppDialogs.showMessageDialog(null, "Please Enter DEX");
-//        }else if(txtvid.getText().isEmpty()){
-//            AppDialogs.showMessageDialog(null, "Please Enter VIT");
-//        }else if(txthp.getText().isEmpty()){
-//            AppDialogs.showMessageDialog(null, "Please Enter HP");
-//        }else if(txtstamina.getText().isEmpty()){
-//            AppDialogs.showMessageDialog(null, "Please Enter Stamina");
-//        }else if(mobimg.getImage()==null){
-//            AppDialogs.showMessageDialog(null, "Please Upload Image");
-//        } 
-//        else{
-//           
-//        String sql = "UPDATE mobs m JOIN stats s ON m.stats = s.stats_id SET m.mobs_name = ?,m.mobs_type = ?,s.str = ?,s.agi = ?,s.dex = ?, s.vid = ?,s.hp = ?,s.stimana = ?,m.image=? WHERE m.mobs_id = ?";
-//        pst = con.prepareStatement(sql);
-//        pst.setString(1, txtmname.getText());
-//        pst.setString(2, txtmobstype.getText());
-//        pst.setInt(3, Integer.parseInt(txtstr.getText()));
-//        pst.setInt(4, Integer.parseInt((txtagi.getText())));
-//        pst.setInt(5, Integer.parseInt(txtdex.getText()));
-//        pst.setInt(6,Integer.parseInt(txtvid.getText()));
-//        pst.setInt(7, Integer.parseInt(txthp.getText()));
-//        pst.setInt(8, Integer.parseInt(txtstamina.getText()));
-//        pst.setString(9, img_name);
-//         pst.setInt(10, Edit_characterController.mid);
-//        pst.executeUpdate();
-//        AppDialogs.showMessageDialog(null, "Updated Successfully!");
-//        Stage stage = Rust_and_roots.stage;
-//
-//        root = FXMLLoader.load(getClass().getResource("/view/edit_character.fxml"));
-//            Scene scene = new Scene(root);
-//            stage.setScene(scene);
-//            stage.show();
-//        }
+        if(txtmname.getText().isEmpty()){
+            AppDialogs.showMessageDialog(null, "Please Enter Mobs Name");
+            return;
+        }
+        if(txtmobstype.getText().isEmpty()){
+            AppDialogs.showMessageDialog(null, "Please Enter Mobs Type");
+            return;
+        }
+        if(txtstr.getText().isEmpty()){
+            AppDialogs.showMessageDialog(null, "Please Enter STR");
+            return;
+        }
+        if(txtagi.getText().isEmpty()){
+            AppDialogs.showMessageDialog(null, "Please Enter AGI");
+            return;
+        }
+        if(txtdex.getText().isEmpty()){
+            AppDialogs.showMessageDialog(null, "Please Enter DEX");
+            return;
+        }
+        if(txtvid.getText().isEmpty()){
+            AppDialogs.showMessageDialog(null, "Please Enter VIT");
+            return;
+        }
+        if(txthp.getText().isEmpty()){
+            AppDialogs.showMessageDialog(null, "Please Enter HP");
+            return;
+        }
+        if(txtstamina.getText().isEmpty()){
+            AppDialogs.showMessageDialog(null, "Please Enter Stamina");
+            return;
+        }
+        if(mobimg.getImage()==null){
+            AppDialogs.showMessageDialog(null, "Please Upload Image");
+            return;
+        }
+
+        try {
+            mobs mob = new mobs(
+                Math.max(0, Edit_characterController.mid),
+                txtmname.getText().trim(),
+                txtmobstype.getText().trim(),
+                MobEditorSupport.parseRequiredInt(txtstr, "STR"),
+                MobEditorSupport.parseRequiredInt(txtagi, "AGI"),
+                MobEditorSupport.parseRequiredInt(txtvid, "VIT"),
+                MobEditorSupport.parseRequiredInt(txtdex, "DEX"),
+                MobEditorSupport.parseRequiredInt(txthp, "HP"),
+                MobEditorSupport.parseRequiredInt(txtstamina, "Stamina"),
+                new ImageView(mobimg.getImage()),
+                img_name
+            );
+
+            if (mob.getImagePath() == null || mob.getImagePath().isBlank()) {
+                AppDialogs.showMessageDialog(null, "Please Upload Image");
+                return;
+            }
+
+            if (Edit_characterController.mid > 0) {
+                mobRepository.update(mob);
+                AppDialogs.showMessageDialog(null, "Updated Successfully!");
+            } else {
+                mobRepository.insert(mob);
+                AppDialogs.showMessageDialog(null, "Added Successfully!");
+            }
+
+            util.SceneManager.switchScene("/view/edit_character.fxml");
+        } catch (ClassNotFoundException ex) {
+            throw new SQLException("Database driver not found.", ex);
+        } catch (NumberFormatException ex) {
+            AppDialogs.showMessageDialog(null, ex.getMessage());
+        }
     }
      @FXML
-    void handlebtnbackaction(ActionEvent event) {
-
-    }
-    public static String copyImageToFolder(File sourceFile) throws IOException{
-       
-        //Create images folder if not exits
-        File imageDir  = new File("E:\\PJ\\rust_and_roots\\src\\image\\");
-        if(!imageDir.exists()){
-            imageDir.mkdirs();
-        }
-        
-        String fileName = sourceFile.getName();
-        File destination = new File(imageDir,  fileName);
-        
-        Files.copy(
-                sourceFile.toPath(), 
-                destination.toPath(), 
-                StandardCopyOption.REPLACE_EXISTING);
-        
-        return fileName;
+    void handlebtnbackaction(ActionEvent event) throws IOException {
+        util.SceneManager.switchScene("/view/edit_character.fxml");
     }
     
     private void fetchAccount() throws SQLException{        
-        String sql = "select m.mobs_name,m.mobs_type,s.str,s.agi,s.vid,s.dex,s.hp,s.stimana,m.image from mobs m JOIN stats s ON m.stats= s.stats_id WHERE m.mobs_id = ?;";
-        pst = con.prepareStatement(sql);
-        pst.setInt(1, Edit_characterController.mid);
-        rs=pst.executeQuery();
+        if (Edit_characterController.mid <= 0) {
+            img_name = "mob/Slime/Slime1_Idle_with_shadow.png";
+            Image image = MobEditorSupport.loadMobImage(img_name);
+            mobimg.setImage(image);
+            if (image != null) {
+                MobEditorSupport.fitImageToPreviewBox(mobimg);
+            }
+            return;
+        }
 
-       if(rs.next()){
-           txtmname.setText(rs.getString("mobs_name"));
-           txtmobstype.setText(rs.getString("mobs_type"));
-           txtstr.setText(rs.getString("str"));
-           txtagi.setText(rs.getString("agi"));
-           txtdex.setText(rs.getString("dex"));
-           txtvid.setText(rs.getString("vid"));
-           txthp.setText(rs.getString("hp"));
-           txtstamina.setText(rs.getString("stimana"));
-           
-           String img_name1 = rs.getString("image");
-            File file= new File("E:\\PJ\\rust_and_roots\\src\\image\\"+img_name1 );
-            Image image = new Image(file.toURI().toString());
-            ImageView imgView = new ImageView(image);
-            imgView.setFitHeight(50);
-            imgView.setFitWidth(50);
-            imgView.setPreserveRatio(true);
-            
-           mobimg.setImage(image);
-       }
+        try {
+            mobs mob = mobRepository.findById(Edit_characterController.mid);
+            if (mob == null) {
+                return;
+            }
+
+            txtmname.setText(mob.getMobs_name());
+            txtmobstype.setText(mob.getMobs_type());
+            txtstr.setText(String.valueOf(mob.getStr()));
+            txtagi.setText(String.valueOf(mob.getAgi()));
+            txtdex.setText(String.valueOf(mob.getDex()));
+            txtvid.setText(String.valueOf(mob.getVid()));
+            txthp.setText(String.valueOf(mob.getHp()));
+            txtstamina.setText(String.valueOf(mob.getStimana()));
+
+            img_name = mob.getImagePath();
+            Image image = MobEditorSupport.loadMobImage(img_name);
+            mobimg.setImage(image);
+            if (image != null) {
+                MobEditorSupport.fitImageToPreviewBox(mobimg);
+            }
+        } catch (ClassNotFoundException ex) {
+            throw new SQLException("Database driver not found.", ex);
+        }
     }
 }

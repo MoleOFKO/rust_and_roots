@@ -21,6 +21,7 @@ public class mobs {
     private int hp;
     private int stimana;
     private ImageView image;
+    private String imagePath;
 
     public int getMobs_id() {
         return mobs_id;
@@ -102,7 +103,19 @@ public class mobs {
         this.image = image;
     }
 
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
+    }
+
     public mobs(int mobs_id, String mobs_name, String mobs_type, int str, int agi, int vid, int dex, int hp, int stimana, ImageView image) {
+        this(mobs_id, mobs_name, mobs_type, str, agi, vid, dex, hp, stimana, image, null);
+    }
+
+    public mobs(int mobs_id, String mobs_name, String mobs_type, int str, int agi, int vid, int dex, int hp, int stimana, ImageView image, String imagePath) {
         this.mobs_id = mobs_id;
         this.mobs_name = mobs_name;
         this.mobs_type = mobs_type;
@@ -113,6 +126,7 @@ public class mobs {
         this.hp = hp;
         this.stimana = stimana;
         this.image = image;
+        this.imagePath = imagePath;
     }
     
 }
