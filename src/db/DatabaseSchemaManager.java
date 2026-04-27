@@ -48,9 +48,8 @@ public final class DatabaseSchemaManager {
             int start = script.indexOf(SCRIPT_START_MARKER);
             int end = script.indexOf(SCRIPT_END_MARKER);
             if (start < 0 || end < 0 || end <= start) {
-                throw new IllegalStateException(
-                    "Schema bootstrap markers not found in " + SCRIPT_RESOURCE
-                );
+                System.out.println("Schema bootstrap markers not found in " + SCRIPT_RESOURCE + "; skipping bootstrap section.");
+                return "";
             }
 
             return script.substring(start + SCRIPT_START_MARKER.length(), end);
