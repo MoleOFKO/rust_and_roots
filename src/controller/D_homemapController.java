@@ -506,19 +506,6 @@ public class D_homemapController extends BaseMapController {
     @FXML
     private ImageView drops_img_hihiogane;
 
-    @Override
-    protected void afterBaseInitialize() {
-        initializeOreNodesIfNeeded();
-    }
-
-    @Override
-    protected void onGameLoopUpdate(Bounds playerBounds) {
-        initializeOreNodesIfNeeded();
-        syncDirectionalHitboxes();
-        updateOreNodes();
-        autoGatherOreDrops(playerBounds);
-    }
-
     private void initializeOreNodesIfNeeded() {
         if (oresInitialized) {
             return;
