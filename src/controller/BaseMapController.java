@@ -233,6 +233,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
 	    // ---------- Shared mob system (FXML-driven) ----------
 	    private MapMobSystem mobSystem;
+	    private NaturalResourceSystem naturalResourceSystem;
 	    
 	    protected final List<StackPane> hotbarSlots = new ArrayList<>();
 	    protected final List<ToggleButton> hotbarSlotButtons = new ArrayList<>();
@@ -466,6 +467,20 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 	        if (mobSystem != null) {
 	            registerPlayerAttackHandler("mobs", mobSystem::handlePlayerAttackStarted);
 	            registerPlayerCollisionRectangles(mobSystem.mobHitboxesForPlayerCollision());
+	            rebuildPlayerCollisionWalls();
+	        }
+
+	        naturalResourceSystem = NaturalResourceSystem.tryCreate(
+	            gameState,
+	            mapKey(),
+	            world,
+	            player,
+	            playerState,
+	            human_hitbox
+	        );
+	        if (naturalResourceSystem != null) {
+	            registerPlayerAttackHandler("resources", naturalResourceSystem::handlePlayerAttackStarted);
+	            registerPlayerCollisionRectangles(naturalResourceSystem.resourceHitboxesForPlayerCollision());
 	            rebuildPlayerCollisionWalls();
 	        }
 
@@ -2341,6 +2356,10 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
 	            if (mobSystem != null) {
 	                mobSystem.update(playerBounds);
+	            }
+
+	            if (naturalResourceSystem != null) {
+	                naturalResourceSystem.update(playerBounds);
 	            }
 
 	            onGameLoopUpdate(playerBounds);

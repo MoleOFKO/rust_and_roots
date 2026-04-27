@@ -500,8 +500,6 @@ public class Left_mapController extends BaseMapController {
         bindSettingControls();
         refreshStatusAllocationUi();
         refreshMenuState();
-        setupTreeSystemIfPresent();
-        setupStoneSystemIfPresent();
     }
 
     private void setupTreeSystemIfPresent() {
