@@ -245,12 +245,11 @@ final class NaturalResourceSystem {
             return;
         }
 
-        Rectangle attackHitbox = resolveActiveAttackHitbox();
-        if (attackHitbox == null) {
+        Bounds attackBounds = buildPlayerAttackBounds();
+        if (attackBounds == null) {
             return;
         }
 
-        Bounds attackBounds = attackHitbox.localToScene(attackHitbox.getBoundsInLocal());
         GameTimeManager time = GameTimeManager.get();
         int currentDay = time.dayNumberProperty().get();
         double nowSeconds = time.totalSecondsProperty().get();
@@ -287,6 +286,7 @@ final class NaturalResourceSystem {
         double nowSeconds = GameTimeManager.get().totalSecondsProperty().get();
 
         List<ResourceHandle> discovered = new ArrayList<>();
+        Set<Node> claimedNodes = new HashSet<>();
         for (Map.Entry<String, Node> entry : nodesById.entrySet()) {
             String id = entry == null ? null : entry.getKey();
             Node node = entry == null ? null : entry.getValue();
@@ -296,6 +296,9 @@ final class NaturalResourceSystem {
 
             ResourceHandle handle = createResourceHandle(id, group);
             if (handle == null) {
+                continue;
+            }
+            if (!claimResourceNodes(handle, claimedNodes)) {
                 continue;
             }
 
@@ -351,6 +354,36 @@ final class NaturalResourceSystem {
             case STONE -> 1;
             case ORE -> 2;
         };
+    }
+
+    private boolean claimResourceNodes(ResourceHandle handle, Set<Node> claimed) {
+        if (handle == null || claimed == null) {
+            return true;
+        }
+
+        if (!claimNodeForHandle(claimed, handle.sprite, handle.nodeId, "sprite")) return false;
+        if (!claimNodeForHandle(claimed, handle.hitbox, handle.nodeId, "hitbox")) return false;
+        if (!claimNodeForHandle(claimed, handle.dropsView, handle.nodeId, "dropsView")) return false;
+
+        if (handle.kind == ResourceKind.TREE) {
+            if (!claimNodeForHandle(claimed, handle.treeLayerGroup, handle.nodeId, "treeLayerGroup")) return false;
+            if (!claimNodeForHandle(claimed, handle.treeLayerImage, handle.nodeId, "treeLayerImage")) return false;
+        }
+
+        return true;
+    }
+
+    private boolean claimNodeForHandle(Set<Node> claimed, Node node, String ownerId, String role) {
+        if (node == null) {
+            return true;
+        }
+        if (claimed.add(node)) {
+            return true;
+        }
+        System.err.println(
+            "[NaturalResourceSystem] Node reused across multiple resources (owner=" + ownerId + ", role=" + role + ", id=" + node.getId() + ")"
+        );
+        return false;
     }
 
     private ResourceHandle createResourceHandle(String id, Group group) {
@@ -1049,6 +1082,9 @@ final class NaturalResourceSystem {
         if (player == null) {
             return;
         }
+        if (playerAttackLeft == null && playerAttackRight == null && playerAttackUp == null && playerAttackDown == null) {
+            return;
+        }
 
         Player.FacingDirection facing = player.getFacingDirection();
         setDirectionalHitboxActive(playerAttackLeft, facing == Player.FacingDirection.LEFT);
@@ -1076,6 +1112,53 @@ final class NaturalResourceSystem {
             case RIGHT -> playerAttackRight;
             case UP -> playerAttackUp;
             case DOWN -> playerAttackDown;
+        };
+    }
+
+    private Bounds buildPlayerAttackBounds() {
+        if (player == null) {
+            return null;
+        }
+
+        Rectangle attackHitbox = resolveActiveAttackHitbox();
+        if (attackHitbox != null) {
+            return attackHitbox.localToScene(attackHitbox.getBoundsInLocal());
+        }
+
+        if (playerBodyHitbox == null) {
+            return null;
+        }
+
+        Bounds body = playerBodyHitbox.localToScene(playerBodyHitbox.getBoundsInLocal());
+
+        double attackWidth = 14.0;
+        double attackHeight = 20.0;
+
+        return switch (player.getFacingDirection()) {
+            case LEFT -> new BoundingBox(
+                body.getMinX() - attackWidth,
+                body.getMinY() + (body.getHeight() - attackHeight) * 0.5,
+                attackWidth,
+                attackHeight
+            );
+            case RIGHT -> new BoundingBox(
+                body.getMaxX(),
+                body.getMinY() + (body.getHeight() - attackHeight) * 0.5,
+                attackWidth,
+                attackHeight
+            );
+            case UP -> new BoundingBox(
+                body.getMinX() + (body.getWidth() - attackWidth) * 0.5,
+                body.getMinY() - attackHeight,
+                attackWidth,
+                attackHeight
+            );
+            case DOWN -> new BoundingBox(
+                body.getMinX() + (body.getWidth() - attackWidth) * 0.5,
+                body.getMaxY(),
+                attackWidth,
+                attackHeight
+            );
         };
     }
 
