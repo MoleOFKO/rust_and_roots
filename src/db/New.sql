@@ -262,7 +262,7 @@ CREATE TABLE `mobs` (
   `image` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`mobs_id`),
   UNIQUE KEY `uq_mobs_mobs_type` (`mobs_type`)
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=76 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -271,7 +271,7 @@ CREATE TABLE `mobs` (
 
 LOCK TABLES `mobs` WRITE;
 /*!40000 ALTER TABLE `mobs` DISABLE KEYS */;
-INSERT INTO `mobs` VALUES (1,'Slime','slime',3,2,6,1,10,30,'mob/Slime/Slime1_Idle_with_shadow.png'),(2,'Poison Slime','poison_slime',6,4,12,2,20,60,'mob/Slime/Slime2_Idle_with_shadow.png'),(3,'Lava Slime','lava_slime',6,4,12,2,20,60,'mob/Slime/Slime3_Idle_with_shadow.png'),(4,'Orc','orc',4,3,3,1,20,25,'mob/Orc/orc1_idle_with_shadow.png'),(5,'Orc Berserker','orcb',12,9,9,3,60,75,'mob/Orc/orc3_idle_with_shadow.png');
+INSERT INTO `mobs` VALUES (1,'Slime','slime',3,2,6,1,10,30,'mob/Slime/Slime1.png'),(2,'Poison Slime','poison_slime',6,4,12,2,20,60,'mob/Slime/Slime2.png'),(3,'Lava Slime','lava_slime',6,4,12,2,20,60,'mob/Slime/Slime3.png'),(4,'Orc','orc',4,3,3,1,20,25,'mob/Orc/orc1.png'),(5,'Orc Berserker','orcb',12,9,9,3,60,75,'mob/Orc/orc3.png');
 /*!40000 ALTER TABLE `mobs` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -798,7 +798,7 @@ CREATE TABLE `saved_tree_resource` (
 
 LOCK TABLES `saved_tree_resource` WRITE;
 /*!40000 ALTER TABLE `saved_tree_resource` DISABLE KEYS */;
-INSERT INTO `saved_tree_resource` VALUES (15,'left_map','stone','stone',1,0,0,0,0,67304.4546497998,1,0,2,0,-1,0),(15,'left_map','tree','blue',1,0,0,0,0,67952.25809939975,1,0,2,0,-1,0);
+INSERT INTO `saved_tree_resource` VALUES (12,'left_map','stone','stone',3,9,10,10,10,-1,10,0,0,0,839444.0891159917,0),(12,'left_map','tree','red',3,9,10,10,10,-1,10,0,0,0,839444.0891159917,0),(15,'left_map','stone','stone',1,0,0,0,0,67304.4546497998,1,0,2,0,-1,0),(15,'left_map','tree','blue',1,0,0,0,0,67952.25809939975,1,0,2,0,-1,0);
 /*!40000 ALTER TABLE `saved_tree_resource` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -970,4 +970,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-04-27 18:45:17
+-- Dump completed on 2026-04-28 14:48:49
