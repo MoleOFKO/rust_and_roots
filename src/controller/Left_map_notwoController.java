@@ -8,6 +8,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Group;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Slider;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
@@ -28,6 +29,48 @@ public class Left_map_notwoController extends BaseMapController {
 
     private static final String DAY_BG_PATH = "/image/maps/leftmap_no.2.png";
     private static final String NIGHT_BG_PATH = "/image/NightMap/leftmap_no.2night.png";
+    @FXML
+    private ImageView bg;
+    @FXML
+    private Group tree;
+    @FXML
+    private ImageView tree_img;
+    @FXML
+    private Rectangle tree_hitbox;
+    @FXML
+    private ImageView drops_img_tree;
+    @FXML
+    private Group tree1;
+    @FXML
+    private ImageView tree_img1;
+    @FXML
+    private Rectangle tree_hitbox1;
+    @FXML
+    private ImageView drops_img_tree1;
+    @FXML
+    private Group treelayorgp1;
+    @FXML
+    private ImageView treelayorimg1;
+    @FXML
+    private Group treelayorgp;
+    @FXML
+    private ImageView treelayorimg;
+    @FXML
+    private Group daynightnavgroup;
+    @FXML
+    private Label day;
+    @FXML
+    private ImageView daynightcircleimg;
+    @FXML
+    private Label time;
+    @FXML
+    private Label name;
+    @FXML
+    private Label coin;
+    @FXML
+    private ProgressBar hpbar;
+    @FXML
+    private ProgressBar spbar;
 
     @Override
     protected String dayBackgroundPath() {
@@ -377,5 +420,4 @@ public class Left_map_notwoController extends BaseMapController {
         registerExit(exit_right, "/view/upper_map_notwo.fxml", SpawnTag.FROM_LEFT);
         registerExit(exit_down, "/view/left_map_noone.fxml", SpawnTag.FROM_UP);
     }
-    
 }
