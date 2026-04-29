@@ -8,6 +8,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Group;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Slider;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
@@ -28,6 +29,100 @@ public class Left_map_nofourController extends BaseMapController {
 
     private static final String DAY_BG_PATH = "/image/maps/leftmap_no.4.png";
     private static final String NIGHT_BG_PATH = "/image/NightMap/leftmap_no.4night.png";
+    @FXML
+    private ImageView bg;
+    @FXML
+    private Group tree;
+    @FXML
+    private ImageView tree_img;
+    @FXML
+    private Rectangle tree_hitbox;
+    @FXML
+    private ImageView drops_img_tree;
+    @FXML
+    private Group treelayorgp;
+    @FXML
+    private ImageView treelayorimg;
+    @FXML
+    private Group daynightnavgroup;
+    @FXML
+    private Label day;
+    @FXML
+    private ImageView daynightcircleimg;
+    @FXML
+    private Label time;
+    @FXML
+    private Label name;
+    @FXML
+    private Label coin;
+    @FXML
+    private ProgressBar hpbar;
+    @FXML
+    private ProgressBar spbar;
+    @FXML
+    private Group stone7;
+    @FXML
+    private ImageView stone_img7;
+    @FXML
+    private Rectangle stone_hitbox7;
+    @FXML
+    private ImageView drops_img_stone7;
+    @FXML
+    private Group stone6;
+    @FXML
+    private ImageView stone_img6;
+    @FXML
+    private Rectangle stone_hitbox6;
+    @FXML
+    private ImageView drops_img_stone6;
+    @FXML
+    private Group stone5;
+    @FXML
+    private ImageView stone_img5;
+    @FXML
+    private Rectangle stone_hitbox5;
+    @FXML
+    private ImageView drops_img_stone5;
+    @FXML
+    private Group stone4;
+    @FXML
+    private ImageView stone_img4;
+    @FXML
+    private Rectangle stone_hitbox4;
+    @FXML
+    private ImageView drops_img_stone4;
+    @FXML
+    private Group stone3;
+    @FXML
+    private ImageView stone_img3;
+    @FXML
+    private Rectangle stone_hitbox3;
+    @FXML
+    private ImageView drops_img_stone3;
+    @FXML
+    private Group stone2;
+    @FXML
+    private ImageView stone_img2;
+    @FXML
+    private Rectangle stone_hitbox2;
+    @FXML
+    private ImageView drops_img_stone2;
+    @FXML
+    private Group stone1;
+    @FXML
+    private ImageView stone_img1;
+    @FXML
+    private Rectangle stone_hitbox1;
+    @FXML
+    private ImageView drops_img_stone1;
+    @FXML
+    private Group stone;
+    @FXML
+    private ImageView stone_img;
+    @FXML
+    private Rectangle stone_hitbox;
+    @FXML
+    private ImageView drops_img_stone;
 
     @Override
     protected String dayBackgroundPath() {
