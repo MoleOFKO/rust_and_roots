@@ -15,6 +15,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.shape.Rectangle?>
@@ -1879,5 +1880,29 @@
             </children>
          </StackPane>
       </Group>
+      <StackPane fx:id="tutorialOverlay" managed="false" onMouseClicked="#handleTutorialOverlayClick" pickOnBounds="true" visible="false">
+         <children>
+            <Rectangle fx:id="tutorialShade" arcHeight="12.0" arcWidth="12.0" fill="#000000d9" height="400.0" width="600.0" />
+            <Pane fx:id="tutorialOverlayContent" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0">
+               <children>
+                  <Label fx:id="tutorialTitleLabel" alignment="CENTER" layoutX="130.0" layoutY="18.0" prefHeight="30.0" prefWidth="340.0" text="Tutorial" textFill="WHITE">
+                     <font>
+                        <Font name="System Bold" size="24.0" />
+                     </font>
+                  </Label>
+                  <ImageView fx:id="tutorialImageView" fitHeight="255.0" fitWidth="460.0" layoutX="70.0" layoutY="62.0" pickOnBounds="true" preserveRatio="true" />
+                  <VBox fx:id="tutorialPromptBox" alignment="CENTER" layoutX="110.0" layoutY="327.0" prefHeight="52.0" prefWidth="380.0" spacing="4.0">
+                     <children>
+                        <Label fx:id="tutorialPromptLabel" alignment="CENTER" prefWidth="380.0" text="Tap anywhere to continue" textFill="WHITE">
+                           <font>
+                              <Font name="System Bold" size="18.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </VBox>
+               </children>
+            </Pane>
+         </children>
+      </StackPane>
    </children>
 </StackPane>

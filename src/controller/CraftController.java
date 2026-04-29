@@ -29,6 +29,7 @@ import util.AppDialogs;
 import util.SceneManager;
 import util.SkillModifiers;
 import util.SpawnTag;
+import util.TutorialOverlayHelper;
 
 public class CraftController implements Initializable, SceneController {
     private static final int MAX_RECIPE_SLOTS = 20;
@@ -100,6 +101,12 @@ public class CraftController implements Initializable, SceneController {
         restoreActiveCraftSelection();
         startUiTimer();
         refreshSelectionDetails();
+        TutorialOverlayHelper.showIfNeeded(
+            view,
+            gameState,
+            "craft_inside",
+            List.of("/image/Toturial/Craft_inside.png")
+        );
     }
 
     private void collectRecipeNodes() {

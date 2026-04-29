@@ -13,6 +13,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 import model.FarmState;
 import model.Inventory;
 import model.MobMapState;
@@ -99,8 +100,9 @@ public class SaveGameService {
             INSERT INTO save_game
             (character_id, saved_name, world_name, current_map_id, player_stats_id, money,
              saved_location_x, saved_location_y, exp,
-             selected_hotbar_index, hotbar_visible, current_hp, current_stamina)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+             selected_hotbar_index, hotbar_visible, current_hp, current_stamina,
+             home_interior_tutorial_seen, tutorial_flags)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """;
 
         try (PreparedStatement psSave = con.prepareStatement(insertSave, Statement.RETURN_GENERATED_KEYS)) {
@@ -117,6 +119,8 @@ public class SaveGameService {
             psSave.setBoolean(11, ps.isHotbarVisible());
             psSave.setInt(12, ps.getHp());
             psSave.setInt(13, ps.getStamina());
+            psSave.setBoolean(14, gs.isHomeInteriorTutorialSeen());
+            psSave.setString(15, serializeTutorialFlags(gs));
             psSave.executeUpdate();
 
             try (ResultSet rs = psSave.getGeneratedKeys()) {
@@ -141,6 +145,8 @@ public class SaveGameService {
                 hotbar_visible = ?,
                 current_hp = ?,
                 current_stamina = ?,
+                home_interior_tutorial_seen = ?,
+                tutorial_flags = ?,
                 last_saved_date = NOW()
             WHERE saved_id = ?
             """;
@@ -158,7 +164,9 @@ public class SaveGameService {
             psmt.setBoolean(8, ps.isHotbarVisible());
             psmt.setInt(9, ps.getHp());
             psmt.setInt(10, ps.getStamina());
-            psmt.setInt(11, gs.getCurrentSaveId());
+            psmt.setBoolean(11, gs.isHomeInteriorTutorialSeen());
+            psmt.setString(12, serializeTutorialFlags(gs));
+            psmt.setInt(13, gs.getCurrentSaveId());
             psmt.executeUpdate();
         }
     }
@@ -1060,8 +1068,9 @@ public class SaveGameService {
             INSERT INTO save_game
             (character_id, saved_name, world_name, current_map_id, player_stats_id, money,
              saved_location_x, saved_location_y, exp,
-             selected_hotbar_index, hotbar_visible, current_hp, current_stamina)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+             selected_hotbar_index, hotbar_visible, current_hp, current_stamina,
+             home_interior_tutorial_seen, tutorial_flags)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """;
 
         try (PreparedStatement psSave = con.prepareStatement(insertSave, Statement.RETURN_GENERATED_KEYS)) {
@@ -1078,6 +1087,8 @@ public class SaveGameService {
             psSave.setBoolean(11, ps.isHotbarVisible());
             psSave.setInt(12, ps.getHp());
             psSave.setInt(13, ps.getStamina());
+            psSave.setBoolean(14, gs.isHomeInteriorTutorialSeen());
+            psSave.setString(15, serializeTutorialFlags(gs));
             psSave.executeUpdate();
 
             try (ResultSet rs = psSave.getGeneratedKeys()) {
@@ -1087,5 +1098,20 @@ public class SaveGameService {
                 gs.setCurrentSaveId(rs.getInt(1));
             }
         }
+    }
+
+    private String serializeTutorialFlags(GameState gs) {
+        if (gs == null) {
+            return "";
+        }
+
+        StringJoiner joiner = new StringJoiner(",");
+        for (String tutorialKey : gs.getSeenTutorialKeys()) {
+            if (tutorialKey == null || tutorialKey.isBlank()) {
+                continue;
+            }
+            joiner.add(tutorialKey.trim());
+        }
+        return joiner.toString();
     }
 }

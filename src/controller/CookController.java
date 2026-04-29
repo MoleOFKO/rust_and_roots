@@ -27,6 +27,7 @@ import util.AppDialogs;
 import util.SceneManager;
 import util.SkillModifiers;
 import util.SpawnTag;
+import util.TutorialOverlayHelper;
 
 public class CookController implements Initializable, SceneController {
 
@@ -143,6 +144,12 @@ public class CookController implements Initializable, SceneController {
         restoreActiveCookingSelection();
         startUiTimer();
         refreshSelectionDetails();
+        TutorialOverlayHelper.showIfNeeded(
+            view,
+            gameState,
+            "cook_inside",
+            List.of("/image/Toturial/Cooking_inside.png")
+        );
     }
 
     private void collectRecipeNodes() {

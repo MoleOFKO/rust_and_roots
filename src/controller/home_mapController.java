@@ -32,6 +32,7 @@ import model.Merchant;
 import model.item;
 import util.SceneManager;
 import util.SpawnTag;
+import util.TutorialOverlayHelper;
 
 public class home_mapController extends BaseMapController {
 
@@ -516,6 +517,16 @@ public class home_mapController extends BaseMapController {
         if (farm1_button != null) {
             farm1_button.setOnAction(e -> openFarmTable());
         }
+
+        TutorialOverlayHelper.showIfNeeded(
+            view,
+            gameState,
+            "home_map_overview",
+            List.of(
+                "/image/Toturial/Shop.png",
+                "/image/Toturial/Farm.png"
+            )
+        );
     }
   
     @Override
