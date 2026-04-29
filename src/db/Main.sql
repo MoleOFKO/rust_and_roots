@@ -175,11 +175,13 @@ CREATE TABLE `save_game` (
   `saved_location_y` int NOT NULL,
   `exp` int NOT NULL,
   `selected_hotbar_index` int NOT NULL DEFAULT '0',
-  `hotbar_visible` tinyint(1) NOT NULL DEFAULT '1',
-  `world_name` varchar(50) NOT NULL DEFAULT '',
-  `current_hp` int NOT NULL DEFAULT '45',
-  `current_stamina` int NOT NULL DEFAULT '50',
-  PRIMARY KEY (`saved_id`),
+    `hotbar_visible` tinyint(1) NOT NULL DEFAULT '1',
+    `world_name` varchar(50) NOT NULL DEFAULT '',
+    `current_hp` int NOT NULL DEFAULT '45',
+    `current_stamina` int NOT NULL DEFAULT '50',
+    `home_interior_tutorial_seen` tinyint(1) NOT NULL DEFAULT '0',
+    `tutorial_flags` varchar(500) NOT NULL DEFAULT '',
+    PRIMARY KEY (`saved_id`),
   KEY `character_id` (`character_id`),
   KEY `current_map_id` (`current_map_id`),
   KEY `stats_id` (`stats_id`),
@@ -197,7 +199,7 @@ CREATE TABLE `save_game` (
 
 LOCK TABLES `save_game` WRITE;
 /*!40000 ALTER TABLE `save_game` DISABLE KEYS */;
-INSERT INTO `save_game` VALUES (1,1,'Save 1','2026-03-29 07:00:50',1,88,2,100,160,135,100,0,1,'',45,50),(2,2,'Save 1','2026-03-21 06:46:36',1,89,NULL,0,432,182,0,0,1,'ff',45,50),(3,1,'Save 2','2026-03-20 07:36:13',1,90,NULL,0,160,135,0,0,1,'world_3',45,50),(5,1,'Save 1','2026-03-27 15:41:54',1,112,1,50,344,188,100,0,1,'asd',45,50),(12,1,'Save 4','2026-03-29 07:59:54',1,119,9,30,160,135,100,0,1,'qweqwe',45,50),(13,1,'Save 3','2026-03-29 04:26:33',1,120,10,0,160,135,100,0,1,'me',45,50);
+INSERT INTO `save_game` VALUES (1,1,'Save 1','2026-03-29 07:00:50',1,88,2,100,160,135,100,0,1,'',45,50,0,''),(2,2,'Save 1','2026-03-21 06:46:36',1,89,NULL,0,432,182,0,0,1,'ff',45,50,0,''),(3,1,'Save 2','2026-03-20 07:36:13',1,90,NULL,0,160,135,0,0,1,'world_3',45,50,0,''),(5,1,'Save 1','2026-03-27 15:41:54',1,112,1,50,344,188,100,0,1,'asd',45,50,0,''),(12,1,'Save 4','2026-03-29 07:59:54',1,119,9,30,160,135,100,0,1,'qweqwe',45,50,0,''),(13,1,'Save 3','2026-03-29 04:26:33',1,120,10,0,160,135,100,0,1,'me',45,50,0,'');
 /*!40000 ALTER TABLE `save_game` ENABLE KEYS */;
 UNLOCK TABLES;
 

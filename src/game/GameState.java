@@ -668,7 +668,9 @@ public final class GameState {
 
     private final Map<Integer, Deque<FoodEffectOutcome>> cookedDishEffectsByItemId = new HashMap<>();
     private final Set<String> unlockedRecipeKeys = new LinkedHashSet<>();
+    private final Set<String> seenTutorialKeys = new LinkedHashSet<>();
     private ActiveSmeltJob activeSmeltJob = null;
+    private boolean homeInteriorTutorialSeen = false;
 
     private GameState() {
         seedDefaultFixedShopItems();
@@ -722,6 +724,8 @@ public final class GameState {
         dailyRemainingShopStock.clear();
         saveMenuMode = false;
         preferredStatusPanelGroup = StatusPanelGroup.STATUS;
+        homeInteriorTutorialSeen = false;
+        seenTutorialKeys.clear();
     }
 
     public void resetSmeltProgressionState() {
@@ -1428,6 +1432,53 @@ public final class GameState {
 
     public void setPreferredStatusPanelGroup(StatusPanelGroup preferredStatusPanelGroup) {
         this.preferredStatusPanelGroup = preferredStatusPanelGroup == null ? StatusPanelGroup.STATUS : preferredStatusPanelGroup;
+    }
+
+    public boolean isHomeInteriorTutorialSeen() {
+        return homeInteriorTutorialSeen || hasSeenTutorial("home_interior_overview");
+    }
+
+    public void setHomeInteriorTutorialSeen(boolean homeInteriorTutorialSeen) {
+        this.homeInteriorTutorialSeen = homeInteriorTutorialSeen;
+        if (homeInteriorTutorialSeen) {
+            markTutorialSeen("home_interior_overview");
+        }
+    }
+
+    public boolean hasSeenTutorial(String tutorialKey) {
+        if (tutorialKey == null || tutorialKey.isBlank()) {
+            return false;
+        }
+        return seenTutorialKeys.contains(tutorialKey.trim());
+    }
+
+    public void markTutorialSeen(String tutorialKey) {
+        if (tutorialKey == null || tutorialKey.isBlank()) {
+            return;
+        }
+        seenTutorialKeys.add(tutorialKey.trim());
+        if ("home_interior_overview".equals(tutorialKey.trim())) {
+            homeInteriorTutorialSeen = true;
+        }
+    }
+
+    public Set<String> getSeenTutorialKeys() {
+        return Set.copyOf(seenTutorialKeys);
+    }
+
+    public void setSeenTutorialKeys(Iterable<String> tutorialKeys) {
+        seenTutorialKeys.clear();
+        if (tutorialKeys == null) {
+            homeInteriorTutorialSeen = false;
+            return;
+        }
+        for (String tutorialKey : tutorialKeys) {
+            if (tutorialKey == null || tutorialKey.isBlank()) {
+                continue;
+            }
+            seenTutorialKeys.add(tutorialKey.trim());
+        }
+        homeInteriorTutorialSeen = seenTutorialKeys.contains("home_interior_overview");
     }
     
     

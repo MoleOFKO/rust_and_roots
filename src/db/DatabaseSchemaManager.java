@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -29,7 +31,25 @@ public final class DatabaseSchemaManager {
             }
 
             executeBootstrapSection(con);
+            ensureSaveGameTutorialColumn(con);
             ensured = true;
+        }
+    }
+
+    private static void ensureSaveGameTutorialColumn(Connection con) throws SQLException {
+        if (hasColumn(con, "save_game", "home_interior_tutorial_seen")) {
+        } else {
+            execute(con, """
+                ALTER TABLE save_game
+                ADD COLUMN home_interior_tutorial_seen TINYINT(1) NOT NULL DEFAULT 0
+                """);
+        }
+
+        if (!hasColumn(con, "save_game", "tutorial_flags")) {
+            execute(con, """
+                ALTER TABLE save_game
+                ADD COLUMN tutorial_flags VARCHAR(500) NOT NULL DEFAULT ''
+                """);
         }
     }
 
@@ -107,6 +127,25 @@ public final class DatabaseSchemaManager {
     private static void execute(Connection con, String sql) throws SQLException {
         try (Statement stmt = con.createStatement()) {
             stmt.execute(sql);
+        }
+    }
+
+    private static boolean hasColumn(Connection con, String tableName, String columnName) throws SQLException {
+        String sql = """
+            SELECT 1
+            FROM INFORMATION_SCHEMA.COLUMNS
+            WHERE TABLE_SCHEMA = DATABASE()
+              AND TABLE_NAME = ?
+              AND COLUMN_NAME = ?
+            LIMIT 1
+            """;
+
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, tableName);
+            ps.setString(2, columnName);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
         }
     }
 }

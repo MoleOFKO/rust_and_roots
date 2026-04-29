@@ -34,6 +34,7 @@ import util.AppDialogs;
 import util.SceneManager;
 import util.SkillModifiers;
 import util.SpawnTag;
+import util.TutorialOverlayHelper;
 
 public class Farm_tableController implements Initializable, SceneController {
     private static final String TOOL_SLOT_STYLE = "-fx-effect: dropshadow(gaussian, rgba(255,215,0,0.85), 14, 0.55, 0, 0);";
@@ -142,6 +143,27 @@ public class Farm_tableController implements Initializable, SceneController {
                 }
             });
         }
+
+        TutorialOverlayHelper.showIfNeeded(
+            view,
+            gameState,
+            "farm_table_inside",
+            List.of(
+                "/image/Toturial/Farm1.png",
+                "/image/Toturial/Farm2.png",
+                "/image/Toturial/Farm3.png",
+                "/image/Toturial/Farm4.png",
+                "/image/Toturial/Farm5.png",
+                "/image/Toturial/Farm6.png",
+                "/image/Toturial/Farm7.png",
+                "/image/Toturial/Farm8.png",
+                "/image/Toturial/Farm9.png",
+                "/image/Toturial/Farm10.png",
+                "/image/Toturial/Farm11.png",
+                "/image/Toturial/Farm12.png",
+                "/image/Toturial/Farm13.png"
+            )
+        );
     }
 
     @FXML

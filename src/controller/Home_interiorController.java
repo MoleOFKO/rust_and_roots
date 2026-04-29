@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 import java.net.URL;
 import java.util.ResourceBundle;
+import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
@@ -48,6 +50,7 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import model.PlayerState;
 import util.SceneManager;
+import util.TutorialOverlayHelper;
 import javafx.animation.Animation;
 import javafx.animation.Interpolator;
 import javafx.animation.TranslateTransition;
@@ -55,6 +58,7 @@ import javafx.util.Duration;
 import javafx.geometry.Bounds;
 import javafx.animation.FadeTransition;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.layout.VBox;
 
 /**
  * FXML Controller class
@@ -65,6 +69,13 @@ public class Home_interiorController extends BaseMapController {
 
     private static final String DAY_BG_PATH = "/image/inhousedesign.png";
     private static final String NIGHT_BG_PATH = "";
+    private static final List<String> HOME_TUTORIAL_IMAGE_PATHS = List.of(
+        "/image/Toturial/Craft.png",
+        "/image/Toturial/Cooing.png",
+        "/image/Toturial/Chest.png",
+        "/image/Toturial/Melting.png",
+        "/image/Toturial/Sleep.png"
+    );
 
     @Override
     protected String dayBackgroundPath() {
@@ -158,6 +169,20 @@ public class Home_interiorController extends BaseMapController {
     private ImageView human_img;
     @FXML
     private StackPane view;
+    @FXML
+    private StackPane tutorialOverlay;
+    @FXML
+    private Rectangle tutorialShade;
+    @FXML
+    private Pane tutorialOverlayContent;
+    @FXML
+    private ImageView tutorialImageView;
+    @FXML
+    private Label tutorialTitleLabel;
+    @FXML
+    private Label tutorialPromptLabel;
+    @FXML
+    private VBox tutorialPromptBox;
     @FXML
     private StackPane sleepStackPane;
     @FXML
@@ -570,6 +595,8 @@ public class Home_interiorController extends BaseMapController {
     private javafx.animation.AnimationTimer dialogOpacityTimer;
     private boolean cookingDialogDimmed = false;
     private FadeTransition cookingDialogFade;
+    private int tutorialIndex = -1;
+    private boolean tutorialOverlayActive = false;
     
     private static final int CHEST_SLOT_CAPACITY = 42;;
     @FXML
@@ -1207,6 +1234,137 @@ public class Home_interiorController extends BaseMapController {
         chestInventory.itemsProperty().addListener(
             (MapChangeListener<Integer, IntegerProperty>) change -> refreshChestAndInventoryViews()
         );
+
+        Platform.runLater(this::showHomeInteriorTutorialIfNeeded);
+    }
+
+    private void showHomeInteriorTutorialIfNeeded() {
+        if (gameState == null || gameState.isHomeInteriorTutorialSeen()) {
+            hideTutorialOverlay();
+            return;
+        }
+        if (tutorialOverlay == null || tutorialImageView == null || tutorialTitleLabel == null) {
+            return;
+        }
+
+        gameState.setHomeInteriorTutorialSeen(true);
+        tutorialIndex = 0;
+        tutorialOverlayActive = true;
+        tutorialOverlay.setManaged(true);
+        tutorialOverlay.setDisable(false);
+        tutorialOverlay.setVisible(true);
+        if (tutorialPromptLabel != null) {
+            tutorialPromptLabel.setText("Tap anywhere to continue");
+        }
+        configureTutorialOverlayResponsiveLayout();
+
+        if (player != null) {
+            player.stop();
+        }
+
+        showTutorialStep(tutorialIndex);
+    }
+
+    private void showTutorialStep(int index) {
+        if (index < 0 || index >= HOME_TUTORIAL_IMAGE_PATHS.size()) {
+            hideTutorialOverlay();
+            return;
+        }
+
+        String imagePath = HOME_TUTORIAL_IMAGE_PATHS.get(index);
+        tutorialImageView.setImage(new Image(getClass().getResource(imagePath).toExternalForm()));
+        tutorialTitleLabel.setText(extractTutorialTitle(imagePath));
+    }
+
+    private String extractTutorialTitle(String imagePath) {
+        if (imagePath == null || imagePath.isBlank()) {
+            return "Tutorial";
+        }
+
+        int slash = imagePath.lastIndexOf('/');
+        int dot = imagePath.lastIndexOf('.');
+        int start = slash >= 0 ? slash + 1 : 0;
+        int end = dot > start ? dot : imagePath.length();
+        return imagePath.substring(start, end);
+    }
+
+    private void hideTutorialOverlay() {
+        tutorialOverlayActive = false;
+        tutorialIndex = -1;
+
+        if (tutorialOverlay != null) {
+            tutorialOverlay.setVisible(false);
+            tutorialOverlay.setDisable(true);
+            tutorialOverlay.setManaged(false);
+        }
+
+        if (view != null && view.getScene() != null && player != null) {
+            player.attachInput(view.getScene());
+            player.start();
+        }
+    }
+
+    private void configureTutorialOverlayResponsiveLayout() {
+        if (view == null || tutorialImageView == null || tutorialTitleLabel == null || tutorialPromptLabel == null) {
+            return;
+        }
+
+        if (tutorialShade != null) {
+            tutorialShade.widthProperty().bind(view.widthProperty());
+            tutorialShade.heightProperty().bind(view.heightProperty());
+        }
+        if (tutorialOverlayContent != null) {
+            tutorialOverlayContent.prefWidthProperty().bind(view.widthProperty());
+            tutorialOverlayContent.prefHeightProperty().bind(view.heightProperty());
+        }
+
+        tutorialImageView.fitWidthProperty().bind(Bindings.createDoubleBinding(
+            () -> clampTutorialSize(view.getWidth() * 0.76, 260, 1100),
+            view.widthProperty()
+        ));
+        tutorialImageView.fitHeightProperty().bind(Bindings.createDoubleBinding(
+            () -> clampTutorialSize(view.getHeight() * 0.62, 180, 820),
+            view.heightProperty()
+        ));
+
+        tutorialTitleLabel.layoutXProperty().bind(view.widthProperty().subtract(tutorialTitleLabel.prefWidthProperty()).divide(2.0));
+        tutorialTitleLabel.layoutYProperty().bind(view.heightProperty().multiply(0.045));
+        tutorialTitleLabel.fontProperty().bind(Bindings.createObjectBinding(
+            () -> javafx.scene.text.Font.font("System Bold", clampTutorialSize(view.getWidth() * 0.04, 18, 34)),
+            view.widthProperty()
+        ));
+
+        tutorialImageView.layoutXProperty().bind(view.widthProperty().subtract(tutorialImageView.fitWidthProperty()).divide(2.0));
+        tutorialImageView.layoutYProperty().bind(view.heightProperty().multiply(0.155));
+
+        tutorialPromptLabel.fontProperty().bind(Bindings.createObjectBinding(
+            () -> javafx.scene.text.Font.font("System Bold", clampTutorialSize(view.getWidth() * 0.028, 14, 26)),
+            view.widthProperty()
+        ));
+        if (tutorialPromptBox != null) {
+            tutorialPromptBox.prefWidthProperty().bind(view.widthProperty().multiply(0.8));
+            tutorialPromptBox.layoutXProperty().bind(view.widthProperty().subtract(tutorialPromptBox.prefWidthProperty()).divide(2.0));
+            tutorialPromptBox.layoutYProperty().bind(view.heightProperty().multiply(0.84));
+        }
+    }
+
+    private double clampTutorialSize(double value, double min, double max) {
+        return Math.max(min, Math.min(max, value));
+    }
+
+    @FXML
+    private void handleTutorialOverlayClick(MouseEvent event) {
+        if (!tutorialOverlayActive) {
+            return;
+        }
+
+        tutorialIndex++;
+        if (tutorialIndex >= HOME_TUTORIAL_IMAGE_PATHS.size()) {
+            hideTutorialOverlay();
+            return;
+        }
+
+        showTutorialStep(tutorialIndex);
     }
     
     private void bridgeInteriorSharedUi() {
@@ -1597,6 +1755,13 @@ public class Home_interiorController extends BaseMapController {
             view.getScene().setOnKeyPressed(null);
             view.getScene().setOnKeyReleased(null);
         }
+
+        TutorialOverlayHelper.showIfNeeded(
+            view,
+            gameState,
+            "home_interior_chest_inside",
+            List.of("/image/Toturial/Chest_inside.png")
+        );
     }
 
     @FXML
@@ -1626,7 +1791,7 @@ public class Home_interiorController extends BaseMapController {
         chestStackPane.setManaged(false);
         clearSelection();
 
-        if (view != null && view.getScene() != null && player != null) {
+        if (!tutorialOverlayActive && view != null && view.getScene() != null && player != null) {
             player.attachInput(view.getScene());
         }
     }

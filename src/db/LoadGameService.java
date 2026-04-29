@@ -124,7 +124,9 @@ public class LoadGameService {
                    sg.saved_location_y,
                    sg.exp,
                    sg.selected_hotbar_index,
-                   sg.hotbar_visible
+                   sg.hotbar_visible,
+                   sg.home_interior_tutorial_seen,
+                   sg.tutorial_flags
             FROM save_game sg
             LEFT JOIN characters c ON sg.character_id = c.character_id
             WHERE sg.saved_id = ?
@@ -151,11 +153,31 @@ public class LoadGameService {
                 psState.setSelectedHotbarIndex(rs.getInt("selected_hotbar_index"));
                 psState.setHotbarVisible(rs.getBoolean("hotbar_visible"));
                 psState.setExp(rs.getInt("exp"));
+                gs.setSeenTutorialKeys(parseTutorialFlags(rs.getString("tutorial_flags")));
+                gs.setHomeInteriorTutorialSeen(rs.getBoolean("home_interior_tutorial_seen"));
 
                 replaceCoins(psState.getInventory(), rs.getInt("money"));
                 return true;
             }
         }
+    }
+
+    private List<String> parseTutorialFlags(String csv) {
+        List<String> tutorialKeys = new ArrayList<>();
+        if (csv == null || csv.isBlank()) {
+            return tutorialKeys;
+        }
+
+        for (String part : csv.split(",")) {
+            if (part == null) {
+                continue;
+            }
+            String key = part.trim();
+            if (!key.isBlank()) {
+                tutorialKeys.add(key);
+            }
+        }
+        return tutorialKeys;
     }
 
     private void loadPlayerStats(Connection con, GameState gs, int saveId) throws Exception {
