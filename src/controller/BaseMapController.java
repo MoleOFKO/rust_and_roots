@@ -32,6 +32,8 @@ import game.InteractionManager;
 import game.SceneController;
 import java.util.Objects;
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
@@ -243,6 +245,9 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     protected Image nightBg;
     protected ChangeListener<Boolean> nightListener;
     protected ChangeListener<Number> farmTimeListener;
+
+    private InvalidationListener sharedHudRefreshListener;
+    private final List<Observable> sharedHudRefreshListenerTargets = new ArrayList<>();
 
     protected abstract String mapKey();
     protected abstract void configureExits();
@@ -499,12 +504,97 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
     protected final void stopAndSwitchScene(String targetFxml, SpawnTag targetSpawn) {
         capturePlayerSnapshot();
-         
-        detachFarmTimeRefresh();
+
+        cleanupBeforeSceneSwitch();
         if (gameLoop != null) gameLoop.stop();
         if (player != null) player.stop();
         GameTimeManager.get().setWorldDilation(1.0);
         SceneManager.switchScene(targetFxml, targetSpawn);
+    }
+
+    private void cleanupBeforeSceneSwitch() {
+        detachFarmTimeRefresh();
+        detachSharedHudRefreshListener();
+
+        if (nightListener != null) {
+            try {
+                GameTimeManager.get().nightProperty().removeListener(nightListener);
+            } catch (Exception ignored) {
+            }
+            nightListener = null;
+        }
+
+        unbindSharedUiFromSingletons();
+        clearCachedUiReferences();
+
+        dayBg = null;
+        nightBg = null;
+    }
+
+    private void clearCachedUiReferences() {
+        hotbarSlots.clear();
+        hotbarSlotButtons.clear();
+        hotbarImages.clear();
+        hotbarLabels.clear();
+
+        playerInventoryImages.clear();
+        playerInventoryLabels.clear();
+        playerInventoryButtons.clear();
+
+        playerInventoryNodes.clear();
+        playerInventorySelectionButtons.clear();
+    }
+
+    private void unbindSharedUiFromSingletons() {
+        GameTimeManager time = GameTimeManager.get();
+
+        // Settings tab (newer ids)
+        if (timeLabel != null) {
+            timeLabel.textProperty().unbind();
+        }
+        if (timeSpeedValueLabel != null) {
+            timeSpeedValueLabel.textProperty().unbind();
+        }
+        if (timeSpeedSlider != null) {
+            try {
+                timeSpeedSlider.valueProperty().unbindBidirectional(time.timeScaleProperty());
+            } catch (Exception ignored) {
+            }
+        }
+
+        // Settings tab (older ids via reflection)
+        Slider legacyTimeScaleSlider = controllerField("timescaleslider", Slider.class);
+        if (legacyTimeScaleSlider != null) {
+            try {
+                legacyTimeScaleSlider.valueProperty().unbindBidirectional(time.timeScaleProperty());
+            } catch (Exception ignored) {
+            }
+        }
+
+        Label legacySliderScale = controllerField("sliderscale", Label.class);
+        if (legacySliderScale != null) legacySliderScale.textProperty().unbind();
+
+        Label legacyDays = controllerField("lbldays", Label.class);
+        if (legacyDays != null) legacyDays.textProperty().unbind();
+
+        Label legacyTime = controllerField("lbltime", Label.class);
+        if (legacyTime != null) legacyTime.textProperty().unbind();
+
+        // Day/night HUD
+        Label dayLabel = day != null ? day : controllerField("day", Label.class);
+        if (dayLabel != null) dayLabel.textProperty().unbind();
+
+        Label timeLabelHud = time != null ? time : controllerField("time", Label.class);
+        if (timeLabelHud != null) timeLabelHud.textProperty().unbind();
+
+        Label nameLabel = name != null ? name : controllerField("name", Label.class);
+        if (nameLabel != null) nameLabel.textProperty().unbind();
+
+        Label coinLabel = coin != null ? coin : controllerField("coin", Label.class);
+        if (coinLabel != null) coinLabel.textProperty().unbind();
+
+        ImageView circle = daynightcircleimg != null ? daynightcircleimg : controllerField("daynightcircleimg", ImageView.class);
+        if (circle != null) circle.rotateProperty().unbind();
     }
 
     private void scheduleNonCurrentMapStateEvictionsIfNeeded() {
@@ -1527,10 +1617,8 @@ public abstract class BaseMapController implements Initializable, SceneControlle
                 new SaveGameService().saveGameToSlot(gameState, slot);
                 gameState.setSaveMenuMode(false);
             }
-            detachFarmTimeRefresh();
-            if (gameLoop != null) gameLoop.stop();
-            if (player != null) player.stop();
-            SceneManager.switchScene("/view/main_menu.fxml");
+            GameTimeManager.get().setWorldDilation(1.0);
+            stopAndSwitchScene("/view/main_menu.fxml", SpawnTag.DEFAULT);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -1695,47 +1783,23 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     }
 
     private void bindSharedStatusAndSettingControlsIfPresent() {
+        detachSharedHudRefreshListener();
+
         if (playerState != null) {
-            playerState.playerNameProperty().addListener((obs, o, n) -> {
+            sharedHudRefreshListener = obs -> {
                 refreshStatusAllocationUi();
                 refreshSharedHudBars();
-            });
-            playerState.expProperty().addListener((obs, o, n) -> {
-                refreshStatusAllocationUi();
-                refreshSharedHudBars();
-            });
-            playerState.hpProperty().addListener((obs, o, n) -> {
-                refreshStatusAllocationUi();
-                refreshSharedHudBars();
-            });
-            playerState.maxHpProperty().addListener((obs, o, n) -> {
-                refreshStatusAllocationUi();
-                refreshSharedHudBars();
-            });
-            playerState.staminaProperty().addListener((obs, o, n) -> {
-                refreshStatusAllocationUi();
-                refreshSharedHudBars();
-            });
-            playerState.maxStaminaProperty().addListener((obs, o, n) -> {
-                refreshStatusAllocationUi();
-                refreshSharedHudBars();
-            });
-            playerState.strProperty().addListener((obs, o, n) -> {
-                refreshStatusAllocationUi();
-                refreshSharedHudBars();
-            });
-            playerState.vitProperty().addListener((obs, o, n) -> {
-                refreshStatusAllocationUi();
-                refreshSharedHudBars();
-            });
-            playerState.dexProperty().addListener((obs, o, n) -> {
-                refreshStatusAllocationUi();
-                refreshSharedHudBars();
-            });
-            playerState.agiProperty().addListener((obs, o, n) -> {
-                refreshStatusAllocationUi();
-                refreshSharedHudBars();
-            });
+            };
+            registerSharedHudRefreshListener(playerState.playerNameProperty());
+            registerSharedHudRefreshListener(playerState.expProperty());
+            registerSharedHudRefreshListener(playerState.hpProperty());
+            registerSharedHudRefreshListener(playerState.maxHpProperty());
+            registerSharedHudRefreshListener(playerState.staminaProperty());
+            registerSharedHudRefreshListener(playerState.maxStaminaProperty());
+            registerSharedHudRefreshListener(playerState.strProperty());
+            registerSharedHudRefreshListener(playerState.vitProperty());
+            registerSharedHudRefreshListener(playerState.dexProperty());
+            registerSharedHudRefreshListener(playerState.agiProperty());
         }
 
         GameTimeManager timeManager = GameTimeManager.get();
@@ -1783,6 +1847,28 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         refreshStatusAllocationUi();
         refreshSharedHudBars();
         refreshMenuState();
+    }
+
+    private void registerSharedHudRefreshListener(Observable observable) {
+        if (observable == null || sharedHudRefreshListener == null) {
+            return;
+        }
+        observable.addListener(sharedHudRefreshListener);
+        sharedHudRefreshListenerTargets.add(observable);
+    }
+
+    protected final void detachSharedHudRefreshListener() {
+        if (sharedHudRefreshListener == null) {
+            return;
+        }
+        for (Observable observable : sharedHudRefreshListenerTargets) {
+            if (observable == null) {
+                continue;
+            }
+            observable.removeListener(sharedHudRefreshListener);
+        }
+        sharedHudRefreshListenerTargets.clear();
+        sharedHudRefreshListener = null;
     }
 
     private void refreshGenericStatusView() {
