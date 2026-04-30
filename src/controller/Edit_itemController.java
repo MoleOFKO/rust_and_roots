@@ -4,15 +4,10 @@
  */
 package controller;
 
-import db.dbcon;
-import java.io.File;
+import db.UiSqlService;
 import java.io.IOException;
 import java.net.URL;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -21,7 +16,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Group;
-import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
@@ -33,9 +27,9 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javax.swing.JOptionPane;
-import util.AppDialogs;
 import model.item;
 import rust_and_roots.Rust_and_roots;
+import util.AppDialogs;
 import util.WorldScaler;
 
 /**
@@ -57,18 +51,15 @@ public class Edit_itemController implements Initializable {
     private Button btnvplayer;
     @FXML
     private Button btnlogout;
-    @FXML 
+    @FXML
     private StackPane view;
-    @FXML 
+    @FXML
     private Group uiRoot;
-    
+
     @FXML
     private TableColumn<?, ?> colaccid;
     @FXML
     private TableColumn<?, ?> colaccname;
-    private TableColumn<?, ?> colemail;
-    private TableColumn<?, ?> colstatus;
-    private TableColumn<?, ?> colcreateddate;
     @FXML
     private TextField txtsearch;
     @FXML
@@ -99,37 +90,20 @@ public class Edit_itemController implements Initializable {
     private TableColumn<?, ?> colprice;
     @FXML
     private TableColumn<?, ?> colitemtype;
-    
-    Connection con;
-    ResultSet rs;
-    PreparedStatement pst;
-    Statement st;
-    Parent root;
+
     public static ObservableList<item> itemList;
-    String created_date;
     public static int item_id;
     public static String itemname;
-    
-    
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        dbcon db = new dbcon();
-        try{
-            con = db.getConnection();
-            System.out.println("Ready...");
-            txtaname.setText(LoginController.txtname);
-            initColumn();
-            inititemList();
-            
-            
-        }catch (ClassNotFoundException e){
-            System.out.println("Not Connected....");
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
+        txtaname.setText(LoginController.txtname);
+        initColumn();
+        loadItems(null);
+
         WorldScaler scaler = new WorldScaler(view, uiRoot);
         Platform.runLater(scaler::scale);
-    }    
+    }
 
     @FXML
     private void handlebtnecharacteraction(ActionEvent event) throws IOException {
@@ -138,8 +112,7 @@ public class Edit_itemController implements Initializable {
 
     @FXML
     private void handlebtneitemaction(ActionEvent event) {
-        
-        
+        // already on this screen
     }
 
     @FXML
@@ -159,105 +132,48 @@ public class Edit_itemController implements Initializable {
 
     @FXML
     private void handlesearchaction(ActionEvent event) throws SQLException {
-        if(txtsearch.getText().isEmpty())
+        if (txtsearch.getText().isEmpty()) {
             AppDialogs.showMessageDialog(null, "Please Enter search name");
-        else{
-            itemList.clear();
-            String sname=txtsearch.getText();
-            String sql = """
-                SELECT i.item_id, i.item_name, i.price,
-                       it.item_type_name,
-                       s.str_stat AS str,
-                       s.agi_stat AS agi,
-                       s.vit_stat AS vit,
-                       s.dex_stat AS dex,
-                       s.hp,
-                       s.stamina,
-                       i.image
-                FROM items i
-                JOIN item_stats s ON i.item_stats_id = s.item_stats_id
-                LEFT JOIN item_types it ON i.item_type_id = it.item_type_id
-                WHERE i.item_name LIKE ?
-            """;
-            pst=con.prepareStatement(sql);
-            pst.setString(1, txtsearch.getText()+"%");
-            rs=pst.executeQuery();
-           
-            while(rs.next()){
-            String img_name = rs.getString("image");
-            Image image = ItemEditorSupport.loadItemImage(img_name);
-            ImageView imgView = new ImageView();
-            imgView.setImage(image);
-            imgView.setFitHeight(75);
-            imgView.setFitWidth(75);
-            imgView.setPreserveRatio(true);
-            
-            
-            itemList.add(new item(
-                    rs.getInt("item_id"),
-                    rs.getString("item_name"),
-                    rs.getString("item_type_name"),
-                    rs.getInt("price"),
-                    rs.getInt("str"),
-                    rs.getInt("agi"),
-                    rs.getInt("vit"),
-                    rs.getInt("dex"),
-                    rs.getInt("hp"),
-                    rs.getInt("stamina"),
+            return;
+        }
+        loadItems(txtsearch.getText());
+    }
+
+    private void loadItems(String namePrefix) {
+        try {
+            itemList = FXCollections.observableArrayList();
+            for (UiSqlService.ItemRow row : UiSqlService.fetchItems(namePrefix)) {
+                item_id = row.itemId();
+                String imgName = row.imageFile();
+
+                Image image = ItemEditorSupport.loadItemImage(imgName);
+                ImageView imgView = new ImageView();
+                imgView.setImage(image);
+                imgView.setFitHeight(50);
+                imgView.setFitWidth(50);
+                imgView.setPreserveRatio(true);
+
+                itemList.add(new item(
+                    row.itemId(),
+                    row.itemName(),
+                    row.itemTypeName(),
+                    row.price(),
+                    row.str(),
+                    row.agi(),
+                    row.vit(),
+                    row.dex(),
+                    row.hp(),
+                    row.stamina(),
                     imgView
-            ));
-         }
+                ));
+            }
+            item_view.setItems(itemList);
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
-    
-    private void inititemList(   ) throws SQLException{
-        itemList = FXCollections.observableArrayList();
-        String sql = """
-            SELECT i.item_id, i.item_name, i.price,
-                   it.item_type_name,
-                   s.str_stat AS str,
-                   s.agi_stat AS agi,
-                   s.vit_stat AS vit,
-                   s.dex_stat AS dex,
-                   s.hp,
-                   s.stamina,
-                   i.image
-            FROM items i
-            JOIN item_stats s ON i.item_stats_id = s.item_stats_id
-            LEFT JOIN item_types it ON i.item_type_id = it.item_type_id
-        """;
-        st = con.createStatement();
-        rs = st.executeQuery(sql);
-        while(rs.next()){
-            item_id = rs.getInt("item_id");
-            String img_name = rs.getString("image");
-            Image image = ItemEditorSupport.loadItemImage(img_name);
-            ImageView imgView = new ImageView();
-            imgView.setImage(image);
-            imgView.setFitHeight(50);
-            imgView.setFitWidth(50);
-            imgView.setPreserveRatio(true);
-            
-            
-            itemList.add(new item(
-                    rs.getInt("item_id"),
-                    rs.getString("item_name"),
-                    rs.getString("item_type_name"),
-                    rs.getInt("price"),
-                    rs.getInt("str"),
-                    rs.getInt("agi"),
-                    rs.getInt("vit"),
-                    rs.getInt("dex"),
-                    rs.getInt("hp"),
-                    rs.getInt("stamina"),
-                    imgView
-            ));
-         }
-        item_view.setItems(itemList);
-    }
-    
-    public void initColumn(){
-        
+
+    public void initColumn() {
         colaccid.setCellValueFactory(new PropertyValueFactory("item_id"));
         colaccname.setCellValueFactory(new PropertyValueFactory("item_name"));
         colitemtype.setCellValueFactory(new PropertyValueFactory("item_type_name"));
@@ -269,11 +185,8 @@ public class Edit_itemController implements Initializable {
         colhp.setCellValueFactory(new PropertyValueFactory("hp"));
         colstimana.setCellValueFactory(new PropertyValueFactory("stimana"));
         colimage.setCellValueFactory(new PropertyValueFactory("image"));
-        
-        
-        
-        
     }
+
     @FXML
     void handlebtnaddaction(ActionEvent event) throws IOException {
         util.SceneManager.switchScene("/view/item_add_btn.fxml");
@@ -281,36 +194,41 @@ public class Edit_itemController implements Initializable {
 
     @FXML
     void handlebtnbanaction(ActionEvent event) throws SQLException, IOException {
-       item i = item_view.getSelectionModel().getSelectedItem();
+        item i = item_view.getSelectionModel().getSelectedItem();
         if (i == null) {
             AppDialogs.showMessageDialog(null, "Please select a item first!");
             return;
         }
         int num = AppDialogs.showConfirmDialog(null, "Are you Sure?");
+        if (num != JOptionPane.YES_OPTION) {
+            return;
+        }
 
-        if (num == JOptionPane.YES_OPTION) {
-            String sql = "DELETE i, s " +
-                "FROM items i " +
-                "JOIN item_stats s ON s.item_stats_id = i.item_stats_id "  +
-                "WHERE i.item_id = ?;";
-            pst = con.prepareStatement(sql);
-            pst.setInt(1, i.getItem_id());   // use selected object
-            pst.executeUpdate();
-            AppDialogs.showMessageDialog(null, "Deleted Successfully!");
-            util.SceneManager.switchScene("/view/edit_item.fxml");
-        }   
+        try {
+            if (UiSqlService.deleteItemAndStats(i.getItem_id())) {
+                AppDialogs.showMessageDialog(null, "Deleted Successfully!");
+            } else {
+                AppDialogs.showMessageDialog(null, "No item was deleted.");
+            }
+        } catch (ClassNotFoundException ex) {
+            throw new SQLException("Database driver not found.", ex);
+        }
+
+        util.SceneManager.switchScene("/view/edit_item.fxml");
     }
+
     @FXML
     void handlebtneditaction(ActionEvent event) throws IOException {
-        item i= item_view.getSelectionModel().getSelectedItem();
-        if(i==null)
+        item i = item_view.getSelectionModel().getSelectedItem();
+        if (i == null) {
             AppDialogs.showMessageDialog(null, "Please Select one Product You Want to Edit!");
-        else{
-            item_id = i.getItem_id();
-            itemname = i.getItem_name();
-            Stage stage = Rust_and_roots.stage;
-            util.SceneManager.switchScene("/view/item_edit_btn.fxml");
-        }    
+            return;
+        }
+
+        item_id = i.getItem_id();
+        itemname = i.getItem_name();
+        Stage stage = Rust_and_roots.stage;
+        util.SceneManager.switchScene("/view/item_edit_btn.fxml");
     }
-    
 }
+

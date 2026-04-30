@@ -991,6 +991,7 @@ public class Home_interiorController extends BaseMapController {
         refreshStatusView();
         refreshSkillsView();
         refreshStatusButtons();
+        refreshSleepInteractionState();
     }
 
     private void refreshStatusView() {
@@ -1144,18 +1145,11 @@ public class Home_interiorController extends BaseMapController {
         setupInteriorZones();
 //        setupMenuTabs();
 //        bindStatusLabels();
-        bindSettingControls();
         
 
         if (btncook != null) btncook.setOnAction(this::handlecookaction);
         if (btncraft != null) btncraft.setOnAction(this::handlecraftaction);
         if (btnmelt != null) btnmelt.setOnAction(e -> openMelt());
-        bindStatusLabels();
-
-        if (playerState != null) {
-            playerState.expProperty().addListener((obs, o, n) -> refreshStatusAllocationUi());
-            playerState.staminaProperty().addListener((obs, o, n) -> refreshSleepInteractionState());
-        }
 
         pinvImages.clear();
         pinvLabels.clear();

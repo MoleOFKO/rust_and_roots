@@ -4,14 +4,9 @@
  */
 package controller;
 
-import db.dbcon;
+import db.UiSqlService;
 import java.io.IOException;
 import java.net.URL;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -69,29 +64,13 @@ public class AccountViewController implements Initializable {
     @FXML
     private TableColumn<?, ?> colcreateddate;
     
-    Connection con;
-    ResultSet rs;
-    PreparedStatement pst;
-    Statement st;
     Parent root;
     public static ObservableList<Account> accountList;
-    String created_date;
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        dbcon db = new dbcon();
-        try{
-            con = db.getConnection();
-            System.out.println("Ready...");
-            txtaname.setText(LoginController.txtname);
-            initColumn();
-            initaccountList();
-            
-            
-        }catch (ClassNotFoundException e){
-            System.out.println("Not Connected....");
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
+        txtaname.setText(LoginController.txtname);
+        initColumn();
+        initaccountList();
         WorldScaler scaler = new WorldScaler(view, uiRoot);
         Platform.runLater(scaler::scale);
     }    
@@ -122,26 +101,13 @@ public class AccountViewController implements Initializable {
     }
     
     
-    private void initaccountList(   ) throws SQLException{
-        accountList = FXCollections.observableArrayList();
-        String sql = """
-        SELECT a.account_id,
-               a.account_name,
-               r.role_name AS user_type,
-               s.status_name AS account_stats,
-               a.created_date
-        FROM accounts a
-        JOIN user_roles r ON a.role_id = r.role_id
-        JOIN account_statuses s ON a.status_id = s.status_id
-        """;
-        st = con.createStatement();
-        rs = st.executeQuery(sql);
-        while(rs.next()){
-            created_date = rs.getString("created_date").toString();
-            
-            accountList.add(new Account(rs.getInt("account_id"), rs.getString("account_name"), rs.getString("user_type"), rs.getString("account_stats"), created_date ));
-         }
-        account_view.setItems(accountList);
+    private void initaccountList() {
+        try {
+            accountList = FXCollections.observableArrayList(UiSqlService.fetchAccountsForAccountView());
+            account_view.setItems(accountList);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
     
     public void initColumn(){
