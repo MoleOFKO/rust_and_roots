@@ -71,11 +71,15 @@ public class Home_interiorController extends BaseMapController {
     private static final String NIGHT_BG_PATH = "";
     private static final List<String> HOME_TUTORIAL_IMAGE_PATHS = List.of(
         "/image/Toturial/Craft.png",
-        "/image/Toturial/Cooing.png",
+        "/image/Toturial/Cooking.png",
         "/image/Toturial/Chest.png",
         "/image/Toturial/Melting.png",
         "/image/Toturial/Sleep.png"
     );
+    @FXML
+    private ImageView bg;
+    @FXML
+    private Button btntuto;
 
     @Override
     protected String dayBackgroundPath() {
@@ -1243,11 +1247,17 @@ public class Home_interiorController extends BaseMapController {
             hideTutorialOverlay();
             return;
         }
+        showHomeInteriorTutorial(true);
+    }
+
+    private void showHomeInteriorTutorial(boolean markAsSeen) {
         if (tutorialOverlay == null || tutorialImageView == null || tutorialTitleLabel == null) {
             return;
         }
 
-        gameState.setHomeInteriorTutorialSeen(true);
+        if (markAsSeen && gameState != null) {
+            gameState.setHomeInteriorTutorialSeen(true);
+        }
         tutorialIndex = 0;
         tutorialOverlayActive = true;
         tutorialOverlay.setManaged(true);
@@ -2137,6 +2147,11 @@ public class Home_interiorController extends BaseMapController {
         cookingDialogFade.setFromValue(cookingdialogimg.getOpacity());
         cookingDialogFade.setToValue(targetOpacity);
         cookingDialogFade.play();
+    }
+
+    @FXML
+    private void handlebtntutoaction(ActionEvent event) {
+        showHomeInteriorTutorial(false);
     }
 
 }

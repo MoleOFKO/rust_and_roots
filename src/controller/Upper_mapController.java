@@ -17,10 +17,12 @@ import javafx.geometry.Bounds;
 import javafx.scene.Group;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Slider;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
@@ -44,6 +46,26 @@ public class Upper_mapController extends BaseMapController {
 
     private static final String DAY_BG_PATH = "/image/maps/upper_map_no.1.png";
     private static final String NIGHT_BG_PATH = "/image/NightMap/upper_map_no.1night.png";
+    @FXML
+    private ImageView bg;
+    @FXML
+    private Group daynightnavgroup;
+    @FXML
+    private Label day;
+    @FXML
+    private ImageView daynightcircleimg;
+    @FXML
+    private Label time;
+    @FXML
+    private Label name;
+    @FXML
+    private Label coin;
+    @FXML
+    private ProgressBar hpbar;
+    @FXML
+    private ProgressBar spbar;
+    @FXML
+    private Button btntuto;
 
     @Override
     protected String dayBackgroundPath() {
@@ -1135,6 +1157,12 @@ public class Upper_mapController extends BaseMapController {
         registerExit(exit_up, "/view/upper_map_notwo.fxml", SpawnTag.FROM_DOWN);
         registerExit(exit_down, "/view/home_map.fxml", SpawnTag.FROM_UP);
         registerExit(exit_right, "/view/right_map_noone.fxml", SpawnTag.FROM_LEFT);
+    }
+
+   
+    @FXML
+    private void handlebtntutoaction(ActionEvent event) {
+        showOverworldTutorialOverlay();
     }
   
     

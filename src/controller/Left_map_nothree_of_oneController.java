@@ -8,6 +8,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Group;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Slider;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
@@ -28,6 +29,26 @@ public class Left_map_nothree_of_oneController extends BaseMapController {
 
     private static final String DAY_BG_PATH = "/image/maps/leftmap_no.3(1).png";
     private static final String NIGHT_BG_PATH = "/image/NightMap/leftmap_no.3(1)night.png";
+    @FXML
+    private ImageView bg;
+    @FXML
+    private Group daynightnavgroup;
+    @FXML
+    private Label day;
+    @FXML
+    private ImageView daynightcircleimg;
+    @FXML
+    private Label time;
+    @FXML
+    private Label name;
+    @FXML
+    private Label coin;
+    @FXML
+    private ProgressBar hpbar;
+    @FXML
+    private ProgressBar spbar;
+    @FXML
+    private Button btntuto;
 
     @Override
     protected String dayBackgroundPath() {
@@ -391,6 +412,12 @@ public class Left_map_nothree_of_oneController extends BaseMapController {
     protected void configureExits() {
         registerExit(exit_right, "/view/left_map_nothree.fxml", SpawnTag.FROM_LEFT);
         registerExit(exit_down, "/view/left_map_notwo_of_one.fxml", SpawnTag.FROM_UP);
+    }
+
+    
+    @FXML
+    private void handlebtntutoaction(ActionEvent event) {
+        showOverworldTutorialOverlay();
     }
     
 }

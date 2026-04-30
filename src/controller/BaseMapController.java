@@ -68,6 +68,7 @@ import util.AppDialogs;
 import util.SceneManager;
 import util.SpawnTag;
 import util.TimeFlow;
+import util.TutorialOverlayHelper;
 import util.WorldScaler;
 import javafx.scene.control.ToggleButton;
 
@@ -87,6 +88,16 @@ import javafx.scene.control.ToggleButton;
  * in its FXML. Missing nodes are handled safely.
  */
 public abstract class BaseMapController implements Initializable, SceneController {
+
+    protected static final List<String> OVERWORLD_TUTORIAL_IMAGES = List.of(
+        "/image/Toturial/Up_bar.png",
+        "/image/Toturial/Wp_hold.png",
+        "/image/Toturial/After_wp_hold.png",
+        "/image/Toturial/before_goes_to_hotbar.png",
+        "/image/Toturial/goes_to_hotbar.png",
+        "/image/Toturial/Attack.png",
+        "/image/Toturial/tt7.png"
+    );
 
     private static final ExecutorService MAP_EVICTION_EXECUTOR = Executors.newSingleThreadExecutor(r -> {
         Thread t = new Thread(r, "map-eviction");
@@ -302,6 +313,10 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 	    /** Hook for subclasses after shared systems are ready. */
 	    protected void afterBaseInitialize() {
 	        // default: do nothing
+	    }
+
+	    protected void showOverworldTutorialOverlay() {
+	        TutorialOverlayHelper.show(view, OVERWORLD_TUTORIAL_IMAGES);
 	    }
 
 	    protected final void registerPlayerAttackHandler(String key, Runnable handler) {

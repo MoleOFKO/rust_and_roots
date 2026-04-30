@@ -32,6 +32,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 import java.util.Locale;
 import java.util.concurrent.ThreadLocalRandom;
+import javafx.scene.control.ProgressBar;
 import model.CollisionRegistry;
 import model.ItemDatabase;
 import model.TreeMapState;
@@ -50,6 +51,26 @@ public class Left_mapController extends BaseMapController {
 
     private static final String DAY_BG_PATH = "/image/maps/leftmap.png";
     private static final String NIGHT_BG_PATH = "/image/NightMap/leftmapnight.png";
+    @FXML
+    private ImageView bg;
+    @FXML
+    private Group daynightnavgroup;
+    @FXML
+    private Label day;
+    @FXML
+    private ImageView daynightcircleimg;
+    @FXML
+    private Label time;
+    @FXML
+    private Label name;
+    @FXML
+    private Label coin;
+    @FXML
+    private ProgressBar hpbar;
+    @FXML
+    private ProgressBar spbar;
+    @FXML
+    private Button btntuto;
 
     @Override
     protected String dayBackgroundPath() {
@@ -100,6 +121,11 @@ public class Left_mapController extends BaseMapController {
     private int sandItemId = -1;
 
     private List<String> cachedValidTreeTypeKeys = null;
+
+    @FXML
+    private void handlebtntutoaction(ActionEvent event) {
+        showOverworldTutorialOverlay();
+    }
 
     @FunctionalInterface
     private interface ResourceDropSpawner {
@@ -153,8 +179,6 @@ public class Left_mapController extends BaseMapController {
     private Rectangle wall16;
     @FXML
     private Rectangle wall17;
-    @FXML
-    private Rectangle exit_left;
     @FXML
     private Rectangle exit_up;
     @FXML

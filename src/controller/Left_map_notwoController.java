@@ -71,6 +71,8 @@ public class Left_map_notwoController extends BaseMapController {
     private ProgressBar hpbar;
     @FXML
     private ProgressBar spbar;
+    @FXML
+    private Button btntuto;
 
     @Override
     protected String dayBackgroundPath() {
@@ -419,5 +421,10 @@ public class Left_map_notwoController extends BaseMapController {
         registerExit(exit_left, "/view/left_map_notwo_of_one.fxml", SpawnTag.FROM_RIGHT);
         registerExit(exit_right, "/view/upper_map_notwo.fxml", SpawnTag.FROM_LEFT);
         registerExit(exit_down, "/view/left_map_noone.fxml", SpawnTag.FROM_UP);
+    }
+
+    @FXML
+    private void handlebtntutoaction(ActionEvent event) {
+        showOverworldTutorialOverlay();
     }
 }

@@ -13,6 +13,7 @@ import javafx.fxml.FXML;
 import javafx.scene.Group;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Slider;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
@@ -37,6 +38,30 @@ public class RightMapController extends BaseMapController {
 
     private static final String DAY_BG_PATH = "/image/maps/rightmap.png";
     private static final String NIGHT_BG_PATH = "/image/NightMap/rightmapnight.png";
+    @FXML
+    private Rectangle spawn_poison_slime;
+    @FXML
+    private Rectangle spawn_lava_slime;
+    @FXML
+    private Rectangle spawn_orcb;
+    @FXML
+    private Group daynightnavgroup;
+    @FXML
+    private Label day;
+    @FXML
+    private ImageView daynightcircleimg;
+    @FXML
+    private Label time;
+    @FXML
+    private Label name;
+    @FXML
+    private Label coin;
+    @FXML
+    private ProgressBar hpbar;
+    @FXML
+    private ProgressBar spbar;
+    @FXML
+    private Button btntuto;
 
     @Override
     protected String dayBackgroundPath() {
@@ -1223,6 +1248,12 @@ public class RightMapController extends BaseMapController {
 
         // Example: right_map -> upper_map
         registerExit(exit_up, "/view/right_map_noone.fxml", SpawnTag.FROM_DOWN);
+    }
+
+   
+    @FXML
+    private void handlebtntutoaction(ActionEvent event) {
+        showOverworldTutorialOverlay();
     }
 
 }

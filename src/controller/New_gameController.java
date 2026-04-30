@@ -13,6 +13,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.List;
 import java.util.Objects;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
@@ -30,6 +31,7 @@ import javax.swing.JOptionPane;
 import util.AppDialogs;
 import model.PlayerState;
 import util.SceneManager;
+import util.TutorialOverlayHelper;
 import util.WorldScaler;
 
 /**
@@ -123,6 +125,8 @@ public class New_gameController implements Initializable, SceneController {
     private int pendingVitPoints;
     private int pendingDexPoints;
     private int pendingAgiPoints;
+    @FXML
+    private Button btntuto;
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -527,5 +531,13 @@ public class New_gameController implements Initializable, SceneController {
                 }
             }
         }
+    }
+
+    @FXML
+    private void handlebtntutoaction(ActionEvent event) {
+        TutorialOverlayHelper.show(
+            view,
+            List.of("/image/Toturial/new_game.png")
+        );
     }
 }
