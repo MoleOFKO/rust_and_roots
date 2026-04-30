@@ -32,6 +32,42 @@ public class Upper_map_notwoController extends BaseMapController {
     @FXML
     private ImageView bg;
     @FXML
+    private Group tree;
+    @FXML
+    private ImageView tree_img;
+    @FXML
+    private Rectangle tree_hitbox;
+    @FXML
+    private ImageView drops_img_tree;
+    @FXML
+    private Group tree1;
+    @FXML
+    private ImageView tree_img1;
+    @FXML
+    private Rectangle tree_hitbox1;
+    @FXML
+    private ImageView drops_img_tree1;
+    @FXML
+    private Group tree2;
+    @FXML
+    private ImageView tree_img2;
+    @FXML
+    private Rectangle tree_hitbox2;
+    @FXML
+    private ImageView drops_img_tree2;
+    @FXML
+    private Group treelayorgp2;
+    @FXML
+    private ImageView treelayorimg2;
+    @FXML
+    private Group treelayorgp1;
+    @FXML
+    private ImageView treelayorimg1;
+    @FXML
+    private Group treelayorgp;
+    @FXML
+    private ImageView treelayorimg;
+    @FXML
     private Group daynightnavgroup;
     @FXML
     private Label day;
@@ -49,6 +85,38 @@ public class Upper_map_notwoController extends BaseMapController {
     private ProgressBar spbar;
     @FXML
     private Button btntuto;
+    @FXML
+    private Group stone;
+    @FXML
+    private ImageView stone_img;
+    @FXML
+    private Rectangle stone_hitbox;
+    @FXML
+    private ImageView drops_img_stone;
+    @FXML
+    private Group stone1;
+    @FXML
+    private ImageView stone_img1;
+    @FXML
+    private Rectangle stone_hitbox1;
+    @FXML
+    private ImageView drops_img_stone1;
+    @FXML
+    private Group stone2;
+    @FXML
+    private ImageView stone_img2;
+    @FXML
+    private Rectangle stone_hitbox2;
+    @FXML
+    private ImageView drops_img_stone2;
+    @FXML
+    private Group stone3;
+    @FXML
+    private ImageView stone_img3;
+    @FXML
+    private Rectangle stone_hitbox3;
+    @FXML
+    private ImageView drops_img_stone3;
 
     @Override
     protected String dayBackgroundPath() {
@@ -399,11 +467,8 @@ public class Upper_map_notwoController extends BaseMapController {
         registerExit(exit_right, "/view/right_map_notwo.fxml", SpawnTag.FROM_LEFT);
         registerExit(exit_down, "/view/upper_map.fxml", SpawnTag.FROM_UP);
     }
-
-    
     @FXML
     private void handlebtntutoaction(ActionEvent event) {
         showOverworldTutorialOverlay();
     }
-     
 }
