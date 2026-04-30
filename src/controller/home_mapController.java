@@ -481,6 +481,8 @@ public class home_mapController extends BaseMapController {
     private ProgressBar hpbar;
     @FXML
     private ProgressBar spbar;
+    @FXML
+    private Button btntuto;
     
 
     @Override
@@ -633,6 +635,18 @@ public class home_mapController extends BaseMapController {
     private void handleuppermapaction(ActionEvent event) {
         GameState.get().setReturnScene("/view/home_map.fxml", SpawnTag.FROM_UP);
         stopAndSwitchScene("/view/upper_map.fxml", SpawnTag.FROM_DOWN);
+    }
+
+
+    @FXML
+    private void handlebtntutoaction(ActionEvent event) {
+        TutorialOverlayHelper.show(
+            view,
+            List.of(
+                "/image/Toturial/Shop.png",
+                "/image/Toturial/Farm.png"
+            )
+        );
     }
 
 

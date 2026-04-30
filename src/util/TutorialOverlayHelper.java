@@ -19,6 +19,13 @@ public final class TutorialOverlayHelper {
     private TutorialOverlayHelper() {
     }
 
+    public static void show(StackPane root, List<String> imagePaths) {
+        if (root == null || imagePaths == null || imagePaths.isEmpty()) {
+            return;
+        }
+        createAndShowOverlay(root, imagePaths);
+    }
+
     public static void showIfNeeded(StackPane root, GameState gameState, String tutorialKey, List<String> imagePaths) {
         if (root == null || gameState == null || tutorialKey == null || tutorialKey.isBlank()
                 || imagePaths == null || imagePaths.isEmpty()) {
@@ -29,7 +36,10 @@ public final class TutorialOverlayHelper {
         }
 
         gameState.markTutorialSeen(tutorialKey);
+        createAndShowOverlay(root, imagePaths);
+    }
 
+    private static void createAndShowOverlay(StackPane root, List<String> imagePaths) {
         StackPane overlay = new StackPane();
         overlay.setManaged(true);
         overlay.setVisible(true);

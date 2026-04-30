@@ -217,32 +217,6 @@ INSERT INTO `items` VALUES (1,'Axe',10,121,'Axe.png',3),(2,'Pickaxe',10,122,'pic
 UNLOCK TABLES;
 
 --
--- Table structure for table `map_item`
---
-
-DROP TABLE IF EXISTS `map_item`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `map_item` (
-  `map_id` int NOT NULL,
-  `item_id` int NOT NULL,
-  PRIMARY KEY (`map_id`,`item_id`),
-  KEY `idx_map_item_item_id` (`item_id`),
-  CONSTRAINT `fk_map_item_item` FOREIGN KEY (`item_id`) REFERENCES `items` (`item_id`),
-  CONSTRAINT `fk_map_item_map` FOREIGN KEY (`map_id`) REFERENCES `game_map` (`map_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `map_item`
---
-
-LOCK TABLES `map_item` WRITE;
-/*!40000 ALTER TABLE `map_item` DISABLE KEYS */;
-/*!40000 ALTER TABLE `map_item` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `mobs`
 --
 
@@ -805,38 +779,6 @@ INSERT INTO `saved_tree_resource` VALUES (12,'left_map','stone','stone',3,9,10,1
 UNLOCK TABLES;
 
 --
--- Table structure for table `saved_tree_state`
---
-
-DROP TABLE IF EXISTS `saved_tree_state`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `saved_tree_state` (
-  `saved_id` int NOT NULL,
-  `map_key` varchar(40) NOT NULL,
-  `tree_id` varchar(40) NOT NULL,
-  `tree_type` varchar(20) NOT NULL DEFAULT 'BLUE',
-  `stage` int NOT NULL DEFAULT '2',
-  `lived_days` int NOT NULL DEFAULT '0',
-  `hp` int NOT NULL DEFAULT '0',
-  `vit` int NOT NULL DEFAULT '0',
-  `respawn_at_seconds` double NOT NULL DEFAULT '-1',
-  `last_day_number` int NOT NULL DEFAULT '1',
-  PRIMARY KEY (`saved_id`,`map_key`,`tree_id`),
-  CONSTRAINT `fk_saved_tree_state_save` FOREIGN KEY (`saved_id`) REFERENCES `save_game` (`saved_id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `saved_tree_state`
---
-
-LOCK TABLES `saved_tree_state` WRITE;
-/*!40000 ALTER TABLE `saved_tree_state` DISABLE KEYS */;
-/*!40000 ALTER TABLE `saved_tree_state` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `saved_unlocked_recipe`
 --
 
@@ -909,33 +851,6 @@ CREATE TABLE `skin` (
 LOCK TABLES `skin` WRITE;
 /*!40000 ALTER TABLE `skin` DISABLE KEYS */;
 /*!40000 ALTER TABLE `skin` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `spawn_point`
---
-
-DROP TABLE IF EXISTS `spawn_point`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `spawn_point` (
-  `spawn_point_id` int NOT NULL AUTO_INCREMENT,
-  `map_id` int NOT NULL,
-  `spawn_x` int NOT NULL DEFAULT '0',
-  `spawn_y` int NOT NULL DEFAULT '0',
-  PRIMARY KEY (`spawn_point_id`),
-  KEY `idx_spawn_point_map_id` (`map_id`),
-  CONSTRAINT `fk_spawn_point_map` FOREIGN KEY (`map_id`) REFERENCES `game_map` (`map_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `spawn_point`
---
-
-LOCK TABLES `spawn_point` WRITE;
-/*!40000 ALTER TABLE `spawn_point` DISABLE KEYS */;
-/*!40000 ALTER TABLE `spawn_point` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --

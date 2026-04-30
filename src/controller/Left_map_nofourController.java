@@ -60,6 +60,7 @@ public class Left_map_nofourController extends BaseMapController {
     @FXML
     private ProgressBar spbar;
     @FXML
+    private Button btntuto;
     private Group stone7;
     @FXML
     private ImageView stone_img7;
@@ -622,4 +623,8 @@ public class Left_map_nofourController extends BaseMapController {
 //    private void handleopensettingaction(ActionEvent event) {
 //    }
 //
+    @FXML
+    private void handlebtntutoaction(ActionEvent event) {
+        showOverworldTutorialOverlay();
+    }
 }

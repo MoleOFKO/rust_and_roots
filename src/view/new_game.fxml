@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon?>
 <?import javafx.scene.Group?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
@@ -240,6 +241,11 @@
                   </StackPane>
                </children>
             </Group>
+            <Button fx:id="btntuto" layoutX="35.0" layoutY="340.0" mnemonicParsing="false" onAction="#handlebtntutoaction" style="-fx-background-radius: 100%; -fx-background-color: transparent;">
+               <graphic>
+                  <FontAwesomeIcon glyphName="QUESTION" size="1.5em" />
+               </graphic>
+            </Button>
             </children>
         </Group>
     </children>     

@@ -179,6 +179,8 @@ public class LeftMapNooneController extends BaseMapController {
     private Rectangle stone_hitbox2;
     @FXML
     private ImageView drops_img_stone2;
+    @FXML
+    private Button btntuto;
 
     @Override
     protected String dayBackgroundPath() {
@@ -528,5 +530,10 @@ public class LeftMapNooneController extends BaseMapController {
         registerExit(exit_left, "/view/left_map_noone_of_one.fxml", SpawnTag.FROM_RIGHT);
         registerExit(exit_up, "/view/left_map_notwo.fxml", SpawnTag.FROM_DOWN);
         registerExit(exit_down, "/view/left_map.fxml", SpawnTag.FROM_UP);
+    }
+    
+    @FXML
+    private void handlebtntutoaction(ActionEvent event) {
+        showOverworldTutorialOverlay();
     }
 }

@@ -110,6 +110,7 @@ public class Left_map_notwo_of_oneController extends BaseMapController {
     @FXML
     private ProgressBar spbar;
     @FXML
+    private Button btntuto;
     private Group stone5;
     @FXML
     private ImageView stone_img5;
@@ -525,5 +526,10 @@ public class Left_map_notwo_of_oneController extends BaseMapController {
 //                MAP_EXIT_DELAY_GAME_SECONDS
 //            ));
 //        }
+    }
+
+    @FXML
+    private void handlebtntutoaction(ActionEvent event) {
+        showOverworldTutorialOverlay();
     }
 }

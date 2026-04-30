@@ -84,6 +84,7 @@ public class Left_map_nothree_of_oneController extends BaseMapController {
     @FXML
     private ProgressBar spbar;
     @FXML
+    private Button btntuto;
     private Group stone6;
     @FXML
     private ImageView stone_img6;
@@ -502,5 +503,13 @@ public class Left_map_nothree_of_oneController extends BaseMapController {
     protected void configureExits() {
         registerExit(exit_right, "/view/left_map_nothree.fxml", SpawnTag.FROM_LEFT);
         registerExit(exit_down, "/view/left_map_notwo_of_one.fxml", SpawnTag.FROM_UP);
+    }
+
+    
+    @FXML
+    private void handlebtntutoaction(ActionEvent event) {
+        showOverworldTutorialOverlay();
+    }
+    
     }  
 }

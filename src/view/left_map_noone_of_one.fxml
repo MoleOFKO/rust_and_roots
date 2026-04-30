@@ -1058,5 +1058,10 @@
             </Group>
          </children>
       </Group>
+      <Button fx:id="btntuto" mnemonicParsing="false" onAction="#handlebtntutoaction" style="-fx-background-radius: 100%; -fx-background-color: transparent; -fx-border-color: yellow; -fx-border-radius: 100%;" textFill="#e6ff00">
+         <graphic>
+            <FontAwesomeIcon fill="#f6ff00" glyphName="QUESTION" selectionFill="YELLOW" size="1.5em" />
+         </graphic>
+      </Button>
    </children>
 </StackPane>
