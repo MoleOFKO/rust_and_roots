@@ -5,14 +5,9 @@
 package controller;
 
 import controller.LoginController;
-import db.dbcon;
+import db.UiSqlService;
 import java.io.IOException;
 import java.net.URL;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -57,28 +52,13 @@ public class Account_editController implements Initializable {
     private ComboBox<String> user_type;
 
     Parent root;
-    Connection con;
-    ResultSet rs;
-    PreparedStatement pst;
-    Statement st;
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        dbcon db = new dbcon();
-        try{
-            con = db.getConnection();
-            System.out.println("Ready...");
-            lblaname.setText(LoginController.txtname);
-            txtaccname.setText(Account_managementController.accname);
-            user_type.getItems().setAll("owner", "admin", "user");
-            initaccount();
-            
-            
-        }catch (ClassNotFoundException e){
-            System.out.println("Not Connected....");
-        } catch (SQLException ex) {
-            System.getLogger(Account_editController.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
-        }
+        lblaname.setText(LoginController.txtname);
+        txtaccname.setText(Account_managementController.accname);
+        user_type.getItems().setAll("owner", "admin", "user");
+        initaccount();
         WorldScaler scaler = new WorldScaler(view, uiRoot);
         Platform.runLater(scaler::scale);
     }    
@@ -97,26 +77,19 @@ public class Account_editController implements Initializable {
         
     }
     
-    private void initaccount() throws SQLException {
-
-    String sql = """
-        SELECT a.account_name, r.role_name AS user_type, a.email, a.passwords
-        FROM accounts a
-        JOIN user_roles r ON a.role_id = r.role_id
-        WHERE a.account_name = ?
-    """;
-    pst = con.prepareStatement(sql);
-    pst.setString(1, Account_managementController.accname);
-    rs = pst.executeQuery();
-
-    if (rs.next()) {
-        txtaccname.setText(rs.getString("account_name"));
-        txtemail.setText(rs.getString("email"));
-        txtpwd.setText(rs.getString("passwords"));
-
-        // Set ComboBox selected value from DB
-        user_type.setValue(rs.getString("user_type"));
+    private void initaccount() {
+        try {
+            UiSqlService.AccountEditData data = UiSqlService.fetchAccountEditData(Account_managementController.accname);
+            if (data == null) {
+                return;
+            }
+            txtaccname.setText(data.accountName());
+            txtemail.setText(data.email());
+            txtpwd.setText(data.password());
+            user_type.setValue(data.roleName());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
-}
 
 }

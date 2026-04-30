@@ -1,11 +1,7 @@
 package controller;
 
-import db.dbcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import java.net.URL;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -28,6 +24,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.util.Duration;
+import db.UiSqlService;
 import util.AppDialogs;
 import util.SmtpOtpSender;
 import util.WorldScaler;
@@ -38,7 +35,6 @@ public class OTPController implements Initializable {
     private static final int OTP_RESEND_COOLDOWN_SECONDS = 180;
     private static final String PASSWORD_REGEX = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{8,}$";
 
-    private Connection con;
     private String pendingOtpCode;
     private LocalDateTime pendingOtpExpiresAt;
     private String verifiedEmail;
@@ -91,12 +87,6 @@ public class OTPController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        dbcon db = new dbcon();
-        try {
-            con = db.getConnection();
-        } catch (ClassNotFoundException ex) {
-            AppDialogs.showMessageDialog(null, "Database driver not found.");
-        }
         WorldScaler scaler = new WorldScaler(view, world);
         Platform.runLater(scaler::scale);
 
@@ -278,16 +268,11 @@ public class OTPController implements Initializable {
     }
 
     private boolean emailExists(String email) {
-        if (con == null) {
-            AppDialogs.showMessageDialog(null, "Database connection is unavailable.");
+        try {
+            return UiSqlService.emailExists(email);
+        } catch (ClassNotFoundException ex) {
+            AppDialogs.showMessageDialog(null, "Database driver not found.");
             return false;
-        }
-        String sql = "SELECT 1 FROM accounts WHERE email=? LIMIT 1";
-        try (PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setString(1, email);
-            try (ResultSet rs = ps.executeQuery()) {
-                return rs.next();
-            }
         } catch (SQLException ex) {
             AppDialogs.showMessageDialog(null, "Failed to check email.\n" + ex.getMessage());
             return false;
@@ -295,20 +280,15 @@ public class OTPController implements Initializable {
     }
 
     private boolean updatePasswordByEmail(String email, String newPassword) {
-        if (con == null) {
-            AppDialogs.showMessageDialog(null, "Database connection is unavailable.");
-            return false;
-        }
-        String sql = "UPDATE accounts SET passwords=? WHERE email=?";
-        try (PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setString(1, newPassword);
-            ps.setString(2, email);
-            int updated = ps.executeUpdate();
-            if (updated <= 0) {
+        try {
+            boolean updated = UiSqlService.updatePasswordByEmail(email, newPassword);
+            if (!updated) {
                 AppDialogs.showMessageDialog(null, "No account was updated for this email.");
-                return false;
             }
-            return true;
+            return updated;
+        } catch (ClassNotFoundException ex) {
+            AppDialogs.showMessageDialog(null, "Database driver not found.");
+            return false;
         } catch (SQLException ex) {
             AppDialogs.showMessageDialog(null, "Failed to update password.\n" + ex.getMessage());
             return false;

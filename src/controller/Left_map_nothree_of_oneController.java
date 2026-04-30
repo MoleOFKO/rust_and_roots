@@ -32,6 +32,42 @@ public class Left_map_nothree_of_oneController extends BaseMapController {
     @FXML
     private ImageView bg;
     @FXML
+    private Group tree;
+    @FXML
+    private ImageView tree_img;
+    @FXML
+    private Rectangle tree_hitbox;
+    @FXML
+    private ImageView drops_img_tree;
+    @FXML
+    private Group tree1;
+    @FXML
+    private ImageView tree_img1;
+    @FXML
+    private Rectangle tree_hitbox1;
+    @FXML
+    private ImageView drops_img_tree1;
+    @FXML
+    private Group tree2;
+    @FXML
+    private ImageView tree_img2;
+    @FXML
+    private Rectangle tree_hitbox2;
+    @FXML
+    private ImageView drops_img_tree2;
+    @FXML
+    private Group treelayorgp2;
+    @FXML
+    private ImageView treelayorimg2;
+    @FXML
+    private Group treelayorgp1;
+    @FXML
+    private ImageView treelayorimg1;
+    @FXML
+    private Group treelayorgp;
+    @FXML
+    private ImageView treelayorimg;
+    @FXML
     private Group daynightnavgroup;
     @FXML
     private Label day;
@@ -49,6 +85,61 @@ public class Left_map_nothree_of_oneController extends BaseMapController {
     private ProgressBar spbar;
     @FXML
     private Button btntuto;
+    private Group stone6;
+    @FXML
+    private ImageView stone_img6;
+    @FXML
+    private Rectangle stone_hitbox6;
+    @FXML
+    private ImageView drops_img_stone6;
+    @FXML
+    private Group stone5;
+    @FXML
+    private ImageView stone_img5;
+    @FXML
+    private Rectangle stone_hitbox5;
+    @FXML
+    private ImageView drops_img_stone5;
+    @FXML
+    private Group stone4;
+    @FXML
+    private ImageView stone_img4;
+    @FXML
+    private Rectangle stone_hitbox4;
+    @FXML
+    private ImageView drops_img_stone4;
+    @FXML
+    private Group stone3;
+    @FXML
+    private ImageView stone_img3;
+    @FXML
+    private Rectangle stone_hitbox3;
+    @FXML
+    private ImageView drops_img_stone3;
+    @FXML
+    private Group stone2;
+    @FXML
+    private ImageView stone_img2;
+    @FXML
+    private Rectangle stone_hitbox2;
+    @FXML
+    private ImageView drops_img_stone2;
+    @FXML
+    private Group stone1;
+    @FXML
+    private ImageView stone_img1;
+    @FXML
+    private Rectangle stone_hitbox1;
+    @FXML
+    private ImageView drops_img_stone1;
+    @FXML
+    private Group stone;
+    @FXML
+    private ImageView stone_img;
+    @FXML
+    private Rectangle stone_hitbox;
+    @FXML
+    private ImageView drops_img_stone;
 
     @Override
     protected String dayBackgroundPath() {
@@ -420,4 +511,5 @@ public class Left_map_nothree_of_oneController extends BaseMapController {
         showOverworldTutorialOverlay();
     }
     
+    }  
 }

@@ -511,7 +511,6 @@ public class home_mapController extends BaseMapController {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         super.initialize(url, rb);
-        bindPlayerEquipmentView(equip_img);
         bridgeHomeSharedUi();
         setupMerchant();
         setupMerchantZone();
@@ -618,24 +617,24 @@ public class home_mapController extends BaseMapController {
     }
     
     @FXML
-    private void handledoorbtnaction(ActionEvent event) throws IOException {
+    private void handledoorbtnaction(ActionEvent event) {
         GameState.get().setReturnScene("/view/home_map.fxml", SpawnTag.FROM_DOOR);
-        SceneManager.switchScene("/view/home_interior.fxml", SpawnTag.FROM_DOOR);
+        stopAndSwitchScene("/view/home_interior.fxml", SpawnTag.FROM_DOOR);
     }
 
-    private void handleleftmapaction(ActionEvent event) throws IOException {
+    private void handleleftmapaction(ActionEvent event) {
         GameState.get().setReturnScene("/view/home_map.fxml", SpawnTag.FROM_LEFT);
-        SceneManager.switchScene("/view/left_map.fxml", SpawnTag.FROM_RIGHT);
+        stopAndSwitchScene("/view/left_map.fxml", SpawnTag.FROM_RIGHT);
     }
 
-    private void handlerightmapaction(ActionEvent event) throws IOException {
+    private void handlerightmapaction(ActionEvent event) {
         GameState.get().setReturnScene("/view/home_map.fxml", SpawnTag.FROM_RIGHT);
-        SceneManager.switchScene("/view/right_map.fxml", SpawnTag.FROM_LEFT);
+        stopAndSwitchScene("/view/right_map.fxml", SpawnTag.FROM_LEFT);
     }
 
-    private void handleuppermapaction(ActionEvent event) throws IOException {
+    private void handleuppermapaction(ActionEvent event) {
         GameState.get().setReturnScene("/view/home_map.fxml", SpawnTag.FROM_UP);
-        SceneManager.switchScene("/view/upper_map.fxml", SpawnTag.FROM_DOWN);
+        stopAndSwitchScene("/view/upper_map.fxml", SpawnTag.FROM_DOWN);
     }
 
 

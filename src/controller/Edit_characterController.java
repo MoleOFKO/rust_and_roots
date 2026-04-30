@@ -5,14 +5,9 @@
 package controller;
 
 import db.MobDefinitionRepository;
-import db.dbcon;
 import java.io.IOException;
 import java.net.URL;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -90,24 +85,16 @@ public class Edit_characterController implements Initializable {
     private Group uiRoot;
     
     
-    Connection con;
-    ResultSet rs;
-    PreparedStatement pst;
-    Statement st;
     public static ObservableList<mobs> mobsList;
     public static int mid;
     private final MobDefinitionRepository mobRepository = new MobDefinitionRepository();
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        dbcon db = new dbcon();
-        try{
-            con = db.getConnection();
-            txtaname.setText(LoginController.txtname);
-            initColumn();
+        txtaname.setText(LoginController.txtname);
+        initColumn();
+        try {
             initmobsList();
-        }catch (ClassNotFoundException e){
-            System.out.println("Not Connected....");
         } catch (SQLException ex) {
             ex.printStackTrace();
             AppDialogs.showMessageDialog(null, "Unable to load mobs from database.");

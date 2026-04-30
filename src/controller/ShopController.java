@@ -1598,14 +1598,14 @@ public class ShopController implements Initializable, SceneController {
 
         List<String> candidates = List.of(
             "sand",
-            "Copper Ore",
-            "Iron Ore",
-            "Silver Ore",
-            "Gold Ore",
-            "Mithril Ore",
-            "Adamantite Ore",
-            "Orichalcum Ore",
-            "Hihiogane Ore"
+            "copper_drop_item",
+            "iron_drop_item",
+            "silver_drop_item",
+            "gold_drop_item",
+            "mithril_drop_item",
+            "adamantite_drop_item",
+            "orichalcum_drop_item",
+            "hihiogane_drop_item"
         );
 
         for (String name : candidates) {

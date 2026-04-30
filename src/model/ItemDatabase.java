@@ -13,6 +13,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import javafx.scene.image.Image;
 
 public final class ItemDatabase {
@@ -26,6 +27,21 @@ public final class ItemDatabase {
     private static final Map<Integer, String> unusableReasonById = new LinkedHashMap<>();
     private static final Map<Integer, Image> imageCache = new HashMap<>();
     private static final Map<Integer, Integer> maxGrowthPhasesBySeedId = new HashMap<>();
+
+    // Items that should never be offered for purchase in the shop.
+    // These are "mineable node"/legacy ore items; gameplay uses the corresponding *_drop_item instead.
+    private static final Set<String> SHOP_EXCLUDED_LOOKUP_KEYS = Set.of(
+        "adamantite ore",
+        "copper ore",
+        "gold ore",
+        "hihiogane ore",
+        "iron ore",
+        "mithril ore",
+        "orichalcum ore",
+        "silver ore",
+        "stone",
+        "stone dungeon"
+    );
 
     private static boolean loaded = false;
 
@@ -153,8 +169,16 @@ public final class ItemDatabase {
     public static boolean isShopDisplayableItem(int itemId) {
         return itemId > 0
                 && isUsableItem(itemId)
+                && !isShopExcludedItem(itemId)
                 && getItemUseType(itemId) != ItemUseType.CROP
                 && isDisplayableItem(itemId);
+    }
+
+    private static boolean isShopExcludedItem(int itemId) {
+        String name = getItemName(itemId);
+        if (name == null || name.isBlank()) return false;
+        String lookupKey = normalizeLookupKey(name);
+        return SHOP_EXCLUDED_LOOKUP_KEYS.contains(lookupKey);
     }
 
     public static String getItemName(int itemId) {

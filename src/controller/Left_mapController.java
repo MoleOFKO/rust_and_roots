@@ -520,8 +520,6 @@ public class Left_mapController extends BaseMapController {
     public void initialize(URL url, ResourceBundle rb) {
         super.initialize(url, rb);
         bridgeLeftMapSharedUi();
-        bindStatusLabels();
-        bindSettingControls();
         refreshStatusAllocationUi();
         refreshMenuState();
     }

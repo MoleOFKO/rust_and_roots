@@ -4,14 +4,11 @@
  */
 package controller;
 
-import db.dbcon;
+import db.UiSqlService;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import game.GameState;
 import java.io.IOException;
 import java.net.URL;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -59,9 +56,6 @@ import util.WorldScaler;
  * @author larry
  */
 public class LoginController implements Initializable {
-    Connection con;
-    ResultSet rs;
-    PreparedStatement pst;
     
     @FXML
     private Group login_pane;
@@ -125,14 +119,6 @@ public class LoginController implements Initializable {
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-
-        dbcon db=new dbcon();
-        try{
-            con=db.getConnection();
-        }catch(ClassNotFoundException ex){
-            System.out.println("Connection not found.....");
-            ex.printStackTrace();
-        }
         WorldScaler scaler = new WorldScaler(view, uiRoot);
         Platform.runLater(scaler::scale);
 
@@ -164,33 +150,29 @@ public class LoginController implements Initializable {
             AppDialogs.showMessageDialog(null, "Please enter a password.");
             return;
         }
-        String sql = """
-    SELECT a.account_id, a.account_name, a.passwords,
-           r.role_name, s.status_name
-    FROM accounts a
-    JOIN user_roles r ON a.role_id = r.role_id
-    JOIN account_statuses s ON a.status_id = s.status_id
-    WHERE a.account_name = ? OR a.email = ?
-    LIMIT 1
-    """;
-               
-        pst = con.prepareStatement(sql);
-        pst.setString(1, loginInput);
-        pst.setString(2, loginInput);
-        rs = pst.executeQuery();
-        if (!rs.next()) {
+
+        UiSqlService.AuthRow auth;
+        try {
+            auth = UiSqlService.fetchAuthRow(loginInput);
+        } catch (ClassNotFoundException ex) {
+            throw new SQLException("Database driver not found.", ex);
+        }
+
+        if (auth == null) {
             AppDialogs.showMessageDialog(null, "No account found with that username.");
             return;
         }
-        String dbPassword = rs.getString("passwords");
-        if (!dbPassword.equals(password)) {
+
+        String dbPassword = auth.password();
+        if (dbPassword == null || !dbPassword.equals(password)) {
             AppDialogs.showMessageDialog(null, "Incorrect password.");
             return;
         }
-        txtname = rs.getString("account_name");
-        int accountId = rs.getInt("account_id");
-        String dbstatus = rs.getString("status_name");
-        String temp = rs.getString("role_name");
+
+        txtname = auth.accountName();
+        int accountId = auth.accountId();
+        String dbstatus = auth.statusName();
+        String temp = auth.roleName();
         if (!"active".equalsIgnoreCase(dbstatus)) {
             AppDialogs.showMessageDialog(null, "This account is banned.");
             return;
@@ -210,35 +192,29 @@ public class LoginController implements Initializable {
                 gs.setCurrentSaveId(-1);
                 gs.setCurrentPlayerName(txtname);
 
-                String charSql = "SELECT character_id, player_name FROM characters WHERE account_id=? ORDER BY character_id LIMIT 1";
-                try (PreparedStatement charPst = con.prepareStatement(charSql)) {
-                    charPst.setInt(1, accountId);
-
-                    try (ResultSet charRs = charPst.executeQuery()) {
-                        if (charRs.next()) {
-                            int characterId = charRs.getInt("character_id");
-                            String playerName = charRs.getString("player_name");
-
-                            gs.setCurrentCharacterId(characterId);
-                            gs.setCurrentPlayerName(playerName);
-
-                            String saveSql = "SELECT saved_id FROM save_game WHERE character_id=? ORDER BY saved_id LIMIT 1";
-                            try (PreparedStatement savePst = con.prepareStatement(saveSql)) {
-                                savePst.setInt(1, characterId);
-                                try (ResultSet saveRs = savePst.executeQuery()) {
-                                    if (saveRs.next()) {
-                                        gs.setCurrentSaveId(saveRs.getInt("saved_id"));
-                                    } else {
-                                        gs.setCurrentSaveId(-1);
-                                    }
-                                }      
-                                
-                            }
-                        }            
-                        
-                    }
-                    util.SceneManager.switchScene("/view/main_menu.fxml");
+                Integer characterId;
+                try {
+                    characterId = UiSqlService.findFirstCharacterIdForAccount(accountId);
+                } catch (ClassNotFoundException ex) {
+                    throw new SQLException("Database driver not found.", ex);
                 }
+
+                if (characterId != null && characterId > 0) {
+                    gs.setCurrentCharacterId(characterId);
+                    try {
+                        String playerName = UiSqlService.findPlayerNameForCharacter(characterId);
+                        if (playerName != null && !playerName.isBlank()) {
+                            gs.setCurrentPlayerName(playerName);
+                        }
+
+                        Integer saveId = UiSqlService.findFirstSaveIdForCharacter(characterId);
+                        gs.setCurrentSaveId(saveId == null ? -1 : saveId);
+                    } catch (ClassNotFoundException ex) {
+                        throw new SQLException("Database driver not found.", ex);
+                    }
+                }
+
+                util.SceneManager.switchScene("/view/main_menu.fxml");
             }
             case "owner" -> {
                 util.SceneManager.switchScene("/view/account_view.fxml");
@@ -391,19 +367,6 @@ public class LoginController implements Initializable {
     }
     
     
-    private int findFirstSaveIdForCharacter(int characterId) throws SQLException {
-        String saveSql = "SELECT saved_id FROM save_game WHERE character_id=? ORDER BY saved_id LIMIT 1";
-        try (PreparedStatement savePst = con.prepareStatement(saveSql)) {
-            savePst.setInt(1, characterId);
-            try (ResultSet saveRs = savePst.executeQuery()) {
-                if (saveRs.next()) {
-                    return saveRs.getInt("saved_id");
-                }
-            }
-        }
-        return -1;
-    }
-
     private boolean isPendingOtpForCurrentInput(String email, String username, String password) {
         if (pendingOtpCode == null || pendingOtpCode.isBlank()) return false;
         if (pendingOtpEmail == null || pendingOtpUsername == null || pendingOtpPassword == null) return false;
@@ -429,42 +392,27 @@ public class LoginController implements Initializable {
     }
 
     private boolean emailExists(String email) throws SQLException {
-        String emailExistsSql = "SELECT 1 FROM accounts WHERE email=? LIMIT 1";
-        try (PreparedStatement emailPst = con.prepareStatement(emailExistsSql)) {
-            emailPst.setString(1, email);
-            try (ResultSet emailRs = emailPst.executeQuery()) {
-                return emailRs.next();
-            }
+        try {
+            return UiSqlService.emailExists(email);
+        } catch (ClassNotFoundException ex) {
+            throw new SQLException("Database driver not found.", ex);
         }
     }
 
     private boolean usernameExists(String username) throws SQLException {
-        String usernameExistsSql = "SELECT 1 FROM accounts WHERE account_name=? LIMIT 1";
-        try (PreparedStatement usernamePst = con.prepareStatement(usernameExistsSql)) {
-            usernamePst.setString(1, username);
-            try (ResultSet usernameRs = usernamePst.executeQuery()) {
-                return usernameRs.next();
-            }
+        try {
+            return UiSqlService.usernameExists(username);
+        } catch (ClassNotFoundException ex) {
+            throw new SQLException("Database driver not found.", ex);
         }
     }
 
     private int createAccount(String email, String username, String password) throws SQLException {
-        String sql = "INSERT INTO accounts (email, account_name, passwords, role_id, status_id) VALUES (?, ?, ?, ?, ?)";
-        try (PreparedStatement accPst = con.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
-            accPst.setString(1, email);
-            accPst.setString(2, username);
-            accPst.setString(3, password);
-            accPst.setInt(4, 3);
-            accPst.setInt(5, 1);
-            accPst.executeUpdate();
-
-            try (ResultSet accKeys = accPst.getGeneratedKeys()) {
-                if (accKeys.next()) {
-                    return accKeys.getInt(1);
-                }
-            }
+        try {
+            return UiSqlService.insertAccount(email, username, password, 3, 1);
+        } catch (ClassNotFoundException ex) {
+            throw new SQLException("Database driver not found.", ex);
         }
-        return -1;
     }
 
     private String generateOtpCode(int length) {
