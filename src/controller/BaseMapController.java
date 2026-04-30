@@ -555,13 +555,10 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         playerInventoryImages.clear();
         playerInventoryLabels.clear();
         playerInventoryButtons.clear();
-
-        playerInventoryNodes.clear();
-        playerInventorySelectionButtons.clear();
     }
 
     private void unbindSharedUiFromSingletons() {
-        GameTimeManager time = GameTimeManager.get();
+        GameTimeManager timeManager = GameTimeManager.get();
 
         // Settings tab (newer ids)
         if (timeLabel != null) {
@@ -572,7 +569,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         }
         if (timeSpeedSlider != null) {
             try {
-                timeSpeedSlider.valueProperty().unbindBidirectional(time.timeScaleProperty());
+                timeSpeedSlider.valueProperty().unbindBidirectional(timeManager.timeScaleProperty());
             } catch (Exception ignored) {
             }
         }
@@ -581,7 +578,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         Slider legacyTimeScaleSlider = controllerField("timescaleslider", Slider.class);
         if (legacyTimeScaleSlider != null) {
             try {
-                legacyTimeScaleSlider.valueProperty().unbindBidirectional(time.timeScaleProperty());
+                legacyTimeScaleSlider.valueProperty().unbindBidirectional(timeManager.timeScaleProperty());
             } catch (Exception ignored) {
             }
         }
@@ -599,8 +596,8 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         Label dayLabel = day != null ? day : controllerField("day", Label.class);
         if (dayLabel != null) dayLabel.textProperty().unbind();
 
-        Label timeLabelHud = time != null ? time : controllerField("time", Label.class);
-        if (timeLabelHud != null) timeLabelHud.textProperty().unbind();
+        Label timeLabelHud = this.time != null ? this.time : controllerField("time", Label.class);
+        if (timeLabelHud != null) timeLabelHud.textProperty().unbind(); 
 
         Label nameLabel = name != null ? name : controllerField("name", Label.class);
         if (nameLabel != null) nameLabel.textProperty().unbind();

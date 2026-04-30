@@ -510,6 +510,4 @@ public class Left_map_nothree_of_oneController extends BaseMapController {
     private void handlebtntutoaction(ActionEvent event) {
         showOverworldTutorialOverlay();
     }
-    
-    }  
 }
