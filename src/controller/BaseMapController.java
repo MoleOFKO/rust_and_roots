@@ -36,6 +36,7 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
+import javafx.collections.MapChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Bounds;
@@ -93,6 +94,7 @@ import javafx.scene.control.ToggleButton;
  */
 public abstract class BaseMapController implements Initializable, SceneController {
 
+    protected static final List<String> OVERWORLD_CORE_TUTORIAL_IMAGES = List.of(
     private static final double DEFAULT_PLAYER_HITBOX_WIDTH = 14.0;
     private static final double DEFAULT_PLAYER_HITBOX_HEIGHT = 20.0;
     private static final double DEFAULT_PLAYER_HITBOX_TRANSLATE_X = 24.0;
@@ -102,12 +104,16 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     protected static final List<String> OVERWORLD_TUTORIAL_IMAGES = List.of(
         "/image/Toturial/Up_bar.png",
         "/image/Toturial/Wp_hold.png",
-        "/image/Toturial/After_wp_hold.png",
-        "/image/Toturial/before_goes_to_hotbar.png",
         "/image/Toturial/goes_to_hotbar.png",
-        "/image/Toturial/Attack.png",
         "/image/Toturial/tt7.png"
     );
+    protected static final List<String> OVERWORLD_COMBAT_TUTORIAL_IMAGES = List.of(
+        "/image/Toturial/before_goes_to_hotbar.png",
+        "/image/Toturial/Wp_hold.png",
+        "/image/Toturial/After_wp_hold.png",
+        "/image/Toturial/Attack.png"
+    );
+    protected static final String OVERWORLD_COMBAT_TUTORIAL_KEY = "overworld_combat_hotbar_unlock";
 
     private static final ExecutorService MAP_EVICTION_EXECUTOR = Executors.newSingleThreadExecutor(r -> {
         Thread t = new Thread(r, "map-eviction");
@@ -267,6 +273,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
     private InvalidationListener sharedHudRefreshListener;
     private final List<Observable> sharedHudRefreshListenerTargets = new ArrayList<>();
+    private MapChangeListener<Integer, javafx.beans.property.IntegerProperty> overworldCombatTutorialInventoryListener;
 
     protected abstract String mapKey();
     protected abstract void configureExits();
@@ -329,7 +336,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 	    }
 
 	    protected void showOverworldTutorialOverlay() {
-	        TutorialOverlayHelper.show(view, OVERWORLD_TUTORIAL_IMAGES);
+	        TutorialOverlayHelper.show(view, TutorialOverlayHelper.GLOBAL_BUTTON_TUTORIAL_IMAGES);
 	    }
 
 	    protected final void registerPlayerAttackHandler(String key, Runnable handler) {
@@ -479,6 +486,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         setupFarmIfPresent();
         setupInventoryUiIfPresent();
         setupHotbarIfPresent();
+        setupOverworldCombatTutorialTrigger();
         setupDayNightBindingIfConfigured();
         setupFarmTimeRefreshIfPresent();
 	        setupSettingsTabIfPresent();
@@ -540,6 +548,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     private void cleanupBeforeSceneSwitch() {
         detachFarmTimeRefresh();
         detachSharedHudRefreshListener();
+        detachOverworldCombatTutorialTrigger();
 
         if (nightListener != null) {
             try {
@@ -2214,6 +2223,114 @@ public abstract class BaseMapController implements Initializable, SceneControlle
             inventoryOverlay.setManaged(false);
             inventoryOverlay.setDisable(true);
         }
+    }
+
+    private void setupOverworldCombatTutorialTrigger() {
+        detachOverworldCombatTutorialTrigger();
+
+        if (playerState == null) {
+            return;
+        }
+
+        Inventory inventory = playerState.getInventory();
+        if (inventory == null) {
+            return;
+        }
+
+        overworldCombatTutorialInventoryListener = change -> {
+            if (!change.wasAdded()) {
+                return;
+            }
+            Platform.runLater(this::showOverworldCombatTutorialIfNeeded);
+        };
+        inventory.itemsProperty().addListener(overworldCombatTutorialInventoryListener);
+
+        Platform.runLater(this::showOverworldCombatTutorialIfNeeded);
+    }
+
+    private void detachOverworldCombatTutorialTrigger() {
+        if (overworldCombatTutorialInventoryListener == null || playerState == null) {
+            overworldCombatTutorialInventoryListener = null;
+            return;
+        }
+
+        Inventory inventory = playerState.getInventory();
+        if (inventory != null) {
+            try {
+                inventory.itemsProperty().removeListener(overworldCombatTutorialInventoryListener);
+            } catch (Exception ignored) {
+            }
+        }
+        overworldCombatTutorialInventoryListener = null;
+    }
+
+    private void showOverworldCombatTutorialIfNeeded() {
+        if (view == null || gameState == null || playerState == null) {
+            return;
+        }
+        if (!playerHasCombatTutorialUnlockItem()) {
+            return;
+        }
+
+        TutorialOverlayHelper.showIfNeeded(
+            view,
+            gameState,
+            OVERWORLD_COMBAT_TUTORIAL_KEY,
+            OVERWORLD_COMBAT_TUTORIAL_IMAGES
+        );
+    }
+
+    private List<String> buildOverworldTutorialImages() {
+        List<String> images = new ArrayList<>(OVERWORLD_CORE_TUTORIAL_IMAGES);
+        if (shouldIncludeCombatTutorialImages()) {
+            images.addAll(OVERWORLD_COMBAT_TUTORIAL_IMAGES);
+        }
+        return images;
+    }
+
+    private boolean shouldIncludeCombatTutorialImages() {
+        return gameState != null && gameState.hasSeenTutorial(OVERWORLD_COMBAT_TUTORIAL_KEY);
+    }
+
+    private boolean playerHasCombatTutorialUnlockItem() {
+        if (playerState == null) {
+            return false;
+        }
+
+        Inventory inventory = playerState.getInventory();
+        if (inventory != null) {
+            for (Map.Entry<Integer, javafx.beans.property.IntegerProperty> entry : inventory.itemsProperty().entrySet()) {
+                if (entry == null || entry.getKey() == null || entry.getValue() == null) continue;
+                if (entry.getValue().get() > 0 && isCombatTutorialUnlockItem(entry.getKey())) {
+                    return true;
+                }
+            }
+        }
+
+        for (int i = 0; i < playerState.getHotbarSize(); i++) {
+            int itemId = playerState.getHotbarItemId(i);
+            if (itemId > 0 && playerState.getHotbarItemCount(i) > 0 && isCombatTutorialUnlockItem(itemId)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean isCombatTutorialUnlockItem(int itemId) {
+        String itemName = ItemDatabase.getItemName(itemId);
+        if (itemName == null || itemName.isBlank()) {
+            return false;
+        }
+
+        String normalized = itemName.trim().toLowerCase(Locale.ROOT).replace('_', ' ');
+        return normalized.contains("pickaxe")
+            || normalized.contains("pick axe")
+            || normalized.contains("iron sword")
+            || normalized.contains("iron spear")
+            || normalized.contains("iron dagger")
+            || normalized.contains("axe")
+            || normalized.contains("sword");
     }
 
     private void setupHotbarIfPresent() {

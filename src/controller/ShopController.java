@@ -32,6 +32,8 @@ import javafx.scene.image.Image;
 import javafx.scene.Group;
 import util.AppDialogs;
 import util.SpawnTag;
+import util.TutorialOverlayHelper;
+import util.WorldScaler;
 
 public class ShopController implements Initializable, SceneController {
     private static final int FIXED_BUY_SLOT_COUNT = 8;
@@ -39,14 +41,31 @@ public class ShopController implements Initializable, SceneController {
     private static final int MAX_STOCK_PER_ITEM = 20;
     private static final int RESTOCK_PER_DAY = 10;
     private static final String HOTBAR_SELL_ENTRY_STYLE = "-fx-text-fill: #8fdcff; -fx-font-weight: bold;";
+    private static final List<String> SHOP_TUTORIAL_IMAGES = List.of(
+        "/image/Toturial/Shop.png",
+        "/image/Toturial/Buy1.png",
+        "/image/Toturial/Buy2.png",
+        "/image/Toturial/Sell1.png",
+        "/image/Toturial/Sell2.png"
+    );
 
     private GameState gameState;
     private Inventory inv;
+    @FXML
+    private Button btntuto;
 
     @Override
     public void init(GameState gs) {
         this.gameState = gs;
         this.inv = gs.getPlayerState().getInventory();
+    }
+
+    @FXML
+    private void handlebtntutoaction(ActionEvent event) {
+        TutorialOverlayHelper.show(view, TutorialOverlayHelper.GLOBAL_BUTTON_TUTORIAL_IMAGES);
+        if (event != null) {
+            event.consume();
+        }
     }
 
     private enum Mode { BUY, SELL }
@@ -366,6 +385,7 @@ public class ShopController implements Initializable, SceneController {
         if (gameState == null) gameState = GameState.get();
         if (inv == null) inv = gameState.getPlayerState().getInventory();
 
+        new WorldScaler(view, world);
         buildUiCollections();
         collectButtonsOnce();
 
