@@ -70,11 +70,14 @@ public class Home_interiorController extends BaseMapController {
     private static final String DAY_BG_PATH = "/image/inhousedesign.png";
     private static final String NIGHT_BG_PATH = "";
     private static final List<String> HOME_TUTORIAL_IMAGE_PATHS = List.of(
+        "/image/Toturial/Move.png",
+        "/image/Toturial/Walk&Run.png",
         "/image/Toturial/Craft.png",
         "/image/Toturial/Cooking.png",
         "/image/Toturial/Chest.png",
         "/image/Toturial/Melting.png",
-        "/image/Toturial/Sleep.png"
+        "/image/Toturial/Sleep.png",
+        "/image/Toturial/Up_bar.png"
     );
     @FXML
     private ImageView bg;
@@ -2145,7 +2148,10 @@ public class Home_interiorController extends BaseMapController {
 
     @FXML
     private void handlebtntutoaction(ActionEvent event) {
-        showHomeInteriorTutorial(false);
+        TutorialOverlayHelper.show(view, TutorialOverlayHelper.GLOBAL_BUTTON_TUTORIAL_IMAGES);
+        if (event != null) {
+            event.consume();
+        }
     }
 
 }
