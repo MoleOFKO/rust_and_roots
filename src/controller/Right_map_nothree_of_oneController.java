@@ -49,6 +49,30 @@ public class Right_map_nothree_of_oneController extends BaseMapController{
     private ProgressBar spbar;
     @FXML
     private Button btntuto;
+    @FXML
+    private Group stone;
+    @FXML
+    private ImageView stone_img;
+    @FXML
+    private Rectangle stone_hitbox;
+    @FXML
+    private ImageView drops_img_stone;
+    @FXML
+    private Group stone1;
+    @FXML
+    private ImageView stone_img1;
+    @FXML
+    private Rectangle stone_hitbox1;
+    @FXML
+    private ImageView drops_img_stone1;
+    @FXML
+    private Group stone2;
+    @FXML
+    private ImageView stone_img2;
+    @FXML
+    private Rectangle stone_hitbox2;
+    @FXML
+    private ImageView drops_img_stone2;
 
     @Override
     protected String dayBackgroundPath() {
@@ -425,10 +449,8 @@ public class Right_map_nothree_of_oneController extends BaseMapController{
         registerExit(exit_left, "/view/right_map_nothree.fxml", SpawnTag.FROM_RIGHT);
     }
 
-    
     @FXML
     private void handlebtntutoaction(ActionEvent event) {
         showOverworldTutorialOverlay();
     }
-
 }

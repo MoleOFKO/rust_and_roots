@@ -28,6 +28,94 @@
          <image>
             <Image url="@../image/maps/rightmap.png" />
          </image></ImageView>
+      <Group fx:id="tree" layoutX="-236.0" layoutY="-124.0">
+         <children>
+            <ImageView fx:id="tree_img" fitHeight="126.0" fitWidth="107.0" layoutX="262.0" layoutY="176.0" pickOnBounds="true" preserveRatio="false" smooth="false">
+               <image>
+                  <Image url="@../image/items/yellow_tree1.png" />
+               </image>
+            </ImageView>
+            <Rectangle fx:id="tree_hitbox" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="22.0" layoutX="278.0" layoutY="246.0" stroke="RED" strokeType="INSIDE" translateX="24" translateY="28" width="26.0" />
+            <ImageView fx:id="drops_img_tree" fitHeight="28.0" fitWidth="28.0" layoutX="303.0" layoutY="267.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
+         </children>
+      </Group>
+      <Group fx:id="tree1" layoutX="-73.0" layoutY="-140.0">
+         <children>
+            <ImageView fx:id="tree_img1" fitHeight="126.0" fitWidth="107.0" layoutX="262.0" layoutY="176.0" pickOnBounds="true" preserveRatio="false" smooth="false">
+               <image>
+                  <Image url="@../image/items/yellow_tree1.png" />
+               </image>
+            </ImageView>
+            <Rectangle fx:id="tree_hitbox1" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="22.0" layoutX="278.0" layoutY="246.0" stroke="RED" strokeType="INSIDE" translateX="24" translateY="28" width="26.0" />
+            <ImageView fx:id="drops_img_tree1" fitHeight="28.0" fitWidth="28.0" layoutX="303.0" layoutY="267.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
+         </children>
+      </Group>
+      <Group fx:id="tree2" layoutX="-186.0" layoutY="92.0">
+         <children>
+            <ImageView fx:id="tree_img2" fitHeight="126.0" fitWidth="107.0" layoutX="262.0" layoutY="176.0" pickOnBounds="true" preserveRatio="false" smooth="false">
+               <image>
+                  <Image url="@../image/items/yellow_tree1.png" />
+               </image>
+            </ImageView>
+            <Rectangle fx:id="tree_hitbox2" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="22.0" layoutX="278.0" layoutY="246.0" stroke="RED" strokeType="INSIDE" translateX="24" translateY="28" width="26.0" />
+            <ImageView fx:id="drops_img_tree2" fitHeight="28.0" fitWidth="28.0" layoutX="303.0" layoutY="267.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
+         </children>
+      </Group>
+      <Group fx:id="tree3" layoutX="-72.0" layoutY="-3.0">
+         <children>
+            <ImageView fx:id="tree_img3" fitHeight="126.0" fitWidth="107.0" layoutX="262.0" layoutY="176.0" pickOnBounds="true" preserveRatio="false" smooth="false">
+               <image>
+                  <Image url="@../image/items/yellow_tree1.png" />
+               </image>
+            </ImageView>
+            <Rectangle fx:id="tree_hitbox3" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="22.0" layoutX="278.0" layoutY="246.0" stroke="RED" strokeType="INSIDE" translateX="24" translateY="28" width="26.0" />
+            <ImageView fx:id="drops_img_tree3" fitHeight="28.0" fitWidth="28.0" layoutX="303.0" layoutY="267.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
+         </children>
+      </Group>
+      <Group fx:id="tree4" layoutX="43.0" layoutY="-176.0">
+         <children>
+            <ImageView fx:id="tree_img4" fitHeight="126.0" fitWidth="107.0" layoutX="262.0" layoutY="176.0" pickOnBounds="true" preserveRatio="false" smooth="false">
+               <image>
+                  <Image url="@../image/items/yellow_tree1.png" />
+               </image>
+            </ImageView>
+            <Rectangle fx:id="tree_hitbox4" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="22.0" layoutX="278.0" layoutY="246.0" stroke="RED" strokeType="INSIDE" translateX="24" translateY="28" width="26.0" />
+            <ImageView fx:id="drops_img_tree4" fitHeight="28.0" fitWidth="28.0" layoutX="303.0" layoutY="267.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
+         </children>
+      </Group>
+      <Group fx:id="tree5" layoutX="190.0" layoutY="-148.0">
+         <children>
+            <ImageView fx:id="tree_img5" fitHeight="126.0" fitWidth="107.0" layoutX="262.0" layoutY="176.0" pickOnBounds="true" preserveRatio="false" smooth="false">
+               <image>
+                  <Image url="@../image/items/yellow_tree1.png" />
+               </image>
+            </ImageView>
+            <Rectangle fx:id="tree_hitbox5" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="22.0" layoutX="278.0" layoutY="246.0" stroke="RED" strokeType="INSIDE" translateX="24" translateY="28" width="26.0" />
+            <ImageView fx:id="drops_img_tree5" fitHeight="28.0" fitWidth="28.0" layoutX="303.0" layoutY="267.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
+         </children>
+      </Group>
+      <Group fx:id="tree6" layoutX="63.0" layoutY="-35.0">
+         <children>
+            <ImageView fx:id="tree_img6" fitHeight="126.0" fitWidth="107.0" layoutX="262.0" layoutY="176.0" pickOnBounds="true" preserveRatio="false" smooth="false">
+               <image>
+                  <Image url="@../image/items/yellow_tree1.png" />
+               </image>
+            </ImageView>
+            <Rectangle fx:id="tree_hitbox6" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="22.0" layoutX="278.0" layoutY="246.0" stroke="RED" strokeType="INSIDE" translateX="24" translateY="28" width="26.0" />
+            <ImageView fx:id="drops_img_tree6" fitHeight="28.0" fitWidth="28.0" layoutX="303.0" layoutY="267.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
+         </children>
+      </Group>
+      <Group fx:id="tree7" layoutX="230.0" layoutY="97.0">
+         <children>
+            <ImageView fx:id="tree_img7" fitHeight="126.0" fitWidth="107.0" layoutX="262.0" layoutY="176.0" pickOnBounds="true" preserveRatio="false" smooth="false">
+               <image>
+                  <Image url="@../image/items/yellow_tree1.png" />
+               </image>
+            </ImageView>
+            <Rectangle fx:id="tree_hitbox7" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="22.0" layoutX="278.0" layoutY="246.0" stroke="RED" strokeType="INSIDE" translateX="24" translateY="28" width="26.0" />
+            <ImageView fx:id="drops_img_tree7" fitHeight="28.0" fitWidth="28.0" layoutX="303.0" layoutY="267.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
+         </children>
+      </Group>
 
         <!-- Player -->
         <Group fx:id="human" layoutX="300" layoutY="200">
@@ -35,6 +123,46 @@
             <ImageView fx:id="equip_img" fitHeight="64" fitWidth="64" />
             <Rectangle fx:id="human_hitbox" arcHeight="6" arcWidth="6" fill="#00000078" height="24" layoutX="18" layoutY="34" visible="false" width="28" />
         </Group>
+      <Group fx:id="treelayorgp7" layoutX="492.0" layoutY="273.0">
+         <children>
+            <ImageView fx:id="treelayorimg7" fitHeight="126.0" fitWidth="107.0" pickOnBounds="true" preserveRatio="true" />
+         </children>
+      </Group>
+      <Group fx:id="treelayorgp6" layoutX="325.0" layoutY="141.0">
+         <children>
+            <ImageView fx:id="treelayorimg6" fitHeight="126.0" fitWidth="107.0" pickOnBounds="true" preserveRatio="true" />
+         </children>
+      </Group>
+      <Group fx:id="treelayorgp5" layoutX="452.0" layoutY="28.0">
+         <children>
+            <ImageView fx:id="treelayorimg5" fitHeight="126.0" fitWidth="107.0" pickOnBounds="true" preserveRatio="true" />
+         </children>
+      </Group>
+      <Group fx:id="treelayorgp4" layoutX="305.0">
+         <children>
+            <ImageView fx:id="treelayorimg4" fitHeight="126.0" fitWidth="107.0" pickOnBounds="true" preserveRatio="true" />
+         </children>
+      </Group>
+      <Group fx:id="treelayorgp3" layoutX="190.0" layoutY="173.0">
+         <children>
+            <ImageView fx:id="treelayorimg3" fitHeight="126.0" fitWidth="107.0" pickOnBounds="true" preserveRatio="true" />
+         </children>
+      </Group>
+      <Group fx:id="treelayorgp2" layoutX="76.0" layoutY="268.0">
+         <children>
+            <ImageView fx:id="treelayorimg2" fitHeight="126.0" fitWidth="107.0" pickOnBounds="true" preserveRatio="true" />
+         </children>
+      </Group>
+      <Group fx:id="treelayorgp1" layoutX="189.0" layoutY="36.0">
+         <children>
+            <ImageView fx:id="treelayorimg1" fitHeight="126.0" fitWidth="107.0" pickOnBounds="true" preserveRatio="true" />
+         </children>
+      </Group>
+      <Group fx:id="treelayorgp" layoutX="26.0" layoutY="52.0">
+         <children>
+            <ImageView fx:id="treelayorimg" fitHeight="126.0" fitWidth="107.0" pickOnBounds="true" preserveRatio="true" />
+         </children>
+      </Group>
 
         <!-- Walls: prefix MUST be "wall" so CollisionRegistry.collectWalls(walls) finds them  -->
         <Group fx:id="walls" layoutX="1.0" visible="false">
@@ -119,6 +247,61 @@
                   <Image url="@../image/tools/SPbar.png" />
                </image>
             </ImageView>
+         </children>
+      </Group>
+      <Group fx:id="stone4" layoutX="-57.0" layoutY="98.0">
+         <children>
+            <ImageView fx:id="stone_img4" fitHeight="32.0" fitWidth="32.0" layoutX="286.0" layoutY="249.0" pickOnBounds="true" preserveRatio="false" smooth="false">
+               <image>
+                  <Image url="@../image/weapons/stone.png" />
+               </image>
+            </ImageView>
+            <Rectangle fx:id="stone_hitbox4" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="20.0" layoutX="266.0" layoutY="226.0" stroke="RED" strokeType="INSIDE" translateX="24" translateY="28" width="25.0" />
+            <ImageView fx:id="drops_img_stone4" fitHeight="28.0" fitWidth="28.0" layoutX="303.0" layoutY="267.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
+         </children>
+      </Group>
+      <Group fx:id="stone3" layoutX="243.0" layoutY="-75.0">
+         <children>
+            <ImageView fx:id="stone_img3" fitHeight="32.0" fitWidth="32.0" layoutX="286.0" layoutY="249.0" pickOnBounds="true" preserveRatio="false" smooth="false">
+               <image>
+                  <Image url="@../image/weapons/stone.png" />
+               </image>
+            </ImageView>
+            <Rectangle fx:id="stone_hitbox3" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="20.0" layoutX="266.0" layoutY="226.0" stroke="RED" strokeType="INSIDE" translateX="24" translateY="28" width="25.0" />
+            <ImageView fx:id="drops_img_stone3" fitHeight="28.0" fitWidth="28.0" layoutX="303.0" layoutY="267.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
+         </children>
+      </Group>
+      <Group fx:id="stone2" layoutX="111.0" layoutY="78.0">
+         <children>
+            <ImageView fx:id="stone_img2" fitHeight="32.0" fitWidth="32.0" layoutX="286.0" layoutY="249.0" pickOnBounds="true" preserveRatio="false" smooth="false">
+               <image>
+                  <Image url="@../image/weapons/stone.png" />
+               </image>
+            </ImageView>
+            <Rectangle fx:id="stone_hitbox2" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="20.0" layoutX="266.0" layoutY="226.0" stroke="RED" strokeType="INSIDE" translateX="24" translateY="28" width="25.0" />
+            <ImageView fx:id="drops_img_stone2" fitHeight="28.0" fitWidth="28.0" layoutX="303.0" layoutY="267.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
+         </children>
+      </Group>
+      <Group fx:id="stone1" layoutX="24.0" layoutY="29.0">
+         <children>
+            <ImageView fx:id="stone_img1" fitHeight="32.0" fitWidth="32.0" layoutX="286.0" layoutY="249.0" pickOnBounds="true" preserveRatio="false" smooth="false">
+               <image>
+                  <Image url="@../image/weapons/stone.png" />
+               </image>
+            </ImageView>
+            <Rectangle fx:id="stone_hitbox1" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="20.0" layoutX="266.0" layoutY="226.0" stroke="RED" strokeType="INSIDE" translateX="24" translateY="28" width="25.0" />
+            <ImageView fx:id="drops_img_stone1" fitHeight="28.0" fitWidth="28.0" layoutX="303.0" layoutY="267.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
+         </children>
+      </Group>
+      <Group fx:id="stone" layoutX="-245.0" layoutY="-35.0">
+         <children>
+            <ImageView fx:id="stone_img" fitHeight="32.0" fitWidth="32.0" layoutX="286.0" layoutY="249.0" pickOnBounds="true" preserveRatio="false" smooth="false">
+               <image>
+                  <Image url="@../image/weapons/stone.png" />
+               </image>
+            </ImageView>
+            <Rectangle fx:id="stone_hitbox" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="20.0" layoutX="266.0" layoutY="226.0" stroke="RED" strokeType="INSIDE" translateX="24" translateY="28" width="25.0" />
+            <ImageView fx:id="drops_img_stone" fitHeight="28.0" fitWidth="28.0" layoutX="303.0" layoutY="267.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
          </children>
       </Group>
       <Group layoutX="10.0" layoutY="1.0">

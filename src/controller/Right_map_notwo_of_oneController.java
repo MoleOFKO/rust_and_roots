@@ -35,6 +35,90 @@ public class Right_map_notwo_of_oneController extends BaseMapController {
     @FXML
     private ImageView bg;
     @FXML
+    private Group tree;
+    @FXML
+    private ImageView tree_img;
+    @FXML
+    private Rectangle tree_hitbox;
+    @FXML
+    private ImageView drops_img_tree;
+    @FXML
+    private Group tree1;
+    @FXML
+    private ImageView tree_img1;
+    @FXML
+    private Rectangle tree_hitbox1;
+    @FXML
+    private ImageView drops_img_tree1;
+    @FXML
+    private Group tree2;
+    @FXML
+    private ImageView tree_img2;
+    @FXML
+    private Rectangle tree_hitbox2;
+    @FXML
+    private ImageView drops_img_tree2;
+    @FXML
+    private Group tree3;
+    @FXML
+    private ImageView tree_img3;
+    @FXML
+    private Rectangle tree_hitbox3;
+    @FXML
+    private ImageView drops_img_tree3;
+    @FXML
+    private Group tree4;
+    @FXML
+    private ImageView tree_img4;
+    @FXML
+    private Rectangle tree_hitbox4;
+    @FXML
+    private ImageView drops_img_tree4;
+    @FXML
+    private Group tree5;
+    @FXML
+    private ImageView tree_img5;
+    @FXML
+    private Rectangle tree_hitbox5;
+    @FXML
+    private ImageView drops_img_tree5;
+    @FXML
+    private Group tree6;
+    @FXML
+    private ImageView tree_img6;
+    @FXML
+    private Rectangle tree_hitbox6;
+    @FXML
+    private ImageView drops_img_tree6;
+    @FXML
+    private Group treelayorgp6;
+    @FXML
+    private ImageView treelayorimg6;
+    @FXML
+    private Group treelayorgp5;
+    @FXML
+    private ImageView treelayorimg5;
+    @FXML
+    private Group treelayorgp4;
+    @FXML
+    private ImageView treelayorimg4;
+    @FXML
+    private Group treelayorgp3;
+    @FXML
+    private ImageView treelayorimg3;
+    @FXML
+    private Group treelayorgp2;
+    @FXML
+    private ImageView treelayorimg2;
+    @FXML
+    private Group treelayorgp1;
+    @FXML
+    private ImageView treelayorimg1;
+    @FXML
+    private Group treelayorgp;
+    @FXML
+    private ImageView treelayorimg;
+    @FXML
     private Group daynightnavgroup;
     @FXML
     private Label day;
@@ -52,7 +136,31 @@ public class Right_map_notwo_of_oneController extends BaseMapController {
     private ProgressBar spbar;
     @FXML
     private Button btntuto;
-
+    @FXML
+    private Group stone;
+    @FXML
+    private ImageView stone_img;
+    @FXML
+    private Rectangle stone_hitbox;
+    @FXML
+    private ImageView drops_img_stone;
+    @FXML
+    private Group stone1;
+    @FXML
+    private ImageView stone_img1;
+    @FXML
+    private Rectangle stone_hitbox1;
+    @FXML
+    private ImageView drops_img_stone1;
+    @FXML
+    private Group stone2;
+    @FXML
+    private ImageView stone_img2;
+    @FXML
+    private Rectangle stone_hitbox2;
+    @FXML
+    private ImageView drops_img_stone2;
+    
     @Override
     protected String dayBackgroundPath() {
         return DAY_BG_PATH;
@@ -416,10 +524,8 @@ public class Right_map_notwo_of_oneController extends BaseMapController {
             ));
         }
     }
-
     @FXML
     private void handlebtntutoaction(ActionEvent event) {
         showOverworldTutorialOverlay();
     }
-    
 }
