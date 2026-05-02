@@ -4,6 +4,7 @@
  */
 package rust_and_roots;
 
+import db.dbcon;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -12,6 +13,8 @@ public class Rust_and_roots extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         Rust_and_roots.stage = stage;
+        
+        dbcon.warmUpAsync();
         
         util.SceneManager.switchScene("/view/login.fxml");
         stage.show();

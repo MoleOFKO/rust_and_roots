@@ -42,6 +42,7 @@ public class SceneManager {
             if (stage == null) throw new IllegalStateException("Primary stage is null");
 
             Scene currentScene = stage.getScene();
+            clearSceneInputHandlers(currentScene);
 
             // first time only
             if (currentScene == null) {
@@ -97,6 +98,17 @@ public class SceneManager {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private static void clearSceneInputHandlers(Scene scene) {
+        if (scene == null) {
+            return;
+        }
+
+        // Avoid keeping old controllers alive via global scene-level input handlers.
+        scene.setOnKeyPressed(null);
+        scene.setOnKeyReleased(null);
+        scene.setOnKeyTyped(null);
     }
 
     private enum BgmTrack {
