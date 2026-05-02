@@ -94,18 +94,15 @@ import javafx.scene.control.ToggleButton;
  */
 public abstract class BaseMapController implements Initializable, SceneController {
 
-    protected static final List<String> OVERWORLD_CORE_TUTORIAL_IMAGES = List.of(
     private static final double DEFAULT_PLAYER_HITBOX_WIDTH = 14.0;
     private static final double DEFAULT_PLAYER_HITBOX_HEIGHT = 20.0;
     private static final double DEFAULT_PLAYER_HITBOX_TRANSLATE_X = 24.0;
     private static final double DEFAULT_PLAYER_HITBOX_TRANSLATE_Y = 28.0;
     private static final double DEFAULT_PLAYER_HITBOX_LAYOUT_Y_OFFSET_FROM_SPRITE = -5.0;
 
-    protected static final List<String> OVERWORLD_TUTORIAL_IMAGES = List.of(
+    protected static final List<String> OVERWORLD_CORE_TUTORIAL_IMAGES = List.of(
         "/image/Toturial/Up_bar.png",
-        "/image/Toturial/Wp_hold.png",
-        "/image/Toturial/goes_to_hotbar.png",
-        "/image/Toturial/tt7.png"
+        "/image/Toturial/goes_to_hotbar.png"
     );
     protected static final List<String> OVERWORLD_COMBAT_TUTORIAL_IMAGES = List.of(
         "/image/Toturial/before_goes_to_hotbar.png",
