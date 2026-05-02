@@ -67,6 +67,7 @@ import model.Player;
 import model.PlayerState;
 import model.TreeMapState;
 import util.AppDialogs;
+import util.ImageCache;
 import util.SceneManager;
 import util.SpawnTag;
 import util.TimeFlow;
@@ -2392,12 +2393,12 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         if (path == null || path.isBlank()) {
             return null;
         }
-        var url = getClass().getResource(path);
-        if (url == null) {
+        Image image = ImageCache.get(path);
+        if (image == null) {
             System.err.println("[BaseMapController] Missing resource: " + path);
             return null;
         }
-        return new Image(url.toExternalForm());
+        return image;
     }
 
     private void setupSettingsTabIfPresent() {

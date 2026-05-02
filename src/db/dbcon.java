@@ -5,31 +5,14 @@
 package db;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 
 /**
  *
  * @author larry
  */
 public class dbcon {
-    
-    private String username="root";
-    private String password="Er05@vE1!fE5";
-    public Connection getConnection() throws ClassNotFoundException{
-        Connection con=null;
-        String url="jdbc:mysql://localhost:3306/rust_and_root";
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        System.out.println("load driver..........");
-        try{
-            con =DriverManager.getConnection(url, username, password);
-            DatabaseSchemaManager.ensureSchema(con);
-            System.out.println("database connected");
-        }catch(SQLException e){
-            System.out.println("not connect");
-            throw new IllegalStateException("Failed to connect or initialize database schema", e);
-        }
-        return con;
-      }
-    
+
+    public Connection getConnection() throws ClassNotFoundException {
+        return Database.openConnection();
+    }
 }

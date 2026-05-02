@@ -28,6 +28,7 @@ import model.TreeMapState;
 import model.item;
 import util.AppDialogs;
 import util.CombatRules;
+import util.ImageCache;
 import util.SkillModifiers;
 
 final class NaturalResourceSystem {
@@ -617,14 +618,26 @@ final class NaturalResourceSystem {
             return;
         }
 
+        double multiplier = oreStatusMultiplier(handle.baseId);
+        int desiredMaxHp = scaledStatus(STARTING_MAX_HP, multiplier);
+        int desiredVit = scaledStatus(STARTING_ORE_VIT, multiplier);
+
+        // Enforce variant stats, while keeping the current HP proportion when migrating existing saves.
         if (data.maxHp <= 0) {
-            data.maxHp = STARTING_MAX_HP;
+            data.maxHp = desiredMaxHp;
+        } else if (data.maxHp != desiredMaxHp) {
+            double ratio = (double) Math.max(0, data.hp) / (double) Math.max(1, data.maxHp);
+            data.maxHp = desiredMaxHp;
+            data.hp = (int) Math.round(ratio * desiredMaxHp);
         }
+
         if (data.hp <= 0) {
             data.hp = data.maxHp;
         }
-        if (data.vit <= 0) {
-            data.vit = STARTING_ORE_VIT;
+
+        // Ores do not use lived-day scaling; VIT is variant-defined.
+        if (data.vit != desiredVit) {
+            data.vit = desiredVit;
         }
 
         if (data.hp > data.maxHp) {
@@ -1421,10 +1434,14 @@ final class NaturalResourceSystem {
             return;
         }
 
+        double multiplier = oreStatusMultiplier(handle.baseId);
+        int desiredMaxHp = scaledStatus(STARTING_MAX_HP, multiplier);
+        int desiredVit = scaledStatus(STARTING_ORE_VIT, multiplier);
+
         handle.data.currentStage = 2;
-        handle.data.hp = STARTING_MAX_HP;
-        handle.data.maxHp = STARTING_MAX_HP;
-        handle.data.vit = STARTING_ORE_VIT;
+        handle.data.hp = desiredMaxHp;
+        handle.data.maxHp = desiredMaxHp;
+        handle.data.vit = desiredVit;
         handle.data.respawnAtTotalSeconds = -1;
         handle.data.lastUpdatedDayNumber = Math.max(1, currentDay);
 
@@ -1435,6 +1452,37 @@ final class NaturalResourceSystem {
         if (handle.hitbox != null) {
             handle.hitbox.setDisable(false);
         }
+    }
+
+    private int scaledStatus(int baseValue, double multiplier) {
+        int base = Math.max(0, baseValue);
+        double safe = Double.isFinite(multiplier) ? multiplier : 1.0;
+        if (safe <= 0.0) safe = 1.0;
+        return Math.max(1, (int) Math.round(base * safe));
+    }
+
+    private double oreStatusMultiplier(String baseId) {
+        if (baseId == null || baseId.isBlank()) {
+            return 1.0;
+        }
+
+        String id = baseId.trim().toLowerCase(Locale.ROOT);
+        // Treat *_ore nodes as the same variant as their base metal.
+        if (id.endsWith("_ore")) {
+            id = id.substring(0, id.length() - "_ore".length());
+        }
+
+        return switch (id) {
+            case "stone", "stone_dungeon" -> 1.0;
+            case "copper", "iron" -> 1.5;
+            case "silver" -> 2.0;
+            case "gold" -> 2.5;
+            case "mithril" -> 3.0;
+            case "adamantite" -> 4.0;
+            case "orichalcum" -> 5.0;
+            case "hihiogane" -> 6.0;
+            default -> 1.0;
+        };
     }
 
     private void killOre(ResourceHandle handle, int currentDay, double nowSeconds) {
@@ -1813,12 +1861,12 @@ final class NaturalResourceSystem {
         if (path == null || path.isBlank()) {
             return null;
         }
-        var url = getClass().getResource(path);
-        if (url == null) {
+        Image image = ImageCache.get(path);
+        if (image == null) {
             System.err.println("[NaturalResourceSystem] Missing resource: " + path);
             return null;
         }
-        return new Image(url.toExternalForm());
+        return image;
     }
 
     private <T extends Node> T node(String id, Class<T> type) {

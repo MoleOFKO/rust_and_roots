@@ -1929,9 +1929,7 @@ public class Left_mapController extends BaseMapController {
                 try {
                     capturePlayerSnapshot();
                     new SaveGameService().saveGame(GameState.get());
-                    if (gameLoop != null) gameLoop.stop();
-                    if (player != null) player.stop();
-                    SceneManager.switchScene("/view/main_menu.fxml");
+                    stopAndSwitchScene("/view/main_menu.fxml", SpawnTag.DEFAULT);
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
