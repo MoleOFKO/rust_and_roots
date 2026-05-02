@@ -13,6 +13,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
+import util.ImageCache;
 
 public final class TutorialOverlayHelper {
 
@@ -102,7 +103,10 @@ public final class TutorialOverlayHelper {
         Runnable updateStep = () -> {
             String imagePath = imagePaths.get(index[0]);
             title.setText(extractTitle(imagePath));
-            imageView.setImage(new Image(TutorialOverlayHelper.class.getResource(imagePath).toExternalForm()));
+            Image cached = ImageCache.get(imagePath);
+            if (cached != null) {
+                imageView.setImage(cached);
+            }
         };
         updateStep.run();
 
