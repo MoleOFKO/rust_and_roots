@@ -5,7 +5,6 @@
 package controller;
 
 import db.dbcon;
-import db.SaveGameService;
 import game.GameState;
 import game.GameTimeManager;
 import game.SceneController;
@@ -202,13 +201,6 @@ public class New_gameController implements Initializable, SceneController {
         } catch (Exception e) {
             e.printStackTrace();
             AppDialogs.showMessageDialog(null, "Failed to create character.");
-            return;
-        }
-
-        // Ensure a save exists immediately so map-state eviction/persistence can work (prevents unbounded RAM growth).
-        new SaveGameService().saveGameToSlot(gs, gs.getSelectedSaveSlot());
-        if (!gs.hasActiveSave()) {
-            AppDialogs.showMessageDialog(null, "Failed to create initial save. Please check database connection.");
             return;
         }
 

@@ -4,7 +4,7 @@
  */
 package rust_and_roots;
 
-import db.dbcon;
+import db.Database;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -16,7 +16,7 @@ public class Rust_and_roots extends Application {
 
         // Warm up DB (driver + schema bootstrap) once at app start so gameplay code doesn't
         // repeatedly pay the initialization cost on first query.
-        dbcon.warmUpAsync();
+        Database.warmUpAsync();
         
         util.SceneManager.switchScene("/view/login.fxml");
         stage.show();

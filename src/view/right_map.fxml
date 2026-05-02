@@ -121,7 +121,7 @@
         <Group fx:id="human" layoutX="300" layoutY="200">
             <ImageView fx:id="human_img" fitHeight="64" fitWidth="64" />
             <ImageView fx:id="equip_img" fitHeight="64" fitWidth="64" />
-            <Rectangle fx:id="human_hitbox" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="24.0" layoutY="23.0" visible="false" width="14.0" />
+            <Rectangle fx:id="human_hitbox" arcHeight="6" arcWidth="6" fill="#00000078" height="24" layoutX="18" layoutY="34" visible="false" width="28" />
         </Group>
       <Group fx:id="treelayorgp7" layoutX="492.0" layoutY="273.0">
          <children>
