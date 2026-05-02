@@ -14,6 +14,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.shape.Rectangle;
 import util.CombatRules;
+import util.ImageCache;
 import util.SkillModifiers;
 import util.TimeFlow;
 
@@ -1184,10 +1185,10 @@ public final class MobEntity {
         if (resourcePath == null || resourcePath.isBlank()) {
             throw new IllegalArgumentException("resourcePath must be non-empty");
         }
-        var url = getClass().getResource(resourcePath);
-        if (url == null) {
+        Image image = ImageCache.get(resourcePath);
+        if (image == null) {
             throw new IllegalStateException("Missing mob sprite resource: " + resourcePath);
         }
-        return new Image(url.toExternalForm());
+        return image;
     }
 }

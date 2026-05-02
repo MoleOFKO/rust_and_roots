@@ -4,7 +4,7 @@
  */
 package rust_and_roots;
 
-import db.Database;
+import db.dbcon;
 import javafx.application.Application;
 import javafx.stage.Stage;
 

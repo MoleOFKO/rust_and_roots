@@ -55,6 +55,7 @@ import javafx.event.ActionEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import model.CollisionRegistry;
 import model.Farm;
 import model.FarmGrowthRules;
@@ -67,6 +68,7 @@ import model.Player;
 import model.PlayerState;
 import model.TreeMapState;
 import util.AppDialogs;
+import util.ImageCache;
 import util.SceneManager;
 import util.SpawnTag;
 import util.TimeFlow;
@@ -90,6 +92,12 @@ import javafx.scene.control.ToggleButton;
  * in its FXML. Missing nodes are handled safely.
  */
 public abstract class BaseMapController implements Initializable, SceneController {
+
+    private static final double DEFAULT_PLAYER_HITBOX_WIDTH = 14.0;
+    private static final double DEFAULT_PLAYER_HITBOX_HEIGHT = 20.0;
+    private static final double DEFAULT_PLAYER_HITBOX_TRANSLATE_X = 24.0;
+    private static final double DEFAULT_PLAYER_HITBOX_TRANSLATE_Y = 28.0;
+    private static final double DEFAULT_PLAYER_HITBOX_LAYOUT_Y_OFFSET_FROM_SPRITE = -5.0;
 
     protected static final List<String> OVERWORLD_TUTORIAL_IMAGES = List.of(
         "/image/Toturial/Up_bar.png",
@@ -429,6 +437,8 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
         ItemDatabase.loadItems();
         playerState = gameState.getPlayerState();
+
+        normalizePlayerBodyHitbox();
 
         player = new Player(
             playerState,
@@ -2392,12 +2402,34 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         if (path == null || path.isBlank()) {
             return null;
         }
-        var url = getClass().getResource(path);
-        if (url == null) {
+        Image image = ImageCache.get(path);
+        if (image == null) {
             System.err.println("[BaseMapController] Missing resource: " + path);
-            return null;
         }
-        return new Image(url.toExternalForm());
+        return image;
+    }
+
+    private void normalizePlayerBodyHitbox() {
+        if (human_hitbox == null || human_img == null) {
+            return;
+        }
+
+        human_hitbox.setWidth(DEFAULT_PLAYER_HITBOX_WIDTH);
+        human_hitbox.setHeight(DEFAULT_PLAYER_HITBOX_HEIGHT);
+
+        // Keep the hitbox anchored to the sprite node so all maps behave consistently even if the
+        // FXML layouts differ (some maps position the group, others position the children).
+        human_hitbox.setLayoutX(human_img.getLayoutX());
+        human_hitbox.setLayoutY(human_img.getLayoutY() + DEFAULT_PLAYER_HITBOX_LAYOUT_Y_OFFSET_FROM_SPRITE);
+        human_hitbox.setTranslateX(DEFAULT_PLAYER_HITBOX_TRANSLATE_X);
+        human_hitbox.setTranslateY(DEFAULT_PLAYER_HITBOX_TRANSLATE_Y);
+
+        // Make sure styling doesn't inflate collision bounds (stroke can affect boundsInLocal).
+        human_hitbox.setFill(Color.TRANSPARENT);
+        human_hitbox.setStroke(null);
+        human_hitbox.setVisible(false);
+        human_hitbox.setManaged(false);
+        human_hitbox.setMouseTransparent(true);
     }
 
     private void setupSettingsTabIfPresent() {
