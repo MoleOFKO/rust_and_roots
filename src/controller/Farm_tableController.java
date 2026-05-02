@@ -41,6 +41,22 @@ public class Farm_tableController implements Initializable, SceneController {
 
     private static final double FARM_TABLE_TIME_SCALE = 0.25;
     private static final int DEFAULT_PLANT_STAMINA_COST = 2;
+    private static final String FARM_TUTORIAL_KEY = "farm_table_inside";
+    private static final List<String> FARM_TUTORIAL_IMAGES = List.of(
+        "/image/Toturial/Farm1.png",
+        "/image/Toturial/Farm2.png",
+        "/image/Toturial/Farm3.png",
+        "/image/Toturial/Farm4.png",
+        "/image/Toturial/Farm5.png",
+        "/image/Toturial/Farm6.png",
+        "/image/Toturial/Farm7.png",
+        "/image/Toturial/Farm8.png",
+        "/image/Toturial/Farm9.png",
+        "/image/Toturial/Farm10.png",
+        "/image/Toturial/Farm11.png",
+        "/image/Toturial/Farm12.png",
+        "/image/Toturial/Farm13.png"
+    );
 
     private static final String PLOT_IDLE_STYLE = "-fx-background-color: transparent; -fx-background-radius: 6; -fx-border-color: transparent; -fx-border-radius: 6;";
     private static final String PLOT_HIGHLIGHT_STYLE = "-fx-background-color: rgba(255,255,0,0.14); -fx-background-radius: 6; -fx-border-color: rgba(255,255,0,0.92); -fx-border-width: 2; -fx-border-radius: 6;";
@@ -73,6 +89,16 @@ public class Farm_tableController implements Initializable, SceneController {
     private final Map<String, Integer> seedSlotMapping = new LinkedHashMap<>();
     private int selectedSeedSlotIndex = -1;
     private final List<SeedListEntry> displayedSeedListEntries = new ArrayList<>();
+    @FXML
+    private Button btntuto;
+
+    @FXML
+    private void handlebtntutoaction(ActionEvent event) {
+        TutorialOverlayHelper.show(view, TutorialOverlayHelper.GLOBAL_BUTTON_TUTORIAL_IMAGES);
+        if (event != null) {
+            event.consume();
+        }
+    }
 
     private record SeedListEntry(int itemId, int quantity) {}
 
@@ -147,22 +173,8 @@ public class Farm_tableController implements Initializable, SceneController {
         TutorialOverlayHelper.showIfNeeded(
             view,
             gameState,
-            "farm_table_inside",
-            List.of(
-                "/image/Toturial/Farm1.png",
-                "/image/Toturial/Farm2.png",
-                "/image/Toturial/Farm3.png",
-                "/image/Toturial/Farm4.png",
-                "/image/Toturial/Farm5.png",
-                "/image/Toturial/Farm6.png",
-                "/image/Toturial/Farm7.png",
-                "/image/Toturial/Farm8.png",
-                "/image/Toturial/Farm9.png",
-                "/image/Toturial/Farm10.png",
-                "/image/Toturial/Farm11.png",
-                "/image/Toturial/Farm12.png",
-                "/image/Toturial/Farm13.png"
-            )
+            FARM_TUTORIAL_KEY,
+            FARM_TUTORIAL_IMAGES
         );
     }
 

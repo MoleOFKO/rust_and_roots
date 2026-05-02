@@ -16,6 +16,20 @@ import javafx.scene.text.Font;
 
 public final class TutorialOverlayHelper {
 
+    public static final List<String> GLOBAL_BUTTON_TUTORIAL_IMAGES = List.of(
+        "/image/Toturial/Move.png",
+        "/image/Toturial/Walk&Run.png",
+        "/image/Toturial/before_goes_to_hotbar.png",
+        "/image/Toturial/goes_to_hotbar.png",
+        "/image/Toturial/Wp_hold.png",
+        "/image/Toturial/After_wp_hold.png",
+        "/image/Toturial/Attack.png",
+        "/image/Toturial/Setting.png",
+        "/image/Toturial/Inventory.png",
+        "/image/Toturial/Stats.png",
+        "/image/Toturial/Skill.png"
+    );
+
     private TutorialOverlayHelper() {
     }
 

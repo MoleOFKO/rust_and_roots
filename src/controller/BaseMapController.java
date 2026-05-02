@@ -36,6 +36,7 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
+import javafx.collections.MapChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Bounds;
@@ -55,6 +56,7 @@ import javafx.event.ActionEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import model.CollisionRegistry;
 import model.Farm;
 import model.FarmGrowthRules;
@@ -67,6 +69,7 @@ import model.Player;
 import model.PlayerState;
 import model.TreeMapState;
 import util.AppDialogs;
+import util.ImageCache;
 import util.SceneManager;
 import util.SpawnTag;
 import util.TimeFlow;
@@ -91,15 +94,26 @@ import javafx.scene.control.ToggleButton;
  */
 public abstract class BaseMapController implements Initializable, SceneController {
 
+    protected static final List<String> OVERWORLD_CORE_TUTORIAL_IMAGES = List.of(
+    private static final double DEFAULT_PLAYER_HITBOX_WIDTH = 14.0;
+    private static final double DEFAULT_PLAYER_HITBOX_HEIGHT = 20.0;
+    private static final double DEFAULT_PLAYER_HITBOX_TRANSLATE_X = 24.0;
+    private static final double DEFAULT_PLAYER_HITBOX_TRANSLATE_Y = 28.0;
+    private static final double DEFAULT_PLAYER_HITBOX_LAYOUT_Y_OFFSET_FROM_SPRITE = -5.0;
+
     protected static final List<String> OVERWORLD_TUTORIAL_IMAGES = List.of(
         "/image/Toturial/Up_bar.png",
         "/image/Toturial/Wp_hold.png",
-        "/image/Toturial/After_wp_hold.png",
-        "/image/Toturial/before_goes_to_hotbar.png",
         "/image/Toturial/goes_to_hotbar.png",
-        "/image/Toturial/Attack.png",
         "/image/Toturial/tt7.png"
     );
+    protected static final List<String> OVERWORLD_COMBAT_TUTORIAL_IMAGES = List.of(
+        "/image/Toturial/before_goes_to_hotbar.png",
+        "/image/Toturial/Wp_hold.png",
+        "/image/Toturial/After_wp_hold.png",
+        "/image/Toturial/Attack.png"
+    );
+    protected static final String OVERWORLD_COMBAT_TUTORIAL_KEY = "overworld_combat_hotbar_unlock";
 
     private static final ExecutorService MAP_EVICTION_EXECUTOR = Executors.newSingleThreadExecutor(r -> {
         Thread t = new Thread(r, "map-eviction");
@@ -259,6 +273,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
     private InvalidationListener sharedHudRefreshListener;
     private final List<Observable> sharedHudRefreshListenerTargets = new ArrayList<>();
+    private MapChangeListener<Integer, javafx.beans.property.IntegerProperty> overworldCombatTutorialInventoryListener;
 
     protected abstract String mapKey();
     protected abstract void configureExits();
@@ -321,7 +336,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 	    }
 
 	    protected void showOverworldTutorialOverlay() {
-	        TutorialOverlayHelper.show(view, OVERWORLD_TUTORIAL_IMAGES);
+	        TutorialOverlayHelper.show(view, TutorialOverlayHelper.GLOBAL_BUTTON_TUTORIAL_IMAGES);
 	    }
 
 	    protected final void registerPlayerAttackHandler(String key, Runnable handler) {
@@ -430,6 +445,8 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         ItemDatabase.loadItems();
         playerState = gameState.getPlayerState();
 
+        normalizePlayerBodyHitbox();
+
         player = new Player(
             playerState,
             human,
@@ -469,6 +486,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         setupFarmIfPresent();
         setupInventoryUiIfPresent();
         setupHotbarIfPresent();
+        setupOverworldCombatTutorialTrigger();
         setupDayNightBindingIfConfigured();
         setupFarmTimeRefreshIfPresent();
 	        setupSettingsTabIfPresent();
@@ -530,6 +548,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     private void cleanupBeforeSceneSwitch() {
         detachFarmTimeRefresh();
         detachSharedHudRefreshListener();
+        detachOverworldCombatTutorialTrigger();
 
         if (nightListener != null) {
             try {
@@ -2206,6 +2225,114 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         }
     }
 
+    private void setupOverworldCombatTutorialTrigger() {
+        detachOverworldCombatTutorialTrigger();
+
+        if (playerState == null) {
+            return;
+        }
+
+        Inventory inventory = playerState.getInventory();
+        if (inventory == null) {
+            return;
+        }
+
+        overworldCombatTutorialInventoryListener = change -> {
+            if (!change.wasAdded()) {
+                return;
+            }
+            Platform.runLater(this::showOverworldCombatTutorialIfNeeded);
+        };
+        inventory.itemsProperty().addListener(overworldCombatTutorialInventoryListener);
+
+        Platform.runLater(this::showOverworldCombatTutorialIfNeeded);
+    }
+
+    private void detachOverworldCombatTutorialTrigger() {
+        if (overworldCombatTutorialInventoryListener == null || playerState == null) {
+            overworldCombatTutorialInventoryListener = null;
+            return;
+        }
+
+        Inventory inventory = playerState.getInventory();
+        if (inventory != null) {
+            try {
+                inventory.itemsProperty().removeListener(overworldCombatTutorialInventoryListener);
+            } catch (Exception ignored) {
+            }
+        }
+        overworldCombatTutorialInventoryListener = null;
+    }
+
+    private void showOverworldCombatTutorialIfNeeded() {
+        if (view == null || gameState == null || playerState == null) {
+            return;
+        }
+        if (!playerHasCombatTutorialUnlockItem()) {
+            return;
+        }
+
+        TutorialOverlayHelper.showIfNeeded(
+            view,
+            gameState,
+            OVERWORLD_COMBAT_TUTORIAL_KEY,
+            OVERWORLD_COMBAT_TUTORIAL_IMAGES
+        );
+    }
+
+    private List<String> buildOverworldTutorialImages() {
+        List<String> images = new ArrayList<>(OVERWORLD_CORE_TUTORIAL_IMAGES);
+        if (shouldIncludeCombatTutorialImages()) {
+            images.addAll(OVERWORLD_COMBAT_TUTORIAL_IMAGES);
+        }
+        return images;
+    }
+
+    private boolean shouldIncludeCombatTutorialImages() {
+        return gameState != null && gameState.hasSeenTutorial(OVERWORLD_COMBAT_TUTORIAL_KEY);
+    }
+
+    private boolean playerHasCombatTutorialUnlockItem() {
+        if (playerState == null) {
+            return false;
+        }
+
+        Inventory inventory = playerState.getInventory();
+        if (inventory != null) {
+            for (Map.Entry<Integer, javafx.beans.property.IntegerProperty> entry : inventory.itemsProperty().entrySet()) {
+                if (entry == null || entry.getKey() == null || entry.getValue() == null) continue;
+                if (entry.getValue().get() > 0 && isCombatTutorialUnlockItem(entry.getKey())) {
+                    return true;
+                }
+            }
+        }
+
+        for (int i = 0; i < playerState.getHotbarSize(); i++) {
+            int itemId = playerState.getHotbarItemId(i);
+            if (itemId > 0 && playerState.getHotbarItemCount(i) > 0 && isCombatTutorialUnlockItem(itemId)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean isCombatTutorialUnlockItem(int itemId) {
+        String itemName = ItemDatabase.getItemName(itemId);
+        if (itemName == null || itemName.isBlank()) {
+            return false;
+        }
+
+        String normalized = itemName.trim().toLowerCase(Locale.ROOT).replace('_', ' ');
+        return normalized.contains("pickaxe")
+            || normalized.contains("pick axe")
+            || normalized.contains("iron sword")
+            || normalized.contains("iron spear")
+            || normalized.contains("iron dagger")
+            || normalized.contains("axe")
+            || normalized.contains("sword");
+    }
+
     private void setupHotbarIfPresent() {
         // If this controller uses shadowed FXML fields (common in existing maps),
         // autoBridgeSharedUiFromControllerFields() will populate the hotbar lists.
@@ -2392,12 +2519,34 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         if (path == null || path.isBlank()) {
             return null;
         }
-        var url = getClass().getResource(path);
-        if (url == null) {
+        Image image = ImageCache.get(path);
+        if (image == null) {
             System.err.println("[BaseMapController] Missing resource: " + path);
-            return null;
         }
-        return new Image(url.toExternalForm());
+        return image;
+    }
+
+    private void normalizePlayerBodyHitbox() {
+        if (human_hitbox == null || human_img == null) {
+            return;
+        }
+
+        human_hitbox.setWidth(DEFAULT_PLAYER_HITBOX_WIDTH);
+        human_hitbox.setHeight(DEFAULT_PLAYER_HITBOX_HEIGHT);
+
+        // Keep the hitbox anchored to the sprite node so all maps behave consistently even if the
+        // FXML layouts differ (some maps position the group, others position the children).
+        human_hitbox.setLayoutX(human_img.getLayoutX());
+        human_hitbox.setLayoutY(human_img.getLayoutY() + DEFAULT_PLAYER_HITBOX_LAYOUT_Y_OFFSET_FROM_SPRITE);
+        human_hitbox.setTranslateX(DEFAULT_PLAYER_HITBOX_TRANSLATE_X);
+        human_hitbox.setTranslateY(DEFAULT_PLAYER_HITBOX_TRANSLATE_Y);
+
+        // Make sure styling doesn't inflate collision bounds (stroke can affect boundsInLocal).
+        human_hitbox.setFill(Color.TRANSPARENT);
+        human_hitbox.setStroke(null);
+        human_hitbox.setVisible(false);
+        human_hitbox.setManaged(false);
+        human_hitbox.setMouseTransparent(true);
     }
 
     private void setupSettingsTabIfPresent() {

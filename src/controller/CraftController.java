@@ -30,10 +30,14 @@ import util.SceneManager;
 import util.SkillModifiers;
 import util.SpawnTag;
 import util.TutorialOverlayHelper;
+import util.WorldScaler;
 
 public class CraftController implements Initializable, SceneController {
     private static final int MAX_RECIPE_SLOTS = 20;
-        private static final int DEFAULT_WAIT_SECONDS = 40;
+    private static final int DEFAULT_WAIT_SECONDS = 40;
+    private static final List<String> CRAFT_TUTORIAL_IMAGES = List.of(
+        "/image/Toturial/Craft_inside.png"
+    );
 
     private GameState gameState;
     private Inventory inventory;
@@ -81,6 +85,8 @@ public class CraftController implements Initializable, SceneController {
     @FXML private Label lblsr;
     @FXML private Label lbleffect;
     @FXML private Button btnclose;
+    @FXML
+    private Button btntuto;
 
     @Override
     public void init(GameState gs) {
@@ -94,6 +100,7 @@ public class CraftController implements Initializable, SceneController {
         if (inventory == null) inventory = gameState.getPlayerState().getInventory();
 
         ItemDatabase.loadItems();
+        new WorldScaler(view, world);
         collectRecipeNodes();
         loadRecipes();
         refreshRecipeSlots();
@@ -105,7 +112,7 @@ public class CraftController implements Initializable, SceneController {
             view,
             gameState,
             "craft_inside",
-            List.of("/image/Toturial/Craft_inside.png")
+            CRAFT_TUTORIAL_IMAGES
         );
     }
 
@@ -478,6 +485,14 @@ public class CraftController implements Initializable, SceneController {
             img.setOpacity(selected ? 1.0 : 0.9);
             img.setScaleX(selected ? 1.05 : 1.0);
             img.setScaleY(selected ? 1.05 : 1.0);
+        }
+    }
+
+    @FXML
+    private void handlebtntutoaction(ActionEvent event) {
+        TutorialOverlayHelper.show(view, TutorialOverlayHelper.GLOBAL_BUTTON_TUTORIAL_IMAGES);
+        if (event != null) {
+            event.consume();
         }
     }
 

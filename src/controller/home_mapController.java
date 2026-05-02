@@ -640,13 +640,10 @@ public class home_mapController extends BaseMapController {
 
     @FXML
     private void handlebtntutoaction(ActionEvent event) {
-        TutorialOverlayHelper.show(
-            view,
-            List.of(
-                "/image/Toturial/Shop.png",
-                "/image/Toturial/Farm.png"
-            )
-        );
+        TutorialOverlayHelper.show(view, TutorialOverlayHelper.GLOBAL_BUTTON_TUTORIAL_IMAGES);
+        if (event != null) {
+            event.consume();
+        }
     }
 
 

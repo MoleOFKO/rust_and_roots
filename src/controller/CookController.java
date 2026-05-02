@@ -28,11 +28,15 @@ import util.SceneManager;
 import util.SkillModifiers;
 import util.SpawnTag;
 import util.TutorialOverlayHelper;
+import util.WorldScaler;
 
 public class CookController implements Initializable, SceneController {
 
     private static final int MAX_RECIPE_SLOTS = 20;
     private static final int DEFAULT_DEX = 5;
+    private static final List<String> COOK_TUTORIAL_IMAGES = List.of(
+        "/image/Toturial/Cooking_inside.png"
+    );
 
     private GameState gameState;
     private Inventory inventory;
@@ -49,64 +53,64 @@ public class CookController implements Initializable, SceneController {
     @FXML private Group world;
     @FXML private ImageView cookimg;
     @FXML private Button cookbtn;
-    @FXML private Label cooklbl1;
+    private Label cooklbl1;
     @FXML private ImageView cookimg1;
     @FXML private Button cookbtn1;
-    @FXML private Label cooklbl2;
+    private Label cooklbl2;
     @FXML private ImageView cookimg2;
     @FXML private Button cookbtn2;
-    @FXML private Label cooklbl3;
+    private Label cooklbl3;
     @FXML private ImageView cookimg3;
     @FXML private Button cookbtn3;
-    @FXML private Label cooklbl4;
+    private Label cooklbl4;
     @FXML private ImageView cookimg4;
     @FXML private Button cookbtn4;
-    @FXML private Label cooklbl5;
+    private Label cooklbl5;
     @FXML private ImageView cookimg5;
     @FXML private Button cookbtn5;
-    @FXML private Label cooklbl6;
+    private Label cooklbl6;
     @FXML private ImageView cookimg6;
     @FXML private Button cookbtn6;
-    @FXML private Label cooklbl7;
+    private Label cooklbl7;
     @FXML private ImageView cookimg7;
     @FXML private Button cookbtn7;
-    @FXML private Label cooklbl8;
+    private Label cooklbl8;
     @FXML private ImageView cookimg8;
     @FXML private Button cookbtn8;
-    @FXML private Label cooklbl9;
+    private Label cooklbl9;
     @FXML private ImageView cookimg9;
     @FXML private Button cookbtn9;
-    @FXML private Label cooklbl10;
+    private Label cooklbl10;
     @FXML private ImageView cookimg10;
     @FXML private Button cookbtn10;
-    @FXML private Label cooklbl11;
+    private Label cooklbl11;
     @FXML private ImageView cookimg11;
     @FXML private Button cookbtn11;
-    @FXML private Label cooklbl12;
+    private Label cooklbl12;
     @FXML private ImageView cookimg12;
     @FXML private Button cookbtn12;
-    @FXML private Label cooklbl13;
+    private Label cooklbl13;
     @FXML private ImageView cookimg13;
     @FXML private Button cookbtn13;
-    @FXML private Label cooklbl14;
+    private Label cooklbl14;
     @FXML private ImageView cookimg14;
     @FXML private Button cookbtn14;
-    @FXML private Label cooklbl15;
+    private Label cooklbl15;
     @FXML private ImageView cookimg15;
     @FXML private Button cookbtn15;
-    @FXML private Label cooklbl16;
+    private Label cooklbl16;
     @FXML private ImageView cookimg16;
     @FXML private Button cookbtn16;
-    @FXML private Label cooklbl17;
+    private Label cooklbl17;
     @FXML private ImageView cookimg17;
     @FXML private Button cookbtn17;
-    @FXML private Label cooklbl18;
+    private Label cooklbl18;
     @FXML private ImageView cookimg18;
     @FXML private Button cookbtn18;
-    @FXML private Label cooklbl19;
+    private Label cooklbl19;
     @FXML private ImageView cookimg19;
     @FXML private Button cookbtn19;
-    @FXML private Label cooklbl20;
+    private Label cooklbl20;
     @FXML private ImageView Ing1;
     @FXML private ImageView ing2;
     @FXML private ImageView ing3;
@@ -119,6 +123,10 @@ public class CookController implements Initializable, SceneController {
     @FXML private Label cookname;
     @FXML private Label cookeffectlbl;
     @FXML private ImageView closeimgbtn;
+    @FXML
+    private Label cooksuccessrate;
+    @FXML
+    private Button btntuto;
 
     @Override
     public void init(GameState gs) {
@@ -136,6 +144,7 @@ public class CookController implements Initializable, SceneController {
         }
 
         ItemDatabase.loadItems();
+        new WorldScaler(view, world);
         collectRecipeNodes();
         wireRecipeButtons();
         loadRecipes();
@@ -148,7 +157,7 @@ public class CookController implements Initializable, SceneController {
             view,
             gameState,
             "cook_inside",
-            List.of("/image/Toturial/Cooking_inside.png")
+            COOK_TUTORIAL_IMAGES
         );
     }
 
@@ -573,6 +582,14 @@ public class CookController implements Initializable, SceneController {
         int index = recipeButtons.indexOf(source);
         if (index >= 0) {
             handleRecipeSelection(index);
+        }
+    }
+
+    @FXML
+    private void handlebtntutoaction(ActionEvent event) {
+        TutorialOverlayHelper.show(view, TutorialOverlayHelper.GLOBAL_BUTTON_TUTORIAL_IMAGES);
+        if (event != null) {
+            event.consume();
         }
     }
 

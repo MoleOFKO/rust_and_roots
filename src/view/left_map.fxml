@@ -159,6 +159,11 @@
                   <ImageView fx:id="drops_img_stone" fitHeight="28.0" fitWidth="28.0" layoutX="303.0" layoutY="267.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
                </children>
             </Group>
+            <Button fx:id="btntuto" layoutX="568.0" mnemonicParsing="false" onAction="#handlebtntutoaction" style="-fx-background-radius: 100%; -fx-background-color: transparent; -fx-border-color: yellow; -fx-border-radius: 100%;" textFill="#e6ff00">
+               <graphic>
+                  <FontAwesomeIcon fill="#f6ff00" glyphName="QUESTION" selectionFill="YELLOW" size="1.5em" />
+               </graphic>
+            </Button>
             <Group>
                <children>
                   <HBox fx:id="hotbar" alignment="CENTER" layoutX="148.0" layoutY="352.0" opacity="0.81" prefHeight="47.0" prefWidth="294.0" styleClass="hbox" stylesheets="@../css/style.css">
@@ -972,10 +977,5 @@
             </Group>
          </children>
       </Group>
-      <Button fx:id="btntuto" mnemonicParsing="false" onAction="#handlebtntutoaction" style="-fx-background-radius: 100%; -fx-background-color: transparent; -fx-border-color: yellow; -fx-border-radius: 100%;" textFill="#e6ff00">
-         <graphic>
-            <FontAwesomeIcon fill="#f6ff00" glyphName="QUESTION" selectionFill="YELLOW" size="1.5em" />
-         </graphic>
-      </Button>
    </children>
 </StackPane>

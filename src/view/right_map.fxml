@@ -1139,6 +1139,11 @@
             <Rectangle fx:id="lava_slime_detect" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="113.0" layoutX="237.0" layoutY="152.0" stroke="RED" strokeType="INSIDE" width="113.0" />
          </children>
       </Group>
+      <Button fx:id="btntuto" layoutX="573.0" mnemonicParsing="false" onAction="#handlebtntutoaction" style="-fx-background-radius: 100%; -fx-background-color: transparent; -fx-border-color: yellow; -fx-border-radius: 100%;" textFill="#e6ff00">
+         <graphic>
+            <FontAwesomeIcon fill="#f6ff00" glyphName="QUESTION" selectionFill="YELLOW" size="1.5em" />
+         </graphic>
+      </Button>
       <Group fx:id="orcb" layoutX="221.0" layoutY="60.0">
          <children>
             <Rectangle fx:id="orcb_hitbox" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="262.0" layoutY="171.0" stroke="RED" strokeType="INSIDE" translateX="24" translateY="28" width="14.0" />
@@ -1153,9 +1158,4 @@
       </Group>
 
     </Group>
-   <Button fx:id="btntuto" mnemonicParsing="false" onAction="#handlebtntutoaction" style="-fx-background-radius: 100%; -fx-background-color: transparent; -fx-border-color: yellow; -fx-border-radius: 100%;" textFill="#e6ff00">
-      <graphic>
-         <FontAwesomeIcon fill="#f6ff00" glyphName="QUESTION" selectionFill="YELLOW" size="1.5em" />
-      </graphic>
-   </Button>
 </StackPane>

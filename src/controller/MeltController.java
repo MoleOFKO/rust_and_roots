@@ -10,6 +10,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.ResourceBundle;
 import javafx.animation.AnimationTimer;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Group;
@@ -24,10 +25,15 @@ import model.item;
 import util.AppDialogs;
 import util.SceneManager;
 import util.SpawnTag;
+import util.TutorialOverlayHelper;
+import util.WorldScaler;
 
 public class MeltController implements Initializable, SceneController {
 
     private static final int MAX_INV_SLOTS = 20;
+    private static final List<String> MELT_TUTORIAL_IMAGES = List.of(
+        "/image/Toturial/Melting.png"
+    );
 
     private GameState gameState;
     private Inventory inventory;
@@ -115,6 +121,8 @@ public class MeltController implements Initializable, SceneController {
     @FXML private Label totalwaitingtimelbl;
     @FXML private Label itemreadylbl;
     @FXML private Label guide;
+    @FXML
+    private Button btntuto;
 
     @Override
     public void init(GameState gs) {
@@ -128,6 +136,7 @@ public class MeltController implements Initializable, SceneController {
         if (inventory == null) inventory = gameState.getPlayerState().getInventory();
 
         ItemDatabase.loadItems();
+        new WorldScaler(view, world);
         collectInventoryNodes();
         wireInventoryButtons();
         wireStandaloneClicks();
@@ -667,6 +676,14 @@ public class MeltController implements Initializable, SceneController {
                 && resultItem != null
                 && ItemDatabase.isDisplayableItem(sourceItem.getItem_id())
                 && ItemDatabase.isDisplayableItem(resultItem.getItem_id());
+    }
+
+    @FXML
+    private void handlebtntutoaction(ActionEvent event) {
+        TutorialOverlayHelper.show(view, TutorialOverlayHelper.GLOBAL_BUTTON_TUTORIAL_IMAGES);
+        if (event != null) {
+            event.consume();
+        }
     }
 
     private static final class SmeltRule {

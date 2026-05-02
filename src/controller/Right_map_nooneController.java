@@ -537,6 +537,7 @@ public class Right_map_nooneController extends BaseMapController {
         registerExit(exit_down, "/view/right_map.fxml", SpawnTag.FROM_UP);
         
     }
+
     @FXML
     private void handlebtntutoaction(ActionEvent event) {
     }
