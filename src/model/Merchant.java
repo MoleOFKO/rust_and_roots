@@ -1,15 +1,13 @@
 
 package model;
 
-import java.net.URL;
-
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.util.Duration;
-
+import util.ImageCache;
 
 public class Merchant {
 
@@ -43,15 +41,23 @@ public class Merchant {
                 new KeyFrame(Duration.seconds(1.0 / fps), e -> nextFrame())
         );
         timeline.setCycleCount(Timeline.INDEFINITE);
+
+        if (this.view != null) {
+            this.view.sceneProperty().addListener((obs, oldScene, newScene) -> {
+                if (newScene == null) {
+                    stop();
+                    this.view.setImage(null);
+                }
+            });
+        }
         }
     
         private void loadSprite(String spritePath) {
-            URL url = getClass().getResource(spritePath);
-        if (url == null) {
+            Image spriteSheet = ImageCache.get(spritePath);
+        if (spriteSheet == null) {
             throw new IllegalStateException("Missing resource: " + spritePath);
         }
 
-        Image spriteSheet = new Image(url.toExternalForm());
         view.setImage(spriteSheet);
 
         view.setViewport(new Rectangle2D(0, 0, frameW, frameH));
@@ -73,10 +79,14 @@ public class Merchant {
     }
 
     public void play() {
-        timeline.play();
+        if (timeline != null) {
+            timeline.play();
+        }
     }
 
     public void stop() {
-        timeline.stop();
+        if (timeline != null) {
+            timeline.stop();
+        }
     }
 }

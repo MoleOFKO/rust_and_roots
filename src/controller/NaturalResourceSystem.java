@@ -28,6 +28,7 @@ import model.TreeMapState;
 import model.item;
 import util.AppDialogs;
 import util.CombatRules;
+import util.ImageCache;
 import util.SkillModifiers;
 
 final class NaturalResourceSystem {
@@ -73,6 +74,36 @@ final class NaturalResourceSystem {
     private static final double HP_REGEN_SECONDS = 48.0;
     private static final double HP_CAP_GROW_SECONDS = 1440.0;
     private static final int STAGE3_AFTER_LIVED_DAYS = 1;
+
+    private double oreStatMultiplierForBaseId(String baseId) {
+        if (baseId == null) {
+            return 1.0;
+        }
+        String key = baseId.trim().toLowerCase(Locale.ROOT);
+        return switch (key) {
+            case "stone", "stone_dungeon" -> 1.0;
+            case "copper", "copper_ore", "iron", "iron_ore" -> 1.5;
+            case "silver", "silver_ore" -> 2.0;
+            case "gold", "gold_ore" -> 2.5;
+            case "mithril", "mithril_ore" -> 3.0;
+            case "adamantite", "adamantite_ore" -> 4.0;
+            case "orichalcum", "orichalcum_ore" -> 5.0;
+            case "hihiogane", "hihiogane_ore" -> 6.0;
+            default -> 1.0;
+        };
+    }
+
+    private int scaledOreMaxHp(String baseId) {
+        double mult = oreStatMultiplierForBaseId(baseId);
+        int scaled = (int) Math.round(STARTING_MAX_HP * mult);
+        return Math.max(STARTING_MAX_HP, scaled);
+    }
+
+    private int scaledOreVit(String baseId) {
+        double mult = oreStatMultiplierForBaseId(baseId);
+        int scaled = (int) Math.round(STARTING_ORE_VIT * mult);
+        return Math.max(STARTING_ORE_VIT, scaled);
+    }
 
     @FunctionalInterface
     private interface ResourceDropSpawner {
@@ -617,14 +648,31 @@ final class NaturalResourceSystem {
             return;
         }
 
-        if (data.maxHp <= 0) {
-            data.maxHp = STARTING_MAX_HP;
+        int requiredMaxHp = scaledOreMaxHp(handle.baseId);
+        int requiredVit = scaledOreVit(handle.baseId);
+
+        int oldMaxHp = Math.max(0, data.maxHp);
+        int oldHp = Math.max(0, data.hp);
+
+        if (oldMaxHp <= 0) {
+            data.maxHp = requiredMaxHp;
+        } else if (oldMaxHp < requiredMaxHp) {
+            data.maxHp = requiredMaxHp;
+
+            // Preserve mined/progress ratio when upgrading max HP for existing saves.
+            if (oldHp > 0) {
+                double ratio = Math.min(1.0, (double) oldHp / (double) oldMaxHp);
+                int scaledHp = (int) Math.round(ratio * (double) requiredMaxHp);
+                data.hp = Math.max(1, Math.min(requiredMaxHp, scaledHp));
+            }
         }
+
         if (data.hp <= 0) {
-            data.hp = data.maxHp;
+            data.hp = Math.max(0, data.maxHp);
         }
-        if (data.vit <= 0) {
-            data.vit = STARTING_ORE_VIT;
+
+        if (data.vit <= 0 || data.vit < requiredVit) {
+            data.vit = requiredVit;
         }
 
         if (data.hp > data.maxHp) {
@@ -1422,9 +1470,13 @@ final class NaturalResourceSystem {
         }
 
         handle.data.currentStage = 2;
-        handle.data.hp = STARTING_MAX_HP;
-        handle.data.maxHp = STARTING_MAX_HP;
-        handle.data.vit = STARTING_ORE_VIT;
+
+        int maxHp = scaledOreMaxHp(handle.baseId);
+        int vit = scaledOreVit(handle.baseId);
+
+        handle.data.hp = maxHp;
+        handle.data.maxHp = maxHp;
+        handle.data.vit = vit;
         handle.data.respawnAtTotalSeconds = -1;
         handle.data.lastUpdatedDayNumber = Math.max(1, currentDay);
 
@@ -1813,12 +1865,11 @@ final class NaturalResourceSystem {
         if (path == null || path.isBlank()) {
             return null;
         }
-        var url = getClass().getResource(path);
-        if (url == null) {
+        Image image = ImageCache.get(path);
+        if (image == null) {
             System.err.println("[NaturalResourceSystem] Missing resource: " + path);
-            return null;
         }
-        return new Image(url.toExternalForm());
+        return image;
     }
 
     private <T extends Node> T node(String id, Class<T> type) {
