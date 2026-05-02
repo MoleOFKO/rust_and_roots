@@ -179,6 +179,8 @@ public class Right_map_nooneController extends BaseMapController {
     private Rectangle stone_hitbox;
     @FXML
     private ImageView drops_img_stone;
+    @FXML
+    private Button btntuto;
 
     @Override
     protected String dayBackgroundPath() {
@@ -534,5 +536,8 @@ public class Right_map_nooneController extends BaseMapController {
         // Example: right_map -> upper_map
         registerExit(exit_down, "/view/right_map.fxml", SpawnTag.FROM_UP);
         
+    }
+    @FXML
+    private void handlebtntutoaction(ActionEvent event) {
     }
 }
