@@ -17,7 +17,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.shape.Rectangle;
 import game.GameTimeManager;
-import util.ImageCache;
 import util.TimeFlow;
 
 public class Player {
@@ -69,11 +68,25 @@ public class Player {
     private int equippedItemId = -1;
     private EquipmentKind equippedKind = EquipmentKind.NONE;
 
-    private final Image walkSpriteSheet = ImageCache.get("/image/human/human_Walk.png");
-    private final Image runSpriteSheet = ImageCache.get("/image/human/human_Run.png");
-    private final Image idleSpriteSheet = ImageCache.get("/image/human/human_Idle.png");
-    private final Image deathSpriteSheet = ImageCache.get("/image/human/human_Death.png");
-    private final Image hurtSpriteSheet = ImageCache.get("/image/human/human_Hurt.png");
+    private final Image walkSpriteSheet = new Image(
+        getClass().getResource("/image/human/human_Walk.png").toExternalForm()
+    );
+
+    private final Image runSpriteSheet = new Image(
+        getClass().getResource("/image/human/human_Run.png").toExternalForm()
+    );
+
+    private final Image idleSpriteSheet = new Image(
+        getClass().getResource("/image/human/human_Idle.png").toExternalForm()
+    );
+
+    private final Image deathSpriteSheet = new Image(
+        getClass().getResource("/image/human/human_Death.png").toExternalForm()
+    );
+
+    private final Image hurtSpriteSheet = new Image(
+        getClass().getResource("/image/human/human_Hurt.png").toExternalForm()
+    );
 
     private enum AnimState {
         IDLE, WALK, RUN, ATTACK, HURT, DEATH
@@ -1015,7 +1028,9 @@ public class Player {
         if (resourcePath == null || resourcePath.isBlank()) {
             return null;
         }
-        return ImageCache.get(resourcePath);
+
+        var url = getClass().getResource(resourcePath);
+        return (url == null) ? null : new Image(url.toExternalForm());
     }
 
     private void triggerAttack() {
