@@ -254,6 +254,10 @@ public class Player {
         return equippedItemId;
     }
 
+    public boolean isSwordEquipped() {
+        return equippedKind == EquipmentKind.SWORD;
+    }
+
     public enum FacingDirection {
         DOWN,
         LEFT,

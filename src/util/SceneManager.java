@@ -135,6 +135,7 @@ public class SceneManager {
             && desiredResource.equals(currentBgmResource)
             && bgmPlayer != null) {
             // Keep current playback running across same-category scenes.
+            bgmPlayer.setVolume(SoundManager.BGM_VOLUME);
             if (bgmPlayer.getStatus() != MediaPlayer.Status.PLAYING) {
                 bgmPlayer.play();
             }
@@ -157,6 +158,7 @@ public class SceneManager {
 
         Media music = new Media(url.toExternalForm());
         bgmPlayer = new MediaPlayer(music);
+        bgmPlayer.setVolume(SoundManager.BGM_VOLUME);
         bgmPlayer.setCycleCount(MediaPlayer.INDEFINITE);
         bgmPlayer.play();
     }

@@ -16,6 +16,7 @@ import javafx.scene.shape.Rectangle;
 import util.CombatRules;
 import util.ImageCache;
 import util.SkillModifiers;
+import util.SoundManager;
 import util.TimeFlow;
 
 /**
@@ -957,6 +958,7 @@ public final class MobEntity {
         }
 
         boolean wasAlive = !playerState.isDead();
+        SoundManager.playSfx(SoundManager.Sfx.HIT);
         int dmg = computeDamageTo(playerState);
         playerState.damageHp(dmg);
         if (wasAlive && !playerState.isDead()) {
