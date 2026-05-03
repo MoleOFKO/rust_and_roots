@@ -94,7 +94,16 @@ import javafx.scene.control.ToggleButton;
  */
 public abstract class BaseMapController implements Initializable, SceneController {
 
-    protected static final List<String> OVERWORLD_CORE_TUTORIAL_IMAGES = List.of(
+    /**
+     * "Core" overworld tutorial pages.
+     *
+     * For now this is wired to the exact same image set that every overworld map tutorial button
+     * previously showed (`TutorialOverlayHelper.GLOBAL_BUTTON_TUTORIAL_IMAGES`) so behavior does not change.
+     *
+     * Later, if you want different tutorials per-map, override {@link #overworldCoreTutorialImages()} in the
+     * specific map controller.
+     */
+    protected static final List<String> OVERWORLD_CORE_TUTORIAL_IMAGES = TutorialOverlayHelper.GLOBAL_BUTTON_TUTORIAL_IMAGES;
     private static final double DEFAULT_PLAYER_HITBOX_WIDTH = 14.0;
     private static final double DEFAULT_PLAYER_HITBOX_HEIGHT = 20.0;
     private static final double DEFAULT_PLAYER_HITBOX_TRANSLATE_X = 24.0;
@@ -113,6 +122,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         "/image/Toturial/After_wp_hold.png",
         "/image/Toturial/Attack.png"
     );
+    protected static final String OVERWORLD_TUTORIAL_KEY = "overworld_tutorial_core";
     protected static final String OVERWORLD_COMBAT_TUTORIAL_KEY = "overworld_combat_hotbar_unlock";
 
     private static final ExecutorService MAP_EVICTION_EXECUTOR = Executors.newSingleThreadExecutor(r -> {
@@ -336,7 +346,22 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 	    }
 
 	    protected void showOverworldTutorialOverlay() {
-	        TutorialOverlayHelper.show(view, TutorialOverlayHelper.GLOBAL_BUTTON_TUTORIAL_IMAGES);
+	        TutorialOverlayHelper.show(view, buildOverworldTutorialImages());
+	    }
+
+	    /**
+	     * Optional "show once" version of the overworld tutorial.
+	     *
+	     * This is intentionally NOT used by the tutorial buttons (those should always show the tutorial),
+	     * but can be called automatically if you want a one-time tutorial per save slot.
+	     */
+	    protected void showOverworldTutorialOverlayIfNeeded() {
+	        TutorialOverlayHelper.showIfNeeded(view, gameState, OVERWORLD_TUTORIAL_KEY, buildOverworldTutorialImages());
+	    }
+
+	    /** Override this in a specific map controller to provide different tutorial pages for that map. */
+	    protected List<String> overworldCoreTutorialImages() {
+	        return OVERWORLD_CORE_TUTORIAL_IMAGES;
 	    }
 
 	    protected final void registerPlayerAttackHandler(String key, Runnable handler) {
@@ -1644,8 +1669,16 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         try {
             capturePlayerSnapshot();
             if (gameState != null) {
-                int slot = Math.max(1, gameState.getSelectedSaveSlot());
-                new SaveGameService().saveGameToSlot(gameState, slot);
+                boolean saved = new SaveGameService().autoSaveGameWithSlotRules(gameState);
+                if (!saved) {
+                    AppDialogs.showMessageDialog(
+                        null,
+                        "Please delete the existing saved slot to save the current game's data, else it will not be saved!",
+                        "Auto Save",
+                        javax.swing.JOptionPane.WARNING_MESSAGE
+                    );
+                    return;
+                }
                 gameState.setSaveMenuMode(false);
             }
             GameTimeManager.get().setWorldDilation(1.0);
@@ -2281,11 +2314,12 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     }
 
     private List<String> buildOverworldTutorialImages() {
-        List<String> images = new ArrayList<>(OVERWORLD_CORE_TUTORIAL_IMAGES);
+        LinkedHashSet<String> orderedUnique = new LinkedHashSet<>();
+        orderedUnique.addAll(overworldCoreTutorialImages());
         if (shouldIncludeCombatTutorialImages()) {
-            images.addAll(OVERWORLD_COMBAT_TUTORIAL_IMAGES);
+            orderedUnique.addAll(OVERWORLD_COMBAT_TUTORIAL_IMAGES);
         }
-        return images;
+        return new ArrayList<>(orderedUnique);
     }
 
     private boolean shouldIncludeCombatTutorialImages() {
