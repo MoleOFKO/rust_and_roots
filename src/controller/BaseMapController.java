@@ -71,6 +71,7 @@ import model.TreeMapState;
 import util.AppDialogs;
 import util.ImageCache;
 import util.SceneManager;
+import util.SoundManager;
 import util.SpawnTag;
 import util.TimeFlow;
 import util.TutorialOverlayHelper;
@@ -388,6 +389,10 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 	    }
 
 	    private void dispatchPlayerAttackStarted() {
+	        if (player != null && player.isSwordEquipped()) {
+	            SoundManager.playSfx(SoundManager.Sfx.SWORD_CUT);
+	        }
+
 	        if (attackHandlers.isEmpty()) {
 	            return;
 	        }
@@ -492,6 +497,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
         player.setOnToggleHotbarRequest(this::toggleHotbarVisible);
         player.setOnHotbarSlotRequest(this::selectHotbarSlot);
+        bindAttackDispatcherIfNeeded();
 
         autoBridgeSharedUiFromControllerFields();
         autoWireSharedUiHandlers();
@@ -567,7 +573,20 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         if (gameLoop != null) gameLoop.stop();
         if (player != null) player.stop();
         GameTimeManager.get().setWorldDilation(1.0);
+        if (isMapChangeSpawnTag(targetSpawn)) {
+            SoundManager.playSfx(SoundManager.Sfx.TELEPORT);
+        }
         SceneManager.switchScene(targetFxml, targetSpawn);
+    }
+
+    private static boolean isMapChangeSpawnTag(SpawnTag spawnTag) {
+        if (spawnTag == null) {
+            return false;
+        }
+        return switch (spawnTag) {
+            case FROM_LEFT, FROM_RIGHT, FROM_UP, FROM_DOWN, FROM_DOOR -> true;
+            default -> false;
+        };
     }
 
     private void cleanupBeforeSceneSwitch() {

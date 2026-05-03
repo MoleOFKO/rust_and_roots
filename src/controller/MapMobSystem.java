@@ -31,6 +31,7 @@ import model.mobs;
 import util.AppDialogs;
 import util.CombatRules;
 import util.SkillModifiers;
+import util.SoundManager;
 
 final class MapMobSystem {
 
@@ -182,6 +183,9 @@ final class MapMobSystem {
         if (system.mobs.isEmpty()) {
             return null;
         }
+        if (system.containsMobType("orcb")) {
+            SoundManager.playSfx(SoundManager.Sfx.BOSS_ENCOUNTER);
+        }
         return system;
     }
 
@@ -267,7 +271,7 @@ final class MapMobSystem {
         double nowSeconds = GameTimeManager.get().totalSecondsProperty().get();
 
         int damage = calculatePlayerMobDamage();
-        if (damage <= 0) return;
+        boolean hitAny = false;
 
         for (MobHandle handle : mobs) {
             if (handle == null || handle.entity == null || handle.entity.isDead() || handle.entity.getBodyHitbox() == null) {
@@ -279,12 +283,34 @@ final class MapMobSystem {
                 continue;
             }
 
-            boolean killed = handle.entity.applyPlayerDamage(damage, nowNanos);
-            if (killed) {
-                handleMobKilledByPlayer(handle.entity, nowSeconds);
-                renderSingleMobDrops(handle);
+            hitAny = true;
+
+            if (damage > 0) {
+                boolean killed = handle.entity.applyPlayerDamage(damage, nowNanos);
+                if (killed) {
+                    handleMobKilledByPlayer(handle.entity, nowSeconds);
+                    renderSingleMobDrops(handle);
+                }
             }
         }
+
+        if (hitAny) {
+            SoundManager.playSfx(SoundManager.Sfx.HIT);
+        }
+    }
+
+    private boolean containsMobType(String mobType) {
+        if (mobType == null) return false;
+        String normalized = mobType.trim().toLowerCase(Locale.ROOT);
+        if (normalized.isEmpty()) return false;
+
+        for (MobHandle handle : mobs) {
+            if (handle == null || handle.mobType == null) continue;
+            if (normalized.equals(handle.mobType.trim().toLowerCase(Locale.ROOT))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void setupMobsFromWorld() {
