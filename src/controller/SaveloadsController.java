@@ -133,6 +133,7 @@ public class SaveloadsController implements Initializable {
                 SELECT world_name
                 FROM save_game
                 WHERE character_id = ? AND saved_name = ?
+                ORDER BY last_saved_date DESC, saved_id DESC
                 LIMIT 1
                 """;
 
@@ -162,7 +163,13 @@ public class SaveloadsController implements Initializable {
         dbcon db = new dbcon();
 
         try (Connection con = db.getConnection()) {
-            String sql = "SELECT saved_id FROM save_game WHERE character_id=? AND saved_name=? LIMIT 1";
+            String sql = """
+                SELECT saved_id
+                FROM save_game
+                WHERE character_id=? AND saved_name=?
+                ORDER BY last_saved_date DESC, saved_id DESC
+                LIMIT 1
+                """;
             try (PreparedStatement ps = con.prepareStatement(sql)) {
                 ps.setInt(1, characterId);
                 ps.setString(2, slotName);
@@ -375,6 +382,7 @@ public class SaveloadsController implements Initializable {
                 JOIN characters c ON sg.character_id = c.character_id
                 LEFT JOIN saved_time st ON sg.saved_id = st.saved_id
                 WHERE sg.character_id = ? AND sg.saved_name = ?
+                ORDER BY sg.last_saved_date DESC, sg.saved_id DESC
                 LIMIT 1
                 """;
 

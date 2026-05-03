@@ -26,7 +26,19 @@ public class SaveGameService {
 
 
     public void saveGame(GameState gs) {
-        if (gs == null) return;
+        autoSaveGameWithSlotRules(gs);
+    }
+
+    /**
+     * Autosaves the current game using save slot rules:
+     * - If the game already has an active save id, it overwrites that save.
+     * - If the game has no active save id, it saves into an empty slot (Save 1..Save 4).
+     * - If no slots are empty, nothing is saved and this returns false.
+     *
+     * UI is expected to show a "delete a slot" warning when this returns false.
+     */
+    public boolean autoSaveGameWithSlotRules(GameState gs) {
+        if (gs == null) return false;
         if (gs.getCurrentCharacterId() <= 0) {
             throw new IllegalStateException("GameState currentCharacterId is not set.");
         }
@@ -37,7 +49,14 @@ public class SaveGameService {
             con.setAutoCommit(false);
 
             if (!gs.hasActiveSave()) {
-                createSaveIfMissing(con, gs, "Save 1");
+                Integer slotToUse = findEmptySaveSlotForCharacter(con, gs.getCurrentCharacterId(), gs.getSelectedSaveSlot());
+                if (slotToUse == null) {
+                    con.rollback();
+                    return false;
+                }
+                String slotName = "Save " + slotToUse;
+                createSaveForSlot(con, gs, slotName);
+                gs.setSelectedSaveSlot(slotToUse);
             }
 
             saveMainRow(con, gs);
@@ -59,9 +78,11 @@ public class SaveGameService {
 
             con.commit();
             System.out.println("Save complete. saved_id=" + gs.getCurrentSaveId());
+            return true;
 
         } catch (Exception e) {
             e.printStackTrace();
+            return false;
         }
     }
 
@@ -1023,7 +1044,13 @@ public class SaveGameService {
     }
     
     private Integer findSaveIdByCharacterAndSlot(Connection con, int characterId, String slotName) throws Exception {
-        String sql = "SELECT saved_id FROM save_game WHERE character_id = ? AND saved_name = ? LIMIT 1";
+        String sql = """
+            SELECT saved_id
+            FROM save_game
+            WHERE character_id = ? AND saved_name = ?
+            ORDER BY last_saved_date DESC, saved_id DESC
+            LIMIT 1
+            """;
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, characterId);
             ps.setString(2, slotName);
@@ -1034,6 +1061,44 @@ public class SaveGameService {
             }
         }
         return null;
+    }
+
+    private Integer findEmptySaveSlotForCharacter(Connection con, int characterId, int preferredSlot) throws Exception {
+        if (con == null || characterId <= 0) {
+            return null;
+        }
+
+        int clampedPreferred = preferredSlot;
+        if (clampedPreferred < 1) clampedPreferred = 1;
+        if (clampedPreferred > 4) clampedPreferred = 4;
+
+        if (isSaveSlotEmpty(con, characterId, clampedPreferred)) {
+            return clampedPreferred;
+        }
+
+        for (int slot = 1; slot <= 4; slot++) {
+            if (slot == clampedPreferred) continue;
+            if (isSaveSlotEmpty(con, characterId, slot)) {
+                return slot;
+            }
+        }
+
+        return null;
+    }
+
+    private boolean isSaveSlotEmpty(Connection con, int characterId, int slotNumber) throws Exception {
+        if (con == null || characterId <= 0) return true;
+        if (slotNumber < 1 || slotNumber > 4) return true;
+
+        String slotName = "Save " + slotNumber;
+        String sql = "SELECT 1 FROM save_game WHERE character_id = ? AND saved_name = ? LIMIT 1";
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, characterId);
+            ps.setString(2, slotName);
+            try (ResultSet rs = ps.executeQuery()) {
+                return !rs.next();
+            }
+        }
     }
 
     private void createSaveForSlot(Connection con, GameState gs, String saveName) throws Exception {
