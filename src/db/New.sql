@@ -86,12 +86,9 @@ CREATE TABLE `characters` (
   `character_id` int NOT NULL AUTO_INCREMENT,
   `account_id` int NOT NULL,
   `player_name` varchar(20) NOT NULL,
-  `skin_id` int DEFAULT NULL,
   PRIMARY KEY (`character_id`),
   KEY `idx_characters_account_id` (`account_id`),
-  KEY `idx_characters_skin_id` (`skin_id`),
-  CONSTRAINT `fk_characters_account` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`account_id`),
-  CONSTRAINT `fk_characters_skin` FOREIGN KEY (`skin_id`) REFERENCES `skin` (`skin_id`)
+  CONSTRAINT `fk_characters_account` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`account_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -101,7 +98,7 @@ CREATE TABLE `characters` (
 
 LOCK TABLES `characters` WRITE;
 /*!40000 ALTER TABLE `characters` DISABLE KEYS */;
-INSERT INTO `characters` VALUES (1,3,'Player1',NULL),(2,15,'koshane',NULL),(3,22,'q',NULL);
+INSERT INTO `characters` VALUES (1,3,'Player1'),(2,15,'koshane'),(3,22,'q');
 /*!40000 ALTER TABLE `characters` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -826,31 +823,6 @@ LOCK TABLES `skill_types` WRITE;
 /*!40000 ALTER TABLE `skill_types` DISABLE KEYS */;
 INSERT INTO `skill_types` VALUES (4,'combat'),(6,'cooking'),(3,'crafting'),(1,'farming'),(2,'gathering');
 /*!40000 ALTER TABLE `skill_types` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `skin`
---
-
-DROP TABLE IF EXISTS `skin`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `skin` (
-  `skin_id` int NOT NULL AUTO_INCREMENT,
-  `skin_name` varchar(255) NOT NULL,
-  `image_url` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`skin_id`),
-  UNIQUE KEY `uq_skin_skin_name` (`skin_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `skin`
---
-
-LOCK TABLES `skin` WRITE;
-/*!40000 ALTER TABLE `skin` DISABLE KEYS */;
-/*!40000 ALTER TABLE `skin` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
