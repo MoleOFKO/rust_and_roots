@@ -558,15 +558,6 @@ public class D_homemapController extends BaseMapController {
     private Rectangle stone_dungeon_hitbox;
     @FXML
     private ImageView drops_img_stone_dungeon;
-//    private ImageView adamantite_img;
-//    private Rectangle adamantite_hitbox;
-//    private ImageView drops_img_adamantite;
-//    private ImageView silver_img;
-//    private Rectangle silver_hitbox;
-//    private ImageView drops_img_silver;
-//    private ImageView orichalcum_img;
-//    private Rectangle orichalcum_hitbox;
-//    private ImageView drops_img_orichalcum;
     @FXML
     private Group iron;
     @FXML
@@ -575,9 +566,6 @@ public class D_homemapController extends BaseMapController {
     private Rectangle iron_hitbox;
     @FXML
     private ImageView drops_img_iron;
-//    private ImageView mithril_img;
-//    private Rectangle mithril_hitbox;
-//    private ImageView drops_img_mithril;
     @FXML
     private Group copper;
     @FXML
@@ -586,12 +574,6 @@ public class D_homemapController extends BaseMapController {
     private Rectangle copper_hitbox;
     @FXML
     private ImageView drops_img_copper;
-//    private ImageView gold_img;
-//    private Rectangle gold_hitbox;
-//    private ImageView drops_img_gold;
-//    private ImageView hihiogane_img;
-//    private Rectangle hihiogane_hitbox;
-//    private ImageView drops_img_hihiogane;
 
     private void initializeOreNodesIfNeeded() {
         if (oresInitialized) {
@@ -612,12 +594,6 @@ public class D_homemapController extends BaseMapController {
         oreNodes.add(new OreNode("stone_dungeon", "stone_dungeon_drop_item", stone_dungeon_img, stone_dungeon_hitbox, drops_img_stone_dungeon));
         oreNodes.add(new OreNode("iron", "iron_drop_item", iron_img, iron_hitbox, drops_img_iron));
         oreNodes.add(new OreNode("copper", "copper_drop_item", copper_img, copper_hitbox, drops_img_copper));
-//        oreNodes.add(new OreNode("silver", "silver_drop_item", silver_img, silver_hitbox, drops_img_silver));
-//        oreNodes.add(new OreNode("gold", "gold_drop_item", gold_img, gold_hitbox, drops_img_gold));
-//        oreNodes.add(new OreNode("adamantite", "adamantite_drop_item", adamantite_img, adamantite_hitbox, drops_img_adamantite));
-//        oreNodes.add(new OreNode("orichalcum", "orichalcum_drop_item", orichalcum_img, orichalcum_hitbox, drops_img_orichalcum));
-//        oreNodes.add(new OreNode("mithril", "mithril_drop_item", mithril_img, mithril_hitbox, drops_img_mithril));
-//        oreNodes.add(new OreNode("hihiogane", "hihiogane_drop_item", hihiogane_img, hihiogane_hitbox, drops_img_hihiogane));
 
         TreeMapState treeState = gameState.getTreeState(mapKey());
         int currentDay = game.GameTimeManager.get().dayNumberProperty().get();
