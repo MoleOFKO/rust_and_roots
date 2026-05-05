@@ -1,6 +1,7 @@
 package controller;
 
 import db.LoadGameService;
+import db.DeleteSaveService;
 import db.SaveGameService;
 import java.net.URL;
 import java.lang.reflect.Field;
@@ -25,6 +26,7 @@ import model.Inventory;
 import model.ItemDatabase;
 import model.NodeCollectors;
 import model.RecipeCatalog;
+import model.item;
 import game.GameLoopManager;
 import game.GameState;
 import game.GameTimeManager;
@@ -133,6 +135,8 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     });
 
     private static final ConcurrentHashMap<String, AtomicLong> MAP_EVICTION_VERSION_BY_KEY = new ConcurrentHashMap<>();
+
+    private boolean permadeathHandled = false;
 
     // ---------- Required common nodes ----------
     @FXML protected StackPane view;
@@ -497,6 +501,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
         player.setOnToggleHotbarRequest(this::toggleHotbarVisible);
         player.setOnHotbarSlotRequest(this::selectHotbarSlot);
+        player.setOnDeathFinished(this::handlePlayerPermadeath);
         bindAttackDispatcherIfNeeded();
 
         autoBridgeSharedUiFromControllerFields();
@@ -564,6 +569,28 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
         // Evict non-current map states in the background so map switches stay smooth.
         Platform.runLater(this::scheduleNonCurrentMapStateEvictionsIfNeeded);
+    }
+
+    private void handlePlayerPermadeath() {
+        if (permadeathHandled) {
+            return;
+        }
+        permadeathHandled = true;
+
+        int saveId = (gameState == null) ? -1 : gameState.getCurrentSaveId();
+
+        if (gameState != null) {
+            gameState.setCurrentSaveId(-1);
+            gameState.resetForNewGame();
+        }
+
+        if (saveId > 0) {
+            Thread t = new Thread(() -> new DeleteSaveService().deleteSaveById(saveId), "permadeath-delete-save");
+            t.setDaemon(true);
+            t.start();
+        }
+
+        Platform.runLater(() -> stopAndSwitchScene("/view/new_game.fxml", SpawnTag.DEFAULT));
     }
 
     protected final void stopAndSwitchScene(String targetFxml, SpawnTag targetSpawn) {
@@ -3097,27 +3124,35 @@ public abstract class BaseMapController implements Initializable, SceneControlle
             return null;
         }
 
-        // Spec:
-        // - Raw food (not obtainable via cooking): +1% SP.
-        // - Single-combo cooking (1 ingredient): +1% HP, +2% SP.
-        // - Double-combo cooking (2+ ingredients): +5% HP, +10% SP.
-        int comboCount = RecipeCatalog.getMinCookingIngredientCountForOutputItem(itemId);
+        item itm = ItemDatabase.getItemById(itemId);
+        int hpDelta = extractItemStat(itm, "getHp");
+        int staminaDelta = extractItemStat(itm, "getStamana", "getStamina", "getStimana");
 
-        double hpPercent;
-        double spPercent;
-        if (comboCount <= 0) {
-            hpPercent = 0.0;
-            spPercent = 0.01;
-        } else if (comboCount == 1) {
-            hpPercent = 0.01;
-            spPercent = 0.02;
-        } else {
-            hpPercent = 0.05;
-            spPercent = 0.10;
+        // Backwards-compatible fallback for legacy DB rows that don't carry recovery stats yet.
+        if (hpDelta == 0 && staminaDelta == 0) {
+            // Spec (legacy):
+            // - Raw food (not obtainable via cooking): +1% SP.
+            // - Single-combo cooking (1 ingredient): +1% HP, +2% SP.
+            // - Double-combo cooking (2+ ingredients): +5% HP, +10% SP.
+            int comboCount = RecipeCatalog.getMinCookingIngredientCountForOutputItem(itemId);
+
+            double hpPercent;
+            double spPercent;
+            if (comboCount <= 0) {
+                hpPercent = 0.0;
+                spPercent = 0.01;
+            } else if (comboCount == 1) {
+                hpPercent = 0.01;
+                spPercent = 0.02;
+            } else {
+                hpPercent = 0.05;
+                spPercent = 0.10;
+            }
+
+            hpDelta = percentOfMaxToDelta(playerState.getMaxHp(), hpPercent);
+            staminaDelta = percentOfMaxToDelta(playerState.getMaxStamina(), spPercent);
         }
 
-        int hpDelta = percentOfMaxToDelta(playerState.getMaxHp(), hpPercent);
-        int staminaDelta = percentOfMaxToDelta(playerState.getMaxStamina(), spPercent);
         return new FoodEffectData(hpDelta, staminaDelta, 0, 0, 0, 0);
     }
 
