@@ -121,6 +121,7 @@ public class Left_map_noone_of_oneController extends BaseMapController {
     private ProgressBar spbar;
     @FXML
     private Button btntuto;
+    @FXML
     private Group stone;
     @FXML
     private ImageView stone_img;
@@ -144,6 +145,42 @@ public class Left_map_noone_of_oneController extends BaseMapController {
     private Rectangle stone_hitbox2;
     @FXML
     private ImageView drops_img_stone2;
+    @FXML
+    private Group slime;
+    @FXML
+    private Rectangle slime_hitbox;
+    @FXML
+    private ImageView slime_img;
+    @FXML
+    private ImageView slime_drops_img;
+    @FXML
+    private Rectangle slime_hitbox_left;
+    @FXML
+    private Rectangle slime_hitbox_up;
+    @FXML
+    private Rectangle slime_hitbox_down;
+    @FXML
+    private Rectangle slime_hitbox_right;
+    @FXML
+    private Rectangle slime_detect;
+    @FXML
+    private Group slime1;
+    @FXML
+    private Rectangle slime1_hitbox;
+    @FXML
+    private ImageView slime1_img;
+    @FXML
+    private ImageView slime1_drops_img;
+    @FXML
+    private Rectangle slime1_hitbox_left;
+    @FXML
+    private Rectangle slime1_hitbox_up;
+    @FXML
+    private Rectangle slime1_hitbox_down;
+    @FXML
+    private Rectangle slime1_hitbox_right;
+    @FXML
+    private Rectangle slime1_detect;
 
     @Override
     protected String dayBackgroundPath() {

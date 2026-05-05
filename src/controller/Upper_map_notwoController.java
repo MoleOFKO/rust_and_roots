@@ -117,6 +117,42 @@ public class Upper_map_notwoController extends BaseMapController {
     private Rectangle stone_hitbox3;
     @FXML
     private ImageView drops_img_stone3;
+    @FXML
+    private Group slime;
+    @FXML
+    private Rectangle slime_hitbox;
+    @FXML
+    private ImageView slime_img;
+    @FXML
+    private ImageView slime_drops_img;
+    @FXML
+    private Rectangle slime_hitbox_left;
+    @FXML
+    private Rectangle slime_hitbox_up;
+    @FXML
+    private Rectangle slime_hitbox_down;
+    @FXML
+    private Rectangle slime_hitbox_right;
+    @FXML
+    private Rectangle slime_detect;
+    @FXML
+    private Group slime1;
+    @FXML
+    private Rectangle slime1_hitbox;
+    @FXML
+    private ImageView slime1_img;
+    @FXML
+    private ImageView slime1_drops_img;
+    @FXML
+    private Rectangle slime1_hitbox_left;
+    @FXML
+    private Rectangle slime1_hitbox_up;
+    @FXML
+    private Rectangle slime1_hitbox_down;
+    @FXML
+    private Rectangle slime1_hitbox_right;
+    @FXML
+    private Rectangle slime1_detect;
 
     @Override
     protected String dayBackgroundPath() {

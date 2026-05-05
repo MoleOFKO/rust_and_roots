@@ -107,6 +107,42 @@ public class RightMapnoone_of_oneController extends BaseMapController {
     private Rectangle stone_hitbox5;
     @FXML
     private ImageView drops_img_stone5;
+    @FXML
+    private Group orc;
+    @FXML
+    private Rectangle orc_hitbox;
+    @FXML
+    private ImageView orc_img;
+    @FXML
+    private ImageView orc_drops_img;
+    @FXML
+    private Rectangle orc_hitbox_left;
+    @FXML
+    private Rectangle orc_hitbox_up;
+    @FXML
+    private Rectangle orc_hitbox_down;
+    @FXML
+    private Rectangle orc_hitbox_right;
+    @FXML
+    private Rectangle orc_detect;
+    @FXML
+    private Group slime;
+    @FXML
+    private Rectangle slime_hitbox;
+    @FXML
+    private ImageView slime_img;
+    @FXML
+    private ImageView slime_drops_img;
+    @FXML
+    private Rectangle slime_hitbox_left;
+    @FXML
+    private Rectangle slime_hitbox_up;
+    @FXML
+    private Rectangle slime_hitbox_down;
+    @FXML
+    private Rectangle slime_hitbox_right;
+    @FXML
+    private Rectangle slime_detect;
 
     @Override
     protected String dayBackgroundPath() {
