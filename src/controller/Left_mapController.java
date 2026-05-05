@@ -71,6 +71,66 @@ public class Left_mapController extends BaseMapController {
     private ProgressBar spbar;
     @FXML
     private Button btntuto;
+    @FXML
+    private Group tree1;
+    @FXML
+    private ImageView tree_img1;
+    @FXML
+    private Rectangle tree_hitbox1;
+    @FXML
+    private ImageView drops_img_tree1;
+    @FXML
+    private Group tree2;
+    @FXML
+    private ImageView tree_img2;
+    @FXML
+    private Rectangle tree_hitbox2;
+    @FXML
+    private ImageView drops_img_tree2;
+    @FXML
+    private Group tree3;
+    @FXML
+    private ImageView tree_img3;
+    @FXML
+    private Rectangle tree_hitbox3;
+    @FXML
+    private ImageView drops_img_tree3;
+    @FXML
+    private Group treelayorgp1;
+    @FXML
+    private ImageView treelayorimg1;
+    @FXML
+    private Group treelayorgp2;
+    @FXML
+    private ImageView treelayorimg2;
+    @FXML
+    private Group treelayorgp3;
+    @FXML
+    private ImageView treelayorimg3;
+    @FXML
+    private Group stone1;
+    @FXML
+    private ImageView stone_img1;
+    @FXML
+    private Rectangle stone_hitbox1;
+    @FXML
+    private ImageView drops_img_stone1;
+    @FXML
+    private Group stone2;
+    @FXML
+    private ImageView stone_img2;
+    @FXML
+    private Rectangle stone_hitbox2;
+    @FXML
+    private ImageView drops_img_stone2;
+    @FXML
+    private Group stone3;
+    @FXML
+    private ImageView stone_img3;
+    @FXML
+    private Rectangle stone_hitbox3;
+    @FXML
+    private ImageView drops_img_stone3;
 
     @Override
     protected String dayBackgroundPath() {
@@ -126,7 +186,7 @@ public class Left_mapController extends BaseMapController {
     private void handlebtntutoaction(ActionEvent event) {
         showOverworldTutorialOverlay();
     }
-
+    
     @FunctionalInterface
     private interface ResourceDropSpawner {
         void spawn(TreeMapState.TreeData resource, double nowSeconds);

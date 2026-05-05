@@ -85,6 +85,7 @@ public class Left_map_nothree_of_oneController extends BaseMapController {
     private ProgressBar spbar;
     @FXML
     private Button btntuto;
+    @FXML
     private Group stone6;
     @FXML
     private ImageView stone_img6;
@@ -140,6 +141,60 @@ public class Left_map_nothree_of_oneController extends BaseMapController {
     private Rectangle stone_hitbox;
     @FXML
     private ImageView drops_img_stone;
+    @FXML
+    private Group slime;
+    @FXML
+    private Rectangle slime_hitbox;
+    @FXML
+    private ImageView slime_img;
+    @FXML
+    private ImageView slime_drops_img;
+    @FXML
+    private Rectangle slime_hitbox_left;
+    @FXML
+    private Rectangle slime_hitbox_up;
+    @FXML
+    private Rectangle slime_hitbox_down;
+    @FXML
+    private Rectangle slime_hitbox_right;
+    @FXML
+    private Rectangle slime_detect;
+    @FXML
+    private Group slime1;
+    @FXML
+    private Group orc;
+    @FXML
+    private Rectangle orc_hitbox;
+    @FXML
+    private ImageView orc_img;
+    @FXML
+    private ImageView orc_drops_img;
+    @FXML
+    private Rectangle orc_hitbox_left;
+    @FXML
+    private Rectangle orc_hitbox_up;
+    @FXML
+    private Rectangle orc_hitbox_down;
+    @FXML
+    private Rectangle orc_hitbox_right;
+    @FXML
+    private Rectangle orc_detect;
+    @FXML
+    private Rectangle slime1_hitbox;
+    @FXML
+    private ImageView slime1_img;
+    @FXML
+    private ImageView slime1_drops_img;
+    @FXML
+    private Rectangle slime1_hitbox_left;
+    @FXML
+    private Rectangle slime1_hitbox_up;
+    @FXML
+    private Rectangle slime1_hitbox_down;
+    @FXML
+    private Rectangle slime1_hitbox_right;
+    @FXML
+    private Rectangle slime1_detect;
 
     @Override
     protected String dayBackgroundPath() {

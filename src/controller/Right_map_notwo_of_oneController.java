@@ -160,6 +160,60 @@ public class Right_map_notwo_of_oneController extends BaseMapController {
     private Rectangle stone_hitbox2;
     @FXML
     private ImageView drops_img_stone2;
+    @FXML
+    private Group orc;
+    @FXML
+    private Rectangle orc_hitbox;
+    @FXML
+    private ImageView orc_img;
+    @FXML
+    private ImageView orc_drops_img;
+    @FXML
+    private Rectangle orc_hitbox_left;
+    @FXML
+    private Rectangle orc_hitbox_up;
+    @FXML
+    private Rectangle orc_hitbox_down;
+    @FXML
+    private Rectangle orc_hitbox_right;
+    @FXML
+    private Rectangle orc_detect;
+    @FXML
+    private Group orc1;
+    @FXML
+    private Group orcb;
+    @FXML
+    private Rectangle orcb_hitbox;
+    @FXML
+    private ImageView orcb_img;
+    @FXML
+    private ImageView orcb_drops_img;
+    @FXML
+    private Rectangle orcb_hitbox_left;
+    @FXML
+    private Rectangle orcb_hitbox_up;
+    @FXML
+    private Rectangle orcb_hitbox_down;
+    @FXML
+    private Rectangle orcb_hitbox_right;
+    @FXML
+    private Rectangle orcb_detect;
+    @FXML
+    private Rectangle orc1_hitbox;
+    @FXML
+    private ImageView orc1_img;
+    @FXML
+    private ImageView orc1_drops_img;
+    @FXML
+    private Rectangle orc1_hitbox_left;
+    @FXML
+    private Rectangle orc1_hitbox_up;
+    @FXML
+    private Rectangle orc1_hitbox_down;
+    @FXML
+    private Rectangle orc1_hitbox_right;
+    @FXML
+    private Rectangle orc1_detect;
     
     @Override
     protected String dayBackgroundPath() {
