@@ -56,6 +56,7 @@ public class Player {
     private IntConsumer onHotbarSlotRequest;
     private Runnable onToggleHotbarRequest;
     private Runnable onAttackStarted;
+    private Runnable onDeathFinished;
 
     private double staminaDrainRemainder = 0.0;
     private List<Rectangle> walls = List.of();
@@ -276,6 +277,10 @@ public class Player {
 
     public void setOnAttackStarted(Runnable onAttackStarted) {
         this.onAttackStarted = onAttackStarted;
+    }
+
+    public void setOnDeathFinished(Runnable onDeathFinished) {
+        this.onDeathFinished = onDeathFinished;
     }
 
     public boolean isRemovedFromWorld() {
@@ -734,6 +739,9 @@ public class Player {
             hitbox.setVisible(false);
             if (equipmentView != null) {
                 equipmentView.setVisible(false);
+            }
+            if (onDeathFinished != null) {
+                onDeathFinished.run();
             }
             return;
         }

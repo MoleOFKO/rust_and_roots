@@ -974,15 +974,16 @@ public final class MobEntity {
     private int computeDamageTo(PlayerState target) {
         if (target == null) return 0;
         int rolled = CombatRules.rollAttackDamage(data.str, 0);
-        int reduced = CombatRules.applyDamageReduction(rolled, target.getVit());
+        int baseReduced = CombatRules.applyDamageReduction(rolled, target.getVit());
 
-        // Night scaling: mobs deal bonus damage to the player as days progress.
-        // Day 1 => +1, Day 2 => +2, ...
+        // Night scaling:
+        // - Scale by day for increasing challenge, but cap it so late-game isn't mathematically impossible.
+        // - Apply combat-skill mitigation after the scaling so combat progression stays meaningful.
+        int nightBonus = 0;
         GameTimeManager timeManager = GameTimeManager.get();
         if (timeManager != null && timeManager.isNight()) {
             int day = Math.max(1, timeManager.dayNumberProperty().get());
-            long boosted = (long) reduced + (long) day;
-            reduced = (int) Math.min((long) Integer.MAX_VALUE, Math.max(0L, boosted));
+            nightBonus = Math.min(25, day);
         }
 
         int combatReduction = 0;
@@ -992,7 +993,9 @@ public final class MobEntity {
             combatReduction = SkillModifiers.combatReceivedDamageReduction(combatLevel);
         }
 
-        return Math.max(0, reduced - Math.max(0, combatReduction));
+        long boosted = (long) baseReduced + (long) nightBonus;
+        int scaled = (int) Math.min((long) Integer.MAX_VALUE, Math.max(0L, boosted));
+        return Math.max(0, scaled - Math.max(0, combatReduction));
     }
 
     private Rectangle resolveActiveAttackHitbox() {

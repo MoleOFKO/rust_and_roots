@@ -213,6 +213,75 @@ INSERT INTO `items` VALUES (1,'Axe',10,121,'Axe.png',3),(2,'Pickaxe',10,122,'pic
 /*!40000 ALTER TABLE `items` ENABLE KEYS */;
 UNLOCK TABLES;
 
+-- ----------------------------------------------------------------------
+-- Balance patch: edible recovery + shop pricing + missing crafting outputs
+-- (Added: 2026-05-05)
+-- ----------------------------------------------------------------------
+
+-- Ensure edible items restore HP/SP when consumed.
+INSERT INTO `item_stats` VALUES
+  (155,0,0,0,0,3,3),   -- basic fruit recovery (blue/red/yellow)
+  (156,0,0,0,0,6,0),   -- cloth bandage
+  (157,0,0,0,0,0,6),   -- water bottle
+  (158,0,0,0,0,10,10); -- fruit mix
+
+UPDATE `item_stats`
+SET
+  `hp` = CASE `item_stats_id`
+    -- Cooking output recovery (single / double / triple combos)
+    WHEN 92 THEN 16 WHEN 93 THEN 16 WHEN 94 THEN 16 WHEN 95 THEN 16 WHEN 96 THEN 16 WHEN 97 THEN 16 WHEN 98 THEN 16
+    WHEN 99 THEN 10 WHEN 100 THEN 10 WHEN 101 THEN 10 WHEN 102 THEN 10 WHEN 103 THEN 10 WHEN 104 THEN 10 WHEN 105 THEN 10 WHEN 107 THEN 10
+    WHEN 106 THEN 6 WHEN 108 THEN 6 WHEN 109 THEN 6 WHEN 110 THEN 6 WHEN 111 THEN 6
+    -- Deluxe soup
+    WHEN 154 THEN 22
+    -- Fruit recovery
+    WHEN 134 THEN 4 WHEN 135 THEN 4 WHEN 136 THEN 3 WHEN 137 THEN 4 WHEN 138 THEN 4
+    WHEN 139 THEN 2 WHEN 140 THEN 2 WHEN 142 THEN 2 WHEN 143 THEN 2 WHEN 144 THEN 2
+    ELSE `hp`
+  END,
+  `stamina` = CASE `item_stats_id`
+    -- Cooking output recovery (single / double / triple combos)
+    WHEN 92 THEN 12 WHEN 93 THEN 12 WHEN 94 THEN 12 WHEN 95 THEN 12 WHEN 96 THEN 12 WHEN 97 THEN 12 WHEN 98 THEN 12
+    WHEN 99 THEN 8 WHEN 100 THEN 8 WHEN 101 THEN 8 WHEN 102 THEN 8 WHEN 103 THEN 8 WHEN 104 THEN 8 WHEN 105 THEN 8 WHEN 107 THEN 8
+    WHEN 106 THEN 5 WHEN 108 THEN 5 WHEN 109 THEN 5 WHEN 110 THEN 5 WHEN 111 THEN 5
+    -- Deluxe soup
+    WHEN 154 THEN 18
+    -- Fruit recovery
+    WHEN 134 THEN 3 WHEN 135 THEN 3 WHEN 136 THEN 2 WHEN 137 THEN 3 WHEN 138 THEN 3
+    WHEN 139 THEN 2 WHEN 140 THEN 2 WHEN 142 THEN 2 WHEN 143 THEN 2 WHEN 144 THEN 2
+    ELSE `stamina`
+  END
+WHERE `item_stats_id` IN (
+  92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,154,
+  134,135,136,137,138,139,140,142,143,144
+);
+
+-- Re-map legacy edible items away from the shared (0,0) stat row (item_stats_id=153).
+UPDATE `items` SET `item_stats_id` = 155 WHERE `item_id` IN (200,201,202);
+UPDATE `items` SET `item_stats_id` = 156 WHERE `item_id` IN (247,248);
+UPDATE `items` SET `item_stats_id` = 157 WHERE `item_id` = 249;
+
+-- Add missing crafting outputs so all RecipeCatalog crafting recipes are valid.
+INSERT INTO `items` VALUES
+  (270,'Wooden Board',30,153,'tree_log.png',6),
+  (271,'Stone Block',20,153,'stone_drop_item.png',6),
+  (272,'Polished Stone',35,153,'glass.png',6),
+  (273,'Fruit Mix',120,158,'banana_fruit.png',1);
+
+-- Shop price re-balance for consumables (stronger items become late-game purchases).
+UPDATE `items` SET `price` = 80  WHERE `item_id` IN (93,95,96,97,98); -- single-combo dishes
+UPDATE `items` SET `price` = 140 WHERE `item_id` IN (86,87,88,89,90,91,92,94); -- double-combo dishes
+UPDATE `items` SET `price` = 220 WHERE `item_id` IN (79,80,81,82,83,84,85); -- triple-combo dishes
+UPDATE `items` SET `price` = 250 WHERE `item_id` = 259; -- deluxe soup
+
+UPDATE `items` SET `price` = 15 WHERE `item_id` IN (117,118,120,121,122); -- small fruits
+UPDATE `items` SET `price` = 30 WHERE `item_id` IN (200,201,202); -- basic colored fruits
+UPDATE `items` SET `price` = 25 WHERE `item_id` IN (247,248,249); -- bandages + water bottle
+
+-- Fix a few missing image filenames so these items remain obtainable/displayable.
+UPDATE `items` SET `image` = 'Pumpkin.png' WHERE `item_id` = 112;
+UPDATE `items` SET `image` = 'coal.png' WHERE `item_id` = 215;
+
 --
 -- Table structure for table `mobs`
 --
