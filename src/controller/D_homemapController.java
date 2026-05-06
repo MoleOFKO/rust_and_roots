@@ -19,6 +19,7 @@ import javafx.geometry.Bounds;
 import javafx.scene.Group;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Slider;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
@@ -45,6 +46,122 @@ public class D_homemapController extends BaseMapController {
 
     private static final String DAY_BG_PATH = "/image/dungeon/d_homemap.png";
     private static final String NIGHT_BG_PATH = "";
+    @FXML
+    private ImageView bg;
+    @FXML
+    private Group walls;
+    @FXML
+    private Group daynightnavgroup;
+    @FXML
+    private Label day;
+    @FXML
+    private ImageView daynightcircleimg;
+    @FXML
+    private Label time;
+    @FXML
+    private Label name;
+    @FXML
+    private Label coin;
+    @FXML
+    private ProgressBar hpbar;
+    @FXML
+    private ProgressBar spbar;
+    @FXML
+    private Group stone_dungeon1;
+    @FXML
+    private ImageView stone_dungeon_img1;
+    @FXML
+    private Rectangle stone_dungeon_hitbox1;
+    @FXML
+    private ImageView drops_img_stone_dungeon1;
+    @FXML
+    private Group stone_dungeon2;
+    @FXML
+    private ImageView stone_dungeon_img2;
+    @FXML
+    private Rectangle stone_dungeon_hitbox2;
+    @FXML
+    private ImageView drops_img_stone_dungeon2;
+    @FXML
+    private Group stone_dungeon3;
+    @FXML
+    private ImageView stone_dungeon_img3;
+    @FXML
+    private Rectangle stone_dungeon_hitbox3;
+    @FXML
+    private ImageView drops_img_stone_dungeon3;
+    @FXML
+    private Group stone_dungeon4;
+    @FXML
+    private ImageView stone_dungeon_img4;
+    @FXML
+    private Rectangle stone_dungeon_hitbox4;
+    @FXML
+    private ImageView drops_img_stone_dungeon4;
+    @FXML
+    private Group iron1;
+    @FXML
+    private ImageView iron_img1;
+    @FXML
+    private Rectangle iron_hitbox1;
+    @FXML
+    private ImageView drops_img_iron1;
+    @FXML
+    private Group iron2;
+    @FXML
+    private ImageView iron_img2;
+    @FXML
+    private Rectangle iron_hitbox2;
+    @FXML
+    private ImageView drops_img_iron2;
+    @FXML
+    private Group iron3;
+    @FXML
+    private ImageView iron_img3;
+    @FXML
+    private Rectangle iron_hitbox3;
+    @FXML
+    private ImageView drops_img_iron3;
+    @FXML
+    private Group iron4;
+    @FXML
+    private ImageView iron_img4;
+    @FXML
+    private Rectangle iron_hitbox4;
+    @FXML
+    private ImageView drops_img_iron4;
+    @FXML
+    private Group iron5;
+    @FXML
+    private ImageView iron_img5;
+    @FXML
+    private Rectangle iron_hitbox5;
+    @FXML
+    private ImageView drops_img_iron5;
+    @FXML
+    private Group iron6;
+    @FXML
+    private ImageView iron_img6;
+    @FXML
+    private Rectangle iron_hitbox6;
+    @FXML
+    private ImageView drops_img_iron6;
+    @FXML
+    private Group iron7;
+    @FXML
+    private ImageView iron_img7;
+    @FXML
+    private Rectangle iron_hitbox7;
+    @FXML
+    private ImageView drops_img_iron7;
+    @FXML
+    private Group copper1;
+    @FXML
+    private ImageView copper_img1;
+    @FXML
+    private Rectangle copper_hitbox1;
+    @FXML
+    private ImageView drops_img_copper1;
 
     @Override
     protected String dayBackgroundPath() {
@@ -61,7 +178,7 @@ public class D_homemapController extends BaseMapController {
     private static final int STARTING_MAX_HP = 10;
     private static final int STARTING_VIT = 1;
     private static final int MAX_DROPS_PER_LIFE = 10;
-    private static final double AUTO_GATHER_MARGIN_PIXELS = 2.0;
+    private static final double AUTO_GATHER_MARGIN_PIXELS = 2.0;    
 
     private static final class OreNode {
         final String nodeId;
@@ -442,30 +559,6 @@ public class D_homemapController extends BaseMapController {
     @FXML
     private ImageView drops_img_stone_dungeon;
     @FXML
-    private Group adamantite;
-    @FXML
-    private ImageView adamantite_img;
-    @FXML
-    private Rectangle adamantite_hitbox;
-    @FXML
-    private ImageView drops_img_adamantite;
-    @FXML
-    private Group silver;
-    @FXML
-    private ImageView silver_img;
-    @FXML
-    private Rectangle silver_hitbox;
-    @FXML
-    private ImageView drops_img_silver;
-    @FXML
-    private Group orichalcum;
-    @FXML
-    private ImageView orichalcum_img;
-    @FXML
-    private Rectangle orichalcum_hitbox;
-    @FXML
-    private ImageView drops_img_orichalcum;
-    @FXML
     private Group iron;
     @FXML
     private ImageView iron_img;
@@ -474,14 +567,6 @@ public class D_homemapController extends BaseMapController {
     @FXML
     private ImageView drops_img_iron;
     @FXML
-    private Group mithril;
-    @FXML
-    private ImageView mithril_img;
-    @FXML
-    private Rectangle mithril_hitbox;
-    @FXML
-    private ImageView drops_img_mithril;
-    @FXML
     private Group copper;
     @FXML
     private ImageView copper_img;
@@ -489,22 +574,6 @@ public class D_homemapController extends BaseMapController {
     private Rectangle copper_hitbox;
     @FXML
     private ImageView drops_img_copper;
-    @FXML
-    private Group gold;
-    @FXML
-    private ImageView gold_img;
-    @FXML
-    private Rectangle gold_hitbox;
-    @FXML
-    private ImageView drops_img_gold;
-    @FXML
-    private Group hihiogane;
-    @FXML
-    private ImageView hihiogane_img;
-    @FXML
-    private Rectangle hihiogane_hitbox;
-    @FXML
-    private ImageView drops_img_hihiogane;
 
     private void initializeOreNodesIfNeeded() {
         if (oresInitialized) {
@@ -525,12 +594,6 @@ public class D_homemapController extends BaseMapController {
         oreNodes.add(new OreNode("stone_dungeon", "stone_dungeon_drop_item", stone_dungeon_img, stone_dungeon_hitbox, drops_img_stone_dungeon));
         oreNodes.add(new OreNode("iron", "iron_drop_item", iron_img, iron_hitbox, drops_img_iron));
         oreNodes.add(new OreNode("copper", "copper_drop_item", copper_img, copper_hitbox, drops_img_copper));
-        oreNodes.add(new OreNode("silver", "silver_drop_item", silver_img, silver_hitbox, drops_img_silver));
-        oreNodes.add(new OreNode("gold", "gold_drop_item", gold_img, gold_hitbox, drops_img_gold));
-        oreNodes.add(new OreNode("adamantite", "adamantite_drop_item", adamantite_img, adamantite_hitbox, drops_img_adamantite));
-        oreNodes.add(new OreNode("orichalcum", "orichalcum_drop_item", orichalcum_img, orichalcum_hitbox, drops_img_orichalcum));
-        oreNodes.add(new OreNode("mithril", "mithril_drop_item", mithril_img, mithril_hitbox, drops_img_mithril));
-        oreNodes.add(new OreNode("hihiogane", "hihiogane_drop_item", hihiogane_img, hihiogane_hitbox, drops_img_hihiogane));
 
         TreeMapState treeState = gameState.getTreeState(mapKey());
         int currentDay = game.GameTimeManager.get().dayNumberProperty().get();

@@ -141,6 +141,78 @@ public class Upper_map_nothreeController extends BaseMapController{
     private Rectangle stone_hitbox3;
     @FXML
     private ImageView drops_img_stone3;
+    @FXML
+    private Group slime;
+    @FXML
+    private Rectangle slime_hitbox;
+    @FXML
+    private ImageView slime_img;
+    @FXML
+    private ImageView slime_drops_img;
+    @FXML
+    private Rectangle slime_hitbox_left;
+    @FXML
+    private Rectangle slime_hitbox_up;
+    @FXML
+    private Rectangle slime_hitbox_down;
+    @FXML
+    private Rectangle slime_hitbox_right;
+    @FXML
+    private Rectangle slime_detect;
+    @FXML
+    private Group orc;
+    @FXML
+    private Rectangle orc_hitbox;
+    @FXML
+    private ImageView orc_img;
+    @FXML
+    private ImageView orc_drops_img;
+    @FXML
+    private Rectangle orc_hitbox_left;
+    @FXML
+    private Rectangle orc_hitbox_up;
+    @FXML
+    private Rectangle orc_hitbox_down;
+    @FXML
+    private Rectangle orc_hitbox_right;
+    @FXML
+    private Rectangle orc_detect;
+    @FXML
+    private Group orc1;
+    @FXML
+    private Group slime1;
+    @FXML
+    private Rectangle orc1_hitbox;
+    @FXML
+    private ImageView orc1_img;
+    @FXML
+    private ImageView orc1_drops_img;
+    @FXML
+    private Rectangle orc1_hitbox_left;
+    @FXML
+    private Rectangle orc1_hitbox_up;
+    @FXML
+    private Rectangle orc1_hitbox_down;
+    @FXML
+    private Rectangle orc1_hitbox_right;
+    @FXML
+    private Rectangle orc1_detect;
+    @FXML
+    private Rectangle slime1_hitbox;
+    @FXML
+    private ImageView slime1_img;
+    @FXML
+    private ImageView slime1_drops_img;
+    @FXML
+    private Rectangle slime1_hitbox_left;
+    @FXML
+    private Rectangle slime1_hitbox_up;
+    @FXML
+    private Rectangle slime1_hitbox_down;
+    @FXML
+    private Rectangle slime1_hitbox_right;
+    @FXML
+    private Rectangle slime1_detect;
 
     @Override
     protected String dayBackgroundPath() {
@@ -490,5 +562,4 @@ public class Upper_map_nothreeController extends BaseMapController{
     private void handlebtntutoaction(ActionEvent event) {
         showOverworldTutorialOverlay();
     }
-
 }

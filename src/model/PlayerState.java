@@ -5,6 +5,7 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import java.util.Arrays;
+import util.SoundManager;
 
 
 /**
@@ -455,7 +456,11 @@ public final class PlayerState {
 
     public void damageHp(int amount) {
         if (amount <= 0) return;
+        boolean wasAlive = !isDead();
         setHp(getHp() - amount);
+        if (wasAlive && isDead()) {
+            SoundManager.playSfx(SoundManager.Sfx.PLAYER_DEFEAT);
+        }
     }
 
     public void healHp(int amount) {

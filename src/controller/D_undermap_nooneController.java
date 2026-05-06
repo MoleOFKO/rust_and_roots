@@ -13,6 +13,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Group;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Slider;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
@@ -33,6 +34,192 @@ public class D_undermap_nooneController extends BaseMapController {
 
     private static final String DAY_BG_PATH = "/image/dungeon/d_undermap_noone.png";
     private static final String NIGHT_BG_PATH = "";
+    @FXML
+    private ImageView bg;
+    @FXML
+    private Group daynightnavgroup;
+    @FXML
+    private Label day;
+    @FXML
+    private ImageView daynightcircleimg;
+    @FXML
+    private Label time;
+    @FXML
+    private Label name;
+    @FXML
+    private Label coin;
+    @FXML
+    private ProgressBar hpbar;
+    @FXML
+    private ProgressBar spbar;
+    @FXML
+    private Group iron;
+    @FXML
+    private ImageView iron_img;
+    @FXML
+    private Rectangle iron_hitbox;
+    @FXML
+    private ImageView drops_img_iron;
+    @FXML
+    private Group iron1;
+    @FXML
+    private ImageView iron_img1;
+    @FXML
+    private Rectangle iron_hitbox1;
+    @FXML
+    private ImageView drops_img_iron1;
+    @FXML
+    private Group iron2;
+    @FXML
+    private ImageView iron_img2;
+    @FXML
+    private Rectangle iron_hitbox2;
+    @FXML
+    private ImageView drops_img_iron2;
+    @FXML
+    private Group iron3;
+    @FXML
+    private ImageView iron_img3;
+    @FXML
+    private Rectangle iron_hitbox3;
+    @FXML
+    private ImageView drops_img_iron3;
+    @FXML
+    private Group copper;
+    @FXML
+    private ImageView copper_img;
+    @FXML
+    private Rectangle copper_hitbox;
+    @FXML
+    private ImageView drops_img_copper;
+    @FXML
+    private Group copper1;
+    @FXML
+    private ImageView copper_img1;
+    @FXML
+    private Rectangle copper_hitbox1;
+    @FXML
+    private ImageView drops_img_copper1;
+    @FXML
+    private Group copper2;
+    @FXML
+    private ImageView copper_img2;
+    @FXML
+    private Rectangle copper_hitbox2;
+    @FXML
+    private ImageView drops_img_copper2;
+    @FXML
+    private Group copper3;
+    @FXML
+    private ImageView copper_img3;
+    @FXML
+    private Rectangle copper_hitbox3;
+    @FXML
+    private ImageView drops_img_copper3;
+    @FXML
+    private Group copper4;
+    @FXML
+    private ImageView copper_img4;
+    @FXML
+    private Rectangle copper_hitbox4;
+    @FXML
+    private ImageView drops_img_copper4;
+    @FXML
+    private Group copper5;
+    @FXML
+    private ImageView copper_img5;
+    @FXML
+    private Rectangle copper_hitbox5;
+    @FXML
+    private ImageView drops_img_copper5;
+    @FXML
+    private Group copper6;
+    @FXML
+    private ImageView copper_img6;
+    @FXML
+    private Rectangle copper_hitbox6;
+    @FXML
+    private ImageView drops_img_copper6;
+    @FXML
+    private Group copper7;
+    @FXML
+    private ImageView copper_img7;
+    @FXML
+    private Rectangle copper_hitbox7;
+    @FXML
+    private ImageView drops_img_copper7;
+    @FXML
+    private Group silver;
+    @FXML
+    private ImageView silver_img;
+    @FXML
+    private Rectangle silver_hitbox;
+    @FXML
+    private ImageView drops_img_silver;
+    @FXML
+    private Group silver1;
+    @FXML
+    private ImageView silver_img1;
+    @FXML
+    private Rectangle silver_hitbox1;
+    @FXML
+    private ImageView drops_img_silver1;
+    @FXML
+    private Group silver2;
+    @FXML
+    private ImageView silver_img2;
+    @FXML
+    private Rectangle silver_hitbox2;
+    @FXML
+    private ImageView drops_img_silver2;
+    @FXML
+    private Group silver3;
+    @FXML
+    private ImageView silver_img3;
+    @FXML
+    private Rectangle silver_hitbox3;
+    @FXML
+    private ImageView drops_img_silver3;
+    @FXML
+    private Group silver4;
+    @FXML
+    private ImageView silver_img4;
+    @FXML
+    private Rectangle silver_hitbox4;
+    @FXML
+    private ImageView drops_img_silver4;
+    @FXML
+    private Group silver5;
+    @FXML
+    private ImageView silver_img5;
+    @FXML
+    private Rectangle silver_hitbox5;
+    @FXML
+    private ImageView drops_img_silver5;
+    @FXML
+    private Group stone_dungeon;
+    @FXML
+    private ImageView stone_dungeon_img;
+    @FXML
+    private Rectangle stone_dungeon_hitbox;
+    @FXML
+    private ImageView drops_img_stone_dungeon;
+    @FXML
+    private Group stone_dungeon1;
+    @FXML
+    private ImageView stone_dungeon_img1;
+    @FXML
+    private Rectangle stone_dungeon_hitbox1;
+    @FXML
+    private ImageView drops_img_stone_dungeon1;
+    @FXML
+    private Group stone_dungeon2;
+    @FXML
+    private ImageView stone_dungeon_img2;
+    @FXML
+    private Rectangle stone_dungeon_hitbox2;
+    @FXML
+    private ImageView drops_img_stone_dungeon2;
 
     @Override
     protected String dayBackgroundPath() {
@@ -384,6 +571,4 @@ public class D_undermap_nooneController extends BaseMapController {
     protected void configureExits() {
         registerExit(exit_up, "/view/d_undermap.fxml", SpawnTag.FROM_DOWN);
     }
-
-
 }

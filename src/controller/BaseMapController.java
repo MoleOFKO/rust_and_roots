@@ -1,6 +1,7 @@
 package controller;
 
 import db.LoadGameService;
+import db.DeleteSaveService;
 import db.SaveGameService;
 import java.net.URL;
 import java.lang.reflect.Field;
@@ -25,6 +26,7 @@ import model.Inventory;
 import model.ItemDatabase;
 import model.NodeCollectors;
 import model.RecipeCatalog;
+import model.item;
 import game.GameLoopManager;
 import game.GameState;
 import game.GameTimeManager;
@@ -71,6 +73,7 @@ import model.TreeMapState;
 import util.AppDialogs;
 import util.ImageCache;
 import util.SceneManager;
+import util.SoundManager;
 import util.SpawnTag;
 import util.TimeFlow;
 import util.TutorialOverlayHelper;
@@ -94,6 +97,16 @@ import javafx.scene.control.ToggleButton;
  */
 public abstract class BaseMapController implements Initializable, SceneController {
 
+    /**
+     * "Core" overworld tutorial pages.
+     *
+     * For now this is wired to the exact same image set that every overworld map tutorial button
+     * previously showed (`TutorialOverlayHelper.GLOBAL_BUTTON_TUTORIAL_IMAGES`) so behavior does not change.
+     *
+     * Later, if you want different tutorials per-map, override {@link #overworldCoreTutorialImages()} in the
+     * specific map controller.
+     */
+    protected static final List<String> OVERWORLD_CORE_TUTORIAL_IMAGES = TutorialOverlayHelper.GLOBAL_BUTTON_TUTORIAL_IMAGES;
     private static final double DEFAULT_PLAYER_HITBOX_WIDTH = 14.0;
     private static final double DEFAULT_PLAYER_HITBOX_HEIGHT = 20.0;
     private static final double DEFAULT_PLAYER_HITBOX_TRANSLATE_X = 24.0;
@@ -110,6 +123,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         "/image/Toturial/After_wp_hold.png",
         "/image/Toturial/Attack.png"
     );
+    protected static final String OVERWORLD_TUTORIAL_KEY = "overworld_tutorial_core";
     protected static final String OVERWORLD_COMBAT_TUTORIAL_KEY = "overworld_combat_hotbar_unlock";
 
     private static final ExecutorService MAP_EVICTION_EXECUTOR = Executors.newSingleThreadExecutor(r -> {
@@ -119,6 +133,8 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     });
 
     private static final ConcurrentHashMap<String, AtomicLong> MAP_EVICTION_VERSION_BY_KEY = new ConcurrentHashMap<>();
+
+    private boolean permadeathHandled = false;
 
     // ---------- Required common nodes ----------
     @FXML protected StackPane view;
@@ -333,7 +349,22 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 	    }
 
 	    protected void showOverworldTutorialOverlay() {
-	        TutorialOverlayHelper.show(view, TutorialOverlayHelper.GLOBAL_BUTTON_TUTORIAL_IMAGES);
+	        TutorialOverlayHelper.show(view, buildOverworldTutorialImages());
+	    }
+
+	    /**
+	     * Optional "show once" version of the overworld tutorial.
+	     *
+	     * This is intentionally NOT used by the tutorial buttons (those should always show the tutorial),
+	     * but can be called automatically if you want a one-time tutorial per save slot.
+	     */
+	    protected void showOverworldTutorialOverlayIfNeeded() {
+	        TutorialOverlayHelper.showIfNeeded(view, gameState, OVERWORLD_TUTORIAL_KEY, buildOverworldTutorialImages());
+	    }
+
+	    /** Override this in a specific map controller to provide different tutorial pages for that map. */
+	    protected List<String> overworldCoreTutorialImages() {
+	        return OVERWORLD_CORE_TUTORIAL_IMAGES;
 	    }
 
 	    protected final void registerPlayerAttackHandler(String key, Runnable handler) {
@@ -360,6 +391,10 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 	    }
 
 	    private void dispatchPlayerAttackStarted() {
+	        if (player != null && player.isSwordEquipped()) {
+	            SoundManager.playSfx(SoundManager.Sfx.SWORD_CUT);
+	        }
+
 	        if (attackHandlers.isEmpty()) {
 	            return;
 	        }
@@ -464,6 +499,8 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
         player.setOnToggleHotbarRequest(this::toggleHotbarVisible);
         player.setOnHotbarSlotRequest(this::selectHotbarSlot);
+        player.setOnDeathFinished(this::handlePlayerPermadeath);
+        bindAttackDispatcherIfNeeded();
 
         autoBridgeSharedUiFromControllerFields();
         autoWireSharedUiHandlers();
@@ -532,14 +569,55 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         Platform.runLater(this::scheduleNonCurrentMapStateEvictionsIfNeeded);
     }
 
+    private void handlePlayerPermadeath() {
+        if (permadeathHandled) {
+            return;
+        }
+        permadeathHandled = true;
+
+        int saveId = (gameState == null) ? -1 : gameState.getCurrentSaveId();
+
+        if (gameState != null) {
+            gameState.setCurrentSaveId(-1);
+            gameState.resetForNewGame();
+        }
+
+        if (saveId > 0) {
+            Thread t = new Thread(() -> new DeleteSaveService().deleteSaveById(saveId), "permadeath-delete-save");
+            t.setDaemon(true);
+            t.start();
+        }
+
+        Platform.runLater(() -> stopAndSwitchSceneInternal("/view/game_over.fxml", SpawnTag.DEFAULT, false));
+    }
+
     protected final void stopAndSwitchScene(String targetFxml, SpawnTag targetSpawn) {
-        capturePlayerSnapshot();
+        stopAndSwitchSceneInternal(targetFxml, targetSpawn, true);
+    }
+
+    private void stopAndSwitchSceneInternal(String targetFxml, SpawnTag targetSpawn, boolean captureSnapshot) {
+        if (captureSnapshot) {
+            capturePlayerSnapshot();
+        }
 
         cleanupBeforeSceneSwitch();
         if (gameLoop != null) gameLoop.stop();
         if (player != null) player.stop();
         GameTimeManager.get().setWorldDilation(1.0);
+        if (isMapChangeSpawnTag(targetSpawn)) {
+            SoundManager.playSfx(SoundManager.Sfx.TELEPORT);
+        }
         SceneManager.switchScene(targetFxml, targetSpawn);
+    }
+
+    private static boolean isMapChangeSpawnTag(SpawnTag spawnTag) {
+        if (spawnTag == null) {
+            return false;
+        }
+        return switch (spawnTag) {
+            case FROM_LEFT, FROM_RIGHT, FROM_UP, FROM_DOWN, FROM_DOOR -> true;
+            default -> false;
+        };
     }
 
     private void cleanupBeforeSceneSwitch() {
@@ -1641,8 +1719,16 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         try {
             capturePlayerSnapshot();
             if (gameState != null) {
-                int slot = Math.max(1, gameState.getSelectedSaveSlot());
-                new SaveGameService().saveGameToSlot(gameState, slot);
+                boolean saved = new SaveGameService().autoSaveGameWithSlotRules(gameState);
+                if (!saved) {
+                    AppDialogs.showMessageDialog(
+                        null,
+                        "Please delete the existing saved slot to save the current game's data, else it will not be saved!",
+                        "Auto Save",
+                        javax.swing.JOptionPane.WARNING_MESSAGE
+                    );
+                    return;
+                }
                 gameState.setSaveMenuMode(false);
             }
             GameTimeManager.get().setWorldDilation(1.0);
@@ -2278,11 +2364,12 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     }
 
     private List<String> buildOverworldTutorialImages() {
-        List<String> images = new ArrayList<>(OVERWORLD_CORE_TUTORIAL_IMAGES);
+        LinkedHashSet<String> orderedUnique = new LinkedHashSet<>();
+        orderedUnique.addAll(overworldCoreTutorialImages());
         if (shouldIncludeCombatTutorialImages()) {
-            images.addAll(OVERWORLD_COMBAT_TUTORIAL_IMAGES);
+            orderedUnique.addAll(OVERWORLD_COMBAT_TUTORIAL_IMAGES);
         }
-        return images;
+        return new ArrayList<>(orderedUnique);
     }
 
     private boolean shouldIncludeCombatTutorialImages() {
@@ -3041,27 +3128,35 @@ public abstract class BaseMapController implements Initializable, SceneControlle
             return null;
         }
 
-        // Spec:
-        // - Raw food (not obtainable via cooking): +1% SP.
-        // - Single-combo cooking (1 ingredient): +1% HP, +2% SP.
-        // - Double-combo cooking (2+ ingredients): +5% HP, +10% SP.
-        int comboCount = RecipeCatalog.getMinCookingIngredientCountForOutputItem(itemId);
+        item itm = ItemDatabase.getItemById(itemId);
+        int hpDelta = extractItemStat(itm, "getHp");
+        int staminaDelta = extractItemStat(itm, "getStamana", "getStamina", "getStimana");
 
-        double hpPercent;
-        double spPercent;
-        if (comboCount <= 0) {
-            hpPercent = 0.0;
-            spPercent = 0.01;
-        } else if (comboCount == 1) {
-            hpPercent = 0.01;
-            spPercent = 0.02;
-        } else {
-            hpPercent = 0.05;
-            spPercent = 0.10;
+        // Backwards-compatible fallback for legacy DB rows that don't carry recovery stats yet.
+        if (hpDelta == 0 && staminaDelta == 0) {
+            // Spec (legacy):
+            // - Raw food (not obtainable via cooking): +1% SP.
+            // - Single-combo cooking (1 ingredient): +1% HP, +2% SP.
+            // - Double-combo cooking (2+ ingredients): +5% HP, +10% SP.
+            int comboCount = RecipeCatalog.getMinCookingIngredientCountForOutputItem(itemId);
+
+            double hpPercent;
+            double spPercent;
+            if (comboCount <= 0) {
+                hpPercent = 0.0;
+                spPercent = 0.01;
+            } else if (comboCount == 1) {
+                hpPercent = 0.01;
+                spPercent = 0.02;
+            } else {
+                hpPercent = 0.05;
+                spPercent = 0.10;
+            }
+
+            hpDelta = percentOfMaxToDelta(playerState.getMaxHp(), hpPercent);
+            staminaDelta = percentOfMaxToDelta(playerState.getMaxStamina(), spPercent);
         }
 
-        int hpDelta = percentOfMaxToDelta(playerState.getMaxHp(), hpPercent);
-        int staminaDelta = percentOfMaxToDelta(playerState.getMaxStamina(), spPercent);
         return new FoodEffectData(hpDelta, staminaDelta, 0, 0, 0, 0);
     }
 

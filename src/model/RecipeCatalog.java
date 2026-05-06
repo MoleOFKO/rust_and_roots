@@ -419,10 +419,10 @@ public final class RecipeCatalog {
         recipes.add(new RecipeDefinition(Domain.CRAFTING, "wooden_board", new String[]{"Wooden Board"}, null,
             new IngredientSpec(new String[]{"tree_log"}, 3)));
         recipes.add(new RecipeDefinition(Domain.CRAFTING, "stone_block", new String[]{"Stone Block"}, null,
-            new IngredientSpec(new String[]{"Rock1_5"}, 2)));
+            new IngredientSpec(new String[]{"stone_drop_item"}, 2)));
         recipes.add(new RecipeDefinition(Domain.CRAFTING, "polished_stone", new String[]{"Polished Stone"}, null,
-            new IngredientSpec(new String[]{"Rock2_5"}, 2),
-            new IngredientSpec(new String[]{"Rock1_5"}, 1)));
+            new IngredientSpec(new String[]{"stone_drop_item"}, 2),
+            new IngredientSpec(new String[]{"sand"}, 1)));
         recipes.add(new RecipeDefinition(Domain.CRAFTING, "fruit_mix", new String[]{"Fruit Mix"}, null,
             new IngredientSpec(new String[]{"blue_fruit"}, 1),
             new IngredientSpec(new String[]{"red_fruit"}, 1)));

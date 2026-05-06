@@ -1681,6 +1681,8 @@ public class ShopController implements Initializable, SceneController {
         double totalWeight = 0.0;
         double[] weights = new double[candidateIds.size()];
 
+        int today = GameTimeManager.get().dayNumberProperty().get();
+
         for (int i = 0; i < candidateIds.size(); i++) {
             Integer rawId = candidateIds.get(i);
             int itemId = rawId == null ? -1 : rawId;
@@ -1701,6 +1703,8 @@ public class ShopController implements Initializable, SceneController {
             if (penalizedIds != null && penalizedIds.contains(itemId)) {
                 weight *= safePenalty;
             }
+
+            weight *= priceProgressionWeight(today, itemId);
 
             if (weight <= 0.0) {
                 weights[i] = 0.0;
@@ -1739,6 +1743,48 @@ public class ShopController implements Initializable, SceneController {
         }
 
         return -1;
+    }
+
+    /**
+     * Biases the random shop pool so early days trend toward cheaper / weaker items, while later days
+     * gradually allow expensive / stronger items to show up more often.
+     *
+     * This is intentionally a soft weight (never a hard lockout) so the shop stays varied.
+     */
+    private double priceProgressionWeight(int dayNumber, int itemId) {
+        int day = Math.max(1, dayNumber);
+        int safeItemId = Math.max(1, itemId);
+
+        item itm = ItemDatabase.getItemById(safeItemId);
+        int price = (itm == null) ? 0 : Math.max(0, itm.getPrice());
+        if (price <= 0) {
+            return 1.0;
+        }
+
+        int cap;
+        if (day <= 3) {
+            cap = 80;
+        } else if (day <= 10) {
+            cap = 150;
+        } else if (day <= 25) {
+            cap = 220;
+        } else {
+            return 1.0;
+        }
+
+        if (price <= cap) {
+            return 1.0;
+        }
+
+        double ratio = (double) price / (double) cap;
+        if (!Double.isFinite(ratio) || ratio <= 0.0) {
+            return 1.0;
+        }
+
+        // Quadratic penalty, capped so expensive items can still occasionally appear.
+        double penalty = ratio * ratio;
+        penalty = Math.min(10.0, Math.max(1.0, penalty));
+        return 1.0 / penalty;
     }
 
     private void rebuildDailyShopAvailability() {

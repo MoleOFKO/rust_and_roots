@@ -540,5 +540,9 @@ public class Right_map_nooneController extends BaseMapController {
 
     @FXML
     private void handlebtntutoaction(ActionEvent event) {
+        showOverworldTutorialOverlay();
+        if (event != null) {
+            event.consume();
+        }
     }
 }

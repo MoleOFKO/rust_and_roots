@@ -13,6 +13,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Group;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Slider;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
@@ -33,6 +34,144 @@ public class Dhome_L_one_S_twoController extends BaseMapController {
 
     private static final String DAY_BG_PATH = "/image/dungeon/dhome_L(1)S(2).png";
     private static final String NIGHT_BG_PATH = "";
+    @FXML
+    private ImageView bg;
+    @FXML
+    private Group daynightnavgroup;
+    @FXML
+    private Label day;
+    @FXML
+    private ImageView daynightcircleimg;
+    @FXML
+    private Label time;
+    @FXML
+    private Label name;
+    @FXML
+    private Label coin;
+    @FXML
+    private ProgressBar hpbar;
+    @FXML
+    private ProgressBar spbar;
+    @FXML
+    private Group silver;
+    @FXML
+    private ImageView silver_img;
+    @FXML
+    private Rectangle silver_hitbox;
+    @FXML
+    private ImageView drops_img_silver;
+    @FXML
+    private Group silver1;
+    @FXML
+    private ImageView silver_img1;
+    @FXML
+    private Rectangle silver_hitbox1;
+    @FXML
+    private ImageView drops_img_silver1;
+    @FXML
+    private Group silver2;
+    @FXML
+    private ImageView silver_img2;
+    @FXML
+    private Rectangle silver_hitbox2;
+    @FXML
+    private ImageView drops_img_silver2;
+    @FXML
+    private Group silver3;
+    @FXML
+    private ImageView silver_img3;
+    @FXML
+    private Rectangle silver_hitbox3;
+    @FXML
+    private ImageView drops_img_silver3;
+    @FXML
+    private Group silver4;
+    @FXML
+    private ImageView silver_img4;
+    @FXML
+    private Rectangle silver_hitbox4;
+    @FXML
+    private ImageView drops_img_silver4;
+    @FXML
+    private Group silver5;
+    @FXML
+    private ImageView silver_img5;
+    @FXML
+    private Rectangle silver_hitbox5;
+    @FXML
+    private ImageView drops_img_silver5;
+    @FXML
+    private Group silver6;
+    @FXML
+    private ImageView silver_img6;
+    @FXML
+    private Rectangle silver_hitbox6;
+    @FXML
+    private ImageView drops_img_silver6;
+    @FXML
+    private Group silver7;
+    @FXML
+    private ImageView silver_img7;
+    @FXML
+    private Rectangle silver_hitbox7;
+    @FXML
+    private ImageView drops_img_silver7;
+    @FXML
+    private Group gold;
+    @FXML
+    private ImageView gold_img;
+    @FXML
+    private Rectangle gold_hitbox;
+    @FXML
+    private ImageView drops_img_gold8;
+    @FXML
+    private Group gold1;
+    @FXML
+    private ImageView gold_img1;
+    @FXML
+    private Rectangle gold_hitbox1;
+    @FXML
+    private ImageView drops_img_gold81;
+    @FXML
+    private Group gold2;
+    @FXML
+    private ImageView gold_img2;
+    @FXML
+    private Rectangle gold_hitbox2;
+    @FXML
+    private ImageView drops_img_gold82;
+    @FXML
+    private Group gold3;
+    @FXML
+    private ImageView gold_img3;
+    @FXML
+    private Rectangle gold_hitbox3;
+    @FXML
+    private ImageView drops_img_gold83;
+    @FXML
+    private Group gold4;
+    @FXML
+    private ImageView gold_img4;
+    @FXML
+    private Rectangle gold_hitbox4;
+    @FXML
+    private ImageView drops_img_gold84;
+    @FXML
+    private Group iron;
+    @FXML
+    private ImageView iron_img;
+    @FXML
+    private Rectangle iron_hitbox;
+    @FXML
+    private ImageView drops_img_iron;
+    @FXML
+    private Group copper;
+    @FXML
+    private ImageView copper_img;
+    @FXML
+    private Rectangle copper_hitbox;
+    @FXML
+    private ImageView drops_img_copper;
 
     @Override
     protected String dayBackgroundPath() {
@@ -387,8 +526,6 @@ public class Dhome_L_one_S_twoController extends BaseMapController {
     @Override
     protected void configureExits() {
         registerExit(exit_right, "/view/d_undermap_right.fxml", SpawnTag.FROM_DOWN);
-        registerExit(exit_down, "/view/dundermapLone_S_two.fxml", SpawnTag.FROM_UP);
+        registerExit(exit_down, "/view/dundermap_Lone_S_two.fxml", SpawnTag.FROM_UP);
     }
-
-
 }
