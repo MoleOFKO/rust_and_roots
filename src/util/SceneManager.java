@@ -60,6 +60,20 @@ public class SceneManager {
                 return;
             }
 
+            // Only show the loading screen for map transitions (exiting through map boundaries/doors).
+            if (!shouldShowLoadingScreen(spawnTag)) {
+                FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource(fxmlPath));
+                Parent root = loader.load();
+
+                Object controller = loader.getController();
+                if (controller instanceof SceneController sc) {
+                    sc.init(GameState.get());
+                }
+
+                stage.getScene().setRoot(wrapResponsiveRoot(root));
+                return;
+            }
+
             // loading screen
             StackPane loadingRoot = new StackPane();
             loadingRoot.setStyle("-fx-background-color: black;");
@@ -98,6 +112,16 @@ public class SceneManager {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private static boolean shouldShowLoadingScreen(SpawnTag spawnTag) {
+        if (spawnTag == null) {
+            return false;
+        }
+        return switch (spawnTag) {
+            case FROM_LEFT, FROM_RIGHT, FROM_UP, FROM_DOWN, FROM_DOOR -> true;
+            default -> false;
+        };
     }
 
     private static void clearSceneInputHandlers(Scene scene) {
@@ -188,6 +212,7 @@ public class SceneManager {
         if (normalized.endsWith("/login.fxml")
             || normalized.endsWith("/main_menu.fxml")
             || normalized.endsWith("/otp.fxml")
+            || normalized.endsWith("/game_over.fxml")
             || normalized.contains("/account_")
             || normalized.endsWith("/edit_character.fxml")
             || normalized.endsWith("/char_edit_btn.fxml")

@@ -1,6 +1,7 @@
 package controller;
 
 import db.LoadGameService;
+import db.DeleteSaveService;
 import db.SaveGameService;
 import db.dbcon;
 import game.GameState;
@@ -266,7 +267,7 @@ public class SaveloadsController implements Initializable {
         if (day != null) day.setText("Day " + preview.dayNumber);
 
         if (cimg != null) {
-            cimg.setImage(loadCharacterPreviewImage(preview.skinId));
+            cimg.setImage(loadCharacterPreviewImage());
         }
     }
 
@@ -363,7 +364,6 @@ public class SaveloadsController implements Initializable {
         String slotName;
         String playerName;
         String worldName;
-        int skinId;
         int dayNumber;
     }
 
@@ -376,7 +376,6 @@ public class SaveloadsController implements Initializable {
                 SELECT sg.saved_name,
                        sg.world_name,
                        c.player_name,
-                       c.skin_id,
                        st.day_number
                 FROM save_game sg
                 JOIN characters c ON sg.character_id = c.character_id
@@ -400,10 +399,6 @@ public class SaveloadsController implements Initializable {
                     preview.worldName = rs.getString("world_name");
                     preview.playerName = rs.getString("player_name");
                     
-                    preview.skinId = rs.getInt("skin_id");
-                    if (rs.wasNull()) {
-                        preview.skinId = -1;
-                    }
                     preview.dayNumber = rs.getInt("day_number");
                     if (rs.wasNull() || preview.dayNumber <= 0) {
                         preview.dayNumber = 1;
@@ -418,29 +413,10 @@ public class SaveloadsController implements Initializable {
         return null;
     }
 
-    private Image loadCharacterPreviewImage(int skinId) {
-        String[] candidates;
-
-        switch (skinId) {
-            case 1 -> candidates = new String[] {
-                "/image/character_to_show.png"
-//                "/image/character/skin1.png",
-//                "/image/human/human_Idle.png"
-            };
-            case 2 -> candidates = new String[] {
-                "/image/character_to_show.png"
-//                "/image/human/human_Idle.png"
-            };
-            case 3 -> candidates = new String[] {
-                "/image/character_to_show.png"
-//                "/image/human/human_Idle.png"
-            };
-            default -> candidates = new String[] {
-                "/image/character_to_show.png"
-//                "/image/human/human_Idle.png"
-            };
-        }
-
+    private Image loadCharacterPreviewImage() {
+        String[] candidates = new String[] {
+            "/image/character_to_show.png"
+        };
         for (String path : candidates) {
             try (InputStream is = getClass().getResourceAsStream(path)) {
                 if (is != null) {
@@ -510,68 +486,20 @@ public class SaveloadsController implements Initializable {
             return;
         }
 
-        dbcon db = new dbcon();
-
-        try (Connection con = db.getConnection()) {
-            con.setAutoCommit(false);
-
-            try {
-                try (PreparedStatement ps = con.prepareStatement(
-                        "DELETE FROM saved_item WHERE saved_id = ?")) {
-                    ps.setInt(1, saveId);
-                    ps.executeUpdate();
-                }
-
-                try (PreparedStatement ps = con.prepareStatement(
-                        "DELETE FROM saved_hotbar WHERE saved_id = ?")) {
-                    ps.setInt(1, saveId);
-                    ps.executeUpdate();
-                }
-
-                try (PreparedStatement ps = con.prepareStatement(
-                        "DELETE FROM saved_time WHERE saved_id = ?")) {
-                    ps.setInt(1, saveId);
-                    ps.executeUpdate();
-                }
-
-                try (PreparedStatement ps = con.prepareStatement(
-                        "DELETE FROM saved_farm_plot WHERE saved_id = ?")) {
-                    ps.setInt(1, saveId);
-                    ps.executeUpdate();
-                }
-
-                try (PreparedStatement ps = con.prepareStatement(
-                        "DELETE FROM saved_chest_item WHERE saved_id = ?")) {
-                    ps.setInt(1, saveId);
-                    ps.executeUpdate();
-                }
-
-                try (PreparedStatement ps = con.prepareStatement(
-                        "DELETE FROM save_game WHERE saved_id = ?")) {
-                    ps.setInt(1, saveId);
-                    ps.executeUpdate();
-                }
-
-                con.commit();
-
-                refreshSlotLabels();
-                refreshSelectedSlotPreview();
-                refreshDeleteButtonState();
-
-                if (day != null) {
-                    day.setText("Deleted save successfully");
-                }
-
-            } catch (Exception ex) {
-                con.rollback();
-                throw ex;
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        boolean ok = new DeleteSaveService().deleteSaveById(saveId);
+        if (!ok) {
             if (day != null) {
                 day.setText("Delete failed");
             }
+            return;
+        }
+
+        refreshSlotLabels();
+        refreshSelectedSlotPreview();
+        refreshDeleteButtonState();
+
+        if (day != null) {
+            day.setText("Deleted save successfully");
         }
     }
 }

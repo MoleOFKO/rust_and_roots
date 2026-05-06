@@ -590,11 +590,17 @@ public abstract class BaseMapController implements Initializable, SceneControlle
             t.start();
         }
 
-        Platform.runLater(() -> stopAndSwitchScene("/view/new_game.fxml", SpawnTag.DEFAULT));
+        Platform.runLater(() -> stopAndSwitchSceneInternal("/view/game_over.fxml", SpawnTag.DEFAULT, false));
     }
 
     protected final void stopAndSwitchScene(String targetFxml, SpawnTag targetSpawn) {
-        capturePlayerSnapshot();
+        stopAndSwitchSceneInternal(targetFxml, targetSpawn, true);
+    }
+
+    private void stopAndSwitchSceneInternal(String targetFxml, SpawnTag targetSpawn, boolean captureSnapshot) {
+        if (captureSnapshot) {
+            capturePlayerSnapshot();
+        }
 
         cleanupBeforeSceneSwitch();
         if (gameLoop != null) gameLoop.stop();
