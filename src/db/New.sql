@@ -279,8 +279,8 @@ UPDATE `items` SET `price` = 30 WHERE `item_id` IN (200,201,202); -- basic color
 UPDATE `items` SET `price` = 25 WHERE `item_id` IN (247,248,249); -- bandages + water bottle
 
 -- Fix a few missing image filenames so these items remain obtainable/displayable.
-UPDATE `items` SET `image` = 'Pumpkin.png' WHERE `item_id` = 112;
-UPDATE `items` SET `image` = 'coal.png' WHERE `item_id` = 215;
+UPDATE `items` SET `image` = 'pumpkin_fruit.png' WHERE `item_id` = 112;
+UPDATE `items` SET `image` = 'coal_brick.png' WHERE `item_id` = 215;
 
 --
 -- Table structure for table `mobs`

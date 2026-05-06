@@ -517,7 +517,7 @@ public class New_gameController implements Initializable, SceneController {
 
         dbcon db = new dbcon();
         try (Connection con = db.getConnection()) {
-            String sql = "INSERT INTO characters (account_id, player_name, skin_id) VALUES (?, ?, NULL)";
+            String sql = "INSERT INTO characters (account_id, player_name) VALUES (?, ?)";
             try (PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
                 ps.setInt(1, accountId);
                 ps.setString(2, playerName);
