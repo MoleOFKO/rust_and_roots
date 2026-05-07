@@ -18,16 +18,22 @@ public final class TutorialOverlayHelper {
 
     public static final List<String> GLOBAL_BUTTON_TUTORIAL_IMAGES = List.of(
         "/image/Toturial/Move.png",
-        "/image/Toturial/Walk&Run.png",
+        "/image/Toturial/Run.png",
         "/image/Toturial/before_goes_to_hotbar.png",
         "/image/Toturial/goes_to_hotbar.png",
         "/image/Toturial/Wp_hold.png",
         "/image/Toturial/After_wp_hold.png",
         "/image/Toturial/Attack.png",
-        "/image/Toturial/Setting.png",
+        "/image/Toturial/Menu.png",
         "/image/Toturial/Inventory.png",
         "/image/Toturial/Stats.png",
-        "/image/Toturial/Skill.png"
+        "/image/Toturial/Skill.png",
+        "/image/Toturial/Setting.png",
+        "/image/Toturial/Skill.png",
+        "/image/Toturial/Croping.png",
+        "/image/Toturial/Croping Using Axe.png",
+        "/image/Toturial/Mining.png",
+        "/image/Toturial/Mining Using Pickaxe.png"
     );
 
     private TutorialOverlayHelper() {
