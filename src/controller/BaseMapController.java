@@ -44,6 +44,7 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Bounds;
 import javafx.scene.Group;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.ButtonBase;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -112,11 +113,6 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     private static final double DEFAULT_PLAYER_HITBOX_TRANSLATE_X = 24.0;
     private static final double DEFAULT_PLAYER_HITBOX_TRANSLATE_Y = 28.0;
     private static final double DEFAULT_PLAYER_HITBOX_LAYOUT_Y_OFFSET_FROM_SPRITE = -5.0;
-
-    protected static final List<String> OVERWORLD_CORE_TUTORIAL_IMAGES = List.of(
-        "/image/Toturial/Up_bar.png",
-        "/image/Toturial/goes_to_hotbar.png"
-    );
     protected static final List<String> OVERWORLD_COMBAT_TUTORIAL_IMAGES = List.of(
         "/image/Toturial/before_goes_to_hotbar.png",
         "/image/Toturial/Wp_hold.png",
@@ -241,6 +237,10 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     @FXML protected Button btnMorning;
     @FXML protected Button btnNight;
     @FXML protected Button btnAddHour;
+
+    // ---------- Optional shared settings / audio controls ----------
+    @FXML protected Slider bgmVolumeSlider;
+    @FXML protected Slider sfxVolumeSlider;
 
     @FXML protected Group player_inv_group;
 
@@ -478,6 +478,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         playerState = gameState.getPlayerState();
 
         normalizePlayerBodyHitbox();
+        normalizeStaticHelperRectangles();
 
         player = new Player(
             playerState,
@@ -2633,6 +2634,85 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         human_hitbox.setMouseTransparent(true);
     }
 
+    private static void hideHelperRectangle(Rectangle rect) {
+        if (rect == null) {
+            return;
+        }
+        rect.setFill(Color.TRANSPARENT);
+        rect.setStroke(null);
+        rect.setOpacity(0.0);
+        rect.setVisible(false);
+        rect.setManaged(false);
+        rect.setMouseTransparent(true);
+    }
+
+    private void normalizeStaticHelperRectangles() {
+        if (walls != null) {
+            walls.setOpacity(0.0);
+            walls.setVisible(false);
+            walls.setManaged(false);
+            walls.setMouseTransparent(true);
+
+            for (Node child : walls.getChildren()) {
+                if (child instanceof Rectangle rect) {
+                    hideHelperRectangle(rect);
+                }
+            }
+        }
+
+        hideHelperRectangle(spawn_default);
+        hideHelperRectangle(spawn_from_left);
+        hideHelperRectangle(spawn_from_right);
+        hideHelperRectangle(spawn_from_up);
+        hideHelperRectangle(spawn_from_down);
+        hideHelperRectangle(spawn_from_door);
+        hideHelperRectangle(spawn_from_farm);
+        hideHelperRectangle(spawn_from_shop);
+        hideHelperRectangle(spawn_from_bed);
+        hideHelperRectangle(spawn_from_cook);
+        hideHelperRectangle(spawn_from_craft);
+        hideHelperRectangle(spawn_from_inv);
+        hideHelperRectangle(spawn_from_melt);
+
+        hideHelperRectangle(exit_left);
+        hideHelperRectangle(exit_right);
+        hideHelperRectangle(exit_up);
+        hideHelperRectangle(exit_down);
+        hideHelperRectangle(exit_door);
+
+        hideHelperRectangle(farm1_detection);
+
+        hideHelperRectanglesRecursively(world);
+    }
+
+    private static void hideHelperRectanglesRecursively(Node node) {
+        if (node == null) {
+            return;
+        }
+        if (node instanceof Rectangle rect && shouldHideHelperRectangleId(rect.getId())) {
+            hideHelperRectangle(rect);
+        }
+        if (node instanceof Parent parent) {
+            for (Node child : parent.getChildrenUnmodifiable()) {
+                hideHelperRectanglesRecursively(child);
+            }
+        }
+    }
+
+    private static boolean shouldHideHelperRectangleId(String id) {
+        if (id == null || id.isBlank()) {
+            return false;
+        }
+        String key = id.toLowerCase(Locale.ROOT);
+        if (key.startsWith("wall")) return true;
+        if (key.startsWith("spawn")) return true;
+        if (key.startsWith("exit")) return true;
+        if (key.contains("hitbox")) return true;
+        if (key.contains("detect")) return true;
+        if (key.endsWith("_detection")) return true;
+        return false;
+    }
+
     private void setupSettingsTabIfPresent() {
         GameTimeManager time = GameTimeManager.get();
 
@@ -2662,6 +2742,52 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         if (btnAddHour != null) {
             btnAddHour.setOnAction(e -> time.addMinutes(60));
         }
+
+        setupAudioSlidersIfPresent();
+    }
+
+    private void setupAudioSlidersIfPresent() {
+        Slider bgmSlider = bgmVolumeSlider != null ? bgmVolumeSlider : controllerField("bgmVolumeSlider", Slider.class);
+        Slider sfxSlider = sfxVolumeSlider != null ? sfxVolumeSlider : controllerField("sfxVolumeSlider", Slider.class);
+
+        if (bgmSlider != null) {
+            bgmSlider.setMin(0.0);
+            bgmSlider.setMax(1.0);
+            double initialBgm = gameState != null ? gameState.getBgmVolume() : SoundManager.getBgmVolume();
+            initialBgm = clamp01(initialBgm);
+            bgmSlider.setValue(initialBgm);
+            SceneManager.setBgmVolume(initialBgm);
+            bgmSlider.valueProperty().addListener((obs, oldV, newV) -> {
+                double vol = clamp01(newV == null ? 0.0 : newV.doubleValue());
+                if (gameState != null) {
+                    gameState.setBgmVolume(vol);
+                }
+                SceneManager.setBgmVolume(vol);
+            });
+        }
+
+        if (sfxSlider != null) {
+            sfxSlider.setMin(0.0);
+            sfxSlider.setMax(1.0);
+            double initialSfx = gameState != null ? gameState.getSfxVolume() : SoundManager.getSfxVolume();
+            initialSfx = clamp01(initialSfx);
+            sfxSlider.setValue(initialSfx);
+            SoundManager.setSfxVolume(initialSfx);
+            sfxSlider.valueProperty().addListener((obs, oldV, newV) -> {
+                double vol = clamp01(newV == null ? 0.0 : newV.doubleValue());
+                if (gameState != null) {
+                    gameState.setSfxVolume(vol);
+                }
+                SoundManager.setSfxVolume(vol);
+            });
+        }
+    }
+
+    private static double clamp01(double value) {
+        if (!Double.isFinite(value)) {
+            return 0.0;
+        }
+        return Math.max(0.0, Math.min(1.0, value));
     }
 
     private void startLoop() {

@@ -20,6 +20,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import model.ItemDatabase;
 import model.Player;
@@ -223,12 +224,24 @@ final class NaturalResourceSystem {
         this.playerAttackUp = node("human_hitbox_up", Rectangle.class);
         this.playerAttackDown = node("human_hitbox_down", Rectangle.class);
 
-        if (playerAttackLeft != null) playerAttackLeft.setMouseTransparent(true);
-        if (playerAttackRight != null) playerAttackRight.setMouseTransparent(true);
-        if (playerAttackUp != null) playerAttackUp.setMouseTransparent(true);
-        if (playerAttackDown != null) playerAttackDown.setMouseTransparent(true);
+        hideHelperRectangle(playerAttackLeft);
+        hideHelperRectangle(playerAttackRight);
+        hideHelperRectangle(playerAttackUp);
+        hideHelperRectangle(playerAttackDown);
 
         setupResourcesFromWorld();
+    }
+
+    private static void hideHelperRectangle(Rectangle rect) {
+        if (rect == null) {
+            return;
+        }
+        rect.setFill(Color.TRANSPARENT);
+        rect.setStroke(null);
+        rect.setOpacity(0.0);
+        rect.setVisible(false);
+        rect.setManaged(false);
+        rect.setMouseTransparent(true);
     }
 
     List<Rectangle> resourceHitboxesForPlayerCollision() {
@@ -341,9 +354,7 @@ final class NaturalResourceSystem {
                 case ORE -> initializeOreDefaults(handle, currentDay, nowSeconds);
             }
 
-            if (handle.hitbox != null) {
-                handle.hitbox.setMouseTransparent(true);
-            }
+            hideHelperRectangle(handle.hitbox);
 
             if (handle.treeLayerGroup != null) {
                 handle.treeLayerGroup.setMouseTransparent(true);
@@ -1146,8 +1157,6 @@ final class NaturalResourceSystem {
             return;
         }
         hitbox.setDisable(!active);
-        hitbox.setVisible(active);
-        hitbox.setManaged(active);
     }
 
     private Rectangle resolveActiveAttackHitbox() {

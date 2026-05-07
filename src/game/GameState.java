@@ -29,6 +29,8 @@ public final class GameState {
     private static final int DEFAULT_RANDOM_SHOP_ITEM_COUNT = 4;
     private static final int CHEST_SLOT_CAPACITY = 42;
     private static final int NEW_GAME_STARTING_COINS = 100;
+    private static final double DEFAULT_BGM_VOLUME = 0.5;
+    private static final double DEFAULT_SFX_VOLUME = 1.0;
 
     private static final int[] RECIPE_UNLOCK_SINGLE_WEIGHT_BY_LEVEL = {100, 90, 80, 70, 60, 50, 40, 30, 20, 10, 10};
     private static final int[] RECIPE_UNLOCK_DOUBLE_WEIGHT_BY_LEVEL = {0, 9, 19, 29, 38, 47, 56, 65, 74, 82, 80};
@@ -1417,6 +1419,8 @@ public final class GameState {
     
     private boolean saveMenuMode = false;
     private StatusPanelGroup preferredStatusPanelGroup = StatusPanelGroup.STATUS;
+    private double bgmVolume = DEFAULT_BGM_VOLUME;
+    private double sfxVolume = DEFAULT_SFX_VOLUME;
 
     public boolean isSaveMenuMode() {
         return saveMenuMode;
@@ -1424,6 +1428,29 @@ public final class GameState {
 
     public void setSaveMenuMode(boolean saveMenuMode) {
         this.saveMenuMode = saveMenuMode;
+    }
+
+    public double getBgmVolume() {
+        return bgmVolume;
+    }
+
+    public void setBgmVolume(double bgmVolume) {
+        this.bgmVolume = clamp01(bgmVolume);
+    }
+
+    public double getSfxVolume() {
+        return sfxVolume;
+    }
+
+    public void setSfxVolume(double sfxVolume) {
+        this.sfxVolume = clamp01(sfxVolume);
+    }
+
+    private static double clamp01(double value) {
+        if (!Double.isFinite(value)) {
+            return 0.0;
+        }
+        return Math.max(0.0, Math.min(1.0, value));
     }
 
     public StatusPanelGroup getPreferredStatusPanelGroup() {

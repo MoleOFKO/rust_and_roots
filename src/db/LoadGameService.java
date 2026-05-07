@@ -24,6 +24,8 @@ import model.PlayerState;
 import model.RecipeCatalog;
 import model.TreeMapState;
 import model.item;
+import util.SceneManager;
+import util.SoundManager;
 
 public class LoadGameService {
     private static final String FARM_SLOT_WATERING_CAN = "__farm_slot_watering_can__";
@@ -126,7 +128,9 @@ public class LoadGameService {
                    sg.selected_hotbar_index,
                    sg.hotbar_visible,
                    sg.home_interior_tutorial_seen,
-                   sg.tutorial_flags
+                   sg.tutorial_flags,
+                   sg.bgm_volume,
+                   sg.sfx_volume
             FROM save_game sg
             LEFT JOIN characters c ON sg.character_id = c.character_id
             WHERE sg.saved_id = ?
@@ -157,9 +161,32 @@ public class LoadGameService {
                 gs.setHomeInteriorTutorialSeen(rs.getBoolean("home_interior_tutorial_seen"));
 
                 replaceCoins(psState.getInventory(), rs.getInt("money"));
+
+                double bgmVol = rs.getDouble("bgm_volume");
+                if (rs.wasNull()) {
+                    bgmVol = gs.getBgmVolume();
+                }
+                bgmVol = clamp01(bgmVol);
+                gs.setBgmVolume(bgmVol);
+                SceneManager.setBgmVolume(bgmVol);
+
+                double sfxVol = rs.getDouble("sfx_volume");
+                if (rs.wasNull()) {
+                    sfxVol = gs.getSfxVolume();
+                }
+                sfxVol = clamp01(sfxVol);
+                gs.setSfxVolume(sfxVol);
+                SoundManager.setSfxVolume(sfxVol);
                 return true;
             }
         }
+    }
+
+    private static double clamp01(double value) {
+        if (!Double.isFinite(value)) {
+            return 0.0;
+        }
+        return Math.max(0.0, Math.min(1.0, value));
     }
 
     private List<String> parseTutorialFlags(String csv) {

@@ -122,8 +122,8 @@ public class SaveGameService {
             (character_id, saved_name, world_name, current_map_id, player_stats_id, money,
              saved_location_x, saved_location_y, exp,
              selected_hotbar_index, hotbar_visible, current_hp, current_stamina,
-             home_interior_tutorial_seen, tutorial_flags)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+             home_interior_tutorial_seen, tutorial_flags, bgm_volume, sfx_volume)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """;
 
         try (PreparedStatement psSave = con.prepareStatement(insertSave, Statement.RETURN_GENERATED_KEYS)) {
@@ -142,6 +142,8 @@ public class SaveGameService {
             psSave.setInt(13, ps.getStamina());
             psSave.setBoolean(14, gs.isHomeInteriorTutorialSeen());
             psSave.setString(15, serializeTutorialFlags(gs));
+            psSave.setDouble(16, gs.getBgmVolume());
+            psSave.setDouble(17, gs.getSfxVolume());
             psSave.executeUpdate();
 
             try (ResultSet rs = psSave.getGeneratedKeys()) {
@@ -168,6 +170,8 @@ public class SaveGameService {
                 current_stamina = ?,
                 home_interior_tutorial_seen = ?,
                 tutorial_flags = ?,
+                bgm_volume = ?,
+                sfx_volume = ?,
                 last_saved_date = NOW()
             WHERE saved_id = ?
             """;
@@ -187,7 +191,9 @@ public class SaveGameService {
             psmt.setInt(10, ps.getStamina());
             psmt.setBoolean(11, gs.isHomeInteriorTutorialSeen());
             psmt.setString(12, serializeTutorialFlags(gs));
-            psmt.setInt(13, gs.getCurrentSaveId());
+            psmt.setDouble(13, gs.getBgmVolume());
+            psmt.setDouble(14, gs.getSfxVolume());
+            psmt.setInt(15, gs.getCurrentSaveId());
             psmt.executeUpdate();
         }
     }
@@ -1134,8 +1140,8 @@ public class SaveGameService {
             (character_id, saved_name, world_name, current_map_id, player_stats_id, money,
              saved_location_x, saved_location_y, exp,
              selected_hotbar_index, hotbar_visible, current_hp, current_stamina,
-             home_interior_tutorial_seen, tutorial_flags)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+             home_interior_tutorial_seen, tutorial_flags, bgm_volume, sfx_volume)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """;
 
         try (PreparedStatement psSave = con.prepareStatement(insertSave, Statement.RETURN_GENERATED_KEYS)) {
@@ -1154,6 +1160,8 @@ public class SaveGameService {
             psSave.setInt(13, ps.getStamina());
             psSave.setBoolean(14, gs.isHomeInteriorTutorialSeen());
             psSave.setString(15, serializeTutorialFlags(gs));
+            psSave.setDouble(16, gs.getBgmVolume());
+            psSave.setDouble(17, gs.getSfxVolume());
             psSave.executeUpdate();
 
             try (ResultSet rs = psSave.getGeneratedKeys()) {

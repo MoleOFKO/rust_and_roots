@@ -159,7 +159,7 @@ public class SceneManager {
             && desiredResource.equals(currentBgmResource)
             && bgmPlayer != null) {
             // Keep current playback running across same-category scenes.
-            bgmPlayer.setVolume(SoundManager.BGM_VOLUME);
+            bgmPlayer.setVolume(SoundManager.getBgmVolume());
             if (bgmPlayer.getStatus() != MediaPlayer.Status.PLAYING) {
                 bgmPlayer.play();
             }
@@ -182,9 +182,32 @@ public class SceneManager {
 
         Media music = new Media(url.toExternalForm());
         bgmPlayer = new MediaPlayer(music);
-        bgmPlayer.setVolume(SoundManager.BGM_VOLUME);
+        bgmPlayer.setVolume(SoundManager.getBgmVolume());
         bgmPlayer.setCycleCount(MediaPlayer.INDEFINITE);
         bgmPlayer.play();
+    }
+
+    public static void setBgmVolume(double volume) {
+        SoundManager.setBgmVolume(volume);
+        refreshCurrentBgmVolume();
+    }
+
+    public static void refreshCurrentBgmVolume() {
+        if (javafx.application.Platform.isFxApplicationThread()) {
+            applyCurrentBgmVolume();
+        } else {
+            javafx.application.Platform.runLater(SceneManager::applyCurrentBgmVolume);
+        }
+    }
+
+    private static void applyCurrentBgmVolume() {
+        if (bgmPlayer == null) {
+            return;
+        }
+        try {
+            bgmPlayer.setVolume(SoundManager.getBgmVolume());
+        } catch (Exception ignored) {
+        }
     }
 
     private static void stopAndDisposeBgm() {
