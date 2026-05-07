@@ -89,19 +89,19 @@ public class SaveloadsController implements Initializable {
     }
 
     private void refreshModeUi() {
-    boolean saveMode = GameState.get().isSaveMenuMode();
+        boolean saveMode = GameState.get().isSaveMenuMode();
 
-    if (btnSave != null) {
-        btnSave.setVisible(saveMode);
-        btnSave.setManaged(saveMode);
-        btnSave.setDisable(!saveMode);
-    }
+        if (btnSave != null) {
+            btnSave.setVisible(saveMode);
+            btnSave.setManaged(saveMode);
+            btnSave.setDisable(!saveMode);
+        }
 
-    if (btnLoad != null) {
-        btnLoad.setVisible(!saveMode);
-        btnLoad.setManaged(!saveMode);
-        btnLoad.setDisable(saveMode);
-    }
+        if (btnLoad != null) {
+            btnLoad.setVisible(!saveMode);
+            btnLoad.setManaged(!saveMode);
+            btnLoad.setDisable(saveMode);
+        }
 }
 
     private void refreshSelectionUi() {
@@ -295,7 +295,9 @@ public class SaveloadsController implements Initializable {
         try {
             GameState.get().setSelectedSaveSlot(selectedSlot);
 
-            if (GameState.get().isSaveMenuMode()) {
+            boolean saveMode = GameState.get().isSaveMenuMode();
+
+            if (saveMode) {
                 SaveGameService saveService = new SaveGameService();
                 saveService.saveGameToSlot(GameState.get(), selectedSlot);
 
@@ -334,6 +336,7 @@ public class SaveloadsController implements Initializable {
             }
 
             GameState.get().setSelectedSaveSlot(selectedSlot);
+            GameState.get().setSaveMenuMode(false);
             SceneManager.switchScene("/view/" + GameState.get().getCurrentMapKey() + ".fxml");
 
         } catch (Exception e) {

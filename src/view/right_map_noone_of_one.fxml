@@ -1023,28 +1023,21 @@
                               <Image url="@../image/menuSetting.png" />
                            </image>
                         </ImageView>
-                        <Slider fx:id="timescaleslider" layoutX="108.0" layoutY="64.0" prefHeight="87.0" prefWidth="371.0" />
-                        <Button fx:id="btnsetday" layoutX="199.0" layoutY="263.0" mnemonicParsing="false" text="Set Day" />
-                        <Button fx:id="btnsetnight" layoutX="108.0" layoutY="263.0" mnemonicParsing="false" text="Set Night" />
-                        <Button fx:id="btnplus1h" layoutX="277.0" layoutY="263.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="59.0" text="+1 h" />
-                        <Button fx:id="btnsaveandexit" layoutX="367.0" layoutY="263.0" mnemonicParsing="false" onAction="#handlesaveexitaction" text="Save &amp; Exit" />
-                        <Label fx:id="sliderscale" layoutX="108.0" layoutY="155.0" prefHeight="30.0" prefWidth="297.0" text="Current Time Speed :" textFill="WHITE">
+                        <Label layoutX="108.0" layoutY="58.0" prefHeight="30.0" prefWidth="297.0" text="BGM Volume :" textFill="WHITE">
                            <font>
                               <Font name="System Bold" size="15.0" />
                            </font>
                         </Label>
-                        <Label fx:id="lbldays" layoutX="108.0" layoutY="185.0" prefHeight="30.0" prefWidth="297.0" text="Days :" textFill="WHITE">
+                        <Slider fx:id="bgmVolumeSlider" layoutX="108.0" layoutY="84.0" max="1.0" min="0.0" prefHeight="25.0" prefWidth="371.0" value="0.5" />
+                        <Label layoutX="108.0" layoutY="121.0" prefHeight="30.0" prefWidth="297.0" text="SFX Volume :" textFill="WHITE">
                            <font>
                               <Font name="System Bold" size="15.0" />
                            </font>
                         </Label>
-                        <Label fx:id="lbltime" layoutX="108.0" layoutY="215.0" prefHeight="30.0" prefWidth="297.0" text="Time : " textFill="WHITE">
-                           <font>
-                              <Font name="System Bold" size="15.0" />
-                           </font>
-                        </Label>
+                        <Slider fx:id="sfxVolumeSlider" layoutX="108.0" layoutY="147.0" max="1.0" min="0.0" prefHeight="25.0" prefWidth="371.0" value="1.0" />
                         <Button fx:id="btnsave" layoutX="368.0" layoutY="226.0" mnemonicParsing="false" onAction="#handlesave" text="Save" />
                         <Button fx:id="btnload" layoutX="413.0" layoutY="226.0" mnemonicParsing="false" onAction="#handleload" text="Load" />
+                        <Button fx:id="btnsaveandexit" layoutX="367.0" layoutY="263.0" mnemonicParsing="false" onAction="#handlesaveexitaction" text="Save &amp; Exit" />
                      </children>
                   </Group>
                   <Button fx:id="openInventory" layoutX="118.0" layoutY="32.0" mnemonicParsing="false" onAction="#handleopenInventoryaction" opacity="0.0" prefHeight="25.0" prefWidth="89.0" />

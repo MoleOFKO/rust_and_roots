@@ -7,8 +7,11 @@ import javafx.scene.media.AudioClip;
 
 public final class SoundManager {
 
-    public static final double SFX_VOLUME = 1.0;
-    public static final double BGM_VOLUME = 0.5;
+    public static final double DEFAULT_SFX_VOLUME = 1.0;
+    public static final double DEFAULT_BGM_VOLUME = 0.5;
+
+    private static volatile double sfxVolume = DEFAULT_SFX_VOLUME;
+    private static volatile double bgmVolume = DEFAULT_BGM_VOLUME;
 
     public enum Sfx {
         SWORD_CUT,
@@ -23,6 +26,22 @@ public final class SoundManager {
     private SoundManager() {
     }
 
+    public static double getSfxVolume() {
+        return sfxVolume;
+    }
+
+    public static void setSfxVolume(double volume) {
+        sfxVolume = clamp01(volume);
+    }
+
+    public static double getBgmVolume() {
+        return bgmVolume;
+    }
+
+    public static void setBgmVolume(double volume) {
+        bgmVolume = clamp01(volume);
+    }
+
     public static void playSfx(Sfx sfx) {
         if (sfx == null) {
             return;
@@ -34,7 +53,7 @@ public final class SoundManager {
                 if (clip == null) {
                     return;
                 }
-                clip.play(SFX_VOLUME);
+                clip.play(getSfxVolume());
             } catch (Exception e) {
                 System.err.println("[SoundManager] Failed to play sfx " + sfx + ": " + e.getMessage());
             }
@@ -45,6 +64,13 @@ public final class SoundManager {
         } else {
             Platform.runLater(play);
         }
+    }
+
+    private static double clamp01(double value) {
+        if (!Double.isFinite(value)) {
+            return 0.0;
+        }
+        return Math.max(0.0, Math.min(1.0, value));
     }
 
     private static AudioClip loadClip(Sfx sfx) {

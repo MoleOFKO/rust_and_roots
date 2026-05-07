@@ -19,6 +19,7 @@ import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.image.ImageView;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import model.CollisionRegistry;
 import model.ItemDatabase;
@@ -213,14 +214,26 @@ final class MapMobSystem {
         this.playerAttackUp = node("human_hitbox_up", Rectangle.class);
         this.playerAttackDown = node("human_hitbox_down", Rectangle.class);
 
-        // Ensure attack hitboxes never intercept input (they're intersection-only helpers).
-        if (playerAttackLeft != null) playerAttackLeft.setMouseTransparent(true);
-        if (playerAttackRight != null) playerAttackRight.setMouseTransparent(true);
-        if (playerAttackUp != null) playerAttackUp.setMouseTransparent(true);
-        if (playerAttackDown != null) playerAttackDown.setMouseTransparent(true);
+        // Ensure attack hitboxes never render / intercept input (they're intersection-only helpers).
+        hideHelperRectangle(playerAttackLeft);
+        hideHelperRectangle(playerAttackRight);
+        hideHelperRectangle(playerAttackUp);
+        hideHelperRectangle(playerAttackDown);
 
         loadMobDefinitions();
         setupMobsFromWorld();
+    }
+
+    private static void hideHelperRectangle(Rectangle rect) {
+        if (rect == null) {
+            return;
+        }
+        rect.setFill(Color.TRANSPARENT);
+        rect.setStroke(null);
+        rect.setOpacity(0.0);
+        rect.setVisible(false);
+        rect.setManaged(false);
+        rect.setMouseTransparent(true);
     }
 
     List<Rectangle> mobHitboxesForPlayerCollision() {
@@ -356,16 +369,17 @@ final class MapMobSystem {
             Rectangle hitboxUp = node(mobId + "_hitbox_up", Rectangle.class);
             Rectangle hitboxDown = node(mobId + "_hitbox_down", Rectangle.class);
 
-            // Mark all mob helper hitboxes as non-interactive.
-            hitbox.setMouseTransparent(true);
+            // Ensure helper hitboxes never render / intercept input.
+            hideHelperRectangle(hitbox);
             if (dropsImg != null) dropsImg.setMouseTransparent(true);
-            if (detect != null) detect.setMouseTransparent(true);
-            if (hitboxLeft != null) hitboxLeft.setMouseTransparent(true);
-            if (hitboxRight != null) hitboxRight.setMouseTransparent(true);
-            if (hitboxUp != null) hitboxUp.setMouseTransparent(true);
-            if (hitboxDown != null) hitboxDown.setMouseTransparent(true);
+            hideHelperRectangle(detect);
+            hideHelperRectangle(hitboxLeft);
+            hideHelperRectangle(hitboxRight);
+            hideHelperRectangle(hitboxUp);
+            hideHelperRectangle(hitboxDown);
 
             Rectangle marker = node("spawn_" + mobId, Rectangle.class);
+            hideHelperRectangle(marker);
 
             MobEntity.Kind kind = mobType.contains("orc") ? MobEntity.Kind.ORC : MobEntity.Kind.SLIME;
 
@@ -848,8 +862,6 @@ final class MapMobSystem {
     private void setDirectionalHitboxActive(Rectangle hitbox, boolean active) {
         if (hitbox == null) return;
         hitbox.setDisable(!active);
-        hitbox.setVisible(active);
-        hitbox.setManaged(active);
     }
 
     private boolean initializeMobDefaultsIfNeeded(
