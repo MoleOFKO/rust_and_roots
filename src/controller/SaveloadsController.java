@@ -10,6 +10,7 @@ import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -62,6 +63,7 @@ public class SaveloadsController implements Initializable {
     private Label day;
 
     private int selectedSlot = 1;
+    private SlotPreview selectedSlotPreview = null;
     @FXML
     private ImageView deletesaveload;
     @FXML
@@ -247,6 +249,7 @@ public class SaveloadsController implements Initializable {
     private void refreshSelectedSlotPreview() {
         int characterId = GameState.get().getCurrentCharacterId();
         SlotPreview preview = loadSlotPreview(characterId, selectedSlot);
+        selectedSlotPreview = preview;
 
         if (preview == null) {
             if (cimg != null) cimg.setImage(null);
@@ -264,7 +267,9 @@ public class SaveloadsController implements Initializable {
                 ? preview.slotName
                 : preview.worldName);
         
-        if (day != null) day.setText("Day " + preview.dayNumber);
+        if (day != null) {
+            day.setText(preview.dead ? ("Day " + preview.dayNumber + " (DEAD)") : ("Day " + preview.dayNumber));
+        }
 
         if (cimg != null) {
             cimg.setImage(loadCharacterPreviewImage());
@@ -325,6 +330,14 @@ public class SaveloadsController implements Initializable {
                 return;
             }
 
+            SlotPreview preview = selectedSlotPreview;
+            if (preview != null && preview.dead) {
+                if (day != null) {
+                    day.setText("This save is DEAD. Delete the slot to play again.");
+                }
+                return;
+            }
+
             LoadGameService loadService = new LoadGameService();
             boolean ok = loadService.loadGame(saveId);
 
@@ -349,11 +362,19 @@ public class SaveloadsController implements Initializable {
     
     private void refreshLoadButtonState() {
         boolean enable = selectedSlot >= 1 && selectedSlot <= 4;
+        boolean enableLoad = enable;
+
+        if (!GameState.get().isSaveMenuMode()) {
+            SlotPreview preview = selectedSlotPreview;
+            if (preview != null && preview.dead) {
+                enableLoad = false;
+            }
+        }
 
         if (btnLoad != null) {
-            btnLoad.setDisable(!enable);
-            btnLoad.setOpacity(enable ? 1.0 : 0.4);
-            btnLoad.setMouseTransparent(!enable);
+            btnLoad.setDisable(!enableLoad);
+            btnLoad.setOpacity(enableLoad ? 1.0 : 0.4);
+            btnLoad.setMouseTransparent(!enableLoad);
         }
 
         if (btnSave != null) {
@@ -368,6 +389,7 @@ public class SaveloadsController implements Initializable {
         String playerName;
         String worldName;
         int dayNumber;
+        boolean dead;
     }
 
     private SlotPreview loadSlotPreview(int characterId, int slotNumber) {
@@ -375,11 +397,13 @@ public class SaveloadsController implements Initializable {
         dbcon db = new dbcon();
 
         try (Connection con = db.getConnection()) {
-            String sql = """
+            String sqlWithDeadFlag = """
                 SELECT sg.saved_name,
                        sg.world_name,
                        c.player_name,
-                       st.day_number
+                       st.day_number,
+                       sg.is_dead,
+                       sg.current_hp
                 FROM save_game sg
                 JOIN characters c ON sg.character_id = c.character_id
                 LEFT JOIN saved_time st ON sg.saved_id = st.saved_id
@@ -388,7 +412,7 @@ public class SaveloadsController implements Initializable {
                 LIMIT 1
                 """;
 
-            try (PreparedStatement ps = con.prepareStatement(sql)) {
+            try (PreparedStatement ps = con.prepareStatement(sqlWithDeadFlag)) {
                 ps.setInt(1, characterId);
                 ps.setString(2, slotName);
 
@@ -401,12 +425,54 @@ public class SaveloadsController implements Initializable {
                     preview.slotName = rs.getString("saved_name");
                     preview.worldName = rs.getString("world_name");
                     preview.playerName = rs.getString("player_name");
-                    
+
                     preview.dayNumber = rs.getInt("day_number");
                     if (rs.wasNull() || preview.dayNumber <= 0) {
                         preview.dayNumber = 1;
                     }
+
+                    boolean isDead = rs.getBoolean("is_dead");
+                    int currentHp = rs.getInt("current_hp");
+                    preview.dead = isDead || currentHp <= 0;
                     return preview;
+                }
+            } catch (SQLException ignored) {
+                String sqlLegacy = """
+                    SELECT sg.saved_name,
+                           sg.world_name,
+                           c.player_name,
+                           st.day_number,
+                           sg.current_hp
+                    FROM save_game sg
+                    JOIN characters c ON sg.character_id = c.character_id
+                    LEFT JOIN saved_time st ON sg.saved_id = st.saved_id
+                    WHERE sg.character_id = ? AND sg.saved_name = ?
+                    ORDER BY sg.last_saved_date DESC, sg.saved_id DESC
+                    LIMIT 1
+                    """;
+
+                try (PreparedStatement ps = con.prepareStatement(sqlLegacy)) {
+                    ps.setInt(1, characterId);
+                    ps.setString(2, slotName);
+
+                    try (ResultSet rs = ps.executeQuery()) {
+                        if (!rs.next()) {
+                            return null;
+                        }
+
+                        SlotPreview preview = new SlotPreview();
+                        preview.slotName = rs.getString("saved_name");
+                        preview.worldName = rs.getString("world_name");
+                        preview.playerName = rs.getString("player_name");
+
+                        preview.dayNumber = rs.getInt("day_number");
+                        if (rs.wasNull() || preview.dayNumber <= 0) {
+                            preview.dayNumber = 1;
+                        }
+
+                        preview.dead = rs.getInt("current_hp") <= 0;
+                        return preview;
+                    }
                 }
             }
         } catch (Exception e) {

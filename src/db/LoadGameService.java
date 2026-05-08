@@ -10,6 +10,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -79,6 +80,10 @@ public class LoadGameService {
         try (Connection con = db.getConnection()) {
             clearRuntimeState(gs);
 
+            if (isSaveDead(con, saveId)) {
+                return false;
+            }
+
             if (!loadMainRow(con, gs, saveId)) {
                 return false;
             }
@@ -111,6 +116,34 @@ public class LoadGameService {
         } catch (Exception e) {
             e.printStackTrace();
             return false;
+        }
+    }
+
+    private boolean isSaveDead(Connection con, int saveId) throws SQLException {
+        String sqlWithDeadFlag = "SELECT is_dead, current_hp FROM save_game WHERE saved_id = ?";
+        try (PreparedStatement ps = con.prepareStatement(sqlWithDeadFlag)) {
+            ps.setInt(1, saveId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (!rs.next()) {
+                    return false;
+                }
+                boolean isDead = rs.getBoolean("is_dead");
+                int currentHp = rs.getInt("current_hp");
+                return isDead || currentHp <= 0;
+            }
+        } catch (SQLException ignored) {
+            // Backward-compatible fallback when schema lacks `is_dead`.
+        }
+
+        String sqlLegacy = "SELECT current_hp FROM save_game WHERE saved_id = ?";
+        try (PreparedStatement ps = con.prepareStatement(sqlLegacy)) {
+            ps.setInt(1, saveId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (!rs.next()) {
+                    return false;
+                }
+                return rs.getInt("current_hp") <= 0;
+            }
         }
     }
 

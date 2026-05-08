@@ -1,7 +1,7 @@
 package controller;
 
 import db.LoadGameService;
-import db.DeleteSaveService;
+import db.MarkSaveDeadService;
 import db.SaveGameService;
 import java.net.URL;
 import java.lang.reflect.Field;
@@ -578,15 +578,22 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
         int saveId = (gameState == null) ? -1 : gameState.getCurrentSaveId();
 
+        if (saveId > 0) {
+            GameTimeManager time = GameTimeManager.get();
+            int dayNumber = time.dayNumberProperty().get();
+            double totalSeconds = time.totalSecondsProperty().get();
+
+            Thread t = new Thread(
+                () -> new MarkSaveDeadService().markSaveDead(saveId, dayNumber, totalSeconds),
+                "permadeath-mark-dead"
+            );
+            t.setDaemon(true);
+            t.start();
+        }
+
         if (gameState != null) {
             gameState.setCurrentSaveId(-1);
             gameState.resetForNewGame();
-        }
-
-        if (saveId > 0) {
-            Thread t = new Thread(() -> new DeleteSaveService().deleteSaveById(saveId), "permadeath-delete-save");
-            t.setDaemon(true);
-            t.start();
         }
 
         Platform.runLater(() -> stopAndSwitchSceneInternal("/view/game_over.fxml", SpawnTag.DEFAULT, false));

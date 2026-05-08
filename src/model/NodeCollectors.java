@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.List;
 import javafx.scene.Group;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 
 public final class NodeCollectors {
 
@@ -18,15 +19,32 @@ public final class NodeCollectors {
     ) {
         List<T> result = new ArrayList<>();
 
-        for (Node node : group.getChildren()) {
-            if (type.isInstance(node)) {
-                String id = node.getId();
-                if (id != null && id.startsWith(idPrefix)) {
-                    result.add(type.cast(node));
-                }
+        collectByTypeAndPrefix(group, type, idPrefix, result);
+        return result;
+    }
+
+    private static <T extends Node> void collectByTypeAndPrefix(
+            Node node,
+            Class<T> type,
+            String idPrefix,
+            List<T> result
+    ) {
+        if (node == null) {
+            return;
+        }
+
+        if (type.isInstance(node)) {
+            String id = node.getId();
+            if (id != null && id.startsWith(idPrefix)) {
+                result.add(type.cast(node));
             }
         }
-        return result;
+
+        if (node instanceof Parent parent) {
+            for (Node child : parent.getChildrenUnmodifiable()) {
+                collectByTypeAndPrefix(child, type, idPrefix, result);
+            }
+        }
     }
 
     // Sort nodes by numeric suffix in id
@@ -36,7 +54,11 @@ public final class NodeCollectors {
 
     public static int extractNumber(String id, String prefix) {
         try {
-            return Integer.parseInt(id.replace(prefix, ""));
+            String suffix = id.replace(prefix, "");
+            if (suffix.isEmpty()) {
+                return 0;
+            }
+            return Integer.parseInt(suffix);
         } catch (Exception e) {
             return Integer.MAX_VALUE;
         }

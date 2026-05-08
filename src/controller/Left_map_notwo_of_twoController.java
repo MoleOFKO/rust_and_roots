@@ -558,7 +558,7 @@ public class Left_map_notwo_of_twoController extends BaseMapController{
 
     @Override
     protected String mapKey() {
-        return "right_map_notwo_of_two";
+        return "left_map_notwo_of_two";
     }
 
     @Override
