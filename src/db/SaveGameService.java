@@ -10,6 +10,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
@@ -156,7 +157,28 @@ public class SaveGameService {
     }
 
     private void saveMainRow(Connection con, GameState gs) throws Exception {
-        String sql = """
+        String sqlWithDeadFlag = """
+            UPDATE save_game
+            SET world_name = ?,
+                current_map_id = ?,
+                money = ?,
+                saved_location_x = ?,
+                saved_location_y = ?,
+                exp = ?,
+                selected_hotbar_index = ?,
+                hotbar_visible = ?,
+                current_hp = ?,
+                current_stamina = ?,
+                is_dead = ?,
+                home_interior_tutorial_seen = ?,
+                tutorial_flags = ?,
+                bgm_volume = ?,
+                sfx_volume = ?,
+                last_saved_date = NOW()
+            WHERE saved_id = ?
+            """;
+
+        String sqlLegacy = """
             UPDATE save_game
             SET world_name = ?,
                 current_map_id = ?,
@@ -178,7 +200,30 @@ public class SaveGameService {
 
         PlayerState ps = gs.getPlayerState();
 
-        try (PreparedStatement psmt = con.prepareStatement(sql)) {
+        try (PreparedStatement psmt = con.prepareStatement(sqlWithDeadFlag)) {
+            psmt.setString(1, gs.getCurrentWorldName());
+            psmt.setInt(2, resolveMapId(con, gs.getCurrentMapKey()));
+            psmt.setInt(3, ps.getInventory().getCoins());
+            psmt.setDouble(4, gs.getPlayerX());
+            psmt.setDouble(5, gs.getPlayerY());
+            psmt.setInt(6, ps.getExp());
+            psmt.setInt(7, ps.getselectedHotbarIndex());
+            psmt.setBoolean(8, ps.isHotbarVisible());
+            psmt.setInt(9, ps.getHp());
+            psmt.setInt(10, ps.getStamina());
+            psmt.setBoolean(11, ps.getHp() <= 0);
+            psmt.setBoolean(12, gs.isHomeInteriorTutorialSeen());
+            psmt.setString(13, serializeTutorialFlags(gs));
+            psmt.setDouble(14, gs.getBgmVolume());
+            psmt.setDouble(15, gs.getSfxVolume());
+            psmt.setInt(16, gs.getCurrentSaveId());
+            psmt.executeUpdate();
+            return;
+        } catch (SQLException ignored) {
+            // Backward-compatible fallback when schema lacks `is_dead`.
+        }
+
+        try (PreparedStatement psmt = con.prepareStatement(sqlLegacy)) {
             psmt.setString(1, gs.getCurrentWorldName());
             psmt.setInt(2, resolveMapId(con, gs.getCurrentMapKey()));
             psmt.setInt(3, ps.getInventory().getCoins());

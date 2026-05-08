@@ -573,7 +573,7 @@ public class D_undermap_rightController extends BaseMapController {
 
     @Override
     protected String mapKey() {
-        return "d_undemap_right";
+        return "d_undermap_right";
     }
 
     @Override

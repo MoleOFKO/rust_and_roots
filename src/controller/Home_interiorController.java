@@ -71,7 +71,7 @@ public class Home_interiorController extends BaseMapController {
     private static final String NIGHT_BG_PATH = "";
     private static final List<String> HOME_TUTORIAL_IMAGE_PATHS = List.of(
         "/image/Toturial/Move.png",
-        "/image/Toturial/Walk&Run.png",
+        "/image/Toturial/Run.png",
         "/image/Toturial/Craft.png",
         "/image/Toturial/Cooking.png",
         "/image/Toturial/Chest.png",
@@ -1279,7 +1279,13 @@ public class Home_interiorController extends BaseMapController {
         }
 
         String imagePath = HOME_TUTORIAL_IMAGE_PATHS.get(index);
-        tutorialImageView.setImage(new Image(getClass().getResource(imagePath).toExternalForm()));
+        URL url = getClass().getResource(imagePath);
+        if (url == null) {
+            System.err.println("Tutorial image missing: " + imagePath);
+            hideTutorialOverlay();
+            return;
+        }
+        tutorialImageView.setImage(new Image(url.toExternalForm()));
         tutorialTitleLabel.setText(extractTutorialTitle(imagePath));
     }
 
