@@ -1,15 +1,9 @@
 package controller;
 
-import db.SaveGameService;
 import game.GameState;
-import game.GameTimeManager;
-import java.io.IOException;
 import java.net.URL;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.ResourceBundle;
-import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
@@ -20,18 +14,12 @@ import javafx.scene.control.Slider;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
-import model.Farm;
 import model.InteractionZone;
-import model.ItemDatabase;
 import model.Merchant;
-import model.NodeCollectors;
-import model.item;
-import util.SceneManager;
 import util.SpawnTag;
 import util.TutorialOverlayHelper;
 
@@ -42,12 +30,7 @@ public class home_mapController extends BaseMapController {
 
     private static final String DAY_BG_PATH = "/image/maps/home_map_withoutshop.png";
     private static final String NIGHT_BG_PATH = "/image/NightMap/home_map_night.png";
-
-    // Home-map night background art is offset slightly vs the day map; nudge crop overlays so they stay planted.
-    // Offsets are in source-image pixels (1536x1024) and are scaled into the current ImageView fit size.
-    private static final double HOME_FARM_NIGHT_PIXEL_OFFSET_X = -5.0;
-    private static final double HOME_FARM_NIGHT_PIXEL_OFFSET_Y = -1.0;
-
+    
     @FXML private Rectangle merchantdetect;
     @FXML private ImageView merchantImage;
     @FXML private Button btnmerchant;
@@ -504,42 +487,6 @@ public class home_mapController extends BaseMapController {
     @Override
     protected String nightBackgroundPath() {
         return NIGHT_BG_PATH;
-    }
-
-    @Override
-    protected void onDayNightSwitched(boolean isNight) {
-        Group farmGroup = super.farm1 != null ? super.farm1 : farm1;
-        if (farmGroup == null) {
-            return;
-        }
-
-        double dx = 0.0;
-        double dy = 0.0;
-
-        if (isNight) {
-            ImageView background = super.bg != null ? super.bg : bg;
-            if (background != null && super.dayBg != null && super.dayBg.getWidth() > 0.0 && super.dayBg.getHeight() > 0.0) {
-                double fitW = background.getFitWidth();
-                double fitH = background.getFitHeight();
-
-                double scaleX = fitW > 0.0 ? (fitW / super.dayBg.getWidth()) : 1.0;
-                double scaleY = fitH > 0.0 ? (fitH / super.dayBg.getHeight()) : 1.0;
-
-                dx = HOME_FARM_NIGHT_PIXEL_OFFSET_X * scaleX;
-                dy = HOME_FARM_NIGHT_PIXEL_OFFSET_Y * scaleY;
-            } else {
-                // Fallback to the known home-map scale (600x400 fit for a 1536x1024 background).
-                dx = HOME_FARM_NIGHT_PIXEL_OFFSET_X * (600.0 / 1536.0);
-                dy = HOME_FARM_NIGHT_PIXEL_OFFSET_Y * (400.0 / 1024.0);
-            }
-        }
-
-        List<ImageView> plots = NodeCollectors.byTypeAndPrefix(farmGroup, ImageView.class, "farm_img");
-        for (ImageView img : plots) {
-            if (img == null) continue;
-            img.setTranslateX(dx);
-            img.setTranslateY(dy);
-        }
     }
 
     @Override

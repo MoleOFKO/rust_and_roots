@@ -1200,7 +1200,7 @@ public final class MobEntity {
     private static Effect createHurtFlashEffect() {
         Blend blend = new Blend();
         blend.setMode(BlendMode.SRC_ATOP);
-        blend.setTopInput(new ColorInput(-1024, -1024, 2048, 2048, Color.rgb(255, 40, 40, 0.60)));
+        blend.setTopInput(new ColorInput(0, 0, FRAME_SIZE, FRAME_SIZE, Color.rgb(255, 40, 40, 0.60)));
         return blend;
     }
 
@@ -1221,14 +1221,14 @@ public final class MobEntity {
     }
 
     private void applyHurtFlashEffect() {
-        if (node != null && node.getEffect() != hurtFlashEffect) {
-            node.setEffect(hurtFlashEffect);
+        if (spriteView != null && spriteView.getEffect() != hurtFlashEffect) {
+            spriteView.setEffect(hurtFlashEffect);
         }
     }
 
     private void clearHurtFlashEffect() {
-        if (node != null && node.getEffect() == hurtFlashEffect) {
-            node.setEffect(null);
+        if (spriteView != null && spriteView.getEffect() != hurtFlashEffect) {
+            spriteView.setEffect(null);
         }
     }
 }

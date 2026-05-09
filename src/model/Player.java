@@ -1129,7 +1129,8 @@ public class Player {
     private static Effect createHurtFlashEffect() {
         Blend blend = new Blend();
         blend.setMode(BlendMode.SRC_ATOP);
-        blend.setTopInput(new ColorInput(-1024, -1024, 2048, 2048, Color.rgb(255, 40, 40, 0.60)));
+        blend.setTopInput(new ColorInput(0, 0, FRAME_SIZE, FRAME_SIZE, Color.rgb(255, 40, 40, 0.60)));
+        
         return blend;
     }
 
@@ -1150,14 +1151,22 @@ public class Player {
     }
 
     private void applyHurtFlashEffect() {
-        if (node != null && node.getEffect() != hurtFlashEffect) {
-            node.setEffect(hurtFlashEffect);
+        if (sprite != null && sprite.getEffect() != hurtFlashEffect) {
+            sprite.setEffect(hurtFlashEffect);
+        }
+
+        if (equipmentView != null && equipmentView.getEffect() != hurtFlashEffect) {
+            equipmentView.setEffect(hurtFlashEffect);
         }
     }
 
     private void clearHurtFlashEffect() {
-        if (node != null && node.getEffect() == hurtFlashEffect) {
-            node.setEffect(null);
+        if (sprite != null && sprite.getEffect() == hurtFlashEffect) {
+            sprite.setEffect(null);
+        }
+
+        if (equipmentView != null && equipmentView.getEffect() == hurtFlashEffect) {
+            equipmentView.setEffect(null);
         }
     }
 
