@@ -10,8 +10,13 @@ import javafx.geometry.BoundingBox;
 import javafx.geometry.Bounds;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Group;
+import javafx.scene.effect.Blend;
+import javafx.scene.effect.BlendMode;
+import javafx.scene.effect.ColorInput;
+import javafx.scene.effect.Effect;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import util.CombatRules;
 import util.ImageCache;
@@ -171,6 +176,7 @@ public final class MobEntity {
     private boolean deathFinished = false;
     private boolean hurtActive = false;
     private long hurtEndsAtNanos = 0L;
+    private final Effect hurtFlashEffect = createHurtFlashEffect();
     private long attackEndsAtNanos = 0L;
     private long nextAttackAvailableAtNanos = 0L;
     private boolean attackDamageApplied = false;
@@ -318,17 +324,7 @@ public final class MobEntity {
         applyDailyGrowthIfNeeded(currentDay);
         applyRegenIfNeeded(nowSeconds);
 
-        if (hurtActive && simNowNanos < hurtEndsAtNanos) {
-            moving = false;
-            syncAttackHitboxesEnabled(false);
-            setAnimState(AnimState.HURT, false);
-            updateAnimation(simNowNanos);
-            return;
-        }
-        if (hurtActive) {
-            hurtActive = false;
-            hurtEndsAtNanos = 0L;
-        }
+        updateHurtFlash(simNowNanos);
 
         if (isAttackActive(simNowNanos)) {
             moving = false;
@@ -405,8 +401,7 @@ public final class MobEntity {
         long now = simNowNanos;
         hurtActive = true;
         hurtEndsAtNanos = now + (long) hurtColumns * HURT_FRAME_DELAY_NANOS;
-        setAnimState(AnimState.HURT, true);
-        lastAnimFrameNanos = now;
+        applyHurtFlashEffect();
 
         if (hpAfter <= 0) {
             data.dead = true;
@@ -665,6 +660,7 @@ public final class MobEntity {
         deathFinished = false;
         hurtActive = false;
         hurtEndsAtNanos = 0L;
+        clearHurtFlashEffect();
         attackEndsAtNanos = 0L;
         nextAttackAvailableAtNanos = 0L;
         attackDamageApplied = false;
@@ -1075,6 +1071,9 @@ public final class MobEntity {
     private void updateDeathAnimation(long nowNanos) {
         if (!deathStarted) {
             deathStarted = true;
+            hurtActive = false;
+            hurtEndsAtNanos = 0L;
+            clearHurtFlashEffect();
             setAnimState(AnimState.DEATH, true);
             lastDeathFrameNanos = nowNanos;
             syncAttackHitboxesEnabled(false);
@@ -1101,6 +1100,7 @@ public final class MobEntity {
         deathFinished = true;
         deathStarted = true;
         setAnimState(AnimState.DEATH, false);
+        clearHurtFlashEffect();
 
         spriteView.setVisible(false);
         spriteView.setManaged(false);
@@ -1195,5 +1195,40 @@ public final class MobEntity {
             throw new IllegalStateException("Missing mob sprite resource: " + resourcePath);
         }
         return image;
+    }
+
+    private static Effect createHurtFlashEffect() {
+        Blend blend = new Blend();
+        blend.setMode(BlendMode.SRC_ATOP);
+        blend.setTopInput(new ColorInput(-1024, -1024, 2048, 2048, Color.rgb(255, 40, 40, 0.60)));
+        return blend;
+    }
+
+    private void updateHurtFlash(long now) {
+        if (!hurtActive) {
+            clearHurtFlashEffect();
+            return;
+        }
+
+        if (now < hurtEndsAtNanos) {
+            applyHurtFlashEffect();
+            return;
+        }
+
+        hurtActive = false;
+        hurtEndsAtNanos = 0L;
+        clearHurtFlashEffect();
+    }
+
+    private void applyHurtFlashEffect() {
+        if (node != null && node.getEffect() != hurtFlashEffect) {
+            node.setEffect(hurtFlashEffect);
+        }
+    }
+
+    private void clearHurtFlashEffect() {
+        if (node != null && node.getEffect() == hurtFlashEffect) {
+            node.setEffect(null);
+        }
     }
 }

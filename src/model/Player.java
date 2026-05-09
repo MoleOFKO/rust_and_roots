@@ -12,9 +12,14 @@ import javafx.geometry.Bounds;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.effect.Blend;
+import javafx.scene.effect.BlendMode;
+import javafx.scene.effect.ColorInput;
+import javafx.scene.effect.Effect;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import game.GameTimeManager;
 import util.TimeFlow;
@@ -173,6 +178,7 @@ public class Player {
     private long nextAttackAvailableAtNanos = 0L;
     private boolean hurtActive = false;
     private long hurtEndsAtNanos = 0L;
+    private final Effect hurtFlashEffect = createHurtFlashEffect();
 
     public Player(
             PlayerState state,
@@ -481,6 +487,7 @@ public class Player {
         nextAttackAvailableAtNanos = 0L;
         hurtActive = false;
         hurtEndsAtNanos = 0L;
+        clearHurtFlashEffect();
 
         if (!deathStarted && !deathFinished) {
             setAnimState(AnimState.IDLE, true);
@@ -507,6 +514,9 @@ public class Player {
         if (state.isDead()) {
             moving = false;
             pressedKeys.clear();
+            hurtActive = false;
+            hurtEndsAtNanos = 0L;
+            clearHurtFlashEffect();
             return;
         }
 
@@ -518,17 +528,7 @@ public class Player {
             return;
         }
 
-        if (hurtActive && now < hurtEndsAtNanos) {
-            moving = false;
-            state.setStaminaMode(PlayerState.StaminaMode.IDLE);
-            state.updateStaminaOverTime(dtWorldSeconds, PlayerState.StaminaMode.IDLE);
-            setAnimState(AnimState.HURT, false);
-            return;
-        }
-        if (hurtActive) {
-            hurtActive = false;
-            hurtEndsAtNanos = 0L;
-        }
+        updateHurtFlash(now);
 
         if (isAttackActive(now)) {
             moving = false;
@@ -1123,7 +1123,42 @@ public class Player {
         long now = simNowNanos;
         hurtActive = true;
         hurtEndsAtNanos = now + (HURT_COLUMNS * HURT_FRAME_DELAY_NANOS);
-        setAnimState(AnimState.HURT, true);
+        applyHurtFlashEffect();
+    }
+
+    private static Effect createHurtFlashEffect() {
+        Blend blend = new Blend();
+        blend.setMode(BlendMode.SRC_ATOP);
+        blend.setTopInput(new ColorInput(-1024, -1024, 2048, 2048, Color.rgb(255, 40, 40, 0.60)));
+        return blend;
+    }
+
+    private void updateHurtFlash(long now) {
+        if (!hurtActive) {
+            clearHurtFlashEffect();
+            return;
+        }
+
+        if (now < hurtEndsAtNanos) {
+            applyHurtFlashEffect();
+            return;
+        }
+
+        hurtActive = false;
+        hurtEndsAtNanos = 0L;
+        clearHurtFlashEffect();
+    }
+
+    private void applyHurtFlashEffect() {
+        if (node != null && node.getEffect() != hurtFlashEffect) {
+            node.setEffect(hurtFlashEffect);
+        }
+    }
+
+    private void clearHurtFlashEffect() {
+        if (node != null && node.getEffect() == hurtFlashEffect) {
+            node.setEffect(null);
+        }
     }
 
     private static long scaleDeltaNanos(long dtNanos, double multiplier) {
