@@ -1241,9 +1241,10 @@ public class ShopController implements Initializable, SceneController {
 
         if (canReuse) {
             List<Integer> reuse = new ArrayList<>(shopSlotCapacity);
+            Set<Integer> seen = new LinkedHashSet<>();
             for (int i = 0; i < shopSlotCapacity; i++) {
                 Integer itemId = savedIds.get(i);
-                if (itemId == null || !allById.containsKey(itemId)) {
+                if (itemId == null || !allById.containsKey(itemId) || !seen.add(itemId)) {
                     canReuse = false;
                     break;
                 }
@@ -1316,7 +1317,7 @@ public class ShopController implements Initializable, SceneController {
             //  7: melt ingredient (always, else any inedible)
             //  8: type weights: recipe 15%, seed 10%, equipment 10%, edible 50%, inedible 15%
             //  9: type weights: recipe 25%, seed 15%, equipment 15%, edible 20%, inedible 25%
-            // 10-12: wildcard (penalize repeats from earlier slots)
+            // 10-12: wildcard (no duplicates)
             if (slotNumber == 1) {
                 if (dayNumber <= 1) {
                     chosenId = resolveShopItemId(shopById, "Axe");
@@ -1373,16 +1374,18 @@ public class ShopController implements Initializable, SceneController {
                     chosenId = pickWeightedItemId(meltCandidates, Set.of(), Set.of(), Set.of(), 1.0, 1.0);
                 }
             } else if (slotNumber == 8) {
-                chosenId = pickItemIdFromCategoryWeights(categoryPools, 15, 10, 10, 50, 15, Set.of());
+                chosenId = pickItemIdFromCategoryWeights(categoryPools, 15, 10, 10, 50, 15, used);
             } else if (slotNumber == 9) {
-                chosenId = pickItemIdFromCategoryWeights(categoryPools, 25, 15, 15, 20, 25, Set.of());
+                chosenId = pickItemIdFromCategoryWeights(categoryPools, 25, 15, 15, 20, 25, used);
             } else {
-                Set<Integer> penalize = new LinkedHashSet<>(result);
-                chosenId = pickWeightedItemId(allShopIds, Set.of(), penalize, Set.of(), 1.0, 0.25);
+                chosenId = pickWeightedItemId(allShopIds, Set.of(), Set.of(), used, 1.0, 1.0);
             }
 
-            if (chosenId <= 0 || !shopById.containsKey(chosenId)) {
-                chosenId = pickWeightedItemId(allShopIds, Set.of(), Set.of(), Set.of(), 1.0, 1.0);
+            if (chosenId <= 0 || !shopById.containsKey(chosenId) || used.contains(chosenId)) {
+                chosenId = pickWeightedItemId(allShopIds, Set.of(), Set.of(), used, 1.0, 1.0);
+                if (chosenId <= 0) {
+                    break;
+                }
             }
 
             result.add(chosenId);

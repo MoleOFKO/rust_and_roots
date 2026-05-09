@@ -343,6 +343,16 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         return null;
     }
 
+    /**
+     * Optional hook called whenever the shared day/night background binding flips.
+     *
+     * Default implementation does nothing; override in specific maps to keep overlays aligned
+     * with day/night background art changes.
+     */
+    protected void onDayNightSwitched(boolean isNight) {
+        // default: no-op
+    }
+
 	    /** Hook for subclasses after shared systems are ready. */
 	    protected void afterBaseInitialize() {
 	        // default: do nothing
@@ -2554,11 +2564,8 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
         GameTimeManager time = GameTimeManager.get();
         nightListener = (obs, wasNight, isNight) -> {
-            if (isNight) {
-                background.setImage(nightBg != null ? nightBg : dayBg);
-                return;
-            }
-            background.setImage(dayBg);
+            background.setImage(isNight ? (nightBg != null ? nightBg : dayBg) : dayBg);
+            onDayNightSwitched(isNight);
         };
 
         time.nightProperty().addListener(nightListener);
