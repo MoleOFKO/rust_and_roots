@@ -126,23 +126,27 @@ public class RightMapnoone_of_oneController extends BaseMapController {
     @FXML
     private Rectangle orc_detect;
     @FXML
-    private Group slime;
+    private Group orc1;
     @FXML
-    private Rectangle slime_hitbox;
+    private Rectangle orc1_hitbox;
     @FXML
-    private ImageView slime_img;
+    private ImageView orc1_img;
     @FXML
-    private ImageView slime_drops_img;
+    private ImageView orc1_drops_img;
     @FXML
-    private Rectangle slime_hitbox_left;
+    private Rectangle orc1_hitbox_left;
     @FXML
-    private Rectangle slime_hitbox_up;
+    private Rectangle orc1_hitbox_up;
     @FXML
-    private Rectangle slime_hitbox_down;
+    private Rectangle orc1_hitbox_down;
     @FXML
-    private Rectangle slime_hitbox_right;
+    private Rectangle orc1_hitbox_right;
     @FXML
-    private Rectangle slime_detect;
+    private Rectangle orc1_detect;
+    @FXML
+    private Slider bgmVolumeSlider;
+    @FXML
+    private Slider sfxVolumeSlider;
 
     @Override
     protected String dayBackgroundPath() {
@@ -487,21 +491,7 @@ public class RightMapnoone_of_oneController extends BaseMapController {
     @FXML
     private Group settingsTab;
     @FXML
-    private Slider timescaleslider;
-    @FXML
-    private Button btnsetday;
-    @FXML
-    private Button btnsetnight;
-    @FXML
-    private Button btnplus1h;
-    @FXML
     private Button btnsaveandexit;
-    @FXML
-    private Label sliderscale;
-    @FXML
-    private Label lbldays;
-    @FXML
-    private Label lbltime;
     @FXML
     private Button btnsave;
     @FXML

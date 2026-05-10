@@ -220,6 +220,46 @@ public class D_undermap_rightController extends BaseMapController {
     private Rectangle stone_dungeon_hitbox3;
     @FXML
     private ImageView drops_img_stone_dungeon3;
+    @FXML
+    private Group poison_slime;
+    @FXML
+    private Rectangle poison_slime_hitbox;
+    @FXML
+    private ImageView poison_slime_img;
+    @FXML
+    private ImageView poison_slime_drops_img;
+    @FXML
+    private Rectangle poison_slime_hitbox_left;
+    @FXML
+    private Rectangle poison_slime_hitbox_up;
+    @FXML
+    private Rectangle poison_slime_hitbox_down;
+    @FXML
+    private Rectangle poison_slime_hitbox_right;
+    @FXML
+    private Rectangle poison_slime_detect;
+    @FXML
+    private Slider bgmVolumeSlider;
+    @FXML
+    private Slider sfxVolumeSlider;
+    @FXML
+    private Group lava_slime;
+    @FXML
+    private Rectangle lava_slime_hitbox;
+    @FXML
+    private ImageView lava_slime_img;
+    @FXML
+    private ImageView lava_slime_drops_img;
+    @FXML
+    private Rectangle lava_slime_hitbox_left;
+    @FXML
+    private Rectangle lava_slime_hitbox_up;
+    @FXML
+    private Rectangle lava_slime_hitbox_down;
+    @FXML
+    private Rectangle lava_slime_hitbox_right;
+    @FXML
+    private Rectangle lava_slime_detect;
 
     @Override
     protected String dayBackgroundPath() {
@@ -537,21 +577,7 @@ public class D_undermap_rightController extends BaseMapController {
     @FXML
     private Group settingsTab;
     @FXML
-    private Slider timescaleslider;
-    @FXML
-    private Button btnsetday;
-    @FXML
-    private Button btnsetnight;
-    @FXML
-    private Button btnplus1h;
-    @FXML
     private Button btnsaveandexit;
-    @FXML
-    private Label sliderscale;
-    @FXML
-    private Label lbldays;
-    @FXML
-    private Label lbltime;
     @FXML
     private Button btnsave;
     @FXML

@@ -161,26 +161,6 @@ public class Right_map_notwo_of_oneController extends BaseMapController {
     @FXML
     private ImageView drops_img_stone2;
     @FXML
-    private Group orc;
-    @FXML
-    private Rectangle orc_hitbox;
-    @FXML
-    private ImageView orc_img;
-    @FXML
-    private ImageView orc_drops_img;
-    @FXML
-    private Rectangle orc_hitbox_left;
-    @FXML
-    private Rectangle orc_hitbox_up;
-    @FXML
-    private Rectangle orc_hitbox_down;
-    @FXML
-    private Rectangle orc_hitbox_right;
-    @FXML
-    private Rectangle orc_detect;
-    @FXML
-    private Group orc1;
-    @FXML
     private Group orcb;
     @FXML
     private Rectangle orcb_hitbox;
@@ -199,21 +179,9 @@ public class Right_map_notwo_of_oneController extends BaseMapController {
     @FXML
     private Rectangle orcb_detect;
     @FXML
-    private Rectangle orc1_hitbox;
+    private Slider bgmVolumeSlider;
     @FXML
-    private ImageView orc1_img;
-    @FXML
-    private ImageView orc1_drops_img;
-    @FXML
-    private Rectangle orc1_hitbox_left;
-    @FXML
-    private Rectangle orc1_hitbox_up;
-    @FXML
-    private Rectangle orc1_hitbox_down;
-    @FXML
-    private Rectangle orc1_hitbox_right;
-    @FXML
-    private Rectangle orc1_detect;
+    private Slider sfxVolumeSlider;
     
     @Override
     protected String dayBackgroundPath() {
@@ -529,21 +497,7 @@ public class Right_map_notwo_of_oneController extends BaseMapController {
     @FXML
     private Group settingsTab;
     @FXML
-    private Slider timescaleslider;
-    @FXML
-    private Button btnsetday;
-    @FXML
-    private Button btnsetnight;
-    @FXML
-    private Button btnplus1h;
-    @FXML
     private Button btnsaveandexit;
-    @FXML
-    private Label sliderscale;
-    @FXML
-    private Label lbldays;
-    @FXML
-    private Label lbltime;
     @FXML
     private Button btnsave;
     @FXML

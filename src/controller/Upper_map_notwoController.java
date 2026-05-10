@@ -136,23 +136,27 @@ public class Upper_map_notwoController extends BaseMapController {
     @FXML
     private Rectangle slime_detect;
     @FXML
-    private Group slime1;
+    private Group orc;
     @FXML
-    private Rectangle slime1_hitbox;
+    private Rectangle orc_hitbox;
     @FXML
-    private ImageView slime1_img;
+    private ImageView orc_img;
     @FXML
-    private ImageView slime1_drops_img;
+    private ImageView orc_drops_img;
     @FXML
-    private Rectangle slime1_hitbox_left;
+    private Rectangle orc_hitbox_left;
     @FXML
-    private Rectangle slime1_hitbox_up;
+    private Rectangle orc_hitbox_up;
     @FXML
-    private Rectangle slime1_hitbox_down;
+    private Rectangle orc_hitbox_down;
     @FXML
-    private Rectangle slime1_hitbox_right;
+    private Rectangle orc_hitbox_right;
     @FXML
-    private Rectangle slime1_detect;
+    private Rectangle orc_detect;
+    @FXML
+    private Slider bgmVolumeSlider;
+    @FXML
+    private Slider sfxVolumeSlider;
 
     @Override
     protected String dayBackgroundPath() {
@@ -459,21 +463,7 @@ public class Upper_map_notwoController extends BaseMapController {
     @FXML
     private Group settingsTab;
     @FXML
-    private Slider timescaleslider;
-    @FXML
-    private Button btnsetday;
-    @FXML
-    private Button btnsetnight;
-    @FXML
-    private Button btnplus1h;
-    @FXML
     private Button btnsaveandexit;
-    @FXML
-    private Label sliderscale;
-    @FXML
-    private Label lbldays;
-    @FXML
-    private Label lbltime;
     @FXML
     private Button btnsave;
     @FXML

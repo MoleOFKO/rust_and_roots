@@ -128,6 +128,30 @@
                   <ImageView fx:id="equip_img" fitHeight="64" fitWidth="64" layoutX="-8.0" layoutY="30.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
                </children>
             </Group>
+            <Group fx:id="orc" layoutX="136.0" layoutY="84.0">
+               <children>
+                  <Rectangle fx:id="orc_hitbox" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="262.0" layoutY="171.0" stroke="RED" strokeType="INSIDE" translateX="24" translateY="28" width="14.0" />
+                  <ImageView fx:id="orc_img" fitHeight="64" fitWidth="64" layoutX="262.0" layoutY="176.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
+                  <ImageView fx:id="orc_drops_img" fitHeight="64" fitWidth="64" layoutX="262.0" layoutY="176.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
+                  <Rectangle fx:id="orc_hitbox_left" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="272.0" layoutY="200.0" stroke="RED" strokeType="INSIDE" width="14.0" />
+                  <Rectangle fx:id="orc_hitbox_up" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="286.0" layoutY="181.0" stroke="RED" strokeType="INSIDE" width="14.0" />
+                  <Rectangle fx:id="orc_hitbox_down" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="286.0" layoutY="218.0" stroke="RED" strokeType="INSIDE" width="14.0" />
+                  <Rectangle fx:id="orc_hitbox_right" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="299.0" layoutY="199.0" stroke="RED" strokeType="INSIDE" width="14.0" />
+                  <Rectangle fx:id="orc_detect" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="137.0" layoutX="225.0" layoutY="141.0" stroke="RED" strokeType="INSIDE" width="137.0" />
+               </children>
+            </Group>
+            <Group fx:id="slime" layoutX="90.0" layoutY="-88.0">
+               <children>
+                  <Rectangle fx:id="slime_hitbox" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="262.0" layoutY="171.0" stroke="RED" strokeType="INSIDE" translateX="24" translateY="28" width="14.0" />
+                  <ImageView fx:id="slime_img" fitHeight="64" fitWidth="64" layoutX="262.0" layoutY="176.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
+                  <ImageView fx:id="slime_drops_img" fitHeight="64" fitWidth="64" layoutX="262.0" layoutY="176.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
+                  <Rectangle fx:id="slime_hitbox_left" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="272.0" layoutY="200.0" stroke="RED" strokeType="INSIDE" width="14.0" />
+                  <Rectangle fx:id="slime_hitbox_up" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="286.0" layoutY="181.0" stroke="RED" strokeType="INSIDE" width="14.0" />
+                  <Rectangle fx:id="slime_hitbox_down" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="286.0" layoutY="218.0" stroke="RED" strokeType="INSIDE" width="14.0" />
+                  <Rectangle fx:id="slime_hitbox_right" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="299.0" layoutY="199.0" stroke="RED" strokeType="INSIDE" width="14.0" />
+                  <Rectangle fx:id="slime_detect" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="113.0" layoutX="237.0" layoutY="152.0" stroke="RED" strokeType="INSIDE" width="113.0" />
+               </children>
+            </Group>
             <Group fx:id="treelayorgp4" layoutX="493.0" layoutY="1.0">
                <children>
                   <ImageView fx:id="treelayorimg4" fitHeight="126.0" fitWidth="107.0" pickOnBounds="true" preserveRatio="true" />
@@ -269,54 +293,6 @@
                   </ImageView>
                   <Rectangle fx:id="stone_hitbox" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="20.0" layoutX="266.0" layoutY="226.0" stroke="RED" strokeType="INSIDE" translateX="24" translateY="28" width="25.0" />
                   <ImageView fx:id="drops_img_stone" fitHeight="28.0" fitWidth="28.0" layoutX="303.0" layoutY="267.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
-               </children>
-            </Group>
-            <Group fx:id="orc" layoutX="136.0" layoutY="84.0">
-               <children>
-                  <Rectangle fx:id="orc_hitbox" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="262.0" layoutY="171.0" stroke="RED" strokeType="INSIDE" translateX="24" translateY="28" width="14.0" />
-                  <ImageView fx:id="orc_img" fitHeight="64" fitWidth="64" layoutX="262.0" layoutY="176.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
-                  <ImageView fx:id="orc_drops_img" fitHeight="64" fitWidth="64" layoutX="262.0" layoutY="176.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
-                  <Rectangle fx:id="orc_hitbox_left" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="272.0" layoutY="200.0" stroke="RED" strokeType="INSIDE" width="14.0" />
-                  <Rectangle fx:id="orc_hitbox_up" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="286.0" layoutY="181.0" stroke="RED" strokeType="INSIDE" width="14.0" />
-                  <Rectangle fx:id="orc_hitbox_down" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="286.0" layoutY="218.0" stroke="RED" strokeType="INSIDE" width="14.0" />
-                  <Rectangle fx:id="orc_hitbox_right" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="299.0" layoutY="199.0" stroke="RED" strokeType="INSIDE" width="14.0" />
-                  <Rectangle fx:id="orc_detect" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="137.0" layoutX="225.0" layoutY="141.0" stroke="RED" strokeType="INSIDE" width="137.0" />
-               </children>
-            </Group>
-            <Group fx:id="slime" layoutX="-12.0" layoutY="16.0">
-               <children>
-                  <Rectangle fx:id="slime_hitbox" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="262.0" layoutY="171.0" stroke="RED" strokeType="INSIDE" translateX="24" translateY="28" width="14.0" />
-                  <ImageView fx:id="slime_img" fitHeight="64" fitWidth="64" layoutX="262.0" layoutY="176.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
-                  <ImageView fx:id="slime_drops_img" fitHeight="64" fitWidth="64" layoutX="262.0" layoutY="176.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
-                  <Rectangle fx:id="slime_hitbox_left" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="272.0" layoutY="200.0" stroke="RED" strokeType="INSIDE" width="14.0" />
-                  <Rectangle fx:id="slime_hitbox_up" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="286.0" layoutY="181.0" stroke="RED" strokeType="INSIDE" width="14.0" />
-                  <Rectangle fx:id="slime_hitbox_down" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="286.0" layoutY="218.0" stroke="RED" strokeType="INSIDE" width="14.0" />
-                  <Rectangle fx:id="slime_hitbox_right" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="299.0" layoutY="199.0" stroke="RED" strokeType="INSIDE" width="14.0" />
-                  <Rectangle fx:id="slime_detect" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="113.0" layoutX="237.0" layoutY="152.0" stroke="RED" strokeType="INSIDE" width="113.0" />
-               </children>
-            </Group>
-            <Group fx:id="slime1" layoutX="169.0" layoutY="-121.0">
-               <children>
-                  <Rectangle fx:id="slime1_hitbox" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="262.0" layoutY="171.0" stroke="RED" strokeType="INSIDE" translateX="24" translateY="28" width="14.0" />
-                  <ImageView fx:id="slime1_img" fitHeight="64" fitWidth="64" layoutX="262.0" layoutY="176.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
-                  <ImageView fx:id="slime1_drops_img" fitHeight="64" fitWidth="64" layoutX="262.0" layoutY="176.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
-                  <Rectangle fx:id="slime1_hitbox_left" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="272.0" layoutY="200.0" stroke="RED" strokeType="INSIDE" width="14.0" />
-                  <Rectangle fx:id="slime1_hitbox_up" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="286.0" layoutY="181.0" stroke="RED" strokeType="INSIDE" width="14.0" />
-                  <Rectangle fx:id="slime1_hitbox_down" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="286.0" layoutY="218.0" stroke="RED" strokeType="INSIDE" width="14.0" />
-                  <Rectangle fx:id="slime1_hitbox_right" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="299.0" layoutY="199.0" stroke="RED" strokeType="INSIDE" width="14.0" />
-                  <Rectangle fx:id="slime1_detect" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="113.0" layoutX="237.0" layoutY="152.0" stroke="RED" strokeType="INSIDE" width="113.0" />
-               </children>
-            </Group>
-            <Group fx:id="slime2" layoutX="-171.0" layoutY="127.0">
-               <children>
-                  <Rectangle fx:id="slime2_hitbox" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="262.0" layoutY="171.0" stroke="RED" strokeType="INSIDE" translateX="24" translateY="28" width="14.0" />
-                  <ImageView fx:id="slime2_img" fitHeight="64" fitWidth="64" layoutX="262.0" layoutY="176.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
-                  <ImageView fx:id="slime2_drops_img" fitHeight="64" fitWidth="64" layoutX="262.0" layoutY="176.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
-                  <Rectangle fx:id="slime2_hitbox_left" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="272.0" layoutY="200.0" stroke="RED" strokeType="INSIDE" width="14.0" />
-                  <Rectangle fx:id="slime2_hitbox_up" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="286.0" layoutY="181.0" stroke="RED" strokeType="INSIDE" width="14.0" />
-                  <Rectangle fx:id="slime2_hitbox_down" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="286.0" layoutY="218.0" stroke="RED" strokeType="INSIDE" width="14.0" />
-                  <Rectangle fx:id="slime2_hitbox_right" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="299.0" layoutY="199.0" stroke="RED" strokeType="INSIDE" width="14.0" />
-                  <Rectangle fx:id="slime2_detect" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="113.0" layoutX="237.0" layoutY="152.0" stroke="RED" strokeType="INSIDE" width="113.0" />
                </children>
             </Group>
             <Button fx:id="btntuto" layoutX="573.0" mnemonicParsing="false" onAction="#handlebtntutoaction" style="-fx-background-radius: 100%; -fx-background-color: transparent; -fx-border-color: yellow; -fx-border-radius: 100%;" textFill="#e6ff00">

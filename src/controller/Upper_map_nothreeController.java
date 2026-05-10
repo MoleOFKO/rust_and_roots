@@ -178,41 +178,9 @@ public class Upper_map_nothreeController extends BaseMapController{
     @FXML
     private Rectangle orc_detect;
     @FXML
-    private Group orc1;
+    private Slider bgmVolumeSlider;
     @FXML
-    private Group slime1;
-    @FXML
-    private Rectangle orc1_hitbox;
-    @FXML
-    private ImageView orc1_img;
-    @FXML
-    private ImageView orc1_drops_img;
-    @FXML
-    private Rectangle orc1_hitbox_left;
-    @FXML
-    private Rectangle orc1_hitbox_up;
-    @FXML
-    private Rectangle orc1_hitbox_down;
-    @FXML
-    private Rectangle orc1_hitbox_right;
-    @FXML
-    private Rectangle orc1_detect;
-    @FXML
-    private Rectangle slime1_hitbox;
-    @FXML
-    private ImageView slime1_img;
-    @FXML
-    private ImageView slime1_drops_img;
-    @FXML
-    private Rectangle slime1_hitbox_left;
-    @FXML
-    private Rectangle slime1_hitbox_up;
-    @FXML
-    private Rectangle slime1_hitbox_down;
-    @FXML
-    private Rectangle slime1_hitbox_right;
-    @FXML
-    private Rectangle slime1_detect;
+    private Slider sfxVolumeSlider;
 
     @Override
     protected String dayBackgroundPath() {
@@ -517,21 +485,7 @@ public class Upper_map_nothreeController extends BaseMapController{
     @FXML
     private Group settingsTab;
     @FXML
-    private Slider timescaleslider;
-    @FXML
-    private Button btnsetday;
-    @FXML
-    private Button btnsetnight;
-    @FXML
-    private Button btnplus1h;
-    @FXML
     private Button btnsaveandexit;
-    @FXML
-    private Label sliderscale;
-    @FXML
-    private Label lbldays;
-    @FXML
-    private Label lbltime;
     @FXML
     private Button btnsave;
     @FXML
