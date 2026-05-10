@@ -70,6 +70,18 @@
                   <Rectangle fx:id="human_hitbox_right" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="299.0" layoutY="199.0" stroke="RED" strokeType="INSIDE" width="14.0" />
                </children>
             </Group>
+            <Group fx:id="poison_slime" layoutX="91.0" layoutY="91.0">
+               <children>
+                  <Rectangle fx:id="poison_slime_hitbox" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="262.0" layoutY="171.0" stroke="RED" strokeType="INSIDE" translateX="24" translateY="28" width="14.0" />
+                  <ImageView fx:id="poison_slime_img" fitHeight="64" fitWidth="64" layoutX="262.0" layoutY="176.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
+                  <ImageView fx:id="poison_slime_drops_img" fitHeight="64" fitWidth="64" layoutX="262.0" layoutY="176.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
+                  <Rectangle fx:id="poison_slime_hitbox_left" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="272.0" layoutY="200.0" stroke="RED" strokeType="INSIDE" width="14.0" />
+                  <Rectangle fx:id="poison_slime_hitbox_up" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="286.0" layoutY="181.0" stroke="RED" strokeType="INSIDE" width="14.0" />
+                  <Rectangle fx:id="poison_slime_hitbox_down" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="286.0" layoutY="218.0" stroke="RED" strokeType="INSIDE" width="14.0" />
+                  <Rectangle fx:id="poison_slime_hitbox_right" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="299.0" layoutY="199.0" stroke="RED" strokeType="INSIDE" width="14.0" />
+                  <Rectangle fx:id="poison_slime_detect" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="113.0" layoutX="237.0" layoutY="152.0" stroke="RED" strokeType="INSIDE" width="113.0" />
+               </children>
+            </Group>
             <Group fx:id="daynightnavgroup" layoutX="2.0" layoutY="1.0">
                <children>
                   <ImageView fitHeight="60.0" fitWidth="210.0" pickOnBounds="true" preserveRatio="true">

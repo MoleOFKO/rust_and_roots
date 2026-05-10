@@ -155,8 +155,6 @@ public class Right_map_nothreeController extends BaseMapController {
     @FXML
     private Group orc1;
     @FXML
-    private Group orc2;
-    @FXML
     private Rectangle orc1_hitbox;
     @FXML
     private ImageView orc1_img;
@@ -173,21 +171,9 @@ public class Right_map_nothreeController extends BaseMapController {
     @FXML
     private Rectangle orc1_detect;
     @FXML
-    private Rectangle orc2_hitbox;
+    private Slider bgmVolumeSlider;
     @FXML
-    private ImageView orc2_img;
-    @FXML
-    private ImageView orc2_drops_img;
-    @FXML
-    private Rectangle orc2_hitbox_left;
-    @FXML
-    private Rectangle orc2_hitbox_up;
-    @FXML
-    private Rectangle orc2_hitbox_down;
-    @FXML
-    private Rectangle orc2_hitbox_right;
-    @FXML
-    private Rectangle orc2_detect;
+    private Slider sfxVolumeSlider;
 
     @Override
     protected String dayBackgroundPath() {
@@ -523,21 +509,7 @@ public class Right_map_nothreeController extends BaseMapController {
     @FXML
     private Group settingsTab;
     @FXML
-    private Slider timescaleslider;
-    @FXML
-    private Button btnsetday;
-    @FXML
-    private Button btnsetnight;
-    @FXML
-    private Button btnplus1h;
-    @FXML
     private Button btnsaveandexit;
-    @FXML
-    private Label sliderscale;
-    @FXML
-    private Label lbldays;
-    @FXML
-    private Label lbltime;
     @FXML
     private Button btnsave;
     @FXML

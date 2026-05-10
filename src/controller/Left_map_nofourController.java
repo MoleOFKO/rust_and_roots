@@ -146,8 +146,6 @@ public class Left_map_nofourController extends BaseMapController {
     @FXML
     private Group slime1;
     @FXML
-    private Group slime2;
-    @FXML
     private Rectangle slime1_hitbox;
     @FXML
     private ImageView slime1_img;
@@ -164,21 +162,9 @@ public class Left_map_nofourController extends BaseMapController {
     @FXML
     private Rectangle slime1_detect;
     @FXML
-    private Rectangle slime2_hitbox;
+    private Slider bgmVolumeSlider;
     @FXML
-    private ImageView slime2_img;
-    @FXML
-    private ImageView slime2_drops_img;
-    @FXML
-    private Rectangle slime2_hitbox_left;
-    @FXML
-    private Rectangle slime2_hitbox_up;
-    @FXML
-    private Rectangle slime2_hitbox_down;
-    @FXML
-    private Rectangle slime2_hitbox_right;
-    @FXML
-    private Rectangle slime2_detect;
+    private Slider sfxVolumeSlider;
 
     @Override
     protected String dayBackgroundPath() {
@@ -505,21 +491,7 @@ public class Left_map_nofourController extends BaseMapController {
     @FXML
     private Group settingsTab;
     @FXML
-    private Slider timescaleslider;
-    @FXML
-    private Button btnsetday;
-    @FXML
-    private Button btnsetnight;
-    @FXML
-    private Button btnplus1h;
-    @FXML
     private Button btnsaveandexit;
-    @FXML
-    private Label sliderscale;
-    @FXML
-    private Label lbldays;
-    @FXML
-    private Label lbltime;
     @FXML
     private Button btnsave;
     @FXML

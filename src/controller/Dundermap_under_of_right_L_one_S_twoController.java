@@ -477,21 +477,7 @@ public class Dundermap_under_of_right_L_one_S_twoController extends BaseMapContr
     @FXML
     private Group settingsTab;
     @FXML
-    private Slider timescaleslider;
-    @FXML
-    private Button btnsetday;
-    @FXML
-    private Button btnsetnight;
-    @FXML
-    private Button btnplus1h;
-    @FXML
     private Button btnsaveandexit;
-    @FXML
-    private Label sliderscale;
-    @FXML
-    private Label lbldays;
-    @FXML
-    private Label lbltime;
     @FXML
     private Button btnsave;
     @FXML
@@ -504,6 +490,46 @@ public class Dundermap_under_of_right_L_one_S_twoController extends BaseMapContr
     private Button openstatus;
     @FXML
     private Button opensetting;
+    @FXML
+    private Group lava_slime;
+    @FXML
+    private Rectangle lava_slime_hitbox;
+    @FXML
+    private ImageView lava_slime_img;
+    @FXML
+    private ImageView lava_slime_drops_img;
+    @FXML
+    private Rectangle lava_slime_hitbox_left;
+    @FXML
+    private Rectangle lava_slime_hitbox_up;
+    @FXML
+    private Rectangle lava_slime_hitbox_down;
+    @FXML
+    private Rectangle lava_slime_hitbox_right;
+    @FXML
+    private Rectangle lava_slime_detect;
+    @FXML
+    private Group poison_slime;
+    @FXML
+    private Rectangle poison_slime_hitbox;
+    @FXML
+    private ImageView poison_slime_img;
+    @FXML
+    private ImageView poison_slime_drops_img;
+    @FXML
+    private Rectangle poison_slime_hitbox_left;
+    @FXML
+    private Rectangle poison_slime_hitbox_up;
+    @FXML
+    private Rectangle poison_slime_hitbox_down;
+    @FXML
+    private Rectangle poison_slime_hitbox_right;
+    @FXML
+    private Rectangle poison_slime_detect;
+    @FXML
+    private Slider bgmVolumeSlider;
+    @FXML
+    private Slider sfxVolumeSlider;
 
     @Override
     protected String dayBackgroundPath() {

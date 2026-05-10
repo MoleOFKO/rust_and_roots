@@ -146,41 +146,9 @@ public class Left_map_noone_of_oneController extends BaseMapController {
     @FXML
     private ImageView drops_img_stone2;
     @FXML
-    private Group slime;
+    private Slider bgmVolumeSlider;
     @FXML
-    private Rectangle slime_hitbox;
-    @FXML
-    private ImageView slime_img;
-    @FXML
-    private ImageView slime_drops_img;
-    @FXML
-    private Rectangle slime_hitbox_left;
-    @FXML
-    private Rectangle slime_hitbox_up;
-    @FXML
-    private Rectangle slime_hitbox_down;
-    @FXML
-    private Rectangle slime_hitbox_right;
-    @FXML
-    private Rectangle slime_detect;
-    @FXML
-    private Group slime1;
-    @FXML
-    private Rectangle slime1_hitbox;
-    @FXML
-    private ImageView slime1_img;
-    @FXML
-    private ImageView slime1_drops_img;
-    @FXML
-    private Rectangle slime1_hitbox_left;
-    @FXML
-    private Rectangle slime1_hitbox_up;
-    @FXML
-    private Rectangle slime1_hitbox_down;
-    @FXML
-    private Rectangle slime1_hitbox_right;
-    @FXML
-    private Rectangle slime1_detect;
+    private Slider sfxVolumeSlider;
 
     @Override
     protected String dayBackgroundPath() {
@@ -487,21 +455,7 @@ public class Left_map_noone_of_oneController extends BaseMapController {
     @FXML
     private Group settingsTab;
     @FXML
-    private Slider timescaleslider;
-    @FXML
-    private Button btnsetday;
-    @FXML
-    private Button btnsetnight;
-    @FXML
-    private Button btnplus1h;
-    @FXML
     private Button btnsaveandexit;
-    @FXML
-    private Label sliderscale;
-    @FXML
-    private Label lbldays;
-    @FXML
-    private Label lbltime;
     @FXML
     private Button btnsave;
     @FXML
