@@ -14,6 +14,7 @@ import javafx.scene.control.Slider;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
@@ -68,14 +69,7 @@ public class home_mapController extends BaseMapController {
     @FXML private ImageView btnUsePoint;
     @FXML private ImageView btnConfirm;
 
-    @FXML private Slider timescaleslider;
-    @FXML private Button btnsetday;
-    @FXML private Button btnsetnight;
-    @FXML private Button btnplus1h;
     @FXML private Button btnsaveandexit;
-    @FXML private Label sliderscale;
-    @FXML private Label lbldays;
-    @FXML private Label lbltime;
     @FXML private Button btnsave;
     @FXML private Button btnload;
 
@@ -472,6 +466,18 @@ public class home_mapController extends BaseMapController {
     private ProgressBar spbar;
     @FXML
     private Button btntuto;
+    @FXML
+    private Slider bgmVolumeSlider;
+    @FXML
+    private Slider sfxVolumeSlider;
+    @FXML
+    private ImageView miniMapIcon;
+    @FXML
+    private Group minimapicongroup;
+    @FXML
+    private Group minimapgroup;
+    @FXML
+    private ImageView closeminimapbtn;
     
 
     @Override
@@ -635,5 +641,11 @@ public class home_mapController extends BaseMapController {
         }
     }
 
+    @FXML
+    private void handleMiniMapIconaction(MouseEvent event) {
+    }
 
+    @FXML
+    private void handleCloseMiniMapAction(MouseEvent event) {
+    }
 }
