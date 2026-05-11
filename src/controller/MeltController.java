@@ -10,6 +10,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.ResourceBundle;
 import javafx.animation.AnimationTimer;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -31,8 +32,9 @@ import util.WorldScaler;
 public class MeltController implements Initializable, SceneController {
 
     private static final int MAX_INV_SLOTS = 20;
+    private static final String MELT_TUTORIAL_KEY = "melt_tutorial";
     private static final List<String> MELT_TUTORIAL_IMAGES = List.of(
-        "/image/Toturial/Melting.png"
+        "/image/Toturial/Melting Tutorial.png"
     );
 
     private GameState gameState;
@@ -142,6 +144,11 @@ public class MeltController implements Initializable, SceneController {
         wireStandaloneClicks();
         startUiTimer();
         refreshAll();
+        Platform.runLater(this::showMeltTutorialIfNeeded);
+    }
+
+    private void showMeltTutorialIfNeeded() {
+        TutorialOverlayHelper.showIfNeeded(view, gameState, MELT_TUTORIAL_KEY, MELT_TUTORIAL_IMAGES);
     }
 
     private void collectInventoryNodes() {
@@ -680,10 +687,8 @@ public class MeltController implements Initializable, SceneController {
 
     @FXML
     private void handlebtntutoaction(ActionEvent event) {
-        TutorialOverlayHelper.show(view, TutorialOverlayHelper.GLOBAL_BUTTON_TUTORIAL_IMAGES);
-        if (event != null) {
-            event.consume();
-        }
+        TutorialOverlayHelper.show(view, MELT_TUTORIAL_IMAGES);
+        if (event != null) event.consume();
     }
 
     private static final class SmeltRule {

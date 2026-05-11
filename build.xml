@@ -2,6 +2,9 @@
     <description>Builds, tests, and runs the project rust_and_roots.</description>
     <import file="nbproject/build-impl.xml"/>
 
+    <!-- Modern JDKs no longer ship the legacy JavaFX deployment/Nashorn tooling used by NetBeans' generated post-jar target. -->
+    <target name="-post-jar"/>
+
     <!-- Ensure non-Java resources (FXML, images, SQL, CSS, etc.) are available when running single files. -->
     <target name="-post-compile-single">
         <copy todir="${build.classes.dir}" overwrite="true">

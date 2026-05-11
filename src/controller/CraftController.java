@@ -36,7 +36,7 @@ public class CraftController implements Initializable, SceneController {
     private static final int MAX_RECIPE_SLOTS = 20;
     private static final int DEFAULT_WAIT_SECONDS = 40;
     private static final List<String> CRAFT_TUTORIAL_IMAGES = List.of(
-        "/image/Toturial/Craft_inside.png"
+        "/image/Toturial/Craft Tutorial.png"
     );
 
     private GameState gameState;
@@ -490,10 +490,8 @@ public class CraftController implements Initializable, SceneController {
 
     @FXML
     private void handlebtntutoaction(ActionEvent event) {
-        TutorialOverlayHelper.show(view, TutorialOverlayHelper.GLOBAL_BUTTON_TUTORIAL_IMAGES);
-        if (event != null) {
-            event.consume();
-        }
+        TutorialOverlayHelper.show(view, List.of("/image/Toturial/Craft Tutorial.png"));
+        if (event != null) event.consume();
     }
 
     private static final class IngredientRequirement {

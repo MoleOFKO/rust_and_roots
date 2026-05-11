@@ -72,12 +72,16 @@ public class Home_interiorController extends BaseMapController {
     private static final List<String> HOME_TUTORIAL_IMAGE_PATHS = List.of(
         "/image/Toturial/Move.png",
         "/image/Toturial/Run.png",
-        "/image/Toturial/Craft.png",
-        "/image/Toturial/Cooking.png",
-        "/image/Toturial/Chest.png",
-        "/image/Toturial/Melting.png",
-        "/image/Toturial/Sleep.png",
-        "/image/Toturial/Up_bar.png"
+        "/image/Toturial/before_goes_to_hotbar.png",
+        "/image/Toturial/goes_to_hotbar.png",
+        "/image/Toturial/Menu.png",
+        "/image/Toturial/Inventory.png",
+        "/image/Toturial/Stats.png",
+        "/image/Toturial/Upgrade Stats.png",
+        "/image/Toturial/Skill.png",
+        "/image/Toturial/Upgrade Skill.png",
+        "/image/Toturial/Setting.png",
+        "/image/Toturial/Skill.png"
     );
     @FXML
     private ImageView bg;
@@ -1773,7 +1777,7 @@ public class Home_interiorController extends BaseMapController {
             view,
             gameState,
             "home_interior_chest_inside",
-            List.of("/image/Toturial/Chest_inside.png")
+            List.of("/image/Toturial/Chest Tutorial.png")
         );
     }
 
@@ -2154,7 +2158,15 @@ public class Home_interiorController extends BaseMapController {
 
     @FXML
     private void handlebtntutoaction(ActionEvent event) {
-        TutorialOverlayHelper.show(view, TutorialOverlayHelper.GLOBAL_BUTTON_TUTORIAL_IMAGES);
+        // Check if the chest interface is currently open/visible
+        if (chestStackPane != null && chestStackPane.isVisible()) {
+            // Show only the specific chest tutorial image
+            TutorialOverlayHelper.show(view, List.of("/image/Toturial/Chest Tutorial.png"));
+        } else {
+            // Otherwise, show the default global tutorial sequence
+            TutorialOverlayHelper.show(view, TutorialOverlayHelper.GLOBAL_BUTTON_TUTORIAL_IMAGES);
+        }
+
         if (event != null) {
             event.consume();
         }
