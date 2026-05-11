@@ -328,9 +328,7 @@ CREATE TABLE `player_skills` (
   `skill_level` int NOT NULL DEFAULT '0',
   `skill_carry` decimal(4,3) NOT NULL DEFAULT '0.000',
   PRIMARY KEY (`saved_id`,`skill_type_id`),
-  KEY `fk_player_skills_type` (`skill_type_id`),
-  CONSTRAINT `fk_player_skills_save` FOREIGN KEY (`saved_id`) REFERENCES `save_game` (`saved_id`) ON DELETE CASCADE,
-  CONSTRAINT `fk_player_skills_type` FOREIGN KEY (`skill_type_id`) REFERENCES `skill_types` (`skill_type_id`)
+  CONSTRAINT `fk_player_skills_save` FOREIGN KEY (`saved_id`) REFERENCES `save_game` (`saved_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -537,7 +535,7 @@ CREATE TABLE `saved_item` (
 
 LOCK TABLES `saved_item` WRITE;
 /*!40000 ALTER TABLE `saved_item` DISABLE KEYS */;
-INSERT INTO `saved_item` VALUES (2,4,1),(3,1,2),(3,6,1),(3,123,3),(5,54,1),(12,7,1),(12,8,1),(14,5,1);
+INSERT INTO `saved_item` VALUES (2,4,1),(3,1,2),(3,6,1),(3,123,3),(5,54,1),(12,7,1),(12,8,1),(12,244,64),(12,261,64),(12,262,64),(12,263,64),(12,264,64),(12,265,64),(12,266,64),(12,267,64),(12,268,64),(14,5,1);
 /*!40000 ALTER TABLE `saved_item` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -746,7 +744,7 @@ CREATE TABLE `saved_smelt_state` (
 
 LOCK TABLES `saved_smelt_state` WRITE;
 /*!40000 ALTER TABLE `saved_smelt_state` DISABLE KEYS */;
-INSERT INTO `saved_smelt_state` VALUES (12,10,10,838352.0016215944,0,0),(15,10,10,26091.277508999723,0,0);
+INSERT INTO `saved_smelt_state` VALUES (12,999,999,838352.0016215944,0,0),(15,10,10,26091.277508999723,0,0);
 /*!40000 ALTER TABLE `saved_smelt_state` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -872,32 +870,6 @@ INSERT INTO `saved_unlocked_recipe` VALUES (1,'rope'),(1,'stick'),(1,'tomato_sli
 /*!40000 ALTER TABLE `saved_unlocked_recipe` ENABLE KEYS */;
 UNLOCK TABLES;
 
---
--- Table structure for table `skill_types`
---
-
-DROP TABLE IF EXISTS `skill_types`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `skill_types` (
-  `skill_type_id` int NOT NULL AUTO_INCREMENT,
-  `skill_name` varchar(30) NOT NULL,
-  PRIMARY KEY (`skill_type_id`),
-  UNIQUE KEY `uq_skill_types_skill_name` (`skill_name`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `skill_types`
---
-
-LOCK TABLES `skill_types` WRITE;
-/*!40000 ALTER TABLE `skill_types` DISABLE KEYS */;
-INSERT INTO `skill_types` VALUES (4,'combat'),(6,'cooking'),(3,'crafting'),(1,'farming'),(2,'gathering');
-/*!40000 ALTER TABLE `skill_types` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `user_roles`
 --
 

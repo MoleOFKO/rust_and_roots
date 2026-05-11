@@ -27,13 +27,15 @@ public final class TutorialOverlayHelper {
         "/image/Toturial/Menu.png",
         "/image/Toturial/Inventory.png",
         "/image/Toturial/Stats.png",
+        "/image/Toturial/Upgrade Stats.png",
         "/image/Toturial/Skill.png",
+        "/image/Toturial/Upgrade Skill.png",
         "/image/Toturial/Setting.png",
         "/image/Toturial/Skill.png",
-        "/image/Toturial/Croping.png",
-        "/image/Toturial/Croping Using Axe.png",
+        "/image/Toturial/Chopping.png",
+        "/image/Toturial/Chopping Using Axe.png",
         "/image/Toturial/Mining.png",
-        "/image/Toturial/Mining Using Pickaxe.png"
+        "/image/Toturial/Mining Using Pickaxe.png"     
     );
 
     private TutorialOverlayHelper() {

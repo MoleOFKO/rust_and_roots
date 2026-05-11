@@ -587,10 +587,8 @@ public class CookController implements Initializable, SceneController {
 
     @FXML
     private void handlebtntutoaction(ActionEvent event) {
-        TutorialOverlayHelper.show(view, TutorialOverlayHelper.GLOBAL_BUTTON_TUTORIAL_IMAGES);
-        if (event != null) {
-            event.consume();
-        }
+        TutorialOverlayHelper.show(view, List.of("/image/Toturial/Cooking Tutorial.png"));
+        if (event != null) event.consume();
     }
 
     private static final class RecipeDifficulty {

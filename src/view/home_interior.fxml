@@ -1074,11 +1074,6 @@
                </ImageView>
             </children>
          </StackPane>
-         <Button fx:id="btntuto" layoutX="522.0" layoutY="29.0" mnemonicParsing="false" onAction="#handlebtntutoaction" style="-fx-background-radius: 100%; -fx-background-color: transparent; -fx-border-color: yellow; -fx-border-radius: 100%;" textFill="#e6ff00">
-            <graphic>
-               <FontAwesomeIcon fill="#f6ff00" glyphName="QUESTION" selectionFill="YELLOW" size="1.5em" />
-            </graphic>
-         </Button>
          <StackPane fx:id="chestStackPane" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: black;" visible="false">
             <children>
                <Pane prefHeight="400.0" prefWidth="600.0">
@@ -1877,6 +1872,11 @@
                </Pane>
             </children>
          </StackPane>
+         <Button fx:id="btntuto" layoutX="522.0" layoutY="29.0" mnemonicParsing="false" onAction="#handlebtntutoaction" style="-fx-background-radius: 100%; -fx-background-color: transparent; -fx-border-color: yellow; -fx-border-radius: 100%;" textFill="#e6ff00">
+            <graphic>
+               <FontAwesomeIcon fill="#f6ff00" glyphName="QUESTION" selectionFill="YELLOW" size="1.5em" />
+            </graphic>
+         </Button>
       </Group>
       <StackPane fx:id="tutorialOverlay" managed="false" onMouseClicked="#handleTutorialOverlayClick" pickOnBounds="true" visible="false">
          <children>
