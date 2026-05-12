@@ -522,15 +522,16 @@ public class Right_map_notwo_of_oneController extends BaseMapController {
     @Override
     protected void configureExits() {
        registerExit(exit_left, "/view/right_map_notwo.fxml", SpawnTag.FROM_RIGHT);
+       registerExit(exit_right, "/view/right_map_notwo_of_two.fxml", SpawnTag.FROM_LEFT);
        registerExit(exit_down, "/view/right_map_noone_of_one.fxml", SpawnTag.FROM_UP);
-       if (exit_right != null) {
-            interactionManager.addZone(new InteractionZone(
-                exit_right,
-                null,
-                () -> JOptionPane.showMessageDialog(null, "Map unavailable"),
-                MAP_EXIT_DELAY_GAME_SECONDS
-            ));
-        }
+//       if (exit_right != null) {
+//            interactionManager.addZone(new InteractionZone(
+//                exit_right,
+//                null,
+//                () -> JOptionPane.showMessageDialog(null, "Map unavailable"),
+//                MAP_EXIT_DELAY_GAME_SECONDS
+//            ));
+//        }
     }
     @FXML
     private void handlebtntutoaction(ActionEvent event) {
