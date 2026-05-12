@@ -38,7 +38,7 @@ import util.WorldScaler;
 public class ShopController implements Initializable, SceneController {
     private static final int FIXED_BUY_SLOT_COUNT = 8;
     private static final int RANDOM_BUY_SLOT_COUNT = 4;
-    private static final int MAX_STOCK_PER_ITEM = 20;
+    private static final int MAX_STOCK_PER_ITEM = 10;
     private static final int RESTOCK_PER_DAY = 10;
     private static final String HOTBAR_SELL_ENTRY_STYLE = "-fx-text-fill: #8fdcff; -fx-font-weight: bold;";
     private static final List<String> SHOP_TUTORIAL_IMAGES = List.of(
@@ -1111,8 +1111,10 @@ public class ShopController implements Initializable, SceneController {
                 img.setScaleY(isSelected ? 1.06 : 1.0);
             }
             if (stockLbl != null) {
-                stockLbl.setText(selected > 0 ? ("x" + selected) : "");
-                stockLbl.setStyle(selected > 0 ? "-fx-text-fill: #f7f3b4; -fx-font-weight: bold;" : "");
+                int remaining = shopAvailable.containsKey(itemId) ? shopAvailable.get(itemId).get() : 0;
+                int limit = dailyTotalShopStock.getOrDefault(itemId, MAX_STOCK_PER_ITEM);
+                stockLbl.setText(remaining + "/" + limit);
+                stockLbl.setStyle("-fx-text-fill: #f7f3b4; -fx-font-weight: bold;");
             }
             if (nameLbl != null) nameLbl.setText(itm.getItem_name());
 
@@ -1805,6 +1807,7 @@ public class ShopController implements Initializable, SceneController {
             int remaining = hasSavedStock
                 ? savedRemaining.getOrDefault(itemId, MAX_STOCK_PER_ITEM)
                 : MAX_STOCK_PER_ITEM;
+            remaining = Math.min(MAX_STOCK_PER_ITEM, Math.max(0, remaining));
 
             if (dayDelta > 0) {
                 remaining = Math.min(MAX_STOCK_PER_ITEM, remaining + (RESTOCK_PER_DAY * dayDelta));

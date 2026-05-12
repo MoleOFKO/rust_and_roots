@@ -678,6 +678,7 @@ CREATE TABLE `saved_shop_stock` (
   `item_id` int NOT NULL,
   `remaining_qty` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`saved_id`,`item_id`),
+  CONSTRAINT `chk_saved_shop_stock_remaining_qty` CHECK ((`remaining_qty` between 0 and 10)),
   CONSTRAINT `fk_saved_shop_stock_save` FOREIGN KEY (`saved_id`) REFERENCES `save_game` (`saved_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -688,7 +689,7 @@ CREATE TABLE `saved_shop_stock` (
 
 LOCK TABLES `saved_shop_stock` WRITE;
 /*!40000 ALTER TABLE `saved_shop_stock` DISABLE KEYS */;
-INSERT INTO `saved_shop_stock` VALUES (1,1,18),(1,2,18),(1,6,20),(1,13,20),(1,83,20),(1,96,20),(1,98,20),(1,99,20),(1,199,20),(1,202,20),(1,210,20),(1,212,20);
+INSERT INTO `saved_shop_stock` VALUES (1,1,8),(1,2,8),(1,6,10),(1,13,10),(1,83,10),(1,96,10),(1,98,10),(1,99,10),(1,199,10),(1,202,10),(1,210,10),(1,212,10);
 /*!40000 ALTER TABLE `saved_shop_stock` ENABLE KEYS */;
 UNLOCK TABLES;
 

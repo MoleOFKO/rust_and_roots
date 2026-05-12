@@ -378,10 +378,7 @@
                                        <Pane layoutX="5.0" layoutY="2.0">
                                           <children>
                                              <ImageView fx:id="Playerinvimg112" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                                                <image>
-                                                   <Image url="@../image/items/tomato.png" />
-                                                </image>
-                                             </ImageView>
+</ImageView>
                                              <Button fx:id="Playerinvbtn112" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                                              <Label fx:id="Playerinvlbl112" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                                 <font>
@@ -393,10 +390,7 @@
                                        <Pane layoutX="99.0" layoutY="2.0">
                                           <children>
                                              <ImageView fx:id="Playerinvimg110" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                                                <image>
-                                                   <Image url="@../image/items/tomato.png" />
-                                                </image>
-                                             </ImageView>
+</ImageView>
                                              <Button fx:id="Playerinvbtn110" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                                              <Label fx:id="Playerinvlbl110" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                                 <font>
@@ -408,10 +402,7 @@
                                        <Pane layoutX="193.0" layoutY="2.0">
                                           <children>
                                              <ImageView fx:id="Playerinvimg21" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                                                <image>
-                                                   <Image url="@../image/items/tomato.png" />
-                                                </image>
-                                             </ImageView>
+</ImageView>
                                              <Button fx:id="Playerinvbtn21" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                                              <Label fx:id="Playerinvlbl21" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                                 <font>
@@ -423,10 +414,7 @@
                                        <Pane layoutX="286.0" layoutY="2.0">
                                           <children>
                                              <ImageView fx:id="Playerinvimg31" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                                                <image>
-                                                   <Image url="@../image/items/tomato.png" />
-                                                </image>
-                                             </ImageView>
+</ImageView>
                                              <Button fx:id="Playerinvbtn31" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                                              <Label fx:id="Playerinvlbl31" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                                 <font>
@@ -438,10 +426,7 @@
                                        <Pane layoutX="5.0" layoutY="52.0">
                                           <children>
                                              <ImageView fx:id="Playerinvimg41" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                                                <image>
-                                                   <Image url="@../image/items/tomato.png" />
-                                                </image>
-                                             </ImageView>
+</ImageView>
                                              <Button fx:id="Playerinvbtn41" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                                              <Label fx:id="Playerinvlbl41" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                                 <font>
@@ -453,10 +438,7 @@
                                        <Pane layoutX="99.0" layoutY="52.0">
                                           <children>
                                              <ImageView fx:id="Playerinvimg51" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                                                <image>
-                                                   <Image url="@../image/items/tomato.png" />
-                                                </image>
-                                             </ImageView>
+</ImageView>
                                              <Button fx:id="Playerinvbtn51" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                                              <Label fx:id="Playerinvlbl51" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                                 <font>
@@ -468,10 +450,7 @@
                                        <Pane layoutX="193.0" layoutY="52.0">
                                           <children>
                                              <ImageView fx:id="Playerinvimg61" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                                                <image>
-                                                   <Image url="@../image/items/tomato.png" />
-                                                </image>
-                                             </ImageView>
+</ImageView>
                                              <Button fx:id="Playerinvbtn61" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                                              <Label fx:id="Playerinvlbl61" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                                 <font>
@@ -483,10 +462,7 @@
                                        <Pane layoutX="286.0" layoutY="52.0">
                                           <children>
                                              <ImageView fx:id="Playerinvimg71" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                                                <image>
-                                                   <Image url="@../image/items/tomato.png" />
-                                                </image>
-                                             </ImageView>
+</ImageView>
                                              <Button fx:id="Playerinvbtn71" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                                              <Label fx:id="Playerinvlbl71" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                                 <font>
@@ -498,10 +474,7 @@
                                        <Pane layoutX="5.0" layoutY="103.0">
                                           <children>
                                              <ImageView fx:id="Playerinvimg81" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                                                <image>
-                                                   <Image url="@../image/items/tomato.png" />
-                                                </image>
-                                             </ImageView>
+</ImageView>
                                              <Button fx:id="Playerinvbtn81" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                                              <Label fx:id="Playerinvlbl81" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                                 <font>
@@ -513,10 +486,7 @@
                                        <Pane layoutX="99.0" layoutY="103.0">
                                           <children>
                                              <ImageView fx:id="Playerinvimg91" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                                                <image>
-                                                   <Image url="@../image/items/tomato.png" />
-                                                </image>
-                                             </ImageView>
+</ImageView>
                                              <Button fx:id="Playerinvbtn91" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                                              <Label fx:id="Playerinvlbl91" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                                 <font>
@@ -528,10 +498,7 @@
                                        <Pane layoutX="193.0" layoutY="103.0">
                                           <children>
                                              <ImageView fx:id="Playerinvimg101" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                                                <image>
-                                                   <Image url="@../image/items/tomato.png" />
-                                                </image>
-                                             </ImageView>
+</ImageView>
                                              <Button fx:id="Playerinvbtn101" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                                              <Label fx:id="Playerinvlbl101" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                                 <font>
@@ -543,10 +510,7 @@
                                        <Pane layoutX="286.0" layoutY="103.0">
                                           <children>
                                              <ImageView fx:id="Playerinvimg111" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                                                <image>
-                                                   <Image url="@../image/items/tomato.png" />
-                                                </image>
-                                             </ImageView>
+</ImageView>
                                              <Button fx:id="Playerinvbtn111" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                                              <Label fx:id="Playerinvlbl111" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                                 <font>
@@ -558,10 +522,7 @@
                                        <Pane layoutX="5.0" layoutY="153.0">
                                           <children>
                                              <ImageView fx:id="Playerinvimg121" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                                                <image>
-                                                   <Image url="@../image/items/tomato.png" />
-                                                </image>
-                                             </ImageView>
+</ImageView>
                                              <Button fx:id="Playerinvbtn121" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                                              <Label fx:id="Playerinvlbl121" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                                 <font>
@@ -573,10 +534,7 @@
                                        <Pane layoutX="99.0" layoutY="153.0">
                                           <children>
                                              <ImageView fx:id="Playerinvimg131" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                                                <image>
-                                                   <Image url="@../image/items/tomato.png" />
-                                                </image>
-                                             </ImageView>
+</ImageView>
                                              <Button fx:id="Playerinvbtn131" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                                              <Label fx:id="Playerinvlbl131" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                                 <font>
@@ -588,10 +546,7 @@
                                        <Pane layoutX="193.0" layoutY="153.0">
                                           <children>
                                              <ImageView fx:id="Playerinvimg141" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                                                <image>
-                                                   <Image url="@../image/items/tomato.png" />
-                                                </image>
-                                             </ImageView>
+</ImageView>
                                              <Button fx:id="Playerinvbtn141" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                                              <Label fx:id="Playerinvlbl141" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                                 <font>
@@ -603,10 +558,7 @@
                                        <Pane layoutX="286.0" layoutY="153.0">
                                           <children>
                                              <ImageView fx:id="Playerinvimg151" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                                                <image>
-                                                   <Image url="@../image/items/tomato.png" />
-                                                </image>
-                                             </ImageView>
+</ImageView>
                                              <Button fx:id="Playerinvbtn151" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                                              <Label fx:id="Playerinvlbl151" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                                 <font>
@@ -618,10 +570,7 @@
                                        <Pane layoutX="5.0" layoutY="202.0">
                                           <children>
                                              <ImageView fx:id="Playerinvimg161" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                                                <image>
-                                                   <Image url="@../image/items/tomato.png" />
-                                                </image>
-                                             </ImageView>
+</ImageView>
                                              <Button fx:id="Playerinvbtn161" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                                              <Label fx:id="Playerinvlbl161" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                                 <font>
@@ -633,10 +582,7 @@
                                        <Pane layoutX="99.0" layoutY="203.0">
                                           <children>
                                              <ImageView fx:id="Playerinvimg171" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                                                <image>
-                                                   <Image url="@../image/items/tomato.png" />
-                                                </image>
-                                             </ImageView>
+</ImageView>
                                              <Button fx:id="Playerinvbtn171" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                                              <Label fx:id="Playerinvlbl171" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                                 <font>
@@ -648,10 +594,7 @@
                                        <Pane layoutX="193.0" layoutY="203.0">
                                           <children>
                                              <ImageView fx:id="Playerinvimg181" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                                                <image>
-                                                   <Image url="@../image/items/tomato.png" />
-                                                </image>
-                                             </ImageView>
+</ImageView>
                                              <Button fx:id="Playerinvbtn181" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                                              <Label fx:id="Playerinvlbl181" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                                 <font>
@@ -663,10 +606,7 @@
                                        <Pane layoutX="286.0" layoutY="202.0">
                                           <children>
                                              <ImageView fx:id="Playerinvimg191" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                                                <image>
-                                                   <Image url="@../image/items/tomato.png" />
-                                                </image>
-                                             </ImageView>
+</ImageView>
                                              <Button fx:id="Playerinvbtn191" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                                              <Label fx:id="Playerinvlbl191" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                                 <font>
@@ -1063,7 +1003,30 @@
                      </DropShadow>
                   </effect>
                </Label>
-         </children>
+            <Group fx:id="minimapicongroup" layoutX="540.0" layoutY="-10.0">
+               <children>
+                  <ImageView fx:id="miniMapIcon" fitHeight="37.0" fitWidth="34.0" layoutX="-14.0" layoutY="9.0" onMouseClicked="#handleMiniMapIconaction" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../image/tools/minimapicon.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </Group>
+            <Group fx:id="minimapgroup" managed="false" visible="false">
+               <children>
+                  <Rectangle fill="BLACK" height="400.0" opacity="0.54" width="600.0" />
+                  <ImageView fx:id="minimap" fitHeight="311.0" fitWidth="514.0" layoutX="45.0" layoutY="35.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../image/maps/map%20(2).png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="closeminimapbtn" fitHeight="33.0" fitWidth="29.0" layoutX="565.0" layoutY="5.0" onMouseClicked="#handleCloseMiniMapAction" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../image/tools/x.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </Group>         </children>
       </Group>
          <StackPane fx:id="sleepStackPane" disable="true" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: black;" visible="false">
             <children>
@@ -1089,10 +1052,7 @@
                               <children>
                                  <Label fx:id="invlbl" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="invbtn" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" />
                               </children>
                            </Pane>
@@ -1100,10 +1060,7 @@
                               <children>
                                  <Label fx:id="invlbl1" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg1" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="invbtn1" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" />
                               </children>
                            </Pane>
@@ -1111,10 +1068,7 @@
                               <children>
                                  <Label fx:id="invlbl2" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg2" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="invbtn2" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" />
                               </children>
                            </Pane>
@@ -1122,10 +1076,7 @@
                               <children>
                                  <Label fx:id="invlbl3" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg3" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="invbtn3" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" />
                               </children>
                            </Pane>
@@ -1133,10 +1084,7 @@
                               <children>
                                  <Label fx:id="invlbl4" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg4" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="invbtn4" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" />
                               </children>
                            </Pane>
@@ -1144,10 +1092,7 @@
                               <children>
                                  <Label fx:id="invlbl5" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg5" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="invbtn5" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" />
                               </children>
                            </Pane>
@@ -1155,10 +1100,7 @@
                               <children>
                                  <Label fx:id="invlbl6" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg6" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="invbtn6" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" />
                               </children>
                            </Pane>
@@ -1166,10 +1108,7 @@
                               <children>
                                  <Label fx:id="invlbl7" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg7" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="invbtn7" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" />
                               </children>
                            </Pane>
@@ -1177,10 +1116,7 @@
                               <children>
                                  <Label fx:id="invlbl8" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg8" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="invbtn8" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" />
                               </children>
                            </Pane>
@@ -1188,10 +1124,7 @@
                               <children>
                                  <Label fx:id="invlbl9" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg9" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="invbtn9" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" />
                               </children>
                            </Pane>
@@ -1199,10 +1132,7 @@
                               <children>
                                  <Label fx:id="invlbl10" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg10" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="invbtn10" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" />
                               </children>
                            </Pane>
@@ -1210,10 +1140,7 @@
                               <children>
                                  <Label fx:id="invlbl11" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg11" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="invbtn11" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" />
                               </children>
                            </Pane>
@@ -1221,10 +1148,7 @@
                               <children>
                                  <Label fx:id="invlbl12" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg12" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="invbtn12" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" />
                               </children>
                            </Pane>
@@ -1232,10 +1156,7 @@
                               <children>
                                  <Label fx:id="invlbl13" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg13" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="invbtn13" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" />
                               </children>
                            </Pane>
@@ -1243,10 +1164,7 @@
                               <children>
                                  <Label fx:id="invlbl14" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg14" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="invbtn14" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" />
                               </children>
                            </Pane>
@@ -1254,10 +1172,7 @@
                               <children>
                                  <Label fx:id="invlbl15" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg15" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="invbtn15" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" />
                               </children>
                            </Pane>
@@ -1265,10 +1180,7 @@
                               <children>
                                  <Label fx:id="invlbl16" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg16" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="invbtn16" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" />
                               </children>
                            </Pane>
@@ -1276,10 +1188,7 @@
                               <children>
                                  <Label fx:id="invlbl17" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg17" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="invbtn17" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" />
                               </children>
                            </Pane>
@@ -1287,10 +1196,7 @@
                               <children>
                                  <Label fx:id="invlbl18" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg18" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="invbtn18" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" />
                               </children>
                            </Pane>
@@ -1298,10 +1204,7 @@
                               <children>
                                  <Label fx:id="invlbl19" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg19" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="invbtn19" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" />
                               </children>
                            </Pane>
@@ -1309,10 +1212,7 @@
                               <children>
                                  <Label fx:id="invlbl20" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg20" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="invbtn20" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" />
                               </children>
                            </Pane>
@@ -1320,10 +1220,7 @@
                               <children>
                                  <Label fx:id="invlbl21" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg21" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="invbtn21" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" />
                               </children>
                            </Pane>
@@ -1331,10 +1228,7 @@
                               <children>
                                  <Label fx:id="invlbl22" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg22" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="invbtn22" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" />
                               </children>
                            </Pane>
@@ -1342,10 +1236,7 @@
                               <children>
                                  <Label fx:id="invlbl23" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg23" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="invbtn23" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" />
                               </children>
                            </Pane>
@@ -1353,10 +1244,7 @@
                               <children>
                                  <Label fx:id="invlbl24" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg24" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="invbtn24" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" />
                               </children>
                            </Pane>
@@ -1364,10 +1252,7 @@
                               <children>
                                  <Label fx:id="invlbl25" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg25" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="invbtn25" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" />
                               </children>
                            </Pane>
@@ -1375,10 +1260,7 @@
                               <children>
                                  <Label fx:id="invlbl26" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg26" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="invbtn26" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" />
                               </children>
                            </Pane>
@@ -1386,10 +1268,7 @@
                               <children>
                                  <Label fx:id="invlbl27" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg27" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="invbtn27" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" />
                               </children>
                            </Pane>
@@ -1397,10 +1276,7 @@
                               <children>
                                  <Label fx:id="invlbl28" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg28" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="invbtn28" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" />
                               </children>
                            </Pane>
@@ -1408,10 +1284,7 @@
                               <children>
                                  <Label fx:id="invlbl29" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg29" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="invbtn29" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" />
                               </children>
                            </Pane>
@@ -1419,10 +1292,7 @@
                               <children>
                                  <Label fx:id="invlbl30" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg30" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="invbtn30" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" />
                               </children>
                            </Pane>
@@ -1430,10 +1300,7 @@
                               <children>
                                  <Label fx:id="invlbl31" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg31" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="invbtn31" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" />
                               </children>
                            </Pane>
@@ -1441,10 +1308,7 @@
                               <children>
                                  <Label fx:id="invlbl32" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg32" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="invbtn32" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" />
                               </children>
                            </Pane>
@@ -1452,10 +1316,7 @@
                               <children>
                                  <Label fx:id="invlbl33" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg33" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="invbtn33" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" />
                               </children>
                            </Pane>
@@ -1463,10 +1324,7 @@
                               <children>
                                  <Label fx:id="invlbl34" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg34" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="invbtn34" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" />
                               </children>
                            </Pane>
@@ -1474,10 +1332,7 @@
                               <children>
                                  <Label fx:id="invlbl35" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg35" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="invbtn35" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" />
                               </children>
                            </Pane>
@@ -1485,10 +1340,7 @@
                               <children>
                                  <Label fx:id="invlbl36" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg36" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="invbtn36" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" />
                               </children>
                            </Pane>
@@ -1496,10 +1348,7 @@
                               <children>
                                  <Label fx:id="invlbl37" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg37" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="invbtn37" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" />
                               </children>
                            </Pane>
@@ -1507,10 +1356,7 @@
                               <children>
                                  <Label fx:id="invlbl38" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg38" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="invbtn38" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" />
                               </children>
                            </Pane>
@@ -1518,10 +1364,7 @@
                               <children>
                                  <Label fx:id="invlbl39" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg39" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="invbtn39" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" />
                               </children>
                            </Pane>
@@ -1529,10 +1372,7 @@
                               <children>
                                  <Label fx:id="invlbl40" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg40" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="invbtn40" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" />
                               </children>
                            </Pane>
@@ -1540,10 +1380,7 @@
                               <children>
                                  <Label fx:id="invlbl41" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg41" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="invbtn41" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" />
                               </children>
                            </Pane>
@@ -1554,10 +1391,7 @@
                            <Pane>
                               <children>
                                  <ImageView fx:id="Playerinvimg" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="Playerinvbtn" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                                  <Label fx:id="Playerinvlbl" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                     <font>
@@ -1569,10 +1403,7 @@
                            <Pane layoutX="61.0">
                               <children>
                                  <ImageView fx:id="Playerinvimg1" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="Playerinvbtn1" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                                  <Label fx:id="Playerinvlbl1" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                     <font>
@@ -1584,10 +1415,7 @@
                            <Pane layoutX="122.0">
                               <children>
                                  <ImageView fx:id="Playerinvimg2" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="Playerinvbtn2" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                                  <Label fx:id="Playerinvlbl2" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                     <font>
@@ -1599,10 +1427,7 @@
                            <Pane layoutX="183.0" layoutY="2.0">
                               <children>
                                  <ImageView fx:id="Playerinvimg3" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="Playerinvbtn3" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                                  <Label fx:id="Playerinvlbl3" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                     <font>
@@ -1614,10 +1439,7 @@
                            <Pane layoutY="59.0">
                               <children>
                                  <ImageView fx:id="Playerinvimg4" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="Playerinvbtn4" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                                  <Label fx:id="Playerinvlbl4" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                     <font>
@@ -1629,10 +1451,7 @@
                            <Pane layoutX="61.0" layoutY="59.0">
                               <children>
                                  <ImageView fx:id="Playerinvimg5" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="Playerinvbtn5" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                                  <Label fx:id="Playerinvlbl5" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                     <font>
@@ -1644,10 +1463,7 @@
                            <Pane layoutX="122.0" layoutY="59.0">
                               <children>
                                  <ImageView fx:id="Playerinvimg6" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="Playerinvbtn6" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                                  <Label fx:id="Playerinvlbl6" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                     <font>
@@ -1659,10 +1475,7 @@
                            <Pane layoutX="183.0" layoutY="59.0">
                               <children>
                                  <ImageView fx:id="Playerinvimg7" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="Playerinvbtn7" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                                  <Label fx:id="Playerinvlbl7" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                     <font>
@@ -1674,10 +1487,7 @@
                            <Pane layoutY="119.0">
                               <children>
                                  <ImageView fx:id="Playerinvimg8" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="Playerinvbtn8" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                                  <Label fx:id="Playerinvlbl8" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                     <font>
@@ -1689,10 +1499,7 @@
                            <Pane layoutX="61.0" layoutY="119.0">
                               <children>
                                  <ImageView fx:id="Playerinvimg9" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="Playerinvbtn9" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                                  <Label fx:id="Playerinvlbl9" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                     <font>
@@ -1704,10 +1511,7 @@
                            <Pane layoutX="122.0" layoutY="119.0">
                               <children>
                                  <ImageView fx:id="Playerinvimg10" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="Playerinvbtn10" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                                  <Label fx:id="Playerinvlbl10" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                     <font>
@@ -1719,10 +1523,7 @@
                            <Pane layoutX="183.0" layoutY="119.0">
                               <children>
                                  <ImageView fx:id="Playerinvimg11" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="Playerinvbtn11" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                                  <Label fx:id="Playerinvlbl11" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                     <font>
@@ -1734,10 +1535,7 @@
                            <Pane layoutY="179.0">
                               <children>
                                  <ImageView fx:id="Playerinvimg12" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="Playerinvbtn12" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                                  <Label fx:id="Playerinvlbl12" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                     <font>
@@ -1749,10 +1547,7 @@
                            <Pane layoutX="61.0" layoutY="179.0">
                               <children>
                                  <ImageView fx:id="Playerinvimg13" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="Playerinvbtn13" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                                  <Label fx:id="Playerinvlbl13" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                     <font>
@@ -1764,10 +1559,7 @@
                            <Pane layoutX="122.0" layoutY="179.0">
                               <children>
                                  <ImageView fx:id="Playerinvimg14" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="Playerinvbtn14" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                                  <Label fx:id="Playerinvlbl14" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                     <font>
@@ -1779,10 +1571,7 @@
                            <Pane layoutX="183.0" layoutY="179.0">
                               <children>
                                  <ImageView fx:id="Playerinvimg15" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="Playerinvbtn15" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                                  <Label fx:id="Playerinvlbl15" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                     <font>
@@ -1794,10 +1583,7 @@
                            <Pane layoutY="235.0">
                               <children>
                                  <ImageView fx:id="Playerinvimg16" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="Playerinvbtn16" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                                  <Label fx:id="Playerinvlbl16" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                     <font>
@@ -1809,10 +1595,7 @@
                            <Pane layoutX="61.0" layoutY="235.0">
                               <children>
                                  <ImageView fx:id="Playerinvimg17" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="Playerinvbtn17" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                                  <Label fx:id="Playerinvlbl17" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                     <font>
@@ -1824,10 +1607,7 @@
                            <Pane layoutX="122.0" layoutY="235.0">
                               <children>
                                  <ImageView fx:id="Playerinvimg18" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="Playerinvbtn18" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                                  <Label fx:id="Playerinvlbl18" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                     <font>
@@ -1839,10 +1619,7 @@
                            <Pane layoutX="183.0" layoutY="235.0">
                               <children>
                                  <ImageView fx:id="Playerinvimg19" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../image/items/tomato.png" />
-                                    </image>
-                                 </ImageView>
+</ImageView>
                                  <Button fx:id="Playerinvbtn19" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
                                  <Label fx:id="Playerinvlbl19" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                     <font>

@@ -60,6 +60,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Polygon;
 import model.CollisionRegistry;
 import model.Farm;
 import model.FarmGrowthRules;
@@ -243,6 +244,14 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     @FXML protected Slider sfxVolumeSlider;
 
     @FXML protected Group player_inv_group;
+
+    // ---------- Optional shared mini-map ----------
+    @FXML protected Group minimapicongroup;
+    @FXML protected Group minimapgroup;
+    @FXML protected ImageView miniMapIcon;
+    @FXML protected ImageView minimap;
+    @FXML protected ImageView closeminimapbtn;
+    private Polygon minimapPlayerMarker;
 
     protected static final int DEFAULT_PLAYER_SLOT_CAPACITY = 20;
 
@@ -562,6 +571,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
         new WorldScaler(view, world);
         disableKeyboardActivationRecursive(view);
+        setupMiniMapIfPresent();
         player.start();
 
         afterBaseInitialize();
@@ -628,6 +638,120 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         };
     }
 
+    @FXML
+    protected void handleMiniMapIconaction(MouseEvent event) {
+        Group miniMapGroup = minimapgroup != null ? minimapgroup : controllerField("minimapgroup", Group.class);
+        if (miniMapGroup == null) {
+            if (event != null) event.consume();
+            return;
+        }
+
+        miniMapGroup.setVisible(true);
+        miniMapGroup.setManaged(true);
+        miniMapGroup.setDisable(false);
+        updateMiniMapPlayerMarker();
+        miniMapGroup.toFront();
+        if (player != null) {
+            player.clearInputState();
+        }
+        if (event != null) event.consume();
+    }
+
+    @FXML
+    protected void handleCloseMiniMapAction(MouseEvent event) {
+        Group miniMapGroup = minimapgroup != null ? minimapgroup : controllerField("minimapgroup", Group.class);
+        if (miniMapGroup != null) {
+            miniMapGroup.setVisible(false);
+            miniMapGroup.setManaged(false);
+            miniMapGroup.setDisable(true);
+        }
+        if (event != null) event.consume();
+    }
+
+    private void setupMiniMapIfPresent() {
+        Group miniMapGroup = minimapgroup != null ? minimapgroup : controllerField("minimapgroup", Group.class);
+        ImageView miniMapIconNode = miniMapIcon != null ? miniMapIcon : controllerField("miniMapIcon", ImageView.class);
+        ImageView closeMiniMapNode = closeminimapbtn != null ? closeminimapbtn : controllerField("closeminimapbtn", ImageView.class);
+
+        if (miniMapGroup != null) {
+            miniMapGroup.setVisible(false);
+            miniMapGroup.setManaged(false);
+            miniMapGroup.setDisable(true);
+        }
+        if (miniMapIconNode != null) {
+            miniMapIconNode.setOnMouseClicked(this::handleMiniMapIconaction);
+        }
+        if (closeMiniMapNode != null) {
+            closeMiniMapNode.setOnMouseClicked(this::handleCloseMiniMapAction);
+        }
+    }
+
+    private void updateMiniMapPlayerMarker() {
+        Group miniMapGroup = minimapgroup != null ? minimapgroup : controllerField("minimapgroup", Group.class);
+        ImageView miniMapImage = minimap != null ? minimap : controllerField("minimap", ImageView.class);
+        if (miniMapGroup == null || miniMapImage == null || human == null) return;
+
+        if (minimapPlayerMarker == null) {
+            minimapPlayerMarker = new Polygon(0.0, -7.0, 6.0, 7.0, 0.0, 4.0, -6.0, 7.0);
+            minimapPlayerMarker.setFill(Color.DODGERBLUE);
+            minimapPlayerMarker.setStroke(Color.WHITE);
+            minimapPlayerMarker.setStrokeWidth(1.1);
+            minimapPlayerMarker.setMouseTransparent(true);
+            miniMapGroup.getChildren().add(minimapPlayerMarker);
+        }
+
+        double imageWidth = miniMapImage.getFitWidth() > 0 ? miniMapImage.getFitWidth() : miniMapImage.getBoundsInParent().getWidth();
+        double imageHeight = miniMapImage.getFitHeight() > 0 ? miniMapImage.getFitHeight() : miniMapImage.getBoundsInParent().getHeight();
+        if (imageWidth <= 0 || imageHeight <= 0) {
+            imageWidth = 514.0;
+            imageHeight = 311.0;
+        }
+
+        MiniMapRegion region = miniMapRegionFor(mapKey());
+        double playerX = clamp(human.getLayoutX() / 600.0, 0.0, 1.0);
+        double playerY = clamp(human.getLayoutY() / 400.0, 0.0, 1.0);
+        double normalizedX = region.x() + (region.width() * playerX);
+        double normalizedY = region.y() + (region.height() * playerY);
+
+        minimapPlayerMarker.setLayoutX(miniMapImage.getLayoutX() + (normalizedX * imageWidth));
+        minimapPlayerMarker.setLayoutY(miniMapImage.getLayoutY() + (normalizedY * imageHeight));
+        minimapPlayerMarker.setRotate(miniMapMarkerRotation());
+        minimapPlayerMarker.toFront();
+    }
+
+    private double miniMapMarkerRotation() {
+        if (player == null) return 180.0;
+        return switch (player.getFacingDirection()) {
+            case UP -> 0.0;
+            case RIGHT -> 90.0;
+            case DOWN -> 180.0;
+            case LEFT -> 270.0;
+        };
+    }
+
+    private MiniMapRegion miniMapRegionFor(String rawMapKey) {
+        String key = rawMapKey == null ? "" : rawMapKey.toLowerCase(Locale.ROOT);
+        if (key.startsWith("upper_map")) {
+            return new MiniMapRegion(0.37, 0.05, 0.26, 0.25);
+        }
+        if (key.startsWith("left_map")) {
+            return new MiniMapRegion(0.10, 0.38, 0.26, 0.25);
+        }
+        if (key.startsWith("right_map")) {
+            return new MiniMapRegion(0.64, 0.38, 0.26, 0.25);
+        }
+        if (key.startsWith("d_") || key.startsWith("dhome") || key.startsWith("dundermap")) {
+            return new MiniMapRegion(0.37, 0.70, 0.26, 0.25);
+        }
+        return new MiniMapRegion(0.37, 0.38, 0.26, 0.25);
+    }
+
+    private double clamp(double value, double min, double max) {
+        return Math.max(min, Math.min(max, value));
+    }
+
+    private record MiniMapRegion(double x, double y, double width, double height) {}
+
     private void cleanupBeforeSceneSwitch() {
         detachFarmTimeRefresh();
         detachSharedHudRefreshListener();
@@ -657,6 +781,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         playerInventoryImages.clear();
         playerInventoryLabels.clear();
         playerInventoryButtons.clear();
+        minimapPlayerMarker = null;
     }
 
     private void unbindSharedUiFromSingletons() {
