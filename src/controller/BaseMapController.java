@@ -673,6 +673,24 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         ImageView miniMapIconNode = miniMapIcon != null ? miniMapIcon : controllerField("miniMapIcon", ImageView.class);
         ImageView closeMiniMapNode = closeminimapbtn != null ? closeminimapbtn : controllerField("closeminimapbtn", ImageView.class);
 
+        if (isMiniMapExcludedMap(mapKey())) {
+            if (miniMapGroup != null) {
+                miniMapGroup.setVisible(false);
+                miniMapGroup.setManaged(false);
+                miniMapGroup.setDisable(true);
+            }
+            if (minimapicongroup != null) {
+                minimapicongroup.setVisible(false);
+                minimapicongroup.setManaged(false);
+                minimapicongroup.setDisable(true);
+            }
+            if (miniMapIconNode != null) {
+                miniMapIconNode.setVisible(false);
+                miniMapIconNode.setDisable(true);
+            }
+            return;
+        }
+
         if (miniMapGroup != null) {
             miniMapGroup.setVisible(false);
             miniMapGroup.setManaged(false);
@@ -689,7 +707,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     private void updateMiniMapPlayerMarker() {
         Group miniMapGroup = minimapgroup != null ? minimapgroup : controllerField("minimapgroup", Group.class);
         ImageView miniMapImage = minimap != null ? minimap : controllerField("minimap", ImageView.class);
-        if (miniMapGroup == null || miniMapImage == null || human == null) return;
+        if (miniMapGroup == null || miniMapImage == null || human == null || isMiniMapExcludedMap(mapKey())) return;
 
         if (minimapPlayerMarker == null) {
             minimapPlayerMarker = new Polygon(0.0, -7.0, 6.0, 7.0, 0.0, 4.0, -6.0, 7.0);
@@ -702,6 +720,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
         MiniMapImageBounds imageBounds = renderedMiniMapImageBounds(miniMapImage);
         MiniMapPoint point = miniMapPointForPlayer(mapKey(), human.getLayoutX(), human.getLayoutY());
+        if (point == null) return;
 
         minimapPlayerMarker.setLayoutX(imageBounds.x() + (point.x() * imageBounds.width()));
         minimapPlayerMarker.setLayoutY(imageBounds.y() + (point.y() * imageBounds.height()));
@@ -744,13 +763,25 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
     private MiniMapPoint miniMapPointForPlayer(String rawMapKey, double layoutX, double layoutY) {
         String key = rawMapKey == null ? "" : rawMapKey.toLowerCase(Locale.ROOT);
+        if (isMiniMapExcludedMap(key)) {
+            return null;
+        }
         if (key.equals("home_interior")) {
             return new MiniMapPoint(0.545, 0.815);
         }
 
         MiniMapRegion region = miniMapRegionFor(key);
-        double playerX = clamp(layoutX / 600.0, 0.0, 1.0);
-        double playerY = clamp(layoutY / 400.0, 0.0, 1.0);
+        MiniMapWorldBounds mapBounds = miniMapPrimaryMapBounds();
+        if (mapBounds == null) {
+            mapBounds = miniMapWallBounds();
+        }
+        if (mapBounds == null) {
+            mapBounds = new MiniMapWorldBounds(0.0, 0.0, 600.0, 400.0);
+        }
+
+        MiniMapPoint playerCenter = miniMapPlayerCenterInWorld(layoutX, layoutY);
+        double playerX = clamp((playerCenter.x() - mapBounds.x()) / mapBounds.width(), 0.0, 1.0);
+        double playerY = clamp((playerCenter.y() - mapBounds.y()) / mapBounds.height(), 0.0, 1.0);
         return new MiniMapPoint(
             region.x() + (region.width() * playerX),
             region.y() + (region.height() * playerY)
@@ -760,15 +791,131 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     private MiniMapRegion miniMapRegionFor(String rawMapKey) {
         String key = rawMapKey == null ? "" : rawMapKey.toLowerCase(Locale.ROOT);
         if (key.startsWith("upper_map")) {
-            return new MiniMapRegion(0.36, 0.18, 0.40, 0.19);
+            return new MiniMapRegion("upper_map", 0.36, 0.18, 0.40, 0.19);
         }
         if (key.startsWith("left_map")) {
-            return new MiniMapRegion(0.05, 0.45, 0.35, 0.24);
+            return new MiniMapRegion("left_map", 0.05, 0.45, 0.35, 0.24);
         }
         if (key.startsWith("right_map")) {
-            return new MiniMapRegion(0.61, 0.39, 0.33, 0.25);
+            return new MiniMapRegion("right_map", 0.61, 0.39, 0.33, 0.25);
         }
-        return new MiniMapRegion(0.43, 0.74, 0.34, 0.18);
+        return new MiniMapRegion("home_map", 0.43, 0.74, 0.34, 0.18);
+    }
+
+    private boolean isMiniMapExcludedMap(String rawMapKey) {
+        String key = rawMapKey == null ? "" : rawMapKey.toLowerCase(Locale.ROOT);
+        return key.startsWith("d_") || key.startsWith("dundermap") || key.startsWith("dhome");
+    }
+
+    private MiniMapWorldBounds miniMapPrimaryMapBounds() {
+        ImageView background = bg != null ? bg : controllerField("bg", ImageView.class);
+        if (background == null) {
+            return null;
+        }
+
+        MiniMapImageBounds rendered = renderedImageViewBoundsInParent(background);
+        if (rendered.width() <= 0.0 || rendered.height() <= 0.0) {
+            return null;
+        }
+        return new MiniMapWorldBounds(rendered.x(), rendered.y(), rendered.width(), rendered.height());
+    }
+
+    private MiniMapWorldBounds miniMapWallBounds() {
+        List<Rectangle> wallRects = cachedStaticWalls;
+        if ((wallRects == null || wallRects.isEmpty()) && walls != null) {
+            wallRects = CollisionRegistry.collectWalls(walls);
+        }
+        if (wallRects == null || wallRects.isEmpty()) {
+            return null;
+        }
+
+        double minX = Double.POSITIVE_INFINITY;
+        double minY = Double.POSITIVE_INFINITY;
+        double maxX = Double.NEGATIVE_INFINITY;
+        double maxY = Double.NEGATIVE_INFINITY;
+
+        for (Rectangle rect : wallRects) {
+            if (rect == null) continue;
+            Bounds bounds = miniMapNodeBoundsInWorld(rect);
+            if (bounds == null || bounds.getWidth() <= 0.0 || bounds.getHeight() <= 0.0) continue;
+            minX = Math.min(minX, bounds.getMinX());
+            minY = Math.min(minY, bounds.getMinY());
+            maxX = Math.max(maxX, bounds.getMaxX());
+            maxY = Math.max(maxY, bounds.getMaxY());
+        }
+
+        if (!Double.isFinite(minX) || !Double.isFinite(minY) || !Double.isFinite(maxX) || !Double.isFinite(maxY)) {
+            return null;
+        }
+
+        double width = maxX - minX;
+        double height = maxY - minY;
+        if (width <= 0.0 || height <= 0.0) {
+            return null;
+        }
+        return new MiniMapWorldBounds(minX, minY, width, height);
+    }
+
+    private MiniMapPoint miniMapPlayerCenterInWorld(double fallbackLayoutX, double fallbackLayoutY) {
+        if (human_hitbox != null) {
+            Bounds hitboxBounds = miniMapNodeBoundsInWorld(human_hitbox);
+            if (hitboxBounds != null && hitboxBounds.getWidth() > 0.0 && hitboxBounds.getHeight() > 0.0) {
+                return new MiniMapPoint(
+                    hitboxBounds.getMinX() + (hitboxBounds.getWidth() / 2.0),
+                    hitboxBounds.getMinY() + (hitboxBounds.getHeight() / 2.0)
+                );
+            }
+        }
+
+        Bounds humanBounds = miniMapNodeBoundsInWorld(human);
+        if (humanBounds != null && humanBounds.getWidth() > 0.0 && humanBounds.getHeight() > 0.0) {
+            return new MiniMapPoint(
+                humanBounds.getMinX() + (humanBounds.getWidth() / 2.0),
+                humanBounds.getMinY() + (humanBounds.getHeight() / 2.0)
+            );
+        }
+
+        return new MiniMapPoint(fallbackLayoutX, fallbackLayoutY);
+    }
+
+    private Bounds miniMapNodeBoundsInWorld(Node node) {
+        if (node == null) {
+            return null;
+        }
+        try {
+            if (world != null && node.getScene() != null) {
+                return world.sceneToLocal(node.localToScene(node.getBoundsInLocal()));
+            }
+        } catch (IllegalStateException ignored) {
+        }
+        return node.getBoundsInParent();
+    }
+
+    private MiniMapImageBounds renderedImageViewBoundsInParent(ImageView imageView) {
+        double fitWidth = imageView.getFitWidth() > 0.0 ? imageView.getFitWidth() : imageView.getBoundsInParent().getWidth();
+        double fitHeight = imageView.getFitHeight() > 0.0 ? imageView.getFitHeight() : imageView.getBoundsInParent().getHeight();
+        if (fitWidth <= 0.0 || fitHeight <= 0.0) {
+            return new MiniMapImageBounds(imageView.getLayoutX(), imageView.getLayoutY(), 0.0, 0.0);
+        }
+
+        double imageWidth = imageView.getImage() == null ? 0.0 : imageView.getImage().getWidth();
+        double imageHeight = imageView.getImage() == null ? 0.0 : imageView.getImage().getHeight();
+        if (imageView.isPreserveRatio() && imageWidth > 0.0 && imageHeight > 0.0) {
+            double scale = Math.min(fitWidth / imageWidth, fitHeight / imageHeight);
+            double renderedWidth = imageWidth * scale;
+            double renderedHeight = imageHeight * scale;
+            return new MiniMapImageBounds(
+                imageView.getLayoutX() + ((fitWidth - renderedWidth) / 2.0),
+                imageView.getLayoutY() + ((fitHeight - renderedHeight) / 2.0),
+                renderedWidth,
+                renderedHeight
+            );
+        }
+
+        Bounds bounds = imageView.getBoundsInParent();
+        double x = Double.isFinite(bounds.getMinX()) ? bounds.getMinX() : imageView.getLayoutX();
+        double y = Double.isFinite(bounds.getMinY()) ? bounds.getMinY() : imageView.getLayoutY();
+        return new MiniMapImageBounds(x, y, fitWidth, fitHeight);
     }
 
     private double clamp(double value, double min, double max) {
@@ -777,7 +924,8 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
     private record MiniMapImageBounds(double x, double y, double width, double height) {}
     private record MiniMapPoint(double x, double y) {}
-    private record MiniMapRegion(double x, double y, double width, double height) {}
+    private record MiniMapRegion(String sectionKey, double x, double y, double width, double height) {}
+    private record MiniMapWorldBounds(double x, double y, double width, double height) {}
 
     private void cleanupBeforeSceneSwitch() {
         detachFarmTimeRefresh();
@@ -2977,6 +3125,11 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 	            if (naturalResourceSystem != null) {
 	                naturalResourceSystem.update(playerBounds);
 	            }
+
+            Group miniMapGroup = minimapgroup != null ? minimapgroup : controllerField("minimapgroup", Group.class);
+            if (miniMapGroup != null && miniMapGroup.isVisible()) {
+                updateMiniMapPlayerMarker();
+            }
 
 	            onGameLoopUpdate(playerBounds);
 	        });

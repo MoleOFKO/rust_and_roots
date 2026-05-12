@@ -874,9 +874,9 @@
                   </ImageView>
                </children>
             </Group>
-            <Group fx:id="minimapgroup" managed="false" visible="false">
+            <Group fx:id="minimapgroup" visible="false">
                <children>
-                  <Rectangle fill="BLACK" height="400.0" opacity="0.54" width="600.0" />
+                  <Pane opacity="0.54" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: black;" />
                   <ImageView fx:id="minimap" fitHeight="311.0" fitWidth="514.0" layoutX="45.0" layoutY="35.0" pickOnBounds="true" preserveRatio="true">
                      <image>
                         <Image url="@../image/maps/map%20(2).png" />
@@ -888,7 +888,7 @@
                      </image>
                   </ImageView>
                </children>
-            </Group>         </children>
+            </Group></children>
       </Group>
    </children>
 </StackPane>

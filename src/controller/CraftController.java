@@ -3,17 +3,23 @@ package controller;
 import game.GameState;
 import game.GameTimeManager;
 import game.SceneController;
+import java.util.HashMap;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.concurrent.ThreadLocalRandom;
+import javafx.animation.Animation;
 import javafx.animation.AnimationTimer;
+import javafx.animation.Interpolator;
+import javafx.animation.TranslateTransition;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Rectangle2D;
 import javafx.fxml.Initializable;
 import javafx.scene.Group;
 import javafx.scene.control.Button;
@@ -32,6 +38,7 @@ import util.SkillModifiers;
 import util.SpawnTag;
 import util.TutorialOverlayHelper;
 import util.WorldScaler;
+import javafx.util.Duration;
 
 public class CraftController implements Initializable, SceneController {
     private static final int MAX_RECIPE_SLOTS = 20;
@@ -49,6 +56,7 @@ public class CraftController implements Initializable, SceneController {
     private Recipe selectedRecipe;
     private AnimationTimer craftUiTimer;
     private Image unknownRecipeImage;
+    private final Map<ImageView, TranslateTransition> lockedRecipeFloatAnimations = new HashMap<>();
 
     @FXML private StackPane view;
     @FXML private Group world;
@@ -201,6 +209,9 @@ public class CraftController implements Initializable, SceneController {
             ImageView imageView = recipeImages.get(i);
             if (i >= unlockedRecipes.size()) {
                 if (imageView != null) {
+                    stopLockedRecipeFloat(imageView);
+                    imageView.setViewport(null);
+                    imageView.setTranslateY(0.0);
                     imageView.setImage(null);
                     imageView.setVisible(false);
                     imageView.setOpacity(0.0);
@@ -212,6 +223,7 @@ public class CraftController implements Initializable, SceneController {
                 imageView.setImage(recipe.unlocked ? ItemDatabase.getImage(recipe.outputItemId) : unknownRecipeImage);
                 imageView.setVisible(true);
                 imageView.setOpacity(recipe.unlocked ? 0.9 : 0.75);
+                applyLockedRecipeVisual(imageView, !recipe.unlocked, i);
             }
         }
         refreshRecipeSelectionHighlight();
@@ -322,6 +334,7 @@ public class CraftController implements Initializable, SceneController {
 
     private void stopUiTimer() {
         if (craftUiTimer != null) { craftUiTimer.stop(); craftUiTimer = null; }
+        stopAllLockedRecipeFloats();
     }
 
     private void updateCraftingStateUi() {
@@ -497,6 +510,50 @@ public class CraftController implements Initializable, SceneController {
             img.setScaleX(selected ? 1.05 : 1.0);
             img.setScaleY(selected ? 1.05 : 1.0);
         }
+    }
+
+    private void applyLockedRecipeVisual(ImageView imageView, boolean locked, int index) {
+        if (imageView == null) return;
+        if (!locked) {
+            stopLockedRecipeFloat(imageView);
+            imageView.setViewport(null);
+            imageView.setPreserveRatio(true);
+            imageView.setTranslateY(0.0);
+            return;
+        }
+
+        imageView.setViewport(new Rectangle2D(328, 34, 720, 720));
+        imageView.setPreserveRatio(false);
+        startLockedRecipeFloat(imageView, index);
+    }
+
+    private void startLockedRecipeFloat(ImageView imageView, int index) {
+        if (imageView == null || lockedRecipeFloatAnimations.containsKey(imageView)) return;
+        TranslateTransition floatAnim = new TranslateTransition(Duration.seconds(1.2), imageView);
+        floatAnim.setFromY(0.0);
+        floatAnim.setToY(-6.0);
+        floatAnim.setAutoReverse(true);
+        floatAnim.setCycleCount(Animation.INDEFINITE);
+        floatAnim.setInterpolator(Interpolator.EASE_BOTH);
+        floatAnim.setDelay(Duration.seconds((index % 4) * 0.12));
+        floatAnim.play();
+        lockedRecipeFloatAnimations.put(imageView, floatAnim);
+    }
+
+    private void stopLockedRecipeFloat(ImageView imageView) {
+        TranslateTransition floatAnim = lockedRecipeFloatAnimations.remove(imageView);
+        if (floatAnim != null) {
+            floatAnim.stop();
+        }
+    }
+
+    private void stopAllLockedRecipeFloats() {
+        for (TranslateTransition floatAnim : new ArrayList<>(lockedRecipeFloatAnimations.values())) {
+            if (floatAnim != null) {
+                floatAnim.stop();
+            }
+        }
+        lockedRecipeFloatAnimations.clear();
     }
 
     private Recipe firstUnlockedRecipe() {

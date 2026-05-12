@@ -990,8 +990,7 @@
                      </image>
                   </ImageView>
                </children>
-            </Group>
-         </children>
+            </Group></children>
       </Group>
 
    </children>
