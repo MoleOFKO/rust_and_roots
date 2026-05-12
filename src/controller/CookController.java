@@ -37,7 +37,7 @@ public class CookController implements Initializable, SceneController {
     private static final int DEFAULT_DEX = 5;
     private static final String UNKNOWN_RECIPE_IMAGE_PATH = "/image/tools/unknown_recipe.png";
     private static final List<String> COOK_TUTORIAL_IMAGES = List.of(
-        "/image/Toturial/Cooking_inside.png"
+        "/image/Toturial/Cooking Tutorial.png"
     );
 
     private GameState gameState;

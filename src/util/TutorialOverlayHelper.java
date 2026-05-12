@@ -31,7 +31,6 @@ public final class TutorialOverlayHelper {
         "/image/Toturial/Skill.png",
         "/image/Toturial/Upgrade Skill.png",
         "/image/Toturial/Setting.png",
-        "/image/Toturial/Skill.png",
         "/image/Toturial/Chopping.png",
         "/image/Toturial/Chopping Using Axe.png",
         "/image/Toturial/Mining.png",
