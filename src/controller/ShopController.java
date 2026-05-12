@@ -852,6 +852,7 @@ public class ShopController implements Initializable, SceneController {
         if (entry == null || amount <= 0) return 0;
         int itemId = entry.itemId;
         if (itemId <= 0) return 0;
+        if (!canAddSellItemType(itemId)) return 0;
 
         int available = getSellSlotAvailableCount(entry);
         if (available <= 0) return 0;
@@ -918,6 +919,12 @@ public class ShopController implements Initializable, SceneController {
         }
 
         return amount - remaining;
+    }
+
+    private boolean canAddSellItemType(int itemId) {
+        if (itemId <= 0) return false;
+        if (sellCart.containsKey(itemId)) return true;
+        return sellCart.size() < sellBtns.size();
     }
 
     private int releaseReservedForSaleInternal(int itemId, int amount) {

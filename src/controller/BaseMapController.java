@@ -700,23 +700,36 @@ public abstract class BaseMapController implements Initializable, SceneControlle
             miniMapGroup.getChildren().add(minimapPlayerMarker);
         }
 
-        double imageWidth = miniMapImage.getFitWidth() > 0 ? miniMapImage.getFitWidth() : miniMapImage.getBoundsInParent().getWidth();
-        double imageHeight = miniMapImage.getFitHeight() > 0 ? miniMapImage.getFitHeight() : miniMapImage.getBoundsInParent().getHeight();
-        if (imageWidth <= 0 || imageHeight <= 0) {
-            imageWidth = 514.0;
-            imageHeight = 311.0;
-        }
+        MiniMapImageBounds imageBounds = renderedMiniMapImageBounds(miniMapImage);
+        MiniMapPoint point = miniMapPointForPlayer(mapKey(), human.getLayoutX(), human.getLayoutY());
 
-        MiniMapRegion region = miniMapRegionFor(mapKey());
-        double playerX = clamp(human.getLayoutX() / 600.0, 0.0, 1.0);
-        double playerY = clamp(human.getLayoutY() / 400.0, 0.0, 1.0);
-        double normalizedX = region.x() + (region.width() * playerX);
-        double normalizedY = region.y() + (region.height() * playerY);
-
-        minimapPlayerMarker.setLayoutX(miniMapImage.getLayoutX() + (normalizedX * imageWidth));
-        minimapPlayerMarker.setLayoutY(miniMapImage.getLayoutY() + (normalizedY * imageHeight));
+        minimapPlayerMarker.setLayoutX(imageBounds.x() + (point.x() * imageBounds.width()));
+        minimapPlayerMarker.setLayoutY(imageBounds.y() + (point.y() * imageBounds.height()));
         minimapPlayerMarker.setRotate(miniMapMarkerRotation());
         minimapPlayerMarker.toFront();
+    }
+
+    private MiniMapImageBounds renderedMiniMapImageBounds(ImageView miniMapImage) {
+        double fitWidth = miniMapImage.getFitWidth() > 0 ? miniMapImage.getFitWidth() : miniMapImage.getBoundsInParent().getWidth();
+        double fitHeight = miniMapImage.getFitHeight() > 0 ? miniMapImage.getFitHeight() : miniMapImage.getBoundsInParent().getHeight();
+        if (fitWidth <= 0) fitWidth = 514.0;
+        if (fitHeight <= 0) fitHeight = 311.0;
+
+        double imageWidth = miniMapImage.getImage() == null ? 0.0 : miniMapImage.getImage().getWidth();
+        double imageHeight = miniMapImage.getImage() == null ? 0.0 : miniMapImage.getImage().getHeight();
+        if (miniMapImage.isPreserveRatio() && imageWidth > 0.0 && imageHeight > 0.0) {
+            double scale = Math.min(fitWidth / imageWidth, fitHeight / imageHeight);
+            double renderedWidth = imageWidth * scale;
+            double renderedHeight = imageHeight * scale;
+            return new MiniMapImageBounds(
+                miniMapImage.getLayoutX() + ((fitWidth - renderedWidth) / 2.0),
+                miniMapImage.getLayoutY() + ((fitHeight - renderedHeight) / 2.0),
+                renderedWidth,
+                renderedHeight
+            );
+        }
+
+        return new MiniMapImageBounds(miniMapImage.getLayoutX(), miniMapImage.getLayoutY(), fitWidth, fitHeight);
     }
 
     private double miniMapMarkerRotation() {
@@ -729,27 +742,41 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         };
     }
 
+    private MiniMapPoint miniMapPointForPlayer(String rawMapKey, double layoutX, double layoutY) {
+        String key = rawMapKey == null ? "" : rawMapKey.toLowerCase(Locale.ROOT);
+        if (key.equals("home_interior")) {
+            return new MiniMapPoint(0.545, 0.815);
+        }
+
+        MiniMapRegion region = miniMapRegionFor(key);
+        double playerX = clamp(layoutX / 600.0, 0.0, 1.0);
+        double playerY = clamp(layoutY / 400.0, 0.0, 1.0);
+        return new MiniMapPoint(
+            region.x() + (region.width() * playerX),
+            region.y() + (region.height() * playerY)
+        );
+    }
+
     private MiniMapRegion miniMapRegionFor(String rawMapKey) {
         String key = rawMapKey == null ? "" : rawMapKey.toLowerCase(Locale.ROOT);
         if (key.startsWith("upper_map")) {
-            return new MiniMapRegion(0.37, 0.05, 0.26, 0.25);
+            return new MiniMapRegion(0.36, 0.18, 0.40, 0.19);
         }
         if (key.startsWith("left_map")) {
-            return new MiniMapRegion(0.10, 0.38, 0.26, 0.25);
+            return new MiniMapRegion(0.05, 0.45, 0.35, 0.24);
         }
         if (key.startsWith("right_map")) {
-            return new MiniMapRegion(0.64, 0.38, 0.26, 0.25);
+            return new MiniMapRegion(0.61, 0.39, 0.33, 0.25);
         }
-        if (key.startsWith("d_") || key.startsWith("dhome") || key.startsWith("dundermap")) {
-            return new MiniMapRegion(0.37, 0.70, 0.26, 0.25);
-        }
-        return new MiniMapRegion(0.37, 0.38, 0.26, 0.25);
+        return new MiniMapRegion(0.43, 0.74, 0.34, 0.18);
     }
 
     private double clamp(double value, double min, double max) {
         return Math.max(min, Math.min(max, value));
     }
 
+    private record MiniMapImageBounds(double x, double y, double width, double height) {}
+    private record MiniMapPoint(double x, double y) {}
     private record MiniMapRegion(double x, double y, double width, double height) {}
 
     private void cleanupBeforeSceneSwitch() {
