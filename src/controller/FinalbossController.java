@@ -554,9 +554,10 @@ public class FinalbossController extends BaseMapController {
 //    private void handleopensettingaction(ActionEvent event) {
 //    }
 //
-//    @FXML
-//    private void handlebtntutoaction(ActionEvent event) {
-//    }
+    @FXML
+    private void handlebtntutoaction(ActionEvent event) {
+        showOverworldTutorialOverlay();
+    }
 
     @Override
     protected String mapKey() {
