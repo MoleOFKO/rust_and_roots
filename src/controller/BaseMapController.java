@@ -324,6 +324,8 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     
     protected enum MenuTab { INVENTORY, STATUS, SETTINGS }
     protected MenuTab activeMenuTab = MenuTab.INVENTORY;
+    private boolean timePausedBySettingsTab = false;
+    private boolean timeWasPausedBeforeSettingsTab = false;
     
     protected void configureFarm(Farm farm) {
         if (farm != null) {
@@ -664,6 +666,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
             miniMapGroup.setVisible(false);
             miniMapGroup.setManaged(false);
             miniMapGroup.setDisable(true);
+            configureMiniMapAreaRectangles(miniMapGroup);
         }
         if (event != null) event.consume();
     }
@@ -718,12 +721,11 @@ public abstract class BaseMapController implements Initializable, SceneControlle
             miniMapGroup.getChildren().add(minimapPlayerMarker);
         }
 
-        MiniMapImageBounds imageBounds = renderedMiniMapImageBounds(miniMapImage);
-        MiniMapPoint point = miniMapPointForPlayer(mapKey(), human.getLayoutX(), human.getLayoutY());
+        MiniMapPoint point = miniMapPointForPlayer(mapKey(), human.getLayoutX(), human.getLayoutY(), miniMapGroup, miniMapImage);
         if (point == null) return;
 
-        minimapPlayerMarker.setLayoutX(imageBounds.x() + (point.x() * imageBounds.width()));
-        minimapPlayerMarker.setLayoutY(imageBounds.y() + (point.y() * imageBounds.height()));
+        minimapPlayerMarker.setLayoutX(point.x());
+        minimapPlayerMarker.setLayoutY(point.y());
         minimapPlayerMarker.setRotate(miniMapMarkerRotation());
         minimapPlayerMarker.toFront();
     }
@@ -761,16 +763,13 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         };
     }
 
-    private MiniMapPoint miniMapPointForPlayer(String rawMapKey, double layoutX, double layoutY) {
+    private MiniMapPoint miniMapPointForPlayer(String rawMapKey, double layoutX, double layoutY, Group miniMapGroup, ImageView miniMapImage) {
         String key = rawMapKey == null ? "" : rawMapKey.toLowerCase(Locale.ROOT);
         if (isMiniMapExcludedMap(key)) {
             return null;
         }
-        if (key.equals("home_interior")) {
-            return new MiniMapPoint(0.545, 0.815);
-        }
 
-        MiniMapRegion region = miniMapRegionFor(key);
+        MiniMapRegion region = miniMapRegionFor(key, miniMapGroup, miniMapImage);
         MiniMapWorldBounds mapBounds = miniMapPrimaryMapBounds();
         if (mapBounds == null) {
             mapBounds = miniMapWallBounds();
@@ -788,18 +787,112 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         );
     }
 
-    private MiniMapRegion miniMapRegionFor(String rawMapKey) {
+    private MiniMapRegion miniMapRegionFor(String rawMapKey, Group miniMapGroup, ImageView miniMapImage) {
         String key = rawMapKey == null ? "" : rawMapKey.toLowerCase(Locale.ROOT);
+        String sectionId = miniMapSectionIdForMapKey(key);
+        Rectangle sectionRect = miniMapSectionRectangle(sectionId, miniMapGroup);
+        Bounds rectBounds = miniMapNodeBoundsInMiniMap(sectionRect, miniMapGroup);
+        if (rectBounds != null && rectBounds.getWidth() > 0.0 && rectBounds.getHeight() > 0.0) {
+            return new MiniMapRegion(
+                sectionId,
+                rectBounds.getMinX(),
+                rectBounds.getMinY(),
+                rectBounds.getWidth(),
+                rectBounds.getHeight()
+            );
+        }
+
+        MiniMapImageBounds imageBounds = renderedMiniMapImageBounds(miniMapImage);
         if (key.startsWith("upper_map")) {
-            return new MiniMapRegion("upper_map", 0.36, 0.18, 0.40, 0.19);
+            return scaledMiniMapRegion("upper_map", imageBounds, 0.36, 0.18, 0.40, 0.19);
         }
         if (key.startsWith("left_map")) {
-            return new MiniMapRegion("left_map", 0.05, 0.45, 0.35, 0.24);
+            return scaledMiniMapRegion("left_map", imageBounds, 0.05, 0.45, 0.35, 0.24);
         }
         if (key.startsWith("right_map")) {
-            return new MiniMapRegion("right_map", 0.61, 0.39, 0.33, 0.25);
+            return scaledMiniMapRegion("right_map", imageBounds, 0.61, 0.39, 0.33, 0.25);
         }
-        return new MiniMapRegion("home_map", 0.43, 0.74, 0.34, 0.18);
+        return scaledMiniMapRegion("home_map", imageBounds, 0.43, 0.74, 0.34, 0.18);
+    }
+
+    private MiniMapRegion scaledMiniMapRegion(String sectionKey, MiniMapImageBounds imageBounds, double x, double y, double width, double height) {
+        return new MiniMapRegion(
+            sectionKey,
+            imageBounds.x() + (imageBounds.width() * x),
+            imageBounds.y() + (imageBounds.height() * y),
+            imageBounds.width() * width,
+            imageBounds.height() * height
+        );
+    }
+
+    private String miniMapSectionIdForMapKey(String rawMapKey) {
+        String key = rawMapKey == null ? "" : rawMapKey.toLowerCase(Locale.ROOT);
+        if (key.equals("home_interior")) {
+            return "home_map";
+        }
+        return key;
+    }
+
+    private void configureMiniMapAreaRectangles(Group miniMapGroup) {
+        if (miniMapGroup == null) return;
+        for (Node node : miniMapGroup.getChildren()) {
+            configureMiniMapAreaRectangle(node);
+        }
+    }
+
+    private void configureMiniMapAreaRectangle(Node node) {
+        if (node == null) return;
+        if (node instanceof Rectangle rect && miniMapSectionIdForMapKey(rect.getId()).equals(rect.getId())) {
+            rect.setVisible(false);
+            rect.setManaged(false);
+            rect.setMouseTransparent(true);
+            rect.setOpacity(0.0);
+        }
+        if (node instanceof Parent parent) {
+            for (Node child : parent.getChildrenUnmodifiable()) {
+                configureMiniMapAreaRectangle(child);
+            }
+        }
+    }
+
+    private Rectangle miniMapSectionRectangle(String sectionId, Group miniMapGroup) {
+        if (sectionId == null || sectionId.isBlank() || miniMapGroup == null) {
+            return null;
+        }
+        Node match = findDescendantById(miniMapGroup, sectionId);
+        return match instanceof Rectangle rect ? rect : null;
+    }
+
+    private Node findDescendantById(Parent parent, String id) {
+        if (parent == null || id == null) return null;
+        for (Node child : parent.getChildrenUnmodifiable()) {
+            if (id.equals(child.getId())) {
+                return child;
+            }
+            if (child instanceof Parent childParent) {
+                Node nested = findDescendantById(childParent, id);
+                if (nested != null) {
+                    return nested;
+                }
+            }
+        }
+        return null;
+    }
+
+    private Bounds miniMapNodeBoundsInMiniMap(Rectangle rect, Group miniMapGroup) {
+        if (rect == null || miniMapGroup == null) {
+            return null;
+        }
+        try {
+            if (rect.getScene() != null && miniMapGroup.getScene() != null) {
+                return miniMapGroup.sceneToLocal(rect.localToScene(rect.getBoundsInLocal()));
+            }
+        } catch (IllegalStateException ignored) {
+        }
+        if (rect.getParent() == miniMapGroup) {
+            return rect.getBoundsInParent();
+        }
+        return new javafx.geometry.BoundingBox(rect.getLayoutX(), rect.getLayoutY(), rect.getWidth(), rect.getHeight());
     }
 
     private boolean isMiniMapExcludedMap(String rawMapKey) {
@@ -1370,7 +1463,34 @@ public abstract class BaseMapController implements Initializable, SceneControlle
             refreshPlayerInventoryView();
         }
 
+        updateSettingsTabTimePause();
         refreshMenuButtons();
+    }
+
+    private void updateSettingsTabTimePause() {
+        GameTimeManager timeManager = GameTimeManager.get();
+        boolean settingsOpen = inventoryOverlay != null
+                && inventoryOverlay.isVisible()
+                && activeMenuTab == MenuTab.SETTINGS;
+
+        if (settingsOpen) {
+            if (!timePausedBySettingsTab) {
+                timeWasPausedBeforeSettingsTab = timeManager.pausedProperty().get();
+                timePausedBySettingsTab = true;
+            }
+            if (!timeManager.pausedProperty().get()) {
+                timeManager.setPaused(true);
+            }
+            return;
+        }
+
+        if (timePausedBySettingsTab) {
+            if (!timeWasPausedBeforeSettingsTab) {
+                timeManager.setPaused(false);
+            }
+            timePausedBySettingsTab = false;
+            timeWasPausedBeforeSettingsTab = false;
+        }
     }
 
     protected void refreshMenuButtons() {
@@ -1583,11 +1703,9 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
         if (pendingHpPoints > 0) {
             playerState.setMaxHp(playerState.getMaxHp() + pendingHpPoints);
-            playerState.setHp(playerState.getMaxHp());
         }
         if (pendingSpPoints > 0) {
             playerState.setMaxStamina(playerState.getMaxStamina() + pendingSpPoints);
-            playerState.setStamina(playerState.getMaxStamina());
         }
         if (pendingStrPoints > 0) playerState.setStr(playerState.getStr() + pendingStrPoints);
         if (pendingVitPoints > 0) playerState.setVit(playerState.getVit() + pendingVitPoints);
@@ -1865,7 +1983,9 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     }
 
     protected void closeMenuScreen(){
+        updateSettingsTabTimePause();
         setInventoryOpen(false);
+        updateSettingsTabTimePause();
     }
     
     protected void openStatus(){
@@ -3038,7 +3158,10 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         }
 
         if (pauseTimeBtn != null) {
-            pauseTimeBtn.setOnAction(e -> time.togglePause());
+            pauseTimeBtn.setOnAction(e -> {
+                time.togglePause();
+                updateSettingsTabTimePause();
+            });
         }
         if (btnMorning != null) {
             btnMorning.setOnAction(e -> time.setTimeOfDay(8, 0));
