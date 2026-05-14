@@ -449,11 +449,9 @@ public class New_gameController implements Initializable, SceneController {
 
         if (pendingHpPoints > 0) {
             playerState.setMaxHp(playerState.getMaxHp() + pendingHpPoints);
-            playerState.setHp(playerState.getMaxHp());
         }
         if (pendingSpPoints > 0) {
             playerState.setMaxStamina(playerState.getMaxStamina() + pendingSpPoints);
-            playerState.setStamina(playerState.getMaxStamina());
         }
         if (pendingStrPoints > 0) playerState.setStr(playerState.getStr() + pendingStrPoints);
         if (pendingVitPoints > 0) playerState.setVit(playerState.getVit() + pendingVitPoints);

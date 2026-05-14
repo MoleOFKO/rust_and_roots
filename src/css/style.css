@@ -118,6 +118,7 @@
 /* Remove cell background */
 .theme-table .table-cell {
     -fx-background-color: transparent;
+    -fx-text-fill: black;
 }
 
 /* Remove empty area */

@@ -200,6 +200,14 @@ public class SceneManager {
         }
     }
 
+    public static void stopBgm() {
+        if (javafx.application.Platform.isFxApplicationThread()) {
+            stopAndDisposeBgm();
+        } else {
+            javafx.application.Platform.runLater(SceneManager::stopAndDisposeBgm);
+        }
+    }
+
     private static void applyCurrentBgmVolume() {
         if (bgmPlayer == null) {
             return;

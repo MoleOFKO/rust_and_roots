@@ -60,6 +60,7 @@ public class Player {
 
     private IntConsumer onHotbarSlotRequest;
     private Runnable onToggleHotbarRequest;
+    private Runnable onMiniMapToggleRequest;
     private Runnable onAttackStarted;
     private Runnable onDeathFinished;
 
@@ -232,6 +233,10 @@ public class Player {
         this.onToggleHotbarRequest = onToggleHotbarRequest;
     }
 
+    public void setOnMiniMapToggleRequest(Runnable onMiniMapToggleRequest) {
+        this.onMiniMapToggleRequest = onMiniMapToggleRequest;
+    }
+
     public void setOnHotbarSlotRequest(IntConsumer onHotbarSlotRequest) {
         this.onHotbarSlotRequest = onHotbarSlotRequest;
     }
@@ -334,6 +339,16 @@ public class Player {
                 return;
             }
 
+            if (code == KeyCode.M) {
+                if (!pressedKeys.contains(code)) {
+                    pressedKeys.add(code);
+                    if (onMiniMapToggleRequest != null) {
+                        onMiniMapToggleRequest.run();
+                    }
+                }
+                return;
+            }
+
             if (isRunKey(code)) {
                 if (!pressedKeys.contains(code)) {
                     pressedKeys.add(code);
@@ -361,6 +376,11 @@ public class Player {
             KeyCode code = e.getCode();
 
             if (code == KeyCode.E) {
+                pressedKeys.remove(code);
+                return;
+            }
+
+            if (code == KeyCode.M) {
                 pressedKeys.remove(code);
                 return;
             }

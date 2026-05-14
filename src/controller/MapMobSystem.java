@@ -31,6 +31,7 @@ import model.item;
 import model.mobs;
 import util.AppDialogs;
 import util.CombatRules;
+import util.SceneManager;
 import util.SkillModifiers;
 import util.SoundManager;
 
@@ -185,6 +186,7 @@ final class MapMobSystem {
             return null;
         }
         if (system.containsMobType("orcb")) {
+            SceneManager.stopBgm();
             SoundManager.playSfx(SoundManager.Sfx.BOSS_ENCOUNTER);
         }
         return system;

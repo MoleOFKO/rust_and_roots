@@ -114,7 +114,7 @@ CREATE TABLE `game_map` (
   `map_name` varchar(50) NOT NULL,
   PRIMARY KEY (`map_id`),
   UNIQUE KEY `uq_game_map_map_name` (`map_name`)
-) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -123,7 +123,7 @@ CREATE TABLE `game_map` (
 
 LOCK TABLES `game_map` WRITE;
 /*!40000 ALTER TABLE `game_map` DISABLE KEYS */;
-INSERT INTO `game_map` VALUES (6,'d_homemap'),(10,'d_undemap_right'),(7,'d_undermap'),(8,'d_undermap_left'),(9,'d_undermap_noone'),(11,'dhome_L_one_S_two'),(2,'Home_interior'),(1,'home_map'),(3,'left_map'),(12,'left_map_nofour'),(13,'left_map_noone'),(14,'left_map_noone_of_one'),(15,'left_map_nothree'),(16,'left_map_nothree_of_one'),(17,'left_map_notwo'),(18,'left_map_notwo_of_one'),(4,'right_map'),(19,'right_map_nofour'),(20,'right_map_noone'),(21,'right_map_noone_of_one'),(22,'right_map_nothree'),(23,'right_map_nothree_of_one'),(24,'right_map_notwo'),(25,'right_map_notwo_of_one'),(26,'right_map_notwo_of_two'),(5,'upper_map'),(27,'upper_map_nofour'),(28,'upper_map_nothree'),(29,'upper_map_notwo');
+INSERT INTO `game_map` VALUES (6,'d_homemap'),(10,'d_undermap_right'),(7,'d_undermap'),(8,'d_undermap_left'),(9,'d_undermap_noone'),(11,'dhome_L_one_S_two'),(30,'dundermap_Lone_S_two'),(31,'dundermap_right_L_one_S_two'),(32,'dundermap_right_one_L_one_S_two'),(33,'dundermap_under_of_right_L_one_S_two'),(2,'Home_interior'),(1,'home_map'),(3,'left_map'),(12,'left_map_nofour'),(13,'left_map_noone'),(14,'left_map_noone_of_one'),(15,'left_map_nothree'),(16,'left_map_nothree_of_one'),(17,'left_map_notwo'),(18,'left_map_notwo_of_one'),(34,'left_map_notwo_of_two'),(4,'right_map'),(19,'right_map_nofour'),(20,'right_map_noone'),(21,'right_map_noone_of_one'),(22,'right_map_nothree'),(23,'right_map_nothree_of_one'),(24,'right_map_notwo'),(25,'right_map_notwo_of_one'),(26,'right_map_notwo_of_two'),(5,'upper_map'),(27,'upper_map_nofour'),(28,'upper_map_nothree'),(29,'upper_map_notwo');
 /*!40000 ALTER TABLE `game_map` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -524,7 +524,7 @@ CREATE TABLE `saved_item` (
   `qty` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`saved_id`,`item_id`),
   KEY `idx_saved_item_item_id` (`item_id`),
-  CONSTRAINT `fk_saved_item_item` FOREIGN KEY (`item_id`) REFERENCES `items` (`item_id`),
+  CONSTRAINT `fk_saved_item_item` FOREIGN KEY (`item_id`) REFERENCES `items` (`item_id`) ON DELETE CASCADE,
   CONSTRAINT `fk_saved_item_save` FOREIGN KEY (`saved_id`) REFERENCES `save_game` (`saved_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -678,6 +678,7 @@ CREATE TABLE `saved_shop_stock` (
   `item_id` int NOT NULL,
   `remaining_qty` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`saved_id`,`item_id`),
+  CONSTRAINT `chk_saved_shop_stock_remaining_qty` CHECK ((`remaining_qty` between 0 and 10)),
   CONSTRAINT `fk_saved_shop_stock_save` FOREIGN KEY (`saved_id`) REFERENCES `save_game` (`saved_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -688,7 +689,7 @@ CREATE TABLE `saved_shop_stock` (
 
 LOCK TABLES `saved_shop_stock` WRITE;
 /*!40000 ALTER TABLE `saved_shop_stock` DISABLE KEYS */;
-INSERT INTO `saved_shop_stock` VALUES (1,1,18),(1,2,18),(1,6,20),(1,13,20),(1,83,20),(1,96,20),(1,98,20),(1,99,20),(1,199,20),(1,202,20),(1,210,20),(1,212,20);
+INSERT INTO `saved_shop_stock` VALUES (1,1,8),(1,2,8),(1,6,10),(1,13,10),(1,83,10),(1,96,10),(1,98,10),(1,99,10),(1,199,10),(1,202,10),(1,210,10),(1,212,10);
 /*!40000 ALTER TABLE `saved_shop_stock` ENABLE KEYS */;
 UNLOCK TABLES;
 
