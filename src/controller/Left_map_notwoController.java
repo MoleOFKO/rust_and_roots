@@ -169,6 +169,60 @@ public class Left_map_notwoController extends BaseMapController {
     private Rectangle slime1_hitbox_right;
     @FXML
     private Rectangle slime1_detect;
+    @FXML
+    private Group minimapicongroup;
+    @FXML
+    private ImageView miniMapIcon;
+    @FXML
+    private Group minimapgroup;
+    @FXML
+    private ImageView minimap;
+    @FXML
+    private ImageView closeminimapbtn;
+    @FXML
+    private Rectangle left_map_nofour;
+    @FXML
+    private Rectangle upper_map_nofour;
+    @FXML
+    private Rectangle right_map_nofour;
+    @FXML
+    private Rectangle left_map_nothree_of_one;
+    @FXML
+    private Rectangle left_map_nothree;
+    @FXML
+    private Rectangle upper_map_nothree;
+    @FXML
+    private Rectangle right_map_nothree;
+    @FXML
+    private Rectangle right_map_nothree_of_one;
+    @FXML
+    private Rectangle left_map_notwo_of_two;
+    @FXML
+    private Rectangle left_map_notwo_of_one;
+    @FXML
+    private Rectangle left_map_notwo;
+    @FXML
+    private Rectangle upper_map_notwo;
+    @FXML
+    private Rectangle right_map_notwo;
+    @FXML
+    private Rectangle right_map_notwo_of_one;
+    @FXML
+    private Rectangle left_map_noone_of_one;
+    @FXML
+    private Rectangle left_map_noone;
+    @FXML
+    private Rectangle upper_map;
+    @FXML
+    private Rectangle right_map_noone;
+    @FXML
+    private Rectangle right_map_noone_of_one;
+    @FXML
+    private Rectangle left_map;
+    @FXML
+    private Rectangle home_map;
+    @FXML
+    private Rectangle right_map;
 
     @Override
     protected String dayBackgroundPath() {

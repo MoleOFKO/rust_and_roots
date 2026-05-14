@@ -19,7 +19,7 @@
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
 
-<StackPane fx:id="view" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Left_map_noone_of_oneController">
+<StackPane fx:id="view" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Left_map_noone_of_oneController">
    <children>
       <Group fx:id="world">
          <children>
@@ -247,9 +247,55 @@
             </Group>
             <Button fx:id="btntuto" layoutX="573.0" mnemonicParsing="false" onAction="#handlebtntutoaction" style="-fx-background-radius: 100%; -fx-background-color: transparent; -fx-border-color: yellow; -fx-border-radius: 100%;" textFill="#e6ff00">
                <graphic>
-                  <FontAwesomeIcon fill="#f6ff00" glyphName="QUESTION"  size="1.5em" />
+                  <FontAwesomeIcon fill="#f6ff00" glyphName="QUESTION" size="1.5em" />
                </graphic>
             </Button>
+            <Group fx:id="minimapicongroup" layoutX="540.0" layoutY="-10.0">
+               <children>
+                  <ImageView fx:id="miniMapIcon" fitHeight="37.0" fitWidth="34.0" layoutX="-14.0" layoutY="9.0" onMouseClicked="#handleMiniMapIconaction" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../image/tools/minimapicon.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </Group>
+            <Group fx:id="minimapgroup" visible="false">
+               <children>
+                  <Pane opacity="0.54" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: black;" />
+                  <ImageView fx:id="minimap" fitHeight="311.0" fitWidth="514.0" layoutX="45.0" layoutY="35.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../image/maps/map%20(2).png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="closeminimapbtn" fitHeight="33.0" fitWidth="29.0" layoutX="565.0" layoutY="5.0" onMouseClicked="#handleCloseMiniMapAction" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../image/tools/x.png" />
+                     </image>
+                  </ImageView>
+                                   <Rectangle fx:id="left_map_nofour" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="42.0" layoutX="206.0" layoutY="63.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
+                    <Rectangle fx:id="upper_map_nofour" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="42.0" layoutX="294.0" layoutY="63.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
+                    <Rectangle fx:id="right_map_nofour" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="42.0" layoutX="382.0" layoutY="63.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
+                    <Rectangle fx:id="left_map_nothree_of_one" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="42.0" layoutX="118.0" layoutY="115.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
+                    <Rectangle fx:id="left_map_nothree" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="42.0" layoutX="206.0" layoutY="105.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
+                    <Rectangle fx:id="upper_map_nothree" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="42.0" layoutX="294.0" layoutY="105.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
+                    <Rectangle fx:id="right_map_nothree" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="42.0" layoutX="382.0" layoutY="105.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
+                    <Rectangle fx:id="right_map_nothree_of_one" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="52.0" layoutX="470.0" layoutY="105.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="69.0" />
+                    <Rectangle fx:id="left_map_notwo_of_two" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="76.0" layoutX="62.0" layoutY="145.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="56.0" />
+                    <Rectangle fx:id="left_map_notwo_of_one" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="46.0" layoutX="118.0" layoutY="157.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
+                    <Rectangle fx:id="left_map_notwo" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="60.0" layoutX="206.0" layoutY="146.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
+                    <Rectangle fx:id="upper_map_notwo" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="60.0" layoutX="294.0" layoutY="146.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
+                    <Rectangle fx:id="right_map_notwo" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="60.0" layoutX="382.0" layoutY="147.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
+                    <Rectangle fx:id="right_map_notwo_of_one" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="52.0" layoutX="470.0" layoutY="157.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="69.0" />
+                    <Rectangle fx:id="left_map_noone_of_one" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="55.0" layoutX="118.0" layoutY="203.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
+                    <Rectangle fx:id="left_map_noone" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="52.0" layoutX="206.0" layoutY="205.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
+                    <Rectangle fx:id="upper_map" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="51.0" layoutX="294.0" layoutY="205.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
+                    <Rectangle fx:id="right_map_noone" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="50.0" layoutX="382.0" layoutY="206.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
+                    <Rectangle fx:id="right_map_noone_of_one" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="52.0" layoutX="470.0" layoutY="205.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="69.0" />
+                    <Rectangle fx:id="left_map" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="60.0" layoutX="206.0" layoutY="255.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
+                    <Rectangle fx:id="home_map" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="60.0" layoutX="294.0" layoutY="255.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
+                    <Rectangle fx:id="right_map" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="60.0" layoutX="382.0" layoutY="256.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
+</children>
+            </Group>
             <Group layoutX="10.0" layoutY="10.0">
                <children>
                   <HBox fx:id="hotbar" alignment="CENTER" layoutX="148.0" layoutY="341.0" opacity="0.81" prefHeight="47.0" prefWidth="294.0" styleClass="hbox" stylesheets="@../css/style.css">
@@ -993,52 +1039,6 @@
                      </children>
                   </Pane>
                </children>
-            </Group>
-            <Group fx:id="minimapicongroup" layoutX="540.0" layoutY="-10.0">
-               <children>
-                  <ImageView fx:id="miniMapIcon" fitHeight="37.0" fitWidth="34.0" layoutX="-14.0" layoutY="9.0" onMouseClicked="#handleMiniMapIconaction" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../image/tools/minimapicon.png" />
-                     </image>
-                  </ImageView>
-               </children>
-            </Group>
-            <Group fx:id="minimapgroup" visible="false">
-               <children>
-                  <Pane opacity="0.54" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: black;" />
-                  <ImageView fx:id="minimap" fitHeight="311.0" fitWidth="514.0" layoutX="45.0" layoutY="35.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../image/maps/map%20(2).png" />
-                     </image>
-                  </ImageView>
-                  <ImageView fx:id="closeminimapbtn" fitHeight="33.0" fitWidth="29.0" layoutX="565.0" layoutY="5.0" onMouseClicked="#handleCloseMiniMapAction" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../image/tools/x.png" />
-                     </image>
-                  </ImageView>
-                                   <Rectangle fx:id="left_map_nofour" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="42.0" layoutX="206.0" layoutY="63.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
-                    <Rectangle fx:id="upper_map_nofour" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="42.0" layoutX="294.0" layoutY="63.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
-                    <Rectangle fx:id="right_map_nofour" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="42.0" layoutX="382.0" layoutY="63.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
-                    <Rectangle fx:id="left_map_nothree_of_one" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="42.0" layoutX="118.0" layoutY="115.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
-                    <Rectangle fx:id="left_map_nothree" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="42.0" layoutX="206.0" layoutY="105.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
-                    <Rectangle fx:id="upper_map_nothree" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="42.0" layoutX="294.0" layoutY="105.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
-                    <Rectangle fx:id="right_map_nothree" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="42.0" layoutX="382.0" layoutY="105.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
-                    <Rectangle fx:id="right_map_nothree_of_one" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="52.0" layoutX="470.0" layoutY="105.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="69.0" />
-                    <Rectangle fx:id="left_map_notwo_of_two" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="76.0" layoutX="62.0" layoutY="145.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="56.0" />
-                    <Rectangle fx:id="left_map_notwo_of_one" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="46.0" layoutX="118.0" layoutY="157.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
-                    <Rectangle fx:id="left_map_notwo" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="60.0" layoutX="206.0" layoutY="146.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
-                    <Rectangle fx:id="upper_map_notwo" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="60.0" layoutX="294.0" layoutY="146.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
-                    <Rectangle fx:id="right_map_notwo" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="60.0" layoutX="382.0" layoutY="147.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
-                    <Rectangle fx:id="right_map_notwo_of_one" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="52.0" layoutX="470.0" layoutY="157.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="69.0" />
-                    <Rectangle fx:id="left_map_noone_of_one" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="55.0" layoutX="118.0" layoutY="203.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
-                    <Rectangle fx:id="left_map_noone" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="52.0" layoutX="206.0" layoutY="205.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
-                    <Rectangle fx:id="upper_map" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="51.0" layoutX="294.0" layoutY="205.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
-                    <Rectangle fx:id="right_map_noone" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="50.0" layoutX="382.0" layoutY="206.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
-                    <Rectangle fx:id="right_map_noone_of_one" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="52.0" layoutX="470.0" layoutY="205.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="69.0" />
-                    <Rectangle fx:id="left_map" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="60.0" layoutX="206.0" layoutY="255.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
-                    <Rectangle fx:id="home_map" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="60.0" layoutX="294.0" layoutY="255.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
-                    <Rectangle fx:id="right_map" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="60.0" layoutX="382.0" layoutY="256.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
-</children>
             </Group></children>
       </Group>
    </children>

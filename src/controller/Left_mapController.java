@@ -131,6 +131,64 @@ public class Left_mapController extends BaseMapController {
     private Rectangle stone_hitbox3;
     @FXML
     private ImageView drops_img_stone3;
+    @FXML
+    private Group minimapicongroup;
+    @FXML
+    private ImageView miniMapIcon;
+    @FXML
+    private Group minimapgroup;
+    @FXML
+    private ImageView minimap;
+    @FXML
+    private ImageView closeminimapbtn;
+    @FXML
+    private Rectangle left_map_nofour;
+    @FXML
+    private Rectangle upper_map_nofour;
+    @FXML
+    private Rectangle right_map_nofour;
+    @FXML
+    private Rectangle left_map_nothree_of_one;
+    @FXML
+    private Rectangle left_map_nothree;
+    @FXML
+    private Rectangle upper_map_nothree;
+    @FXML
+    private Rectangle right_map_nothree;
+    @FXML
+    private Rectangle right_map_nothree_of_one;
+    @FXML
+    private Rectangle left_map_notwo_of_two;
+    @FXML
+    private Rectangle left_map_notwo_of_one;
+    @FXML
+    private Rectangle left_map_notwo;
+    @FXML
+    private Rectangle upper_map_notwo;
+    @FXML
+    private Rectangle right_map_notwo;
+    @FXML
+    private Rectangle right_map_notwo_of_one;
+    @FXML
+    private Rectangle left_map_noone_of_one;
+    @FXML
+    private Rectangle left_map_noone;
+    @FXML
+    private Rectangle upper_map;
+    @FXML
+    private Rectangle right_map_noone;
+    @FXML
+    private Rectangle right_map_noone_of_one;
+    @FXML
+    private Rectangle left_map;
+    @FXML
+    private Rectangle home_map;
+    @FXML
+    private Rectangle right_map;
+    @FXML
+    private Slider bgmVolumeSlider;
+    @FXML
+    private Slider sfxVolumeSlider;
 
     @Override
     protected String dayBackgroundPath() {
@@ -513,21 +571,14 @@ public class Left_mapController extends BaseMapController {
     private ImageView btncookingplus1;
     @FXML
     private Group settingsTab;
-    @FXML
     private Slider timescaleslider;
-    @FXML
     private Button btnsetday;
-    @FXML
     private Button btnsetnight;
-    @FXML
     private Button btnplus1h;
     @FXML
     private Button btnsaveandexit;
-    @FXML
     private Label sliderscale;
-    @FXML
     private Label lbldays;
-    @FXML
     private Label lbltime;
     @FXML
     private Button btnsave;
