@@ -370,200 +370,140 @@
                         <Pane layoutX="51.0" layoutY="50.0">
                            <children>
                               <ImageView fx:id="inyimg1" fitHeight="49.0" fitWidth="55.0" onMouseClicked="#handleinybox" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../image/items/tomato.png" />
-                                 </image>
-                              </ImageView>
+</ImageView>
                               <Label fx:id="invlbl1" alignment="CENTER_RIGHT" layoutX="27.0" layoutY="34.0" prefHeight="17.0" prefWidth="27.0" text="x0" textFill="WHITE" />
                            </children>
                         </Pane>
                         <Pane layoutX="135.0" layoutY="49.0">
                            <children>
                               <ImageView fx:id="inyimg2" fitHeight="49.0" fitWidth="55.0" onMouseClicked="#handleinybox" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../image/items/tomato.png" />
-                                 </image>
-                              </ImageView>
+</ImageView>
                               <Label fx:id="invlbl2" alignment="CENTER_RIGHT" layoutX="27.0" layoutY="34.0" prefHeight="17.0" prefWidth="27.0" text="x0" textFill="WHITE" />
                            </children>
                         </Pane>
                         <Pane layoutX="217.0" layoutY="48.0">
                            <children>
                               <ImageView fx:id="inyimg3" fitHeight="49.0" fitWidth="55.0" onMouseClicked="#handleinybox" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../image/items/tomato.png" />
-                                 </image>
-                              </ImageView>
+</ImageView>
                               <Label fx:id="invlbl3" alignment="CENTER_RIGHT" layoutX="27.0" layoutY="34.0" prefHeight="17.0" prefWidth="27.0" text="x0" textFill="WHITE" />
                            </children>
                         </Pane>
                         <Pane layoutX="301.0" layoutY="47.0">
                            <children>
                               <ImageView fx:id="inyimg4" fitHeight="49.0" fitWidth="55.0" onMouseClicked="#handleinybox" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../image/items/tomato.png" />
-                                 </image>
-                              </ImageView>
+</ImageView>
                               <Label fx:id="invlbl4" alignment="CENTER_RIGHT" layoutX="27.0" layoutY="34.0" prefHeight="17.0" prefWidth="27.0" text="x0" textFill="WHITE" />
                            </children>
                         </Pane>
                         <Pane layoutX="52.0" layoutY="103.0">
                            <children>
                               <ImageView fx:id="inyimg5" fitHeight="49.0" fitWidth="55.0" onMouseClicked="#handleinybox" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../image/items/tomato.png" />
-                                 </image>
-                              </ImageView>
+</ImageView>
                               <Label fx:id="invlbl5" alignment="CENTER_RIGHT" layoutX="27.0" layoutY="34.0" prefHeight="17.0" prefWidth="27.0" text="x0" textFill="WHITE" />
                            </children>
                         </Pane>
                         <Pane layoutX="136.0" layoutY="102.0">
                            <children>
                               <ImageView fx:id="inyimg6" fitHeight="49.0" fitWidth="55.0" onMouseClicked="#handleinybox" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../image/items/tomato.png" />
-                                 </image>
-                              </ImageView>
+</ImageView>
                               <Label fx:id="invlbl6" alignment="CENTER_RIGHT" layoutX="27.0" layoutY="34.0" prefHeight="17.0" prefWidth="27.0" text="x0" textFill="WHITE" />
                            </children>
                         </Pane>
                         <Pane layoutX="218.0" layoutY="101.0">
                            <children>
                               <ImageView fx:id="inyimg7" fitHeight="49.0" fitWidth="55.0" onMouseClicked="#handleinybox" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../image/items/tomato.png" />
-                                 </image>
-                              </ImageView>
+</ImageView>
                               <Label fx:id="invlbl7" alignment="CENTER_RIGHT" layoutX="27.0" layoutY="34.0" prefHeight="17.0" prefWidth="27.0" text="x0" textFill="WHITE" />
                            </children>
                         </Pane>
                         <Pane layoutX="302.0" layoutY="100.0">
                            <children>
                               <ImageView fx:id="inyimg8" fitHeight="49.0" fitWidth="55.0" onMouseClicked="#handleinybox" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../image/items/tomato.png" />
-                                 </image>
-                              </ImageView>
+</ImageView>
                               <Label fx:id="invlbl8" alignment="CENTER_RIGHT" layoutX="27.0" layoutY="34.0" prefHeight="17.0" prefWidth="27.0" text="x0" textFill="WHITE" />
                            </children>
                         </Pane>
                         <Pane layoutX="54.0" layoutY="150.0">
                            <children>
                               <ImageView fx:id="inyimg9" fitHeight="49.0" fitWidth="55.0" onMouseClicked="#handleinybox" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../image/items/tomato.png" />
-                                 </image>
-                              </ImageView>
+</ImageView>
                               <Label fx:id="invlbl9" alignment="CENTER_RIGHT" layoutX="27.0" layoutY="34.0" prefHeight="17.0" prefWidth="27.0" text="x0" textFill="WHITE" />
                            </children>
                         </Pane>
                         <Pane layoutX="138.0" layoutY="149.0">
                            <children>
                               <ImageView fx:id="inyimg10" fitHeight="49.0" fitWidth="55.0" onMouseClicked="#handleinybox" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../image/items/tomato.png" />
-                                 </image>
-                              </ImageView>
+</ImageView>
                               <Label fx:id="invlbl10" alignment="CENTER_RIGHT" layoutX="27.0" layoutY="34.0" prefHeight="17.0" prefWidth="27.0" text="x0" textFill="WHITE" />
                            </children>
                         </Pane>
                         <Pane layoutX="220.0" layoutY="148.0">
                            <children>
                               <ImageView fx:id="inyimg11" fitHeight="49.0" fitWidth="55.0" onMouseClicked="#handleinybox" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../image/items/tomato.png" />
-                                 </image>
-                              </ImageView>
+</ImageView>
                               <Label fx:id="invlbl11" alignment="CENTER_RIGHT" layoutX="27.0" layoutY="34.0" prefHeight="17.0" prefWidth="27.0" text="x0" textFill="WHITE" />
                            </children>
                         </Pane>
                         <Pane layoutX="304.0" layoutY="147.0">
                            <children>
                               <ImageView fx:id="inyimg12" fitHeight="49.0" fitWidth="55.0" onMouseClicked="#handleinybox" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../image/items/tomato.png" />
-                                 </image>
-                              </ImageView>
+</ImageView>
                               <Label fx:id="invlbl12" alignment="CENTER_RIGHT" layoutX="27.0" layoutY="34.0" prefHeight="17.0" prefWidth="27.0" text="x0" textFill="WHITE" />
                            </children>
                         </Pane>
                         <Pane layoutX="54.0" layoutY="199.0">
                            <children>
                               <ImageView fx:id="inyimg13" fitHeight="49.0" fitWidth="55.0" onMouseClicked="#handleinybox" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../image/items/tomato.png" />
-                                 </image>
-                              </ImageView>
+</ImageView>
                               <Label fx:id="invlbl13" alignment="CENTER_RIGHT" layoutX="27.0" layoutY="34.0" prefHeight="17.0" prefWidth="27.0" text="x0" textFill="WHITE" />
                            </children>
                         </Pane>
                         <Pane layoutX="138.0" layoutY="198.0">
                            <children>
                               <ImageView fx:id="inyimg14" fitHeight="49.0" fitWidth="55.0" onMouseClicked="#handleinybox" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../image/items/tomato.png" />
-                                 </image>
-                              </ImageView>
+</ImageView>
                               <Label fx:id="invlbl14" alignment="CENTER_RIGHT" layoutX="27.0" layoutY="34.0" prefHeight="17.0" prefWidth="27.0" text="x0" textFill="WHITE" />
                            </children>
                         </Pane>
                         <Pane layoutX="220.0" layoutY="197.0">
                            <children>
                               <ImageView fx:id="inyimg15" fitHeight="49.0" fitWidth="55.0" onMouseClicked="#handleinybox" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../image/items/tomato.png" />
-                                 </image>
-                              </ImageView>
+</ImageView>
                               <Label fx:id="invlbl15" alignment="CENTER_RIGHT" layoutX="27.0" layoutY="34.0" prefHeight="17.0" prefWidth="27.0" text="x0" textFill="WHITE" />
                            </children>
                         </Pane>
                         <Pane layoutX="304.0" layoutY="196.0">
                            <children>
                               <ImageView fx:id="inyimg16" fitHeight="49.0" fitWidth="55.0" onMouseClicked="#handleinybox" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../image/items/tomato.png" />
-                                 </image>
-                              </ImageView>
+</ImageView>
                               <Label fx:id="invlbl16" alignment="CENTER_RIGHT" layoutX="27.0" layoutY="34.0" prefHeight="17.0" prefWidth="27.0" text="x0" textFill="WHITE" />
                            </children>
                         </Pane>
                         <Pane layoutX="52.0" layoutY="247.0">
                            <children>
                               <ImageView fx:id="inyimg17" fitHeight="49.0" fitWidth="55.0" onMouseClicked="#handleinybox" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../image/items/tomato.png" />
-                                 </image>
-                              </ImageView>
+</ImageView>
                               <Label fx:id="invlbl17" alignment="CENTER_RIGHT" layoutX="27.0" layoutY="34.0" prefHeight="17.0" prefWidth="27.0" text="x0" textFill="WHITE" />
                            </children>
                         </Pane>
                         <Pane layoutX="136.0" layoutY="246.0">
                            <children>
                               <ImageView fx:id="inyimg18" fitHeight="49.0" fitWidth="55.0" onMouseClicked="#handleinybox" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../image/items/tomato.png" />
-                                 </image>
-                              </ImageView>
+</ImageView>
                               <Label fx:id="invlbl18" alignment="CENTER_RIGHT" layoutX="27.0" layoutY="34.0" prefHeight="17.0" prefWidth="27.0" text="x0" textFill="WHITE" />
                            </children>
                         </Pane>
                         <Pane layoutX="218.0" layoutY="245.0">
                            <children>
                               <ImageView fx:id="inyimg19" fitHeight="49.0" fitWidth="55.0" onMouseClicked="#handleinybox" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../image/items/tomato.png" />
-                                 </image>
-                              </ImageView>
+</ImageView>
                               <Label fx:id="invlbl19" alignment="CENTER_RIGHT" layoutX="27.0" layoutY="34.0" prefHeight="17.0" prefWidth="27.0" text="x0" textFill="WHITE" />
                            </children>
                         </Pane>
                         <Pane layoutX="302.0" layoutY="244.0">
                            <children>
                               <ImageView fx:id="inyimg20" fitHeight="49.0" fitWidth="55.0" onMouseClicked="#handleinybox" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../image/items/tomato.png" />
-                                 </image>
-                              </ImageView>
+</ImageView>
                               <Label fx:id="invlbl20" alignment="CENTER_RIGHT" layoutX="27.0" layoutY="34.0" prefHeight="17.0" prefWidth="27.0" text="x0" textFill="WHITE" />
                            </children>
                         </Pane>

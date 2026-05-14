@@ -642,10 +642,12 @@ public class home_mapController extends BaseMapController {
     }
 
     @FXML
-    private void handleMiniMapIconaction(MouseEvent event) {
+    protected void handleMiniMapIconaction(MouseEvent event) {
+        super.handleMiniMapIconaction(event);
     }
 
     @FXML
-    private void handleCloseMiniMapAction(MouseEvent event) {
+    protected void handleCloseMiniMapAction(MouseEvent event) {
+        super.handleCloseMiniMapAction(event);
     }
 }

@@ -5,6 +5,7 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import java.util.Arrays;
+import util.SceneManager;
 import util.SoundManager;
 
 
@@ -459,6 +460,7 @@ public final class PlayerState {
         boolean wasAlive = !isDead();
         setHp(getHp() - amount);
         if (wasAlive && isDead()) {
+            SceneManager.stopBgm();
             SoundManager.playSfx(SoundManager.Sfx.PLAYER_DEFEAT);
         }
     }
@@ -518,9 +520,7 @@ public final class PlayerState {
      *
      * <p>Spec (AGI scaling):
      * <ul>
-     *   <li>AGI 20 => -1 SP per 1 game-world second</li>
-     *   <li>AGI 21 => -2 SP per 1 game-world second</li>
-     *   <li>AGI 31 => -12 SP per 1 game-world second</li>
+     *   <li>Running drain is capped at -1 SP per 1 game-world second.</li>
      * </ul>
      *
      * <p>For lower AGI values, a small baseline drain is retained so "run" mode still has a cost.
@@ -538,7 +538,7 @@ public final class PlayerState {
         int safeAgi = Math.max(0, getAgi());
         double agiScaledPerGameSecond = Math.max(0.0, safeAgi - 19.0);
 
-        return Math.max(0.0, Math.max(baselinePerGameSecond, agiScaledPerGameSecond));
+        return Math.min(1.0, Math.max(0.0, Math.max(baselinePerGameSecond, agiScaledPerGameSecond)));
     }
 
     public int getAttackStaminaCost() {

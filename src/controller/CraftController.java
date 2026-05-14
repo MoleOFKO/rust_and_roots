@@ -3,21 +3,28 @@ package controller;
 import game.GameState;
 import game.GameTimeManager;
 import game.SceneController;
+import java.util.HashMap;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.concurrent.ThreadLocalRandom;
+import javafx.animation.Animation;
 import javafx.animation.AnimationTimer;
+import javafx.animation.Interpolator;
+import javafx.animation.TranslateTransition;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Rectangle2D;
 import javafx.fxml.Initializable;
 import javafx.scene.Group;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
@@ -31,10 +38,12 @@ import util.SkillModifiers;
 import util.SpawnTag;
 import util.TutorialOverlayHelper;
 import util.WorldScaler;
+import javafx.util.Duration;
 
 public class CraftController implements Initializable, SceneController {
     private static final int MAX_RECIPE_SLOTS = 20;
     private static final int DEFAULT_WAIT_SECONDS = 40;
+    private static final String UNKNOWN_RECIPE_IMAGE_PATH = "/image/tools/unknown_recipe.png";
     private static final List<String> CRAFT_TUTORIAL_IMAGES = List.of(
         "/image/Toturial/Craft Tutorial.png"
     );
@@ -46,6 +55,8 @@ public class CraftController implements Initializable, SceneController {
     private final List<Recipe> unlockedRecipes = new ArrayList<>();
     private Recipe selectedRecipe;
     private AnimationTimer craftUiTimer;
+    private Image unknownRecipeImage;
+    private final Map<ImageView, TranslateTransition> lockedRecipeFloatAnimations = new HashMap<>();
 
     @FXML private StackPane view;
     @FXML private Group world;
@@ -100,6 +111,7 @@ public class CraftController implements Initializable, SceneController {
         if (inventory == null) inventory = gameState.getPlayerState().getInventory();
 
         ItemDatabase.loadItems();
+        unknownRecipeImage = loadImage(UNKNOWN_RECIPE_IMAGE_PATH);
         new WorldScaler(view, world);
         collectRecipeNodes();
         loadRecipes();
@@ -130,7 +142,7 @@ public class CraftController implements Initializable, SceneController {
     }
 
     private void addRecipeIfValid(RecipeCatalog.RecipeDefinition definition) {
-        if (definition == null || !gameState.canAccessRecipe(definition.getKey())) {
+        if (definition == null) {
             return;
         }
 
@@ -143,6 +155,7 @@ public class CraftController implements Initializable, SceneController {
             ingredients.add(new IngredientRequirement(ingItem.getItem_id(), spec.getAmount()));
         }
         CraftRecipeBalance balance = craftBalanceFor(definition);
+        boolean unlocked = gameState.canAccessRecipe(definition.getKey());
         unlockedRecipes.add(new Recipe(
             definition.getKey(),
             output.getItem_id(),
@@ -151,7 +164,8 @@ public class CraftController implements Initializable, SceneController {
             balance.baseSuccessRate,
             balance.dexScaling,
             balance.staminaCost,
-            ingredients
+            ingredients,
+            unlocked
         ));
     }
 
@@ -195,6 +209,9 @@ public class CraftController implements Initializable, SceneController {
             ImageView imageView = recipeImages.get(i);
             if (i >= unlockedRecipes.size()) {
                 if (imageView != null) {
+                    stopLockedRecipeFloat(imageView);
+                    imageView.setViewport(null);
+                    imageView.setTranslateY(0.0);
                     imageView.setImage(null);
                     imageView.setVisible(false);
                     imageView.setOpacity(0.0);
@@ -203,9 +220,10 @@ public class CraftController implements Initializable, SceneController {
             }
             Recipe recipe = unlockedRecipes.get(i);
             if (imageView != null) {
-                imageView.setImage(ItemDatabase.getImage(recipe.outputItemId));
+                imageView.setImage(recipe.unlocked ? ItemDatabase.getImage(recipe.outputItemId) : unknownRecipeImage);
                 imageView.setVisible(true);
-                imageView.setOpacity(0.9);
+                imageView.setOpacity(recipe.unlocked ? 0.9 : 0.75);
+                applyLockedRecipeVisual(imageView, !recipe.unlocked, i);
             }
         }
         refreshRecipeSelectionHighlight();
@@ -213,7 +231,9 @@ public class CraftController implements Initializable, SceneController {
 
     private void handleRecipeSelection(int index) {
         if (index < 0 || index >= unlockedRecipes.size()) return;
-        selectedRecipe = unlockedRecipes.get(index);
+        Recipe recipe = unlockedRecipes.get(index);
+        if (recipe == null || !recipe.unlocked) return;
+        selectedRecipe = recipe;
         refreshSelectionDetails();
     }
 
@@ -288,14 +308,16 @@ public class CraftController implements Initializable, SceneController {
 
     private void restoreActiveCraftSelection() {
         if (!gameState.hasActiveCraftingJob()) {
-            if (!unlockedRecipes.isEmpty()) selectedRecipe = unlockedRecipes.get(0);
+            Recipe firstUnlocked = firstUnlockedRecipe();
+            if (firstUnlocked != null) selectedRecipe = firstUnlocked;
             return;
         }
         int outputItemId = gameState.getActiveCraftingOutputItemId();
         for (Recipe recipe : unlockedRecipes) {
-            if (recipe.outputItemId == outputItemId) { selectedRecipe = recipe; return; }
+            if (recipe.unlocked && recipe.outputItemId == outputItemId) { selectedRecipe = recipe; return; }
         }
-        if (!unlockedRecipes.isEmpty()) selectedRecipe = unlockedRecipes.get(0);
+        Recipe firstUnlocked = firstUnlockedRecipe();
+        if (firstUnlocked != null) selectedRecipe = firstUnlocked;
     }
 
     private void startUiTimer() {
@@ -312,6 +334,7 @@ public class CraftController implements Initializable, SceneController {
 
     private void stopUiTimer() {
         if (craftUiTimer != null) { craftUiTimer.stop(); craftUiTimer = null; }
+        stopAllLockedRecipeFloats();
     }
 
     private void updateCraftingStateUi() {
@@ -429,7 +452,7 @@ public class CraftController implements Initializable, SceneController {
     private Recipe findUnlockedRecipeByOutputItemId(int outputItemId) {
         if (outputItemId <= 0) return null;
         for (Recipe recipe : unlockedRecipes) {
-            if (recipe != null && recipe.outputItemId == outputItemId) {
+            if (recipe != null && recipe.unlocked && recipe.outputItemId == outputItemId) {
                 return recipe;
             }
         }
@@ -482,9 +505,70 @@ public class CraftController implements Initializable, SceneController {
             if (img == null) continue;
             boolean selected = i < unlockedRecipes.size() && unlockedRecipes.get(i) == selectedRecipe;
             img.setStyle(selected ? "-fx-effect: dropshadow(gaussian, yellow, 12, 0.7, 0, 0);" : "");
-            img.setOpacity(selected ? 1.0 : 0.9);
+            boolean locked = i < unlockedRecipes.size() && !unlockedRecipes.get(i).unlocked;
+            img.setOpacity(selected ? 1.0 : (locked ? 0.75 : 0.9));
             img.setScaleX(selected ? 1.05 : 1.0);
             img.setScaleY(selected ? 1.05 : 1.0);
+        }
+    }
+
+    private void applyLockedRecipeVisual(ImageView imageView, boolean locked, int index) {
+        if (imageView == null) return;
+        if (!locked) {
+            stopLockedRecipeFloat(imageView);
+            imageView.setViewport(null);
+            imageView.setPreserveRatio(true);
+            imageView.setTranslateY(0.0);
+            return;
+        }
+
+        imageView.setViewport(new Rectangle2D(328, 34, 720, 720));
+        imageView.setPreserveRatio(false);
+        startLockedRecipeFloat(imageView, index);
+    }
+
+    private void startLockedRecipeFloat(ImageView imageView, int index) {
+        if (imageView == null || lockedRecipeFloatAnimations.containsKey(imageView)) return;
+        TranslateTransition floatAnim = new TranslateTransition(Duration.seconds(1.2), imageView);
+        floatAnim.setFromY(0.0);
+        floatAnim.setToY(-6.0);
+        floatAnim.setAutoReverse(true);
+        floatAnim.setCycleCount(Animation.INDEFINITE);
+        floatAnim.setInterpolator(Interpolator.EASE_BOTH);
+        floatAnim.setDelay(Duration.seconds((index % 4) * 0.12));
+        floatAnim.play();
+        lockedRecipeFloatAnimations.put(imageView, floatAnim);
+    }
+
+    private void stopLockedRecipeFloat(ImageView imageView) {
+        TranslateTransition floatAnim = lockedRecipeFloatAnimations.remove(imageView);
+        if (floatAnim != null) {
+            floatAnim.stop();
+        }
+    }
+
+    private void stopAllLockedRecipeFloats() {
+        for (TranslateTransition floatAnim : new ArrayList<>(lockedRecipeFloatAnimations.values())) {
+            if (floatAnim != null) {
+                floatAnim.stop();
+            }
+        }
+        lockedRecipeFloatAnimations.clear();
+    }
+
+    private Recipe firstUnlockedRecipe() {
+        for (Recipe recipe : unlockedRecipes) {
+            if (recipe != null && recipe.unlocked) return recipe;
+        }
+        return null;
+    }
+
+    private Image loadImage(String path) {
+        try {
+            var url = getClass().getResource(path);
+            return url == null ? null : new Image(url.toExternalForm());
+        } catch (Exception ignored) {
+            return null;
         }
     }
 
@@ -512,8 +596,8 @@ public class CraftController implements Initializable, SceneController {
         }
     }
     private static final class Recipe {
-        private final String key; private final int outputItemId; private final String name; private final int waitSeconds; private final int baseSuccessRate; private final int dexScaling; private final int staminaCost; private final int baseOutputAmount; private final List<IngredientRequirement> ingredients;
-        private Recipe(String key, int outputItemId, String name, int waitSeconds, int baseSuccessRate, int dexScaling, int staminaCost, List<IngredientRequirement> ingredients) { this(key, outputItemId, name, waitSeconds, baseSuccessRate, dexScaling, staminaCost, 1, ingredients); }
-        private Recipe(String key, int outputItemId, String name, int waitSeconds, int baseSuccessRate, int dexScaling, int staminaCost, int baseOutputAmount, List<IngredientRequirement> ingredients) { this.key = key; this.outputItemId = outputItemId; this.name = name; this.waitSeconds = waitSeconds; this.baseSuccessRate = baseSuccessRate; this.dexScaling = dexScaling; this.staminaCost = staminaCost; this.baseOutputAmount = Math.max(1, baseOutputAmount); this.ingredients = Collections.unmodifiableList(new ArrayList<>(ingredients == null ? List.of() : ingredients)); }
+        private final String key; private final int outputItemId; private final String name; private final int waitSeconds; private final int baseSuccessRate; private final int dexScaling; private final int staminaCost; private final int baseOutputAmount; private final List<IngredientRequirement> ingredients; private final boolean unlocked;
+        private Recipe(String key, int outputItemId, String name, int waitSeconds, int baseSuccessRate, int dexScaling, int staminaCost, List<IngredientRequirement> ingredients, boolean unlocked) { this(key, outputItemId, name, waitSeconds, baseSuccessRate, dexScaling, staminaCost, 1, ingredients, unlocked); }
+        private Recipe(String key, int outputItemId, String name, int waitSeconds, int baseSuccessRate, int dexScaling, int staminaCost, int baseOutputAmount, List<IngredientRequirement> ingredients, boolean unlocked) { this.key = key; this.outputItemId = outputItemId; this.name = name; this.waitSeconds = waitSeconds; this.baseSuccessRate = baseSuccessRate; this.dexScaling = dexScaling; this.staminaCost = staminaCost; this.baseOutputAmount = Math.max(1, baseOutputAmount); this.ingredients = Collections.unmodifiableList(new ArrayList<>(ingredients == null ? List.of() : ingredients)); this.unlocked = unlocked; }
     }
 }

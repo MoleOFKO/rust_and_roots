@@ -409,16 +409,77 @@ public final class UiSqlService {
         if (itemId <= 0) {
             return false;
         }
-        String sql = """
-            DELETE i, s
-            FROM items i
-            JOIN item_stats s ON s.item_stats_id = i.item_stats_id
-            WHERE i.item_id = ?
-            """;
-        try (Connection con = open();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+        try (Connection con = open()) {
+            boolean previousAutoCommit = con.getAutoCommit();
+            con.setAutoCommit(false);
+            try {
+                Integer statsId = null;
+                try (PreparedStatement ps = con.prepareStatement("SELECT item_stats_id FROM items WHERE item_id = ?")) {
+                    ps.setInt(1, itemId);
+                    try (ResultSet rs = ps.executeQuery()) {
+                        if (rs.next()) {
+                            int value = rs.getInt("item_stats_id");
+                            if (!rs.wasNull()) {
+                                statsId = value;
+                            }
+                        }
+                    }
+                }
+
+                deleteRowsByItemId(con, "saved_item", "item_id", itemId);
+                deleteRowsByItemId(con, "saved_shop_stock", "item_id", itemId);
+                deleteRowsByItemId(con, "saved_shop_random_item", "item_id", itemId);
+                deleteRowsByItemId(con, "saved_mob_drop", "item_id", itemId);
+                deleteRowsByItemId(con, "saved_tree_drop", "item_id", itemId);
+                deleteRowsByItemId(con, "saved_chest_item", "item_id", itemId);
+                deleteRowsByItemId(con, "saved_smelt_ore_history", "source_item_id", itemId);
+                try (PreparedStatement ps = con.prepareStatement("UPDATE saved_hotbar SET item_id = NULL, qty = 0 WHERE item_id = ?")) {
+                    ps.setInt(1, itemId);
+                    ps.executeUpdate();
+                }
+                try (PreparedStatement ps = con.prepareStatement("UPDATE saved_farm_plot SET seed_item_id = NULL WHERE seed_item_id = ?")) {
+                    ps.setInt(1, itemId);
+                    ps.executeUpdate();
+                }
+
+                int deletedItems;
+                try (PreparedStatement ps = con.prepareStatement("DELETE FROM items WHERE item_id = ?")) {
+                    ps.setInt(1, itemId);
+                    deletedItems = ps.executeUpdate();
+                }
+
+                if (statsId != null) {
+                    try (PreparedStatement ps = con.prepareStatement("""
+                        DELETE s
+                          FROM item_stats s
+                          LEFT JOIN items i ON i.item_stats_id = s.item_stats_id
+                         WHERE s.item_stats_id = ?
+                           AND i.item_id IS NULL
+                        """)) {
+                        ps.setInt(1, statsId);
+                        ps.executeUpdate();
+                    }
+                }
+
+                con.commit();
+                return deletedItems > 0;
+            } catch (SQLException ex) {
+                con.rollback();
+                throw ex;
+            } finally {
+                con.setAutoCommit(previousAutoCommit);
+            }
+        }
+    }
+
+    private static void deleteRowsByItemId(Connection con, String tableName, String columnName, int itemId) throws SQLException {
+        if (con == null || tableName == null || columnName == null || itemId <= 0) {
+            return;
+        }
+        String sql = "DELETE FROM " + tableName + " WHERE " + columnName + " = ?";
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, itemId);
-            return ps.executeUpdate() > 0;
+            ps.executeUpdate();
         }
     }
 
