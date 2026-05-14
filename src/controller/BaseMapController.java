@@ -1021,6 +1021,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     private record MiniMapWorldBounds(double x, double y, double width, double height) {}
 
     private void cleanupBeforeSceneSwitch() {
+        releaseSettingsTabTimePause();
         detachFarmTimeRefresh();
         detachSharedHudRefreshListener();
         detachOverworldCombatTutorialTrigger();
@@ -1038,6 +1039,19 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
         dayBg = null;
         nightBg = null;
+    }
+
+    private void releaseSettingsTabTimePause() {
+        if (!timePausedBySettingsTab) {
+            return;
+        }
+
+        if (!timeWasPausedBeforeSettingsTab) {
+            GameTimeManager.get().setPaused(false);
+        }
+
+        timePausedBySettingsTab = false;
+        timeWasPausedBeforeSettingsTab = false;
     }
 
     private void clearCachedUiReferences() {
@@ -1395,6 +1409,8 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         } else {
             clearPlayerInventorySelection();
         }
+
+        updateSettingsTabTimePause();
 
         if (view != null && view.getScene() != null) {
             if (open) {
