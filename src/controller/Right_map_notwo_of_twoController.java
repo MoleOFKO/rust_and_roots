@@ -419,6 +419,74 @@ public class Right_map_notwo_of_twoController extends BaseMapController {
     private Button opensetting;
     @FXML
     private Button btntuto;
+    @FXML
+    private Group stone3;
+    @FXML
+    private ImageView stone_img3;
+    @FXML
+    private Rectangle stone_hitbox3;
+    @FXML
+    private ImageView drops_img_stone3;
+    @FXML
+    private Group stone2;
+    @FXML
+    private ImageView stone_img2;
+    @FXML
+    private Rectangle stone_hitbox2;
+    @FXML
+    private ImageView drops_img_stone2;
+    @FXML
+    private Group stone1;
+    @FXML
+    private ImageView stone_img1;
+    @FXML
+    private Rectangle stone_hitbox1;
+    @FXML
+    private ImageView drops_img_stone1;
+    @FXML
+    private Group stone;
+    @FXML
+    private ImageView stone_img;
+    @FXML
+    private Rectangle stone_hitbox;
+    @FXML
+    private ImageView drops_img_stone;
+    @FXML
+    private Group orc;
+    @FXML
+    private Rectangle orc_hitbox;
+    @FXML
+    private ImageView orc_img;
+    @FXML
+    private ImageView orc_drops_img;
+    @FXML
+    private Rectangle orc_hitbox_left;
+    @FXML
+    private Rectangle orc_hitbox_up;
+    @FXML
+    private Rectangle orc_hitbox_down;
+    @FXML
+    private Rectangle orc_hitbox_right;
+    @FXML
+    private Rectangle orc_detect;
+    @FXML
+    private Group orc1;
+    @FXML
+    private Rectangle orc_hitbox1;
+    @FXML
+    private ImageView orc_img1;
+    @FXML
+    private ImageView orc_drops_img1;
+    @FXML
+    private Rectangle orc_hitbox_left1;
+    @FXML
+    private Rectangle orc_hitbox_up1;
+    @FXML
+    private Rectangle orc_hitbox_down1;
+    @FXML
+    private Rectangle orc_hitbox_right1;
+    @FXML
+    private Rectangle orc_detect1;
 
     @Override
     protected String mapKey() {
@@ -434,5 +502,4 @@ public class Right_map_notwo_of_twoController extends BaseMapController {
         private void handlebtntutoaction(ActionEvent event) {
             showOverworldTutorialOverlay();
         }
- 
 }

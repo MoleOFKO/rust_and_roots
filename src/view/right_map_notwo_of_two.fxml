@@ -19,7 +19,7 @@
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
 
-<StackPane fx:id="view" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Right_map_notwo_of_twoController">
+<StackPane fx:id="view" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Right_map_notwo_of_twoController">
    <children>
       <Group fx:id="world">
          <children>
@@ -33,6 +33,30 @@
                   <ImageView fx:id="human_img" fitHeight="64" fitWidth="64" layoutX="228.0" layoutY="177.0" />
                   <ImageView fx:id="equip_img" fitHeight="64" fitWidth="64" layoutX="227.0" layoutY="176.0" />
                   <Rectangle fx:id="human_hitbox" arcHeight="6" arcWidth="6" fill="#00000074" height="36.0" layoutX="244.0" layoutY="190.0" stroke="#ffffff00" visible="false" width="28" />
+               </children>
+            </Group>
+            <Group fx:id="orc" layoutX="170.0" layoutY="83.0">
+               <children>
+                  <Rectangle fx:id="orc_hitbox" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="262.0" layoutY="171.0" stroke="RED" strokeType="INSIDE" translateX="24" translateY="28" width="14.0" />
+                  <ImageView fx:id="orc_img" fitHeight="64" fitWidth="64" layoutX="262.0" layoutY="176.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
+                  <ImageView fx:id="orc_drops_img" fitHeight="64" fitWidth="64" layoutX="262.0" layoutY="176.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
+                  <Rectangle fx:id="orc_hitbox_left" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="272.0" layoutY="200.0" stroke="RED" strokeType="INSIDE" width="14.0" />
+                  <Rectangle fx:id="orc_hitbox_up" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="286.0" layoutY="181.0" stroke="RED" strokeType="INSIDE" width="14.0" />
+                  <Rectangle fx:id="orc_hitbox_down" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="286.0" layoutY="218.0" stroke="RED" strokeType="INSIDE" width="14.0" />
+                  <Rectangle fx:id="orc_hitbox_right" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="299.0" layoutY="199.0" stroke="RED" strokeType="INSIDE" width="14.0" />
+                  <Rectangle fx:id="orc_detect" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="137.0" layoutX="225.0" layoutY="141.0" stroke="RED" strokeType="INSIDE" width="137.0" />
+               </children>
+            </Group>
+            <Group fx:id="orc1" layoutX="-42.0" layoutY="-137.0">
+               <children>
+                  <Rectangle fx:id="orc_hitbox1" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="262.0" layoutY="171.0" stroke="RED" strokeType="INSIDE" translateX="24" translateY="28" width="14.0" />
+                  <ImageView fx:id="orc_img1" fitHeight="64" fitWidth="64" layoutX="262.0" layoutY="176.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
+                  <ImageView fx:id="orc_drops_img1" fitHeight="64" fitWidth="64" layoutX="262.0" layoutY="176.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
+                  <Rectangle fx:id="orc_hitbox_left1" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="272.0" layoutY="200.0" stroke="RED" strokeType="INSIDE" width="14.0" />
+                  <Rectangle fx:id="orc_hitbox_up1" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="286.0" layoutY="181.0" stroke="RED" strokeType="INSIDE" width="14.0" />
+                  <Rectangle fx:id="orc_hitbox_down1" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="286.0" layoutY="218.0" stroke="RED" strokeType="INSIDE" width="14.0" />
+                  <Rectangle fx:id="orc_hitbox_right1" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="299.0" layoutY="199.0" stroke="RED" strokeType="INSIDE" width="14.0" />
+                  <Rectangle fx:id="orc_detect1" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="137.0" layoutX="225.0" layoutY="141.0" stroke="RED" strokeType="INSIDE" width="137.0" />
                </children>
             </Group>
             <Group fx:id="walls" visible="false">
@@ -137,6 +161,55 @@
                   </ImageView>
                </children>
             </Group>
+            <Group fx:id="stone3" layoutX="-157.0" layoutY="34.0">
+               <children>
+                  <ImageView fx:id="stone_img3" fitHeight="32.0" fitWidth="32.0" layoutX="286.0" layoutY="249.0" pickOnBounds="true" preserveRatio="false" smooth="false">
+                     <image>
+                        <Image url="@../image/weapons/stone.png" />
+                     </image>
+                  </ImageView>
+                  <Rectangle fx:id="stone_hitbox3" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="20.0" layoutX="266.0" layoutY="226.0" stroke="RED" strokeType="INSIDE" translateX="24" translateY="28" width="25.0" />
+                  <ImageView fx:id="drops_img_stone3" fitHeight="28.0" fitWidth="28.0" layoutX="303.0" layoutY="267.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
+               </children>
+            </Group>
+            <Group fx:id="stone2" layoutX="-86.0" layoutY="-100.0">
+               <children>
+                  <ImageView fx:id="stone_img2" fitHeight="32.0" fitWidth="32.0" layoutX="286.0" layoutY="249.0" pickOnBounds="true" preserveRatio="false" smooth="false">
+                     <image>
+                        <Image url="@../image/weapons/stone.png" />
+                     </image>
+                  </ImageView>
+                  <Rectangle fx:id="stone_hitbox2" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="20.0" layoutX="266.0" layoutY="226.0" stroke="RED" strokeType="INSIDE" translateX="24" translateY="28" width="25.0" />
+                  <ImageView fx:id="drops_img_stone2" fitHeight="28.0" fitWidth="28.0" layoutX="303.0" layoutY="267.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
+               </children>
+            </Group>
+            <Group fx:id="stone1" layoutX="2.0" layoutY="-186.0">
+               <children>
+                  <ImageView fx:id="stone_img1" fitHeight="32.0" fitWidth="32.0" layoutX="286.0" layoutY="249.0" pickOnBounds="true" preserveRatio="false" smooth="false">
+                     <image>
+                        <Image url="@../image/weapons/stone.png" />
+                     </image>
+                  </ImageView>
+                  <Rectangle fx:id="stone_hitbox1" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="20.0" layoutX="266.0" layoutY="226.0" stroke="RED" strokeType="INSIDE" translateX="24" translateY="28" width="25.0" />
+                  <ImageView fx:id="drops_img_stone1" fitHeight="28.0" fitWidth="28.0" layoutX="303.0" layoutY="267.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
+               </children>
+            </Group>
+            <Group fx:id="stone">
+               <children>
+                  <ImageView fx:id="stone_img" fitHeight="32.0" fitWidth="32.0" layoutX="286.0" layoutY="249.0" pickOnBounds="true" preserveRatio="false" smooth="false">
+                     <image>
+                        <Image url="@../image/weapons/stone.png" />
+                     </image>
+                  </ImageView>
+                  <Rectangle fx:id="stone_hitbox" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="20.0" layoutX="266.0" layoutY="226.0" stroke="RED" strokeType="INSIDE" translateX="24" translateY="28" width="25.0" />
+                  <ImageView fx:id="drops_img_stone" fitHeight="28.0" fitWidth="28.0" layoutX="303.0" layoutY="267.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
+               </children>
+            </Group>
+            <Button fx:id="btntuto" layoutX="568.0" mnemonicParsing="false" onAction="#handlebtntutoaction" style="-fx-background-radius: 100%; -fx-background-color: transparent; -fx-border-color: yellow; -fx-border-radius: 100%;" textFill="#e6ff00">
+               <graphic>
+                  <FontAwesomeIcon fill="#f6ff00" glyphName="QUESTION" size="1.5em" />
+               </graphic>
+            </Button>
             <Group>
                <children>
                   <Label fx:id="hotbarguide" layoutX="219.0" layoutY="364.0" text="press 'e' to open hotbar">
@@ -949,11 +1022,6 @@
                   </Pane>
                </children>
             </Group>
-            <Button fx:id="btntuto" layoutX="568.0" mnemonicParsing="false" onAction="#handlebtntutoaction" style="-fx-background-radius: 100%; -fx-background-color: transparent; -fx-border-color: yellow; -fx-border-radius: 100%;" textFill="#e6ff00">
-               <graphic>
-                  <FontAwesomeIcon fill="#f6ff00" glyphName="QUESTION" selectionFill="YELLOW" size="1.5em" />
-               </graphic>
-            </Button>
          </children>
       </Group>
    </children>
