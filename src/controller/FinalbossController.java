@@ -413,6 +413,24 @@ public class FinalbossController extends BaseMapController {
     private Button opensetting;
     @FXML
     private Button btntuto;
+    @FXML
+    private Group orcb;
+    @FXML
+    private Rectangle orcb_hitbox;
+    @FXML
+    private ImageView orcb_img;
+    @FXML
+    private ImageView orcb_drops_img;
+    @FXML
+    private Rectangle orcb_hitbox_left;
+    @FXML
+    private Rectangle orcb_hitbox_up;
+    @FXML
+    private Rectangle orcb_hitbox_down;
+    @FXML
+    private Rectangle orcb_hitbox_right;
+    @FXML
+    private Rectangle orcb_detect;
 
 //    /**
 //     * Initializes the controller class.
@@ -568,5 +586,4 @@ public class FinalbossController extends BaseMapController {
     protected void configureExits() {
         registerExit(exit_down, "/view/right_map_notwo_of_two.fxml", SpawnTag.FROM_UP);
     }
-    
 }

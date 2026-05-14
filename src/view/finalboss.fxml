@@ -19,7 +19,7 @@
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
 
-<StackPane fx:id="view" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.FinalbossController">
+<StackPane fx:id="view" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.FinalbossController">
    <children>
       <Group fx:id="world">
          <children>
@@ -33,6 +33,18 @@
                   <ImageView fx:id="human_img" fitHeight="64" fitWidth="64" layoutX="269.0" layoutY="226.0" />
                   <ImageView fx:id="equip_img" fitHeight="64" fitWidth="64" layoutX="270.0" layoutY="227.0" />
                   <Rectangle fx:id="human_hitbox" arcHeight="6" arcWidth="6" fill="#00000074" height="36.0" layoutX="285.0" layoutY="240.0" stroke="#ffffff00" visible="false" width="28" />
+               </children>
+            </Group>
+            <Group fx:id="orcb" layoutX="8.0" layoutY="-65.0">
+               <children>
+                  <Rectangle fx:id="orcb_hitbox" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="262.0" layoutY="171.0" stroke="RED" strokeType="INSIDE" translateX="24" translateY="28" width="14.0" />
+                  <ImageView fx:id="orcb_img" fitHeight="64" fitWidth="64" layoutX="262.0" layoutY="176.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
+                  <ImageView fx:id="orcb_drops_img" fitHeight="64" fitWidth="64" layoutX="262.0" layoutY="176.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
+                  <Rectangle fx:id="orcb_hitbox_left" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="272.0" layoutY="200.0" stroke="RED" strokeType="INSIDE" width="14.0" />
+                  <Rectangle fx:id="orcb_hitbox_up" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="286.0" layoutY="181.0" stroke="RED" strokeType="INSIDE" width="14.0" />
+                  <Rectangle fx:id="orcb_hitbox_down" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="286.0" layoutY="218.0" stroke="RED" strokeType="INSIDE" width="14.0" />
+                  <Rectangle fx:id="orcb_hitbox_right" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="299.0" layoutY="199.0" stroke="RED" strokeType="INSIDE" width="14.0" />
+                  <Rectangle fx:id="orcb_detect" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="137.0" layoutX="225.0" layoutY="141.0" stroke="RED" strokeType="INSIDE" width="137.0" />
                </children>
             </Group>
             <Group fx:id="walls" visible="false">
@@ -948,7 +960,7 @@
             </Group>
             <Button fx:id="btntuto" layoutX="575.0" layoutY="3.0" mnemonicParsing="false" onAction="#handlebtntutoaction" style="-fx-background-radius: 100%; -fx-background-color: transparent; -fx-border-color: yellow; -fx-border-radius: 100%;" textFill="#e6ff00">
                <graphic>
-                  <FontAwesomeIcon fill="#f6ff00" glyphName="QUESTION" selectionFill="YELLOW" size="1.5em" />
+                  <FontAwesomeIcon fill="#f6ff00" glyphName="QUESTION" size="1.5em" />
                </graphic>
             </Button>
          </children>
