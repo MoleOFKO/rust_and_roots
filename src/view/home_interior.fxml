@@ -1003,7 +1003,7 @@
                      </DropShadow>
                   </effect>
                </Label>
-            <Group fx:id="minimapicongroup" layoutX="540.0" layoutY="-10.0">
+            <Group fx:id="minimapicongroup" layoutX="490.0" layoutY="17.0">
                <children>
                   <ImageView fx:id="miniMapIcon" fitHeight="37.0" fitWidth="34.0" layoutX="-14.0" layoutY="9.0" onMouseClicked="#handleMiniMapIconaction" pickOnBounds="true" preserveRatio="true">
                      <image>
@@ -1047,6 +1047,7 @@
                     <Rectangle fx:id="left_map" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="60.0" layoutX="206.0" layoutY="255.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
                     <Rectangle fx:id="home_map" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="60.0" layoutX="294.0" layoutY="255.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
                     <Rectangle fx:id="right_map" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="60.0" layoutX="382.0" layoutY="256.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
+                     <Rectangle fx:id="home_interior" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="13.0" layoutX="314.0" layoutY="258.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="18.0" />
 </children>
             </Group></children>
       </Group>

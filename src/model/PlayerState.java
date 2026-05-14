@@ -5,6 +5,7 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import java.util.Arrays;
+import util.SceneManager;
 import util.SoundManager;
 
 
@@ -459,6 +460,7 @@ public final class PlayerState {
         boolean wasAlive = !isDead();
         setHp(getHp() - amount);
         if (wasAlive && isDead()) {
+            SceneManager.stopBgm();
             SoundManager.playSfx(SoundManager.Sfx.PLAYER_DEFEAT);
         }
     }

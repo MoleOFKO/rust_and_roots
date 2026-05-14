@@ -510,6 +510,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         }
 
         player.setOnToggleHotbarRequest(this::toggleHotbarVisible);
+        player.setOnMiniMapToggleRequest(this::toggleMiniMapVisible);
         player.setOnHotbarSlotRequest(this::selectHotbarSlot);
         player.setOnDeathFinished(this::handlePlayerPermadeath);
         bindAttackDispatcherIfNeeded();
@@ -642,33 +643,41 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
     @FXML
     protected void handleMiniMapIconaction(MouseEvent event) {
-        Group miniMapGroup = minimapgroup != null ? minimapgroup : controllerField("minimapgroup", Group.class);
-        if (miniMapGroup == null) {
-            if (event != null) event.consume();
-            return;
-        }
-
-        miniMapGroup.setVisible(true);
-        miniMapGroup.setManaged(true);
-        miniMapGroup.setDisable(false);
-        updateMiniMapPlayerMarker();
-        miniMapGroup.toFront();
-        if (player != null) {
-            player.clearInputState();
-        }
+        setMiniMapVisible(true);
         if (event != null) event.consume();
     }
 
     @FXML
     protected void handleCloseMiniMapAction(MouseEvent event) {
+        setMiniMapVisible(false);
+        if (event != null) event.consume();
+    }
+
+    protected void toggleMiniMapVisible() {
+        if (isMiniMapExcludedMap(mapKey())) return;
         Group miniMapGroup = minimapgroup != null ? minimapgroup : controllerField("minimapgroup", Group.class);
-        if (miniMapGroup != null) {
-            miniMapGroup.setVisible(false);
-            miniMapGroup.setManaged(false);
-            miniMapGroup.setDisable(true);
+        setMiniMapVisible(miniMapGroup == null || !miniMapGroup.isVisible());
+    }
+
+    private void setMiniMapVisible(boolean visible) {
+        Group miniMapGroup = minimapgroup != null ? minimapgroup : controllerField("minimapgroup", Group.class);
+        if (miniMapGroup == null || isMiniMapExcludedMap(mapKey())) {
+            return;
+        }
+
+        miniMapGroup.setVisible(visible);
+        miniMapGroup.setManaged(visible);
+        miniMapGroup.setDisable(!visible);
+
+        if (visible) {
+            updateMiniMapPlayerMarker();
+            miniMapGroup.toFront();
+            if (player != null) {
+                player.clearInputState();
+            }
+        } else {
             configureMiniMapAreaRectangles(miniMapGroup);
         }
-        if (event != null) event.consume();
     }
 
     private void setupMiniMapIfPresent() {
@@ -827,9 +836,6 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
     private String miniMapSectionIdForMapKey(String rawMapKey) {
         String key = rawMapKey == null ? "" : rawMapKey.toLowerCase(Locale.ROOT);
-        if (key.equals("home_interior")) {
-            return "home_map";
-        }
         return key;
     }
 
