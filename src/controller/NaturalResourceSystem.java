@@ -63,7 +63,7 @@ final class NaturalResourceSystem {
 
     private static final double RESOURCE_RESPAWN_SECONDS = 3.0 * 60.0 * 60.0;
     private static final double DROP_TTL_SECONDS = 12.0 * 60.0 * 60.0;
-    private static final double DROP_AUTO_COLLECT_DELAY_SECONDS = 0.5 * 60.0;
+    private static final double DROP_AUTO_COLLECT_DELAY_SECONDS = 0.2 * 60.0;
     private static final double AUTO_GATHER_MARGIN_PIXELS = 2.0;
 
     private static final int STARTING_MAX_HP = 10;
