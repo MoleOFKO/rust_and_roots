@@ -207,6 +207,7 @@ public class Left_mapController extends BaseMapController {
     private static final double TREE_RESPAWN_SECONDS = 3.0 * 60.0 * 60.0;
 
     private static final double TREE_DROP_TTL_SECONDS = 12.0 * 60.0 * 60.0;
+    private static final double TREE_DROP_AUTO_COLLECT_DELAY_SECONDS = 0.5 * 60.0;
     private static final int TREE_STARTING_MAX_HP = 10;
     private static final int TREE_MAX_DROPS_PER_LIFE = 10;
     private static final int TREE_STAGE2_MAX_ALIVE_DROPS = 9;
@@ -1493,14 +1494,16 @@ public class Left_mapController extends BaseMapController {
     private void autoGatherDrops(Bounds playerBoundsScene) {
         if (player == null || playerBoundsScene == null) return;
 
-        warnedTreeInventoryFull = autoGatherResourceDrops(mainTreeData, tree_hitbox, playerBoundsScene, warnedTreeInventoryFull, this::renderTreeDrops);
-        warnedStoneInventoryFull = autoGatherResourceDrops(mainStoneData, stone_hitbox, playerBoundsScene, warnedStoneInventoryFull, this::renderStoneDrops);
+        double nowSeconds = GameTimeManager.get().totalSecondsProperty().get();
+        warnedTreeInventoryFull = autoGatherResourceDrops(mainTreeData, tree_hitbox, playerBoundsScene, nowSeconds, warnedTreeInventoryFull, this::renderTreeDrops);
+        warnedStoneInventoryFull = autoGatherResourceDrops(mainStoneData, stone_hitbox, playerBoundsScene, nowSeconds, warnedStoneInventoryFull, this::renderStoneDrops);
     }
 
     private boolean autoGatherResourceDrops(
         TreeMapState.TreeData resource,
         Rectangle resourceHitbox,
         Bounds playerBoundsScene,
+        double nowSeconds,
         boolean warnedInventoryFull,
         Runnable rerender
     ) {
@@ -1524,6 +1527,9 @@ public class Left_mapController extends BaseMapController {
             if (drop == null || drop.itemId <= 0 || drop.quantity <= 0) {
                 it.remove();
                 removedAny = true;
+                continue;
+            }
+            if (nowSeconds < drop.spawnedAtTotalSeconds + TREE_DROP_AUTO_COLLECT_DELAY_SECONDS) {
                 continue;
             }
 
