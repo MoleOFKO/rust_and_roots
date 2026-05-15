@@ -47,6 +47,8 @@ final class MapMobSystem {
 
     private static final double MOB_DROP_TTL_SECONDS = 12.0 * 60.0 * 60.0;
     private static final double AUTO_GATHER_MARGIN_PIXELS = 2.0;
+    private static final double ORC_ATTACK_RECEIVE_PADDING_X = 18.0;
+    private static final double ORC_ATTACK_RECEIVE_PADDING_Y = 12.0;
     private static final double ORC_LOOT_COMMON_WEIGHT = 70.0;
     private static final double ORC_LOOT_UNCOMMON_WEIGHT = 25.0;
     private static final double ORC_LOOT_RARE_WEIGHT = 5.0;
@@ -293,7 +295,7 @@ final class MapMobSystem {
                 continue;
             }
 
-            Bounds mobBounds = handle.entity.getBodyHitbox().localToScene(handle.entity.getBodyHitbox().getBoundsInLocal());
+            Bounds mobBounds = playerAttackTargetBounds(handle);
             if (!attackBounds.intersects(mobBounds)) {
                 continue;
             }
@@ -312,6 +314,19 @@ final class MapMobSystem {
         if (hitAny) {
             SoundManager.playSfx(SoundManager.Sfx.HIT);
         }
+    }
+
+    private Bounds playerAttackTargetBounds(MobHandle handle) {
+        Bounds bounds = handle.entity.getBodyHitbox().localToScene(handle.entity.getBodyHitbox().getBoundsInLocal());
+        if (handle.kind != MobEntity.Kind.ORC) {
+            return bounds;
+        }
+        return new BoundingBox(
+            bounds.getMinX() - ORC_ATTACK_RECEIVE_PADDING_X,
+            bounds.getMinY() - ORC_ATTACK_RECEIVE_PADDING_Y,
+            bounds.getWidth() + (ORC_ATTACK_RECEIVE_PADDING_X * 2.0),
+            bounds.getHeight() + (ORC_ATTACK_RECEIVE_PADDING_Y * 2.0)
+        );
     }
 
     private boolean containsMobType(String mobType) {

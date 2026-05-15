@@ -21,7 +21,14 @@ public final class FarmGrowthRules {
         if (timedPhases <= 0) {
             return 0.0;
         }
-        return timedPhases * DEFAULT_GROWTH_PHASE_SECONDS;
+        double baseSeconds = timedPhases * DEFAULT_GROWTH_PHASE_SECONDS;
+        int cropVit = ItemDatabase.resolveCropGrowthVitForSeed(seedItemId);
+        if (cropVit <= 0) {
+            return baseSeconds;
+        }
+
+        double speedMultiplier = 1.0 + (Math.min(50, cropVit) * 0.05);
+        return Math.max(60.0, baseSeconds / speedMultiplier);
     }
 
     public static double resolvePhaseDurationSeconds(double totalGrowthSeconds) {

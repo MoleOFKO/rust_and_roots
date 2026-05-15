@@ -1227,7 +1227,7 @@ public final class MobEntity {
     }
 
     private void clearHurtFlashEffect() {
-        if (spriteView != null && spriteView.getEffect() != hurtFlashEffect) {
+        if (spriteView != null && spriteView.getEffect() == hurtFlashEffect) {
             spriteView.setEffect(null);
         }
     }

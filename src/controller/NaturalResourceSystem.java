@@ -63,6 +63,7 @@ final class NaturalResourceSystem {
 
     private static final double RESOURCE_RESPAWN_SECONDS = 3.0 * 60.0 * 60.0;
     private static final double DROP_TTL_SECONDS = 12.0 * 60.0 * 60.0;
+    private static final double DROP_AUTO_COLLECT_DELAY_SECONDS = 0.2 * 60.0;
     private static final double AUTO_GATHER_MARGIN_PIXELS = 2.0;
 
     private static final int STARTING_MAX_HP = 10;
@@ -1068,11 +1069,12 @@ final class NaturalResourceSystem {
             return;
         }
 
+        double nowSeconds = GameTimeManager.get().totalSecondsProperty().get();
         for (ResourceHandle handle : resources) {
             if (handle == null || handle.data == null || handle.hitbox == null) {
                 continue;
             }
-            handle.warnedInventoryFull = autoGatherResourceDrops(handle.data, handle.hitbox, playerBoundsScene, handle.warnedInventoryFull);
+            handle.warnedInventoryFull = autoGatherResourceDrops(handle.data, handle.hitbox, playerBoundsScene, nowSeconds, handle.warnedInventoryFull);
             renderDrops(handle);
         }
     }
@@ -1081,6 +1083,7 @@ final class NaturalResourceSystem {
         TreeMapState.TreeData resource,
         Rectangle resourceHitbox,
         Bounds playerBoundsScene,
+        double nowSeconds,
         boolean warnedInventoryFull
     ) {
         if (resource == null || resourceHitbox == null || player == null || playerBoundsScene == null) {
@@ -1101,6 +1104,9 @@ final class NaturalResourceSystem {
             TreeMapState.TreeDrop drop = it.next();
             if (drop == null || drop.itemId <= 0 || drop.quantity <= 0) {
                 it.remove();
+                continue;
+            }
+            if (nowSeconds < drop.spawnedAtTotalSeconds + DROP_AUTO_COLLECT_DELAY_SECONDS) {
                 continue;
             }
 

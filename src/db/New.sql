@@ -278,6 +278,19 @@ UPDATE `items` SET `price` = 15 WHERE `item_id` IN (117,118,120,121,122); -- sma
 UPDATE `items` SET `price` = 30 WHERE `item_id` IN (200,201,202); -- basic colored fruits
 UPDATE `items` SET `price` = 25 WHERE `item_id` IN (247,248,249); -- bandages + water bottle
 
+-- Item stat rules by item type. The admin item add/edit screens enforce the
+-- same rules; this keeps imported seed rows consistent with gameplay.
+UPDATE `item_stats` s
+JOIN `items` i ON i.`item_stats_id` = s.`item_stats_id`
+JOIN `item_types` t ON t.`item_type_id` = i.`item_type_id`
+SET
+  s.`str_stat` = CASE WHEN t.`item_type_name` = 'equipment' THEN s.`str_stat` ELSE 0 END,
+  s.`agi_stat` = CASE WHEN t.`item_type_name` = 'equipment' THEN s.`agi_stat` ELSE 0 END,
+  s.`dex_stat` = CASE WHEN t.`item_type_name` = 'equipment' THEN s.`dex_stat` ELSE 0 END,
+  s.`vit_stat` = CASE WHEN t.`item_type_name` IN ('equipment','crop') THEN s.`vit_stat` ELSE 0 END,
+  s.`hp` = CASE WHEN t.`item_type_name` = 'edible' THEN s.`hp` ELSE 0 END,
+  s.`stamina` = CASE WHEN t.`item_type_name` = 'edible' THEN s.`stamina` ELSE 0 END;
+
 -- Fix a few missing image filenames so these items remain obtainable/displayable.
 UPDATE `items` SET `image` = 'pumpkin_fruit.png' WHERE `item_id` = 112;
 UPDATE `items` SET `image` = 'coal_brick.png' WHERE `item_id` = 215;
