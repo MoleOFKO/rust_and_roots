@@ -42,7 +42,7 @@
                   <Image url="@../image/Admin/admin_save_button.png" />
                </image>
             </ImageView>
-               <Button fx:id="btnsave" layoutX="207.0" layoutY="247.0" mnemonicParsing="false" onAction="#handlebtnsaveaction" opacity="0.0" prefHeight="25.0" prefWidth="68.0" text="Save" />
+               <Button fx:id="btnsave" layoutX="208.0" layoutY="247.0" mnemonicParsing="false" onAction="#handlebtnsaveaction" opacity="0.0" prefHeight="25.0" prefWidth="68.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Save" />
                <Label layoutX="93.0" layoutY="92.0" prefHeight="17.0" prefWidth="84.0" text="Account Name" textFill="#572a00">
                <font>
                   <Font name="Serif Bold" size="12.0" />
@@ -64,7 +64,7 @@
                   <Image url="@../image/Admin/admin_back_button.png" />
                </image>
             </ImageView>
-               <Button fx:id="btnback" layoutX="391.0" layoutY="12.0" mnemonicParsing="false" onAction="#handlebtnbackaction" opacity="0.0" prefHeight="25.0" prefWidth="67.0" text="Back">
+               <Button fx:id="btnback" layoutX="391.0" layoutY="12.0" mnemonicParsing="false" onAction="#handlebtnbackaction" opacity="0.0" prefHeight="25.0" prefWidth="67.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Back">
                   <graphic>
                      <FontAwesomeIcon glyphName="ARROW_LEFT" />
                   </graphic>

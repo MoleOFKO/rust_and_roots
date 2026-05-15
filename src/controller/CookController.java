@@ -133,7 +133,7 @@ public class CookController implements Initializable, SceneController {
     @FXML private Label cookwaitingtimelbl;
     @FXML private Label cookname;
     @FXML private Label cookeffectlbl;
-    @FXML private ImageView closeimgbtn;
+    @FXML private Button closeimgbtn;
     @FXML
     private Label cooksuccessrate;
     @FXML
@@ -571,7 +571,6 @@ public class CookController implements Initializable, SceneController {
         return null;
     }
 
-    @FXML
     private void handlecloseimgbtn(MouseEvent event) {
         stopUiTimer();
 
@@ -673,6 +672,10 @@ public class CookController implements Initializable, SceneController {
     private void handlebtntutoaction(ActionEvent event) {
         TutorialOverlayHelper.show(view, List.of("/image/Toturial/Cooking Tutorial.png"));
         if (event != null) event.consume();
+    }
+
+    @FXML
+    private void handlecloseimgbtn(ActionEvent event) {
     }
 
     private static final class RecipeDifficulty {
