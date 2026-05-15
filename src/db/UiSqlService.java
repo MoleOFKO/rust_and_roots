@@ -549,6 +549,7 @@ public final class UiSqlService {
         if (details == null || details.itemId() <= 0) {
             return false;
         }
+        ItemDetails normalized = normalizeItemDetails(details);
 
         String sql = """
             UPDATE items i
@@ -568,17 +569,17 @@ public final class UiSqlService {
 
         try (Connection con = open();
              PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setString(1, details.itemName());
-            ps.setInt(2, details.price());
-            ps.setInt(3, details.itemTypeId());
-            ps.setInt(4, details.str());
-            ps.setInt(5, details.agi());
-            ps.setInt(6, details.dex());
-            ps.setInt(7, details.vit());
-            ps.setInt(8, details.hp());
-            ps.setInt(9, details.stamina());
-            ps.setString(10, details.imageFile());
-            ps.setInt(11, details.itemId());
+            ps.setString(1, normalized.itemName());
+            ps.setInt(2, normalized.price());
+            ps.setInt(3, normalized.itemTypeId());
+            ps.setInt(4, normalized.str());
+            ps.setInt(5, normalized.agi());
+            ps.setInt(6, normalized.dex());
+            ps.setInt(7, normalized.vit());
+            ps.setInt(8, normalized.hp());
+            ps.setInt(9, normalized.stamina());
+            ps.setString(10, normalized.imageFile());
+            ps.setInt(11, normalized.itemId());
             return ps.executeUpdate() > 0;
         }
     }
@@ -595,6 +596,7 @@ public final class UiSqlService {
         int stamina,
         String imageFile
     ) throws SQLException, ClassNotFoundException {
+        int[] normalized = normalizeItemStats(itemTypeId, str, agi, dex, vit, hp, stamina);
         String sqlStats = "INSERT INTO item_stats (str_stat, agi_stat, dex_stat, vit_stat, hp, stamina) VALUES (?, ?, ?, ?, ?, ?)";
         String sqlItem = "INSERT INTO items (item_name, price, item_stats_id, image, item_type_id) VALUES (?, ?, ?, ?, ?)";
 
@@ -603,12 +605,12 @@ public final class UiSqlService {
             try {
                 int statsId;
                 try (PreparedStatement psStats = con.prepareStatement(sqlStats, Statement.RETURN_GENERATED_KEYS)) {
-                    psStats.setInt(1, str);
-                    psStats.setInt(2, agi);
-                    psStats.setInt(3, dex);
-                    psStats.setInt(4, vit);
-                    psStats.setInt(5, hp);
-                    psStats.setInt(6, stamina);
+                    psStats.setInt(1, normalized[0]);
+                    psStats.setInt(2, normalized[1]);
+                    psStats.setInt(3, normalized[2]);
+                    psStats.setInt(4, normalized[3]);
+                    psStats.setInt(5, normalized[4]);
+                    psStats.setInt(6, normalized[5]);
                     psStats.executeUpdate();
                     try (ResultSet keys = psStats.getGeneratedKeys()) {
                         statsId = keys.next() ? keys.getInt(1) : 0;
@@ -646,5 +648,40 @@ public final class UiSqlService {
                 }
             }
         }
+    }
+
+    private static ItemDetails normalizeItemDetails(ItemDetails details) {
+        int[] stats = normalizeItemStats(
+            details.itemTypeId(),
+            details.str(),
+            details.agi(),
+            details.dex(),
+            details.vit(),
+            details.hp(),
+            details.stamina()
+        );
+        return new ItemDetails(
+            details.itemId(),
+            details.itemName(),
+            details.itemTypeId(),
+            details.price(),
+            stats[0],
+            stats[1],
+            stats[3],
+            stats[2],
+            stats[4],
+            stats[5],
+            details.imageFile()
+        );
+    }
+
+    private static int[] normalizeItemStats(int itemTypeId, int str, int agi, int dex, int vit, int hp, int stamina) {
+        return switch (itemTypeId) {
+            case 1 -> new int[]{0, 0, 0, 0, Math.max(0, hp), Math.max(0, stamina)}; // edible
+            case 3 -> new int[]{Math.max(0, str), Math.max(0, agi), Math.max(0, dex), Math.max(0, vit), 0, 0}; // equipment
+            case 5 -> new int[]{0, 0, 0, Math.max(0, vit), 0, 0}; // crop
+            case 2, 4, 6 -> new int[]{0, 0, 0, 0, 0, 0}; // recipe, seed, inedible
+            default -> new int[]{0, 0, 0, 0, 0, 0};
+        };
     }
 }

@@ -100,10 +100,10 @@ public class SaveGameService {
             """;
 
         try (PreparedStatement psStats = con.prepareStatement(insertStats, Statement.RETURN_GENERATED_KEYS)) {
-            psStats.setInt(1, ps.getStr());
-            psStats.setInt(2, ps.getAgi());
-            psStats.setInt(3, ps.getDex());
-            psStats.setInt(4, ps.getVit());
+            psStats.setInt(1, ps.getBaseStr());
+            psStats.setInt(2, ps.getBaseAgi());
+            psStats.setInt(3, ps.getBaseDex());
+            psStats.setInt(4, ps.getBaseVit());
             psStats.setInt(5, ps.getMaxHp());
             psStats.setInt(6, ps.getMaxStamina());
             psStats.executeUpdate();
@@ -254,10 +254,10 @@ public class SaveGameService {
             """;
 
         try (PreparedStatement psmt = con.prepareStatement(sql)) {
-            psmt.setInt(1, ps.getStr());
-            psmt.setInt(2, ps.getAgi());
-            psmt.setInt(3, ps.getDex());
-            psmt.setInt(4, ps.getVit());
+            psmt.setInt(1, ps.getBaseStr());
+            psmt.setInt(2, ps.getBaseAgi());
+            psmt.setInt(3, ps.getBaseDex());
+            psmt.setInt(4, ps.getBaseVit());
             psmt.setInt(5, ps.getMaxHp());
             psmt.setInt(6, ps.getMaxStamina());
             psmt.setInt(7, statsId);
@@ -1162,10 +1162,10 @@ public class SaveGameService {
             """;
 
         try (PreparedStatement psStats = con.prepareStatement(insertStats, Statement.RETURN_GENERATED_KEYS)) {
-            psStats.setInt(1, ps.getStr());
-            psStats.setInt(2, ps.getAgi());
-            psStats.setInt(3, ps.getDex());
-            psStats.setInt(4, ps.getVit());
+            psStats.setInt(1, ps.getBaseStr());
+            psStats.setInt(2, ps.getBaseAgi());
+            psStats.setInt(3, ps.getBaseDex());
+            psStats.setInt(4, ps.getBaseVit());
             psStats.setInt(5, ps.getMaxHp());
             psStats.setInt(6, ps.getMaxStamina());
             psStats.executeUpdate();

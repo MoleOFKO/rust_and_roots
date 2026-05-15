@@ -73,6 +73,7 @@ public class Item_add_btnController implements Initializable {
 
         try (Connection con = new dbcon().getConnection()) {
             ItemEditorSupport.loadItemTypes(con, cbitemtype);
+            ItemEditorSupport.applyStatPolicy(cbitemtype, txtstr, txtagi, txtdex, txtvid, txthp, txtstamina);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -106,27 +107,30 @@ public class Item_add_btnController implements Initializable {
             AppDialogs.showMessageDialog(null, "Please Select Item Type");
             return;
         }
-        if (txtstr.getText().isEmpty()) {
+        ItemEditorSupport.ItemTypeOption selectedType = cbitemtype.getSelectionModel().getSelectedItem();
+        ItemEditorSupport.ItemStatPolicy policy = ItemEditorSupport.policyFor(selectedType);
+
+        if (policy.allowStr() && txtstr.getText().isEmpty()) {
             AppDialogs.showMessageDialog(null, "Please Enter STR");
             return;
         }
-        if (txtagi.getText().isEmpty()) {
+        if (policy.allowAgi() && txtagi.getText().isEmpty()) {
             AppDialogs.showMessageDialog(null, "Please Enter AGI");
             return;
         }
-        if (txtdex.getText().isEmpty()) {
+        if (policy.allowDex() && txtdex.getText().isEmpty()) {
             AppDialogs.showMessageDialog(null, "Please Enter DEX");
             return;
         }
-        if (txtvid.getText().isEmpty()) {
+        if (policy.allowVit() && txtvid.getText().isEmpty()) {
             AppDialogs.showMessageDialog(null, "Please Enter VIT");
             return;
         }
-        if (txthp.getText().isEmpty()) {
+        if (policy.allowHp() && txthp.getText().isEmpty()) {
             AppDialogs.showMessageDialog(null, "Please Enter HP");
             return;
         }
-        if (txtstamina.getText().isEmpty()) {
+        if (policy.allowStamina() && txtstamina.getText().isEmpty()) {
             AppDialogs.showMessageDialog(null, "Please Enter Stamina");
             return;
         }
@@ -136,25 +140,28 @@ public class Item_add_btnController implements Initializable {
         }
 
         try {
-            int itemTypeId = cbitemtype.getSelectionModel().getSelectedItem().id();
+            int itemTypeId = selectedType.id();
             int price = ItemEditorSupport.parseRequiredInt(txtmobstype, "Price");
-            int str = ItemEditorSupport.parseRequiredInt(txtstr, "STR");
-            int agi = ItemEditorSupport.parseRequiredInt(txtagi, "AGI");
-            int dex = ItemEditorSupport.parseRequiredInt(txtdex, "DEX");
-            int vit = ItemEditorSupport.parseRequiredInt(txtvid, "VIT");
-            int hp = ItemEditorSupport.parseRequiredInt(txthp, "HP");
-            int stamina = ItemEditorSupport.parseRequiredInt(txtstamina, "Stamina");
+            ItemEditorSupport.ItemStats stats = ItemEditorSupport.normalizeStats(
+                selectedType,
+                ItemEditorSupport.parsePolicyInt(txtstr, "STR", policy.allowStr()),
+                ItemEditorSupport.parsePolicyInt(txtagi, "AGI", policy.allowAgi()),
+                ItemEditorSupport.parsePolicyInt(txtdex, "DEX", policy.allowDex()),
+                ItemEditorSupport.parsePolicyInt(txtvid, "VIT", policy.allowVit()),
+                ItemEditorSupport.parsePolicyInt(txthp, "HP", policy.allowHp()),
+                ItemEditorSupport.parsePolicyInt(txtstamina, "Stamina", policy.allowStamina())
+            );
 
             boolean inserted = UiSqlService.insertItemWithStats(
                 txtmname.getText().trim(),
                 price,
                 itemTypeId,
-                str,
-                agi,
-                dex,
-                vit,
-                hp,
-                stamina,
+                stats.str(),
+                stats.agi(),
+                stats.dex(),
+                stats.vit(),
+                stats.hp(),
+                stats.stamina(),
                 img_name
             );
 
@@ -178,6 +185,7 @@ public class Item_add_btnController implements Initializable {
 
     @FXML
     private void handlecbitemboxaction(ActionEvent event) {
+        ItemEditorSupport.applyStatPolicy(cbitemtype, txtstr, txtagi, txtdex, txtvid, txthp, txtstamina);
     }
 }
 

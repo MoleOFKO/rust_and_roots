@@ -38,6 +38,10 @@ public final class PlayerState {
     private final IntegerProperty dex = new SimpleIntegerProperty(DEFAULT_DEX);
     private final IntegerProperty str = new SimpleIntegerProperty(DEFAULT_STR);
     private final IntegerProperty vit = new SimpleIntegerProperty(DEFAULT_VIT);
+    private int equipmentStrBonus = 0;
+    private int equipmentAgiBonus = 0;
+    private int equipmentDexBonus = 0;
+    private int equipmentVitBonus = 0;
     private final IntegerProperty exp = new SimpleIntegerProperty(0);
     private final StringProperty playerName = new SimpleStringProperty(DEFAULT_NAME);
 
@@ -352,10 +356,18 @@ public final class PlayerState {
     }
 
     public int getAgi() {
-        return agi.get();
+        return agi.get() + equipmentAgiBonus;
     }
 
     public void setAgi(int value) {
+        agi.set(Math.max(0, value - equipmentAgiBonus));
+    }
+
+    public int getBaseAgi() {
+        return agi.get();
+    }
+
+    public void setBaseAgi(int value) {
         agi.set(Math.max(0, value));
     }
 
@@ -364,10 +376,18 @@ public final class PlayerState {
     }
 
     public int getDex() {
-        return dex.get();
+        return dex.get() + equipmentDexBonus;
     }
 
     public void setDex(int value) {
+        dex.set(Math.max(0, value - equipmentDexBonus));
+    }
+
+    public int getBaseDex() {
+        return dex.get();
+    }
+
+    public void setBaseDex(int value) {
         dex.set(Math.max(0, value));
     }
 
@@ -399,10 +419,18 @@ public final class PlayerState {
     }
 
     public int getStr() {
-        return str.get();
+        return str.get() + equipmentStrBonus;
     }
 
     public void setStr(int value) {
+        str.set(Math.max(0, value - equipmentStrBonus));
+    }
+
+    public int getBaseStr() {
+        return str.get();
+    }
+
+    public void setBaseStr(int value) {
         str.set(Math.max(0, value));
     }
 
@@ -411,11 +439,30 @@ public final class PlayerState {
     }
 
     public int getVit() {
-        return vit.get();
+        return vit.get() + equipmentVitBonus;
     }
 
     public void setVit(int value) {
+        vit.set(Math.max(0, value - equipmentVitBonus));
+    }
+
+    public int getBaseVit() {
+        return vit.get();
+    }
+
+    public void setBaseVit(int value) {
         vit.set(Math.max(0, value));
+    }
+
+    public void setEquipmentStatBonuses(int strBonus, int agiBonus, int dexBonus, int vitBonus) {
+        equipmentStrBonus = Math.max(0, strBonus);
+        equipmentAgiBonus = Math.max(0, agiBonus);
+        equipmentDexBonus = Math.max(0, dexBonus);
+        equipmentVitBonus = Math.max(0, vitBonus);
+    }
+
+    public void clearEquipmentStatBonuses() {
+        setEquipmentStatBonuses(0, 0, 0, 0);
     }
 
     public IntegerProperty expProperty() {

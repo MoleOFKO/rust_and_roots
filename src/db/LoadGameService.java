@@ -256,10 +256,10 @@ public class LoadGameService {
                 if (!rs.next()) return;
 
                 PlayerState psState = gs.getPlayerState();
-                psState.setStr(rs.getInt("str_stat"));
-                psState.setAgi(rs.getInt("agi_stat"));
-                psState.setDex(rs.getInt("dex_stat"));
-                psState.setVit(rs.getInt("vit_stat"));
+                psState.setBaseStr(rs.getInt("str_stat"));
+                psState.setBaseAgi(rs.getInt("agi_stat"));
+                psState.setBaseDex(rs.getInt("dex_stat"));
+                psState.setBaseVit(rs.getInt("vit_stat"));
 
                 psState.setMaxHp(rs.getInt("hp"));
                 psState.setHp(rs.getInt("current_hp"));
@@ -704,6 +704,7 @@ public class LoadGameService {
         PlayerState psState = gs.getPlayerState();
 
         psState.clearTransientFoodEffects();
+        psState.clearEquipmentStatBonuses();
         clearInventoryItems(psState.getInventory());
         replaceCoins(psState.getInventory(), 0);
 

@@ -1581,10 +1581,10 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         return switch (Objects.requireNonNullElse(statKey, "")) {
             case "hp" -> Math.max(0, playerState.getMaxHp() - 45);
             case "sp" -> Math.max(0, playerState.getMaxStamina() - 50);
-            case "str" -> Math.max(0, playerState.getStr() - 1);
-            case "vit" -> Math.max(0, playerState.getVit() - 1);
-            case "dex" -> Math.max(0, playerState.getDex() - 1);
-            case "agi" -> Math.max(0, playerState.getAgi() - 1);
+            case "str" -> Math.max(0, playerState.getBaseStr() - 1);
+            case "vit" -> Math.max(0, playerState.getBaseVit() - 1);
+            case "dex" -> Math.max(0, playerState.getBaseDex() - 1);
+            case "agi" -> Math.max(0, playerState.getBaseAgi() - 1);
             default -> 0;
         };
     }
@@ -1640,10 +1640,10 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         return switch (Objects.requireNonNullElse(statKey, "")) {
             case "hp" -> playerState.getMaxHp() + pendingHpPoints;
             case "sp" -> playerState.getMaxStamina() + pendingSpPoints;
-            case "str" -> playerState.getStr() + pendingStrPoints;
-            case "vit" -> playerState.getVit() + pendingVitPoints;
-            case "dex" -> playerState.getDex() + pendingDexPoints;
-            case "agi" -> playerState.getAgi() + pendingAgiPoints;
+            case "str" -> playerState.getBaseStr() + pendingStrPoints;
+            case "vit" -> playerState.getBaseVit() + pendingVitPoints;
+            case "dex" -> playerState.getBaseDex() + pendingDexPoints;
+            case "agi" -> playerState.getBaseAgi() + pendingAgiPoints;
             default -> 0;
         };
     }
@@ -1652,10 +1652,10 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         if (playerState == null) return 0;
 
         int total =
-            (playerState.getStr() + pendingStrPoints) +
-            (playerState.getVit() + pendingVitPoints) +
-            (playerState.getDex() + pendingDexPoints) +
-            (playerState.getAgi() + pendingAgiPoints);
+            (playerState.getBaseStr() + pendingStrPoints) +
+            (playerState.getBaseVit() + pendingVitPoints) +
+            (playerState.getBaseDex() + pendingDexPoints) +
+            (playerState.getBaseAgi() + pendingAgiPoints);
 
         return Math.max(0, total / 4);
     }
@@ -1732,10 +1732,10 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         if (pendingSpPoints > 0) {
             playerState.setMaxStamina(playerState.getMaxStamina() + pendingSpPoints);
         }
-        if (pendingStrPoints > 0) playerState.setStr(playerState.getStr() + pendingStrPoints);
-        if (pendingVitPoints > 0) playerState.setVit(playerState.getVit() + pendingVitPoints);
-        if (pendingDexPoints > 0) playerState.setDex(playerState.getDex() + pendingDexPoints);
-        if (pendingAgiPoints > 0) playerState.setAgi(playerState.getAgi() + pendingAgiPoints);
+        if (pendingStrPoints > 0) playerState.setBaseStr(playerState.getBaseStr() + pendingStrPoints);
+        if (pendingVitPoints > 0) playerState.setBaseVit(playerState.getBaseVit() + pendingVitPoints);
+        if (pendingDexPoints > 0) playerState.setBaseDex(playerState.getBaseDex() + pendingDexPoints);
+        if (pendingAgiPoints > 0) playerState.setBaseAgi(playerState.getBaseAgi() + pendingAgiPoints);
 
         statusAllocationMode = false;
         resetPendingStatusChanges();
@@ -2732,7 +2732,30 @@ public abstract class BaseMapController implements Initializable, SceneControlle
                 itemId = -1;
             }
         }
+        applyEquipmentStatBonuses(itemId);
         player.setEquippedItem(itemId);
+        refreshStatusAllocationUi();
+    }
+
+    protected void applyEquipmentStatBonuses(int itemId) {
+        if (playerState == null) return;
+        if (itemId <= 0 || !ItemDatabase.isEquipmentItem(itemId)) {
+            playerState.clearEquipmentStatBonuses();
+            return;
+        }
+
+        item equipped = ItemDatabase.getItemById(itemId);
+        if (equipped == null) {
+            playerState.clearEquipmentStatBonuses();
+            return;
+        }
+
+        playerState.setEquipmentStatBonuses(
+            equipped.getStr(),
+            equipped.getAgi(),
+            equipped.getDex(),
+            equipped.getVid()
+        );
     }
     
     private void setupFarmIfPresent() {

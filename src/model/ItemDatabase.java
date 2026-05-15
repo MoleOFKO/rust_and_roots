@@ -369,6 +369,16 @@ public final class ItemDatabase {
         return harvest == null ? -1 : harvest.getItem_id();
     }
 
+    public static int resolveCropGrowthVitForSeed(int seedItemId) {
+        if (seedItemId <= 0 || !isSeedItem(seedItemId)) {
+            return 0;
+        }
+
+        int cropItemId = resolveCropItemIdForSeed(seedItemId);
+        item crop = cropItemId > 0 ? getItemById(cropItemId) : null;
+        return crop == null ? 0 : Math.max(0, crop.getVid());
+    }
+
     public static boolean hasCompleteFarmDataForSeed(int seedItemId) {
         if (seedItemId <= 0 || !isSeedItem(seedItemId)) return false;
         String seedName = getItemName(seedItemId);
