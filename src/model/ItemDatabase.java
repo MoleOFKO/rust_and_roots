@@ -240,6 +240,35 @@ public final class ItemDatabase {
         return getItemUseType(itemId) == ItemUseType.EDIBLE || RecipeCatalog.isCookingOutputItem(itemId);
     }
 
+    public static boolean isMaterialItem(int itemId) {
+        if (itemId <= 0 || isEquipmentItem(itemId) || isEdibleItem(itemId) || isSeedItem(itemId)) {
+            return false;
+        }
+
+        return RecipeCatalog.isIngredientItem(itemId)
+                || isSmeltingSourceItem(itemId)
+                || getItemUseType(itemId) == ItemUseType.INEDIBLE;
+    }
+
+    public static String getItemUsageHoverText(int itemId) {
+        if (itemId <= 0) {
+            return "";
+        }
+        if (isEquipmentItem(itemId)) {
+            return "Tool";
+        }
+        if (isEdibleItem(itemId)) {
+            return "can eat";
+        }
+        if (isSeedItem(itemId)) {
+            return "seeds";
+        }
+        if (isMaterialItem(itemId)) {
+            return "material";
+        }
+        return "Item";
+    }
+
     public static boolean isRecipeItem(int itemId) {
         return itemId > 0 && getItemUseType(itemId) == ItemUseType.RECIPE;
     }
@@ -671,6 +700,19 @@ public final class ItemDatabase {
         String name = normalizeLookupKey(getItemName(itemId));
         String imageFile = normalizeType(stripFileExtension(getImageFileName(itemId)));
         return name.endsWith(" fruit") || imageFile.endsWith("_fruit");
+    }
+
+    private static boolean isSmeltingSourceItem(int itemId) {
+        String lookup = normalizeLookupKey(getItemName(itemId));
+        return lookup.equals("sand")
+                || lookup.equals("copper drop item")
+                || lookup.equals("iron drop item")
+                || lookup.equals("silver drop item")
+                || lookup.equals("gold drop item")
+                || lookup.equals("hihiogane drop item")
+                || lookup.equals("orichalcum drop item")
+                || lookup.equals("adamantite drop item")
+                || lookup.equals("mithril drop item");
     }
 
     private static String guessCropSpriteKeyForSeed(int seedItemId) {

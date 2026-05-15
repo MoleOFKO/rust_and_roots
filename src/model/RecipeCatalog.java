@@ -158,6 +158,48 @@ public final class RecipeCatalog {
         return false;
     }
 
+    public static boolean isIngredientItem(int itemId) {
+        if (itemId <= 0) {
+            return false;
+        }
+
+        for (RecipeDefinition definition : getAllRecipes()) {
+            if (definition == null) {
+                continue;
+            }
+
+            for (IngredientSpec spec : definition.getIngredients()) {
+                item ingredient = resolveItemByAliases(spec.getItemAliases());
+                if (ingredient != null && ingredient.getItem_id() == itemId) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public static boolean isIngredientItem(int itemId, Domain domain) {
+        if (itemId <= 0) {
+            return false;
+        }
+
+        for (RecipeDefinition definition : getRecipes(domain)) {
+            if (definition == null) {
+                continue;
+            }
+
+            for (IngredientSpec spec : definition.getIngredients()) {
+                item ingredient = resolveItemByAliases(spec.getItemAliases());
+                if (ingredient != null && ingredient.getItem_id() == itemId) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     /**
      * Returns the minimum number of ingredient specs required to cook the given output item.
      *

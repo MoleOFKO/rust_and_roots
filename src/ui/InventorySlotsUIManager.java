@@ -13,14 +13,19 @@ import java.util.Comparator;
 import java.util.List;
 import javafx.beans.property.IntegerProperty;
 import javafx.collections.MapChangeListener;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import model.Inventory;
 import model.ItemDatabase;
 import model.item;
+import javafx.util.Duration;
 
 public class InventorySlotsUIManager {
+
+    private static final String ITEM_USAGE_TOOLTIP_KEY = "rust_and_roots.itemUsageTooltip";
 
     private final Inventory inventory;
     private final List<ImageView> images;
@@ -64,11 +69,13 @@ public class InventorySlotsUIManager {
 
             if (i >= slots.size()) {
                 if (imageView != null) imageView.setImage(null);
+                installItemUsageTooltip(imageView, -1);
                 if (label != null) label.setText("");
                 if (button != null) {
                     button.setText("");
                     button.setDisable(true);
                     button.setOnAction(null);
+                    installItemUsageTooltip(button, -1);
                 }
                 continue;
             }
@@ -81,6 +88,7 @@ public class InventorySlotsUIManager {
 
             if (imageView != null) {
                 imageView.setImage(ItemDatabase.getImage(itemId));
+                installItemUsageTooltip(imageView, itemId);
             }
 
             if (label != null) {
@@ -90,8 +98,27 @@ public class InventorySlotsUIManager {
             if (button != null) {
                 button.setDisable(false);
                 button.setText(itemName);
+                installItemUsageTooltip(button, itemId);
             }
         }
+    }
+
+    private static void installItemUsageTooltip(Node node, int itemId) {
+        if (node == null) return;
+
+        Object previous = node.getProperties().remove(ITEM_USAGE_TOOLTIP_KEY);
+        if (previous instanceof Tooltip oldTooltip) {
+            Tooltip.uninstall(node, oldTooltip);
+        }
+
+        String text = ItemDatabase.getItemUsageHoverText(itemId);
+        if (text == null || text.isBlank()) return;
+
+        Tooltip tooltip = new Tooltip(text);
+        tooltip.setShowDelay(Duration.ZERO);
+        tooltip.setHideDelay(Duration.millis(80));
+        Tooltip.install(node, tooltip);
+        node.getProperties().put(ITEM_USAGE_TOOLTIP_KEY, tooltip);
     }
 
     private static final class SlotData {
