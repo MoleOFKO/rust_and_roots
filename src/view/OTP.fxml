@@ -31,7 +31,7 @@
                      <font>
                         <Font size="15.0" />
                      </font></TextField>
-                  <Button fx:id="btnotpconfirm" layoutX="155.0" layoutY="230.0" mnemonicParsing="false" onAction="#handleotpconfirmaction" prefHeight="46.0" prefWidth="130.0" style="-fx-background-color: #904e0b;" stylesheets="@../css/style.css" text="Confirm">
+                  <Button fx:id="btnotpconfirm" layoutX="155.0" layoutY="230.0" mnemonicParsing="false" onAction="#handleotpconfirmaction" prefHeight="46.0" prefWidth="130.0" style="-fx-background-color: #904e0b;" stylesheets="@../css/style.css" text="Confirm" styleClass="invisible-button">
                      <styleClass>
                         <String fx:value="btnmenu" />
                         <String fx:value="inputbox" />
@@ -50,7 +50,7 @@
                         <Font size="15.0" />
                      </font>
                   </TextField>
-                  <Button fx:id="btnback1" layoutX="71.0" layoutY="328.0" mnemonicParsing="false" onAction="#handlbtnbackaction" prefHeight="46.0" prefWidth="130.0" style="-fx-background-color: #904e0b;" stylesheets="@../css/style.css" text="Back">
+                  <Button fx:id="btnback1" layoutX="71.0" layoutY="328.0" mnemonicParsing="false" onAction="#handlbtnbackaction" prefHeight="46.0" prefWidth="130.0" style="-fx-background-color: #904e0b;" stylesheets="@../css/style.css" text="Back" styleClass="invisible-button">
                      <styleClass>
                         <String fx:value="btnmenu" />
                         <String fx:value="inputbox" />
@@ -71,7 +71,7 @@
             </Pane>
             <Pane fx:id="newpasswordpane" prefHeight="400.0" prefWidth="600.0" visible="false">
                <children>
-                  <Button fx:id="btnnewpasswordconfirm" layoutX="153.0" layoutY="240.0" mnemonicParsing="false" onAction="#handlenewpasswordconfirmaction" prefHeight="46.0" prefWidth="130.0" style="-fx-background-color: #904e0b;" stylesheets="@../css/style.css" text="Confirm">
+                  <Button fx:id="btnnewpasswordconfirm" layoutX="153.0" layoutY="240.0" mnemonicParsing="false" onAction="#handlenewpasswordconfirmaction" prefHeight="46.0" prefWidth="130.0" style="-fx-background-color: #904e0b;" stylesheets="@../css/style.css" text="Confirm" styleClass="invisible-button">
                      <styleClass>
                         <String fx:value="btnmenu" />
                         <String fx:value="inputbox" />
@@ -104,7 +104,7 @@
                   </TextField>
                   <FontAwesomeIcon fx:id="openpassword1" fill="WHITE" glyphName="EYE" layoutX="412.0" layoutY="116.0" onMouseClicked="#handleopenpasswordaction" size="1.5em" />
                   <FontAwesomeIcon fx:id="closedpassword1" fill="WHITE" glyphName="EYE_SLASH" layoutX="412.0" layoutY="116.0" onMouseClicked="#handlecolsedpasswordaction" size="1.5em" visible="false" />
-                  <Button fx:id="btnback" layoutX="72.0" layoutY="329.0" mnemonicParsing="false" onAction="#handlbtnbackaction" prefHeight="46.0" prefWidth="130.0" style="-fx-background-color: #904e0b;" stylesheets="@../css/style.css" text="Back">
+                  <Button fx:id="btnback" layoutX="72.0" layoutY="329.0" mnemonicParsing="false" onAction="#handlbtnbackaction" prefHeight="46.0" prefWidth="130.0" style="-fx-background-color: #904e0b;" stylesheets="@../css/style.css" text="Back" styleClass="invisible-button">
                      <styleClass>
                         <String fx:value="btnmenu" />
                         <String fx:value="inputbox" />

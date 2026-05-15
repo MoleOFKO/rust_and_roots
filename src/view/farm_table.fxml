@@ -294,7 +294,7 @@
                               <Font name="Serif Bold Italic" size="14.0" />
                            </font>
                         </Label>
-                        <Button fx:id="btnConfirm" layoutX="6.0" layoutY="17.0" mnemonicParsing="false" onAction="#handleConfirm" opacity="0.0" prefHeight="49.0" prefWidth="71.0" text="Confirm" />
+                        <Button fx:id="btnConfirm" layoutX="6.0" layoutY="17.0" mnemonicParsing="false" onAction="#handleConfirm" opacity="0.0" prefHeight="49.0" prefWidth="71.0" text="Confirm" styleClass="invisible-button" stylesheets="@../css/style.css" />
                      </children>
                   </Pane>
                   <Pane layoutX="30.0" layoutY="312.0">
@@ -309,7 +309,7 @@
                               <Font name="Serif Bold Italic" size="14.0" />
                            </font>
                         </Label>
-                        <Button fx:id="btnBack" layoutX="16.0" layoutY="19.0" mnemonicParsing="false" onAction="#handleBack" opacity="0.0" prefHeight="49.0" prefWidth="40.0" text="Back" />
+                        <Button fx:id="btnBack" layoutX="16.0" layoutY="19.0" mnemonicParsing="false" onAction="#handleBack" opacity="0.0" prefHeight="49.0" prefWidth="40.0" text="Back" styleClass="invisible-button" stylesheets="@../css/style.css" />
                      </children>
                   </Pane>
                   <Label layoutX="115.0" layoutY="345.0" prefHeight="20.0" prefWidth="40.0" text="Seeds" textFill="WHITE">
@@ -516,7 +516,7 @@
                   </Pane>
                </children>
             </Pane>
-            <Button fx:id="btntuto" layoutX="572.0" layoutY="3.0" mnemonicParsing="false" onAction="#handlebtntutoaction" style="-fx-background-radius: 100%; -fx-background-color: transparent; -fx-border-color: yellow; -fx-border-radius: 100%;" textFill="#e6ff00">
+            <Button fx:id="btntuto" layoutX="572.0" layoutY="3.0" mnemonicParsing="false" onAction="#handlebtntutoaction" style="-fx-background-radius: 100%; -fx-background-color: transparent; -fx-border-color: yellow; -fx-border-radius: 100%;" textFill="#e6ff00" styleClass="invisible-button" stylesheets="@../css/style.css">
                <graphic>
                   <FontAwesomeIcon fill="#f6ff00" glyphName="QUESTION" selectionFill="YELLOW" size="1.5em" />
                </graphic>

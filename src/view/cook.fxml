@@ -54,112 +54,112 @@
                      <children>
                         <ImageView fx:id="cookimg4" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                        <Button fx:id="cookbtn4" mnemonicParsing="false" onAction="#handlerecipes" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
+                        <Button fx:id="cookbtn4" mnemonicParsing="false" onAction="#handlerecipes" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
                      </children>
                   </Pane>
                   <Pane layoutX="63.0" layoutY="61.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
                      <children>
                         <ImageView fx:id="cookimg5" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                        <Button fx:id="cookbtn5" mnemonicParsing="false" onAction="#handlerecipes" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
+                        <Button fx:id="cookbtn5" mnemonicParsing="false" onAction="#handlerecipes" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
                      </children>
                   </Pane>
                   <Pane layoutX="125.0" layoutY="61.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
                      <children>
                         <ImageView fx:id="cookimg6" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                        <Button fx:id="cookbtn6" mnemonicParsing="false" onAction="#handlerecipes" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
+                        <Button fx:id="cookbtn6" mnemonicParsing="false" onAction="#handlerecipes" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
                      </children>
                   </Pane>
                   <Pane layoutX="184.0" layoutY="61.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
                      <children>
                         <ImageView fx:id="cookimg7" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                        <Button fx:id="cookbtn7" layoutY="-1.0" mnemonicParsing="false" onAction="#handlerecipes" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
+                        <Button fx:id="cookbtn7" layoutY="-1.0" mnemonicParsing="false" onAction="#handlerecipes" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
                      </children>
                   </Pane>
                   <Pane layoutX="2.0" layoutY="120.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
                      <children>
                         <ImageView fx:id="cookimg8" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                        <Button fx:id="cookbtn8" mnemonicParsing="false" onAction="#handlerecipes" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
+                        <Button fx:id="cookbtn8" mnemonicParsing="false" onAction="#handlerecipes" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
                      </children>
                   </Pane>
                   <Pane layoutX="63.0" layoutY="120.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
                      <children>
                         <ImageView fx:id="cookimg9" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                        <Button fx:id="cookbtn9" mnemonicParsing="false" onAction="#handlerecipes" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
+                        <Button fx:id="cookbtn9" mnemonicParsing="false" onAction="#handlerecipes" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
                      </children>
                   </Pane>
                   <Pane layoutX="125.0" layoutY="120.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
                      <children>
                         <ImageView fx:id="cookimg10" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                        <Button fx:id="cookbtn10" mnemonicParsing="false" onAction="#handlerecipes" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
+                        <Button fx:id="cookbtn10" mnemonicParsing="false" onAction="#handlerecipes" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
                      </children>
                   </Pane>
                   <Pane layoutX="184.0" layoutY="120.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
                      <children>
                         <ImageView fx:id="cookimg11" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                        <Button fx:id="cookbtn11" layoutY="-1.0" mnemonicParsing="false" onAction="#handlerecipes" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
+                        <Button fx:id="cookbtn11" layoutY="-1.0" mnemonicParsing="false" onAction="#handlerecipes" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
                      </children>
                   </Pane>
                   <Pane layoutX="2.0" layoutY="179.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
                      <children>
                         <ImageView fx:id="cookimg12" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                        <Button fx:id="cookbtn12" mnemonicParsing="false" onAction="#handlerecipes" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
+                        <Button fx:id="cookbtn12" mnemonicParsing="false" onAction="#handlerecipes" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
                      </children>
                   </Pane>
                   <Pane layoutX="63.0" layoutY="179.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
                      <children>
                         <ImageView fx:id="cookimg13" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                        <Button fx:id="cookbtn13" mnemonicParsing="false" onAction="#handlerecipes" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
+                        <Button fx:id="cookbtn13" mnemonicParsing="false" onAction="#handlerecipes" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
                      </children>
                   </Pane>
                   <Pane layoutX="125.0" layoutY="179.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
                      <children>
                         <ImageView fx:id="cookimg14" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                        <Button fx:id="cookbtn14" mnemonicParsing="false" onAction="#handlerecipes" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
+                        <Button fx:id="cookbtn14" mnemonicParsing="false" onAction="#handlerecipes" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
                      </children>
                   </Pane>
                   <Pane layoutX="184.0" layoutY="179.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
                      <children>
                         <ImageView fx:id="cookimg15" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                        <Button fx:id="cookbtn15" layoutY="-1.0" mnemonicParsing="false" onAction="#handlerecipes" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
+                        <Button fx:id="cookbtn15" layoutY="-1.0" mnemonicParsing="false" onAction="#handlerecipes" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
                      </children>
                   </Pane>
                   <Pane layoutX="2.0" layoutY="236.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
                      <children>
                         <ImageView fx:id="cookimg16" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                        <Button fx:id="cookbtn16" mnemonicParsing="false" onAction="#handlerecipes" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
+                        <Button fx:id="cookbtn16" mnemonicParsing="false" onAction="#handlerecipes" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
                      </children>
                   </Pane>
                   <Pane layoutX="63.0" layoutY="236.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
                      <children>
                         <ImageView fx:id="cookimg17" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                        <Button fx:id="cookbtn17" mnemonicParsing="false" onAction="#handlerecipes" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
+                        <Button fx:id="cookbtn17" mnemonicParsing="false" onAction="#handlerecipes" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
                      </children>
                   </Pane>
                   <Pane layoutX="125.0" layoutY="236.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
                      <children>
                         <ImageView fx:id="cookimg18" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                        <Button fx:id="cookbtn18" mnemonicParsing="false" onAction="#handlerecipes" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
+                        <Button fx:id="cookbtn18" mnemonicParsing="false" onAction="#handlerecipes" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
                      </children>
                   </Pane>
                   <Pane layoutX="184.0" layoutY="236.0" prefHeight="55.0" prefWidth="55.0" stylesheets="@../css/style.css">
                      <children>
                         <ImageView fx:id="cookimg19" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                        <Button fx:id="cookbtn19" layoutY="14.0" mnemonicParsing="false" onAction="#handlerecipes" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
+                        <Button fx:id="cookbtn19" layoutY="14.0" mnemonicParsing="false" onAction="#handlerecipes" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
                      </children>
                   </Pane>
                </children>
@@ -249,7 +249,7 @@
                   <Font name="System Bold Italic" size="12.0" />
                </font>
             </Label>
-            <Button fx:id="btntuto" layoutX="603.0" layoutY="2.0" mnemonicParsing="false" onAction="#handlebtntutoaction" style="-fx-background-radius: 100%; -fx-background-color: transparent; -fx-border-color: yellow; -fx-border-radius: 100%;" textFill="#e6ff00">
+            <Button fx:id="btntuto" layoutX="603.0" layoutY="2.0" mnemonicParsing="false" onAction="#handlebtntutoaction" style="-fx-background-radius: 100%; -fx-background-color: transparent; -fx-border-color: yellow; -fx-border-radius: 100%;" textFill="#e6ff00" styleClass="invisible-button" stylesheets="@../css/style.css">
                <graphic>
                   <FontAwesomeIcon fill="#f6ff00" glyphName="QUESTION" selectionFill="YELLOW" size="1.5em" />
                </graphic>
