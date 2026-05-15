@@ -241,7 +241,7 @@
                   </StackPane>
                </children>
             </Group>
-            <Button fx:id="btntuto" layoutX="35.0" layoutY="340.0" mnemonicParsing="false" onAction="#handlebtntutoaction" style="-fx-background-radius: 100%; -fx-background-color: transparent;">
+            <Button fx:id="btntuto" layoutX="35.0" layoutY="340.0" mnemonicParsing="false" onAction="#handlebtntutoaction" style="-fx-background-radius: 100%; -fx-background-color: transparent;" styleClass="invisible-button" stylesheets="@../css/style.css">
                <graphic>
                   <FontAwesomeIcon glyphName="QUESTION" size="1.5em" />
                </graphic>

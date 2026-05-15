@@ -289,7 +289,7 @@
                                                 <Image url="@../image/items/tomato.png" />
                                              </image>
                                           </ImageView>
-                                          <Button fx:id="Playerinvbtn" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
+                                          <Button fx:id="Playerinvbtn" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
                                           <Label fx:id="Playerinvlbl" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                              <font>
                                                 <Font name="System Bold" size="12.0" />
@@ -304,7 +304,7 @@
                                                 <Image url="@../image/items/tomato.png" />
                                              </image>
                                           </ImageView>
-                                          <Button fx:id="Playerinvbtn1" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
+                                          <Button fx:id="Playerinvbtn1" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
                                           <Label fx:id="Playerinvlbl1" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                              <font>
                                                 <Font name="System Bold" size="12.0" />
@@ -319,7 +319,7 @@
                                                 <Image url="@../image/items/tomato.png" />
                                              </image>
                                           </ImageView>
-                                          <Button fx:id="Playerinvbtn2" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
+                                          <Button fx:id="Playerinvbtn2" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
                                           <Label fx:id="Playerinvlbl2" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                              <font>
                                                 <Font name="System Bold" size="12.0" />
@@ -334,7 +334,7 @@
                                                 <Image url="@../image/items/tomato.png" />
                                              </image>
                                           </ImageView>
-                                          <Button fx:id="Playerinvbtn3" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
+                                          <Button fx:id="Playerinvbtn3" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
                                           <Label fx:id="Playerinvlbl3" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                              <font>
                                                 <Font name="System Bold" size="12.0" />
@@ -349,7 +349,7 @@
                                                 <Image url="@../image/items/tomato.png" />
                                              </image>
                                           </ImageView>
-                                          <Button fx:id="Playerinvbtn4" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
+                                          <Button fx:id="Playerinvbtn4" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
                                           <Label fx:id="Playerinvlbl4" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                              <font>
                                                 <Font name="System Bold" size="12.0" />
@@ -364,7 +364,7 @@
                                                 <Image url="@../image/items/tomato.png" />
                                              </image>
                                           </ImageView>
-                                          <Button fx:id="Playerinvbtn5" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
+                                          <Button fx:id="Playerinvbtn5" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
                                           <Label fx:id="Playerinvlbl5" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                              <font>
                                                 <Font name="System Bold" size="12.0" />
@@ -379,7 +379,7 @@
                                                 <Image url="@../image/items/tomato.png" />
                                              </image>
                                           </ImageView>
-                                          <Button fx:id="Playerinvbtn6" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
+                                          <Button fx:id="Playerinvbtn6" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
                                           <Label fx:id="Playerinvlbl6" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                              <font>
                                                 <Font name="System Bold" size="12.0" />
@@ -394,7 +394,7 @@
                                                 <Image url="@../image/items/tomato.png" />
                                              </image>
                                           </ImageView>
-                                          <Button fx:id="Playerinvbtn7" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
+                                          <Button fx:id="Playerinvbtn7" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
                                           <Label fx:id="Playerinvlbl7" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                              <font>
                                                 <Font name="System Bold" size="12.0" />
@@ -409,7 +409,7 @@
                                                 <Image url="@../image/items/tomato.png" />
                                              </image>
                                           </ImageView>
-                                          <Button fx:id="Playerinvbtn8" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
+                                          <Button fx:id="Playerinvbtn8" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
                                           <Label fx:id="Playerinvlbl8" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                              <font>
                                                 <Font name="System Bold" size="12.0" />
@@ -424,7 +424,7 @@
                                                 <Image url="@../image/items/tomato.png" />
                                              </image>
                                           </ImageView>
-                                          <Button fx:id="Playerinvbtn9" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
+                                          <Button fx:id="Playerinvbtn9" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
                                           <Label fx:id="Playerinvlbl9" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                              <font>
                                                 <Font name="System Bold" size="12.0" />
@@ -439,7 +439,7 @@
                                                 <Image url="@../image/items/tomato.png" />
                                              </image>
                                           </ImageView>
-                                          <Button fx:id="Playerinvbtn10" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
+                                          <Button fx:id="Playerinvbtn10" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
                                           <Label fx:id="Playerinvlbl10" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                              <font>
                                                 <Font name="System Bold" size="12.0" />
@@ -454,7 +454,7 @@
                                                 <Image url="@../image/items/tomato.png" />
                                              </image>
                                           </ImageView>
-                                          <Button fx:id="Playerinvbtn11" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
+                                          <Button fx:id="Playerinvbtn11" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
                                           <Label fx:id="Playerinvlbl11" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                              <font>
                                                 <Font name="System Bold" size="12.0" />
@@ -469,7 +469,7 @@
                                                 <Image url="@../image/items/tomato.png" />
                                              </image>
                                           </ImageView>
-                                          <Button fx:id="Playerinvbtn12" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
+                                          <Button fx:id="Playerinvbtn12" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
                                           <Label fx:id="Playerinvlbl12" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                              <font>
                                                 <Font name="System Bold" size="12.0" />
@@ -484,7 +484,7 @@
                                                 <Image url="@../image/items/tomato.png" />
                                              </image>
                                           </ImageView>
-                                          <Button fx:id="Playerinvbtn13" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
+                                          <Button fx:id="Playerinvbtn13" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
                                           <Label fx:id="Playerinvlbl13" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                              <font>
                                                 <Font name="System Bold" size="12.0" />
@@ -499,7 +499,7 @@
                                                 <Image url="@../image/items/tomato.png" />
                                              </image>
                                           </ImageView>
-                                          <Button fx:id="Playerinvbtn14" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
+                                          <Button fx:id="Playerinvbtn14" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
                                           <Label fx:id="Playerinvlbl14" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                              <font>
                                                 <Font name="System Bold" size="12.0" />
@@ -514,7 +514,7 @@
                                                 <Image url="@../image/items/tomato.png" />
                                              </image>
                                           </ImageView>
-                                          <Button fx:id="Playerinvbtn15" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
+                                          <Button fx:id="Playerinvbtn15" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
                                           <Label fx:id="Playerinvlbl15" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                              <font>
                                                 <Font name="System Bold" size="12.0" />
@@ -529,7 +529,7 @@
                                                 <Image url="@../image/items/tomato.png" />
                                              </image>
                                           </ImageView>
-                                          <Button fx:id="Playerinvbtn16" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
+                                          <Button fx:id="Playerinvbtn16" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
                                           <Label fx:id="Playerinvlbl16" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                              <font>
                                                 <Font name="System Bold" size="12.0" />
@@ -544,7 +544,7 @@
                                                 <Image url="@../image/items/tomato.png" />
                                              </image>
                                           </ImageView>
-                                          <Button fx:id="Playerinvbtn17" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
+                                          <Button fx:id="Playerinvbtn17" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
                                           <Label fx:id="Playerinvlbl17" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                              <font>
                                                 <Font name="System Bold" size="12.0" />
@@ -559,7 +559,7 @@
                                                 <Image url="@../image/items/tomato.png" />
                                              </image>
                                           </ImageView>
-                                          <Button fx:id="Playerinvbtn18" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
+                                          <Button fx:id="Playerinvbtn18" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
                                           <Label fx:id="Playerinvlbl18" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                              <font>
                                                 <Font name="System Bold" size="12.0" />
@@ -574,7 +574,7 @@
                                                 <Image url="@../image/items/tomato.png" />
                                              </image>
                                           </ImageView>
-                                          <Button fx:id="Playerinvbtn19" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" />
+                                          <Button fx:id="Playerinvbtn19" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
                                           <Label fx:id="Playerinvlbl19" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                              <font>
                                                 <Font name="System Bold" size="12.0" />
@@ -941,24 +941,24 @@
                                  </font>
                               </Label>
                               <Slider fx:id="sfxVolumeSlider" layoutX="108.0" layoutY="147.0" max="1.0" min="0.0" prefHeight="25.0" prefWidth="371.0" value="1.0" />
-                              <Button fx:id="btnsave" layoutX="368.0" layoutY="226.0" mnemonicParsing="false" onAction="#handlesave" text="Save" />
-                              <Button fx:id="btnload" layoutX="413.0" layoutY="226.0" mnemonicParsing="false" onAction="#handleload" text="Load" />
-                              <Button fx:id="btnsaveandexit" layoutX="367.0" layoutY="263.0" mnemonicParsing="false" onAction="#handlesaveexitaction" text="Save &amp; Exit" />
+                              <Button fx:id="btnsave" layoutX="368.0" layoutY="226.0" mnemonicParsing="false" onAction="#handlesave" text="Save" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                              <Button fx:id="btnload" layoutX="413.0" layoutY="226.0" mnemonicParsing="false" onAction="#handleload" text="Load" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                              <Button fx:id="btnsaveandexit" layoutX="367.0" layoutY="263.0" mnemonicParsing="false" onAction="#handlesaveexitaction" text="Save &amp; Exit" styleClass="invisible-button" stylesheets="@../css/style.css" />
                            </children>
                         </Group>
-                        <Button fx:id="openInventory" layoutX="118.0" layoutY="32.0" mnemonicParsing="false" onAction="#handleopenInventoryaction" opacity="0.0" prefHeight="25.0" prefWidth="89.0" />
+                        <Button fx:id="openInventory" layoutX="118.0" layoutY="32.0" mnemonicParsing="false" onAction="#handleopenInventoryaction" opacity="0.0" prefHeight="25.0" prefWidth="89.0" styleClass="invisible-button" stylesheets="@../css/style.css" />
                         <ImageView fx:id="btnclose" fitHeight="25.0" fitWidth="20.0" layoutX="472.0" layoutY="29.0" onMouseClicked="#handlecloseaction" pickOnBounds="true" preserveRatio="true">
                            <image>
                               <Image url="@../image/tools/x.png" />
                            </image>
                         </ImageView>
-                        <Button fx:id="openstatus" layoutX="261.0" layoutY="28.0" mnemonicParsing="false" onAction="#handleopenstatusaction" opacity="0.0" prefHeight="25.0" prefWidth="64.0" />
-                        <Button fx:id="opensetting" layoutX="375.0" layoutY="29.0" mnemonicParsing="false" onAction="#handleopensettingaction" opacity="0.0" prefHeight="25.0" prefWidth="64.0" />
+                        <Button fx:id="openstatus" layoutX="261.0" layoutY="28.0" mnemonicParsing="false" onAction="#handleopenstatusaction" opacity="0.0" prefHeight="25.0" prefWidth="64.0" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                        <Button fx:id="opensetting" layoutX="375.0" layoutY="29.0" mnemonicParsing="false" onAction="#handleopensettingaction" opacity="0.0" prefHeight="25.0" prefWidth="64.0" styleClass="invisible-button" stylesheets="@../css/style.css" />
                      </children>
                   </Pane>
                </children>
             </Group>
-            <Button fx:id="btntuto" layoutX="575.0" layoutY="3.0" mnemonicParsing="false" onAction="#handlebtntutoaction" style="-fx-background-radius: 100%; -fx-background-color: transparent; -fx-border-color: yellow; -fx-border-radius: 100%;" textFill="#e6ff00">
+            <Button fx:id="btntuto" layoutX="575.0" layoutY="3.0" mnemonicParsing="false" onAction="#handlebtntutoaction" style="-fx-background-radius: 100%; -fx-background-color: transparent; -fx-border-color: yellow; -fx-border-radius: 100%;" textFill="#e6ff00" styleClass="invisible-button" stylesheets="@../css/style.css">
                <graphic>
                   <FontAwesomeIcon fill="#f6ff00" glyphName="QUESTION" size="1.5em" />
                </graphic>

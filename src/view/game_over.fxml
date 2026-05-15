@@ -22,7 +22,7 @@
                                 </Label>
 
                                 <Button fx:id="btnMainMenu" mnemonicParsing="false" onAction="#handleMainMenuAction" text="Main Menu"
-                                        style="-fx-background-color: rgba(255,255,255,0.18); -fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 10 28 10 28;" />
+                                        style="-fx-background-color: rgba(255,255,255,0.18); -fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 10 28 10 28;" styleClass="invisible-button" stylesheets="@../css/style.css" />
                             </children>
                         </VBox>
                     </children>

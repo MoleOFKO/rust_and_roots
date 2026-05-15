@@ -51,13 +51,13 @@
                   <Image url="@../image/Admin/upload_btn.png" />
                </image>
             </ImageView>
-               <Button fx:id="btnupload" layoutX="385.0" layoutY="425.0" mnemonicParsing="false" onAction="#handlebtnuploadaction" opacity="0.0" prefHeight="31.0" prefWidth="81.0" text="Upload" />
+               <Button fx:id="btnupload" layoutX="385.0" layoutY="425.0" mnemonicParsing="false" onAction="#handlebtnuploadaction" opacity="0.0" prefHeight="31.0" prefWidth="81.0" text="Upload" styleClass="invisible-button" stylesheets="@../css/style.css" />
             <ImageView fitHeight="37.0" fitWidth="82.0" layoutX="235.0" layoutY="534.0" pickOnBounds="true">
                <image>
                   <Image url="@../image/Admin/admin_save_button.png" />
                </image>
             </ImageView>
-               <Button fx:id="btnsave" layoutX="235.0" layoutY="537.0" mnemonicParsing="false" onAction="#handlebtnsaveaction" opacity="0.0" prefHeight="31.0" prefWidth="84.0" text="Save" />
+               <Button fx:id="btnsave" layoutX="235.0" layoutY="537.0" mnemonicParsing="false" onAction="#handlebtnsaveaction" opacity="0.0" prefHeight="31.0" prefWidth="84.0" text="Save" styleClass="invisible-button" stylesheets="@../css/style.css" />
                <Label layoutX="119.0" layoutY="44.0" prefHeight="21.0" prefWidth="79.0" text="Item Name" textFill="#572a00">
                <font>
                   <Font name="Serif Bold" size="12.0" />
@@ -95,7 +95,7 @@
                   <Image url="@../image/Admin/admin_back_button.png" />
                </image>
             </ImageView>
-               <Button fx:id="btnback" layoutX="513.0" layoutY="14.0" mnemonicParsing="false" onAction="#handlebtnbackaction" opacity="0.0" prefHeight="31.0" prefWidth="78.0" text="Back">
+               <Button fx:id="btnback" layoutX="513.0" layoutY="14.0" mnemonicParsing="false" onAction="#handlebtnbackaction" opacity="0.0" prefHeight="31.0" prefWidth="78.0" text="Back" styleClass="invisible-button" stylesheets="@../css/style.css">
                   <graphic>
                      <FontAwesomeIcon glyphName="ARROW_LEFT" />
                   </graphic>

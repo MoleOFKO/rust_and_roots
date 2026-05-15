@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.text.Font?>
 
-<StackPane fx:id="view" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Char_edit_btnController">
+<StackPane fx:id="view" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Char_edit_btnController">
     <children>
       <ImageView fitHeight="528.0" fitWidth="608.0" pickOnBounds="true">
          <image>
@@ -54,13 +54,13 @@
                   <Image url="@../image/Admin/upload_btn.png" />
                </image>
             </ImageView>
-               <Button fx:id="btnupload" layoutX="396.0" layoutY="387.0" mnemonicParsing="false" onAction="#handlebtnuploadaction" opacity="0.0" prefHeight="25.0" prefWidth="84.0" text="Upload" />
+               <Button fx:id="btnupload" layoutX="396.0" layoutY="387.0" mnemonicParsing="false" onAction="#handlebtnuploadaction" opacity="0.0" prefHeight="25.0" prefWidth="84.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Upload" />
             <ImageView fitHeight="32.0" fitWidth="101.0" layoutX="252.0" layoutY="484.0" pickOnBounds="true">
                <image>
                   <Image url="@../image/Admin/admin_save_button.png" />
                </image>
             </ImageView>
-               <Button fx:id="btnsave" layoutX="254.0" layoutY="488.0" mnemonicParsing="false" onAction="#handlebtnsaveaction" opacity="0.0" prefHeight="25.0" prefWidth="97.0" text="Save" />
+               <Button fx:id="btnsave" layoutX="254.0" layoutY="488.0" mnemonicParsing="false" onAction="#handlebtnsaveaction" opacity="0.0" prefHeight="25.0" prefWidth="97.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Save" />
                <Label layoutX="157.0" layoutY="40.0" prefHeight="17.0" prefWidth="67.0" text="Mob Name" textFill="#572a00">
                <font>
                   <Font name="Serif Bold" size="12.0" />
@@ -94,14 +94,14 @@
                   <Font name="Serif Bold" size="12.0" />
                </font></Label>
                <Label layoutX="265.0" layoutY="390.0" prefHeight="21.0" prefWidth="80.0" text="Inset Image" textFill="#572a00" />
-            <ImageView fitHeight="149.0" fitWidth="181.0" layoutX="211.0" layoutY="324.0" pickOnBounds="true" />
                <BorderPane layoutX="209.0" layoutY="324.0" prefHeight="150.0" prefWidth="183.0" style="-fx-border-color: black; -fx-border-radius: 10px; -fx-border-width: 3px;" />
+            <ImageView fitHeight="149.0" fitWidth="181.0" layoutX="211.0" layoutY="324.0" pickOnBounds="true" />
             <ImageView fitHeight="37.0" fitWidth="94.0" layoutX="503.0" layoutY="26.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../image/Admin/admin_back_button.png" />
                </image>
             </ImageView>
-               <Button fx:id="btnback" layoutX="506.0" layoutY="24.0" mnemonicParsing="false" onAction="#handlebtnbackaction" opacity="0.0" prefHeight="15.0" prefWidth="88.0" text="Back">
+               <Button fx:id="btnback" layoutX="506.0" layoutY="24.0" mnemonicParsing="false" onAction="#handlebtnbackaction" opacity="0.0" prefHeight="15.0" prefWidth="88.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Back">
                   <graphic>
                      <FontAwesomeIcon glyphName="ARROW_LEFT" />
                   </graphic>
