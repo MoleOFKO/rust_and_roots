@@ -50,6 +50,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Slider;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
@@ -81,6 +82,7 @@ import util.TimeFlow;
 import util.TutorialOverlayHelper;
 import util.WorldScaler;
 import javafx.scene.control.ToggleButton;
+import javafx.util.Duration;
 
 /**
  * BaseMapController
@@ -114,6 +116,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     private static final double DEFAULT_PLAYER_HITBOX_TRANSLATE_X = 24.0;
     private static final double DEFAULT_PLAYER_HITBOX_TRANSLATE_Y = 28.0;
     private static final double DEFAULT_PLAYER_HITBOX_LAYOUT_Y_OFFSET_FROM_SPRITE = -5.0;
+    private static final String ITEM_USAGE_TOOLTIP_KEY = "rust_and_roots.itemUsageTooltip";
     protected static final List<String> OVERWORLD_COMBAT_TUTORIAL_IMAGES = List.of(
         "/image/Toturial/before_goes_to_hotbar.png",
         "/image/Toturial/Wp_hold.png",
@@ -2958,13 +2961,19 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
             if (itemId <= 0 || quantity <= 0) {
                 if (img != null) img.setImage(null);
+                installItemUsageTooltip(img, -1);
+                ToggleButton button = (i < hotbarSlotButtons.size()) ? hotbarSlotButtons.get(i) : null;
+                installItemUsageTooltip(button, -1);
                 if (lbl != null) lbl.setText("");
                 continue;
             }
 
             if (img != null) {
                 img.setImage(ItemDatabase.getImage(itemId));
+                installItemUsageTooltip(img, itemId);
             }
+            ToggleButton button = (i < hotbarSlotButtons.size()) ? hotbarSlotButtons.get(i) : null;
+            installItemUsageTooltip(button, itemId);
 
             if (lbl != null) {
                 lbl.setText("x" + quantity);
@@ -3484,12 +3493,14 @@ public abstract class BaseMapController implements Initializable, SceneControlle
                     imageView.setScaleX(1.0);
                     imageView.setScaleY(1.0);
                     imageView.setStyle("");
+                    installItemUsageTooltip(imageView, -1);
                 }
                 if (label != null) {
                     label.setText("");
                 }
                 if (button != null) {
                     button.setDisable(true);
+                    installItemUsageTooltip(button, -1);
                 }
                 continue;
             }
@@ -3501,6 +3512,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
                 imageView.setScaleX(1.0);
                 imageView.setScaleY(1.0);
                 imageView.setStyle("");
+                installItemUsageTooltip(imageView, slot.itemId());
             }
 
             if (label != null) {
@@ -3509,10 +3521,29 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
             if (button != null) {
                 button.setDisable(false);
+                installItemUsageTooltip(button, slot.itemId());
             }
         }
 
         refreshPlayerInventorySelectionHighlight();
+    }
+
+    protected void installItemUsageTooltip(Node node, int itemId) {
+        if (node == null) return;
+
+        Object previous = node.getProperties().remove(ITEM_USAGE_TOOLTIP_KEY);
+        if (previous instanceof Tooltip oldTooltip) {
+            Tooltip.uninstall(node, oldTooltip);
+        }
+
+        String text = ItemDatabase.getItemUsageHoverText(itemId);
+        if (text == null || text.isBlank()) return;
+
+        Tooltip tooltip = new Tooltip(text);
+        tooltip.setShowDelay(Duration.ZERO);
+        tooltip.setHideDelay(Duration.millis(80));
+        Tooltip.install(node, tooltip);
+        node.getProperties().put(ITEM_USAGE_TOOLTIP_KEY, tooltip);
     }
 
     protected void refreshPlayerInventorySelectionHighlight() {
