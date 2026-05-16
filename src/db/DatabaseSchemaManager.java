@@ -33,6 +33,7 @@ public final class DatabaseSchemaManager {
             executeBootstrapSection(con);
             ensureSaveGameTutorialColumn(con);
             ensureSaveGameAudioColumns(con);
+            ensureSaveGameHighScoreColumn(con);
             ensured = true;
         }
     }
@@ -66,6 +67,15 @@ public final class DatabaseSchemaManager {
             execute(con, """
                 ALTER TABLE save_game
                 ADD COLUMN sfx_volume DOUBLE NOT NULL DEFAULT 1.0
+                """);
+        }
+    }
+
+    private static void ensureSaveGameHighScoreColumn(Connection con) throws SQLException {
+        if (!hasColumn(con, "save_game", "high_score")) {
+            execute(con, """
+                ALTER TABLE save_game
+                ADD COLUMN high_score INT NOT NULL DEFAULT 0
                 """);
         }
     }

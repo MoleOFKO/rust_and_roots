@@ -76,6 +76,7 @@ public class SaveGameService {
             saveSmeltState(con, gs);
             saveSmeltOreHistory(con, gs);
             saveUnlockedRecipes(con, gs);
+            HighScoreService.updateHighScore(con, gs.getCurrentSaveId());
 
             con.commit();
             System.out.println("Save complete. saved_id=" + gs.getCurrentSaveId());
@@ -1048,6 +1049,7 @@ public class SaveGameService {
             saveSmeltState(con, gs);
             saveSmeltOreHistory(con, gs);
             saveUnlockedRecipes(con, gs);
+            HighScoreService.updateHighScore(con, gs.getCurrentSaveId());
 
             con.commit();
             System.out.println("Save complete. slot=" + slotName + ", saved_id=" + gs.getCurrentSaveId());
