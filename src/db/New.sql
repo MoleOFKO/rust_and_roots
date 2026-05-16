@@ -432,6 +432,9 @@ INSERT INTO `save_game` VALUES (1,1,'Save 1','2026-03-29 00:30:50',1,88,1000,160
 /*!40000 ALTER TABLE `save_game` ENABLE KEYS */;
 UNLOCK TABLES;
 
+ALTER TABLE `save_game`
+  ADD COLUMN `high_score` int NOT NULL DEFAULT '0' AFTER `sfx_volume`;
+
 --
 -- Table structure for table `saved_chest_item`
 --
@@ -787,6 +790,37 @@ LOCK TABLES `saved_time` WRITE;
 INSERT INTO `saved_time` VALUES (1,1,4.351699199999998),(2,1,10.469164200000012),(3,1,228.982360901002),(5,1,36.70162290000008),(12,10,838352.0016215944),(13,1,48.0978993),(14,1,21617.568197499975),(15,1,26091.277508999723);
 /*!40000 ALTER TABLE `saved_time` ENABLE KEYS */;
 UNLOCK TABLES;
+
+UPDATE `save_game` sg
+LEFT JOIN `saved_time` st ON sg.`saved_id` = st.`saved_id`
+LEFT JOIN `player_stats` ps ON sg.`player_stats_id` = ps.`player_stats_id`
+LEFT JOIN (
+  SELECT `saved_id`,
+         SUM(CASE
+           WHEN `skill_level` >= 2314 THEN 10
+           WHEN `skill_level` >= 1855 THEN 9
+           WHEN `skill_level` >= 1448 THEN 8
+           WHEN `skill_level` >= 1094 THEN 7
+           WHEN `skill_level` >= 791 THEN 6
+           WHEN `skill_level` >= 540 THEN 5
+           WHEN `skill_level` >= 338 THEN 4
+           WHEN `skill_level` >= 185 THEN 3
+           WHEN `skill_level` >= 79 THEN 2
+           WHEN `skill_level` >= 18 THEN 1
+           ELSE 0
+         END) AS `total_skill_levels`
+    FROM `player_skills`
+   GROUP BY `saved_id`
+) sk ON sg.`saved_id` = sk.`saved_id`
+   SET sg.`high_score` =
+       (GREATEST(COALESCE(st.`day_number`, 1), 1) * 100)
+       + ((COALESCE(ps.`str_stat`, 0)
+           + COALESCE(ps.`agi_stat`, 0)
+           + COALESCE(ps.`dex_stat`, 0)
+           + COALESCE(ps.`vit_stat`, 0)
+           + COALESCE(ps.`hp`, 0)
+           + COALESCE(ps.`stamina`, 0)) * 10)
+       + (COALESCE(sk.`total_skill_levels`, 0) * 50);
 
 --
 -- Table structure for table `saved_tree_drop`

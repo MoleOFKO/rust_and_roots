@@ -2,6 +2,7 @@ package controller;
 
 import db.LoadGameService;
 import db.DeleteSaveService;
+import db.HighScoreService;
 import db.SaveGameService;
 import db.dbcon;
 import game.GameState;
@@ -61,6 +62,8 @@ public class SaveloadsController implements Initializable {
     private Label wname;
     @FXML
     private Label day;
+    @FXML
+    private Label highScores;
 
     private int selectedSlot = 1;
     private SlotPreview selectedSlotPreview = null;
@@ -256,6 +259,7 @@ public class SaveloadsController implements Initializable {
             if (cname != null) cname.setText("Empty");
             if (wname != null) wname.setText("No save data");
             if (day != null) day.setText("Day -");
+            if (highScores != null) highScores.setText("?");
             return;
         }
 
@@ -269,6 +273,10 @@ public class SaveloadsController implements Initializable {
         
         if (day != null) {
             day.setText(preview.dead ? ("Day " + preview.dayNumber + " (DEAD)") : ("Day " + preview.dayNumber));
+        }
+
+        if (highScores != null) {
+            highScores.setText(Integer.toString(preview.highScore));
         }
 
         if (cimg != null) {
@@ -388,7 +396,9 @@ public class SaveloadsController implements Initializable {
         String slotName;
         String playerName;
         String worldName;
+        int savedId;
         int dayNumber;
+        int highScore;
         boolean dead;
     }
 
@@ -399,6 +409,7 @@ public class SaveloadsController implements Initializable {
         try (Connection con = db.getConnection()) {
             String sqlWithDeadFlag = """
                 SELECT sg.saved_name,
+                       sg.saved_id,
                        sg.world_name,
                        c.player_name,
                        st.day_number,
@@ -423,6 +434,7 @@ public class SaveloadsController implements Initializable {
 
                     SlotPreview preview = new SlotPreview();
                     preview.slotName = rs.getString("saved_name");
+                    preview.savedId = rs.getInt("saved_id");
                     preview.worldName = rs.getString("world_name");
                     preview.playerName = rs.getString("player_name");
 
@@ -434,11 +446,13 @@ public class SaveloadsController implements Initializable {
                     boolean isDead = rs.getBoolean("is_dead");
                     int currentHp = rs.getInt("current_hp");
                     preview.dead = isDead || currentHp <= 0;
+                    preview.highScore = HighScoreService.computeHighScore(con, preview.savedId);
                     return preview;
                 }
             } catch (SQLException ignored) {
                 String sqlLegacy = """
                     SELECT sg.saved_name,
+                           sg.saved_id,
                            sg.world_name,
                            c.player_name,
                            st.day_number,
@@ -462,6 +476,7 @@ public class SaveloadsController implements Initializable {
 
                         SlotPreview preview = new SlotPreview();
                         preview.slotName = rs.getString("saved_name");
+                        preview.savedId = rs.getInt("saved_id");
                         preview.worldName = rs.getString("world_name");
                         preview.playerName = rs.getString("player_name");
 
@@ -471,6 +486,7 @@ public class SaveloadsController implements Initializable {
                         }
 
                         preview.dead = rs.getInt("current_hp") <= 0;
+                        preview.highScore = HighScoreService.computeHighScore(con, preview.savedId);
                         return preview;
                     }
                 }
