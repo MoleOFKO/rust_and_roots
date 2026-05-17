@@ -103,6 +103,9 @@ public class Player {
         NONE,
         AXE,
         PICKAXE,
+        DAGGER,
+        SHOVEL,
+        SPEAR,
         SWORD,
         FISHING_ROD,
         TOOL
@@ -1005,6 +1008,51 @@ public class Player {
             "/image/human/human_attack.png",
             8
         );
+        registerEquipmentAnimation(
+            EquipmentKind.DAGGER,
+            "/image/human/dagger_idle.png",
+            IDLE_COLUMNS,
+            "/image/human/dagger_walk.png",
+            WALK_COLUMNS,
+            "/image/human/dagger_run.png",
+            RUN_COLUMNS,
+            "/image/human/dagger_attack.png",
+            ATTACK_COLUMNS,
+            "/image/human/dagger_hurt.png",
+            HURT_COLUMNS,
+            "/image/human/human_attack.png",
+            ATTACK_COLUMNS
+        );
+        registerEquipmentAnimation(
+            EquipmentKind.SPEAR,
+            "/image/human/spear_idle.png",
+            IDLE_COLUMNS,
+            "/image/human/spear_walk.png",
+            WALK_COLUMNS,
+            "/image/human/spear_run.png",
+            RUN_COLUMNS,
+            "/image/human/spear_attack.png",
+            ATTACK_COLUMNS,
+            "/image/human/spear_hurt.png",
+            HURT_COLUMNS,
+            "/image/human/human_spear_attack.png",
+            ATTACK_COLUMNS
+        );
+        registerEquipmentAnimation(
+            EquipmentKind.SHOVEL,
+            "/image/human/shovel_idle.png",
+            IDLE_COLUMNS,
+            "/image/human/shovel_walk.png",
+            WALK_COLUMNS,
+            "/image/human/shovel_run.png",
+            RUN_COLUMNS,
+            "/image/human/shovel_action.png",
+            ATTACK_COLUMNS,
+            "/image/human/shovel_hurt.png",
+            HURT_COLUMNS,
+            "/image/human/human_shovel_action.png",
+            ATTACK_COLUMNS
+        );
     }
 
     private void registerEquipmentAnimation(
@@ -1215,17 +1263,26 @@ public class Player {
         String name = ItemDatabase.getItemName(itemId);
         String lookup = ((type == null ? "" : type) + " " + (name == null ? "" : name)).toLowerCase();
 
+        if (lookup.contains("fishing rod") || lookup.contains("rod")) {
+            return EquipmentKind.NONE;
+        }
         if (lookup.contains("pickaxe") || lookup.contains("pick axe")) {
             return EquipmentKind.PICKAXE;
         }
         if (lookup.contains("axe")) {
             return EquipmentKind.AXE;
         }
+        if (lookup.contains("dagger")) {
+            return EquipmentKind.DAGGER;
+        }
+        if (lookup.contains("shovel")) {
+            return EquipmentKind.SHOVEL;
+        }
+        if (lookup.contains("spear")) {
+            return EquipmentKind.SPEAR;
+        }
         if (lookup.contains("sword")) {
             return EquipmentKind.SWORD;
-        }
-        if (lookup.contains("fishing rod") || lookup.contains("rod")) {
-            return EquipmentKind.FISHING_ROD;
         }
         if (lookup.contains("tool") || lookup.contains("weapon")) {
             return EquipmentKind.TOOL;

@@ -291,6 +291,34 @@ SET
   s.`hp` = CASE WHEN t.`item_type_name` = 'edible' THEN s.`hp` ELSE 0 END,
   s.`stamina` = CASE WHEN t.`item_type_name` = 'edible' THEN s.`stamina` ELSE 0 END;
 
+-- Dedicated weapon equipment stats. Target-specific damage bonuses are handled in combat code.
+INSERT INTO `item_stats` (`item_stats_id`, `str_stat`, `agi_stat`, `dex_stat`, `vit_stat`, `hp`, `stamina`) VALUES
+  (159,2,0,0,0,0,0), -- Axe
+  (160,1,0,0,0,0,0), -- Pickaxe
+  (161,5,0,0,0,0,0), -- Iron Sword
+  (162,3,1,0,0,0,0), -- Iron Spear
+  (163,2,2,0,0,0,0), -- Iron Dagger
+  (164,1,0,0,0,0,0)  -- Iron Shovel
+ON DUPLICATE KEY UPDATE
+  `str_stat` = VALUES(`str_stat`),
+  `agi_stat` = VALUES(`agi_stat`),
+  `dex_stat` = VALUES(`dex_stat`),
+  `vit_stat` = VALUES(`vit_stat`),
+  `hp` = VALUES(`hp`),
+  `stamina` = VALUES(`stamina`);
+
+UPDATE `items`
+SET `item_stats_id` = CASE `item_id`
+  WHEN 1 THEN 159
+  WHEN 2 THEN 160
+  WHEN 250 THEN 161
+  WHEN 251 THEN 162
+  WHEN 252 THEN 163
+  WHEN 253 THEN 164
+  ELSE `item_stats_id`
+END
+WHERE `item_id` IN (1,2,250,251,252,253);
+
 -- Fix a few missing image filenames so these items remain obtainable/displayable.
 UPDATE `items` SET `image` = 'pumpkin_fruit.png' WHERE `item_id` = 112;
 UPDATE `items` SET `image` = 'coal_brick.png' WHERE `item_id` = 215;

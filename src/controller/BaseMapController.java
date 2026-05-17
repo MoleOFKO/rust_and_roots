@@ -2750,12 +2750,35 @@ public abstract class BaseMapController implements Initializable, SceneControlle
             return;
         }
 
+        int[] weaponStats = weaponEquipmentStats(equipped.getItem_name());
+        if (weaponStats != null) {
+            playerState.setEquipmentStatBonuses(
+                weaponStats[0],
+                weaponStats[1],
+                weaponStats[2],
+                weaponStats[3]
+            );
+            return;
+        }
+
         playerState.setEquipmentStatBonuses(
             equipped.getStr(),
             equipped.getAgi(),
             equipped.getDex(),
             equipped.getVid()
         );
+    }
+
+    private int[] weaponEquipmentStats(String itemName) {
+        if (itemName == null || itemName.isBlank()) return null;
+        String normalized = itemName.trim().toLowerCase(Locale.ROOT);
+        if (normalized.contains("pickaxe") || normalized.contains("pick axe")) return new int[] {1, 0, 0, 0};
+        if (normalized.contains("dagger")) return new int[] {2, 2, 0, 0};
+        if (normalized.contains("shovel")) return new int[] {1, 0, 0, 0};
+        if (normalized.contains("spear")) return new int[] {3, 1, 0, 0};
+        if (normalized.contains("sword")) return new int[] {5, 0, 0, 0};
+        if (normalized.contains("axe")) return new int[] {2, 0, 0, 0};
+        return null;
     }
     
     private void setupFarmIfPresent() {
@@ -2889,6 +2912,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
             || normalized.contains("iron sword")
             || normalized.contains("iron spear")
             || normalized.contains("iron dagger")
+            || normalized.contains("iron shovel")
             || normalized.contains("axe")
             || normalized.contains("sword");
     }
