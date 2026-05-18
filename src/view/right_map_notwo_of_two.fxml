@@ -210,7 +210,7 @@
                   <FontAwesomeIcon fill="#f6ff00" glyphName="QUESTION" size="1.5em" />
                </graphic>
             </Button>
-            <Group fx:id="minimapicongroup" layoutX="537.0" layoutY="-9.0">
+            <Group fx:id="minimapicongroup" layoutX="535.0" layoutY="-9.0">
                <children>
                   <ImageView fx:id="miniMapIcon" fitHeight="37.0" fitWidth="34.0" layoutX="-14.0" layoutY="9.0" onMouseClicked="#handleMiniMapIconaction" pickOnBounds="true" preserveRatio="true">
                      <image>
@@ -219,7 +219,7 @@
                   </ImageView>
                </children>
             </Group>
-            <Group fx:id="minimapgroup" layoutY="1.0" visible="false">
+            <Group fx:id="minimapgroup" visible="false">
                <children>
                   <Pane opacity="0.54" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: black;" />
                   <ImageView fx:id="minimap" fitHeight="311.0" fitWidth="514.0" layoutX="45.0" layoutY="35.0" pickOnBounds="true" preserveRatio="true">

@@ -556,4 +556,5 @@ public class Right_map_notwo_of_twoController extends BaseMapController {
         private void handlebtntutoaction(ActionEvent event) {
             showOverworldTutorialOverlay();
         }
+
 }
