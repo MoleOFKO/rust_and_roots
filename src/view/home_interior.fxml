@@ -247,6 +247,70 @@
                      </ImageView>
                   </children>
                </Group>
+               <Label fx:id="hotbarguide" layoutX="229.0" layoutY="358.0" text="press 'e' to open hotbar">
+                  <font>
+                     <Font name="System Bold" size="12.0" />
+                  </font>
+                  <effect>
+                     <DropShadow height="10.5" radius="6.9925" spread="0.67" width="19.47">
+                        <color>
+                           <Color fx:value="#ffffff" />
+                        </color>
+                     </DropShadow>
+                  </effect>
+               </Label>
+               <Button fx:id="btntuto" layoutX="523.0" layoutY="28.0" mnemonicParsing="false" onAction="#handlebtntutoaction" prefHeight="28.0" prefWidth="28.0" style="-fx-background-radius: 100%; -fx-background-color: transparent; -fx-border-color: yellow; -fx-border-radius: 100%; -fx-border-width: 1; -fx-padding: 0;" styleClass="invisible-button" stylesheets="@../css/style.css" textFill="#e6ff00">
+                  <graphic>
+                     <FontAwesomeIcon fill="#f6ff00" glyphName="QUESTION" selectionFill="YELLOW" size="1.5em" text="" />
+                  </graphic>
+               </Button>
+            <Group fx:id="minimapicongroup" layoutX="490.0" layoutY="17.0">
+               <children>
+                  <ImageView fx:id="miniMapIcon" fitHeight="37.0" fitWidth="34.0" layoutX="-14.0" layoutY="9.0" onMouseClicked="#handleMiniMapIconaction" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../image/tools/minimapicon.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </Group>
+            <Group fx:id="minimapgroup" visible="false">
+               <children>
+                  <Pane opacity="0.54" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: black;" />
+                  <ImageView fx:id="minimap" fitHeight="311.0" fitWidth="514.0" layoutX="45.0" layoutY="35.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../image/maps/map%20(2).png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="closeminimapbtn" fitHeight="33.0" fitWidth="29.0" layoutX="565.0" layoutY="5.0" onMouseClicked="#handleCloseMiniMapAction" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../image/tools/x.png" />
+                     </image>
+                  </ImageView>
+                                   <Rectangle fx:id="left_map_nofour" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="42.0" layoutX="206.0" layoutY="63.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
+                    <Rectangle fx:id="upper_map_nofour" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="42.0" layoutX="294.0" layoutY="63.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
+                    <Rectangle fx:id="right_map_nofour" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="42.0" layoutX="382.0" layoutY="63.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
+                    <Rectangle fx:id="left_map_nothree_of_one" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="42.0" layoutX="118.0" layoutY="115.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
+                    <Rectangle fx:id="left_map_nothree" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="42.0" layoutX="206.0" layoutY="105.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
+                    <Rectangle fx:id="upper_map_nothree" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="42.0" layoutX="294.0" layoutY="105.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
+                    <Rectangle fx:id="right_map_nothree" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="42.0" layoutX="382.0" layoutY="105.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
+                    <Rectangle fx:id="right_map_nothree_of_one" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="52.0" layoutX="470.0" layoutY="105.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="69.0" />
+                    <Rectangle fx:id="left_map_notwo_of_two" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="76.0" layoutX="62.0" layoutY="145.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="56.0" />
+                    <Rectangle fx:id="left_map_notwo_of_one" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="46.0" layoutX="118.0" layoutY="157.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
+                    <Rectangle fx:id="left_map_notwo" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="60.0" layoutX="206.0" layoutY="146.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
+                    <Rectangle fx:id="upper_map_notwo" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="60.0" layoutX="294.0" layoutY="146.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
+                    <Rectangle fx:id="right_map_notwo" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="60.0" layoutX="382.0" layoutY="147.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
+                    <Rectangle fx:id="right_map_notwo_of_one" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="52.0" layoutX="470.0" layoutY="157.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="69.0" />
+                    <Rectangle fx:id="left_map_noone_of_one" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="55.0" layoutX="118.0" layoutY="203.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
+                    <Rectangle fx:id="left_map_noone" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="52.0" layoutX="206.0" layoutY="205.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
+                    <Rectangle fx:id="upper_map" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="51.0" layoutX="294.0" layoutY="205.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
+                    <Rectangle fx:id="right_map_noone" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="50.0" layoutX="382.0" layoutY="206.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
+                    <Rectangle fx:id="right_map_noone_of_one" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="52.0" layoutX="470.0" layoutY="205.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="69.0" />
+                    <Rectangle fx:id="left_map" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="60.0" layoutX="206.0" layoutY="255.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
+                    <Rectangle fx:id="home_map" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="60.0" layoutX="294.0" layoutY="255.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
+                    <Rectangle fx:id="right_map" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="60.0" layoutX="382.0" layoutY="256.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
+                     <Rectangle fx:id="home_interior" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="13.0" layoutX="314.0" layoutY="258.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="18.0" />
+</children>
+            </Group>
                <Group>
                   <children>
                      <HBox fx:id="hotbar" alignment="CENTER" layoutX="143.0" layoutY="345.0" opacity="0.81" prefHeight="47.0" prefWidth="294.0" styleClass="hbox" stylesheets="@../css/style.css">
@@ -379,7 +443,7 @@
                                           <children>
                                              <ImageView fx:id="Playerinvimg112" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                             <Button fx:id="Playerinvbtn112" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                             <Button fx:id="Playerinvbtn112" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                              <Label fx:id="Playerinvlbl112" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                                 <font>
                                                    <Font name="System Bold" size="12.0" />
@@ -391,7 +455,7 @@
                                           <children>
                                              <ImageView fx:id="Playerinvimg110" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                             <Button fx:id="Playerinvbtn110" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                             <Button fx:id="Playerinvbtn110" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                              <Label fx:id="Playerinvlbl110" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                                 <font>
                                                    <Font name="System Bold" size="12.0" />
@@ -403,7 +467,7 @@
                                           <children>
                                              <ImageView fx:id="Playerinvimg21" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                             <Button fx:id="Playerinvbtn21" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                             <Button fx:id="Playerinvbtn21" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                              <Label fx:id="Playerinvlbl21" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                                 <font>
                                                    <Font name="System Bold" size="12.0" />
@@ -415,7 +479,7 @@
                                           <children>
                                              <ImageView fx:id="Playerinvimg31" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                             <Button fx:id="Playerinvbtn31" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                             <Button fx:id="Playerinvbtn31" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                              <Label fx:id="Playerinvlbl31" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                                 <font>
                                                    <Font name="System Bold" size="12.0" />
@@ -427,7 +491,7 @@
                                           <children>
                                              <ImageView fx:id="Playerinvimg41" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                             <Button fx:id="Playerinvbtn41" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                             <Button fx:id="Playerinvbtn41" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                              <Label fx:id="Playerinvlbl41" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                                 <font>
                                                    <Font name="System Bold" size="12.0" />
@@ -439,7 +503,7 @@
                                           <children>
                                              <ImageView fx:id="Playerinvimg51" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                             <Button fx:id="Playerinvbtn51" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                             <Button fx:id="Playerinvbtn51" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                              <Label fx:id="Playerinvlbl51" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                                 <font>
                                                    <Font name="System Bold" size="12.0" />
@@ -451,7 +515,7 @@
                                           <children>
                                              <ImageView fx:id="Playerinvimg61" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                             <Button fx:id="Playerinvbtn61" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                             <Button fx:id="Playerinvbtn61" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                              <Label fx:id="Playerinvlbl61" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                                 <font>
                                                    <Font name="System Bold" size="12.0" />
@@ -463,7 +527,7 @@
                                           <children>
                                              <ImageView fx:id="Playerinvimg71" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                             <Button fx:id="Playerinvbtn71" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                             <Button fx:id="Playerinvbtn71" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                              <Label fx:id="Playerinvlbl71" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                                 <font>
                                                    <Font name="System Bold" size="12.0" />
@@ -475,7 +539,7 @@
                                           <children>
                                              <ImageView fx:id="Playerinvimg81" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                             <Button fx:id="Playerinvbtn81" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                             <Button fx:id="Playerinvbtn81" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                              <Label fx:id="Playerinvlbl81" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                                 <font>
                                                    <Font name="System Bold" size="12.0" />
@@ -487,7 +551,7 @@
                                           <children>
                                              <ImageView fx:id="Playerinvimg91" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                             <Button fx:id="Playerinvbtn91" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                             <Button fx:id="Playerinvbtn91" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                              <Label fx:id="Playerinvlbl91" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                                 <font>
                                                    <Font name="System Bold" size="12.0" />
@@ -499,7 +563,7 @@
                                           <children>
                                              <ImageView fx:id="Playerinvimg101" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                             <Button fx:id="Playerinvbtn101" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                             <Button fx:id="Playerinvbtn101" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                              <Label fx:id="Playerinvlbl101" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                                 <font>
                                                    <Font name="System Bold" size="12.0" />
@@ -511,7 +575,7 @@
                                           <children>
                                              <ImageView fx:id="Playerinvimg111" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                             <Button fx:id="Playerinvbtn111" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                             <Button fx:id="Playerinvbtn111" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                              <Label fx:id="Playerinvlbl111" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                                 <font>
                                                    <Font name="System Bold" size="12.0" />
@@ -523,7 +587,7 @@
                                           <children>
                                              <ImageView fx:id="Playerinvimg121" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                             <Button fx:id="Playerinvbtn121" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                             <Button fx:id="Playerinvbtn121" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                              <Label fx:id="Playerinvlbl121" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                                 <font>
                                                    <Font name="System Bold" size="12.0" />
@@ -535,7 +599,7 @@
                                           <children>
                                              <ImageView fx:id="Playerinvimg131" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                             <Button fx:id="Playerinvbtn131" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                             <Button fx:id="Playerinvbtn131" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                              <Label fx:id="Playerinvlbl131" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                                 <font>
                                                    <Font name="System Bold" size="12.0" />
@@ -547,7 +611,7 @@
                                           <children>
                                              <ImageView fx:id="Playerinvimg141" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                             <Button fx:id="Playerinvbtn141" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                             <Button fx:id="Playerinvbtn141" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                              <Label fx:id="Playerinvlbl141" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                                 <font>
                                                    <Font name="System Bold" size="12.0" />
@@ -559,7 +623,7 @@
                                           <children>
                                              <ImageView fx:id="Playerinvimg151" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                             <Button fx:id="Playerinvbtn151" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                             <Button fx:id="Playerinvbtn151" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                              <Label fx:id="Playerinvlbl151" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                                 <font>
                                                    <Font name="System Bold" size="12.0" />
@@ -571,7 +635,7 @@
                                           <children>
                                              <ImageView fx:id="Playerinvimg161" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                             <Button fx:id="Playerinvbtn161" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                             <Button fx:id="Playerinvbtn161" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                              <Label fx:id="Playerinvlbl161" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                                 <font>
                                                    <Font name="System Bold" size="12.0" />
@@ -583,7 +647,7 @@
                                           <children>
                                              <ImageView fx:id="Playerinvimg171" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                             <Button fx:id="Playerinvbtn171" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                             <Button fx:id="Playerinvbtn171" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                              <Label fx:id="Playerinvlbl171" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                                 <font>
                                                    <Font name="System Bold" size="12.0" />
@@ -595,7 +659,7 @@
                                           <children>
                                              <ImageView fx:id="Playerinvimg181" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                             <Button fx:id="Playerinvbtn181" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                             <Button fx:id="Playerinvbtn181" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                              <Label fx:id="Playerinvlbl181" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                                 <font>
                                                    <Font name="System Bold" size="12.0" />
@@ -607,7 +671,7 @@
                                           <children>
                                              <ImageView fx:id="Playerinvimg191" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                             <Button fx:id="Playerinvbtn191" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                             <Button fx:id="Playerinvbtn191" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                              <Label fx:id="Playerinvlbl191" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                                 <font>
                                                    <Font name="System Bold" size="12.0" />
@@ -974,9 +1038,9 @@
                                     </font>
                                  </Label>
                                  <Slider fx:id="sfxVolumeSlider" layoutX="108.0" layoutY="147.0" max="1.0" min="0.0" prefHeight="25.0" prefWidth="371.0" value="1.0" />
-                                 <Button fx:id="btnsave" layoutX="368.0" layoutY="226.0" mnemonicParsing="false" onAction="#handlesave" text="Save" styleClass="invisible-button" stylesheets="@../css/style.css" />
-                                 <Button fx:id="btnload" layoutX="413.0" layoutY="226.0" mnemonicParsing="false" onAction="#handleload" text="Load" styleClass="invisible-button" stylesheets="@../css/style.css" />
-                              <Button fx:id="btnsaveandexit" layoutX="367.0" layoutY="263.0" mnemonicParsing="false" onAction="#handlesaveexitaction" text="Save &amp; Exit" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="btnsave" layoutX="368.0" layoutY="226.0" mnemonicParsing="false" onAction="#handlesave" styleClass="invisible-button" stylesheets="@../css/style.css" text="Save" />
+                                 <Button fx:id="btnload" layoutX="413.0" layoutY="226.0" mnemonicParsing="false" onAction="#handleload" styleClass="invisible-button" stylesheets="@../css/style.css" text="Load" />
+                              <Button fx:id="btnsaveandexit" layoutX="367.0" layoutY="263.0" mnemonicParsing="false" onAction="#handlesaveexitaction" styleClass="invisible-button" stylesheets="@../css/style.css" text="Save &amp; Exit" />
                               </children>
                            </Group>
                            <Button fx:id="openInventory" layoutX="117.0" layoutY="32.0" mnemonicParsing="false" onAction="#handleopenInventoryaction" opacity="0.0" prefHeight="25.0" prefWidth="89.0" styleClass="invisible-button" stylesheets="@../css/style.css" />
@@ -990,66 +1054,7 @@
                         </children>
                      </Pane>
                   </children>
-               </Group>
-               <Label fx:id="hotbarguide" layoutX="229.0" layoutY="358.0" text="press 'e' to open hotbar">
-                  <font>
-                     <Font name="System Bold" size="12.0" />
-                  </font>
-                  <effect>
-                     <DropShadow height="10.5" radius="6.9925" spread="0.67" width="19.47">
-                        <color>
-                           <Color fx:value="#ffffff" />
-                        </color>
-                     </DropShadow>
-                  </effect>
-               </Label>
-            <Group fx:id="minimapicongroup" layoutX="490.0" layoutY="17.0">
-               <children>
-                  <ImageView fx:id="miniMapIcon" fitHeight="37.0" fitWidth="34.0" layoutX="-14.0" layoutY="9.0" onMouseClicked="#handleMiniMapIconaction" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../image/tools/minimapicon.png" />
-                     </image>
-                  </ImageView>
-               </children>
-            </Group>
-            <Group fx:id="minimapgroup" visible="false">
-               <children>
-                  <Pane opacity="0.54" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: black;" />
-                  <ImageView fx:id="minimap" fitHeight="311.0" fitWidth="514.0" layoutX="45.0" layoutY="35.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../image/maps/map%20(2).png" />
-                     </image>
-                  </ImageView>
-                  <ImageView fx:id="closeminimapbtn" fitHeight="33.0" fitWidth="29.0" layoutX="565.0" layoutY="5.0" onMouseClicked="#handleCloseMiniMapAction" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../image/tools/x.png" />
-                     </image>
-                  </ImageView>
-                                   <Rectangle fx:id="left_map_nofour" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="42.0" layoutX="206.0" layoutY="63.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
-                    <Rectangle fx:id="upper_map_nofour" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="42.0" layoutX="294.0" layoutY="63.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
-                    <Rectangle fx:id="right_map_nofour" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="42.0" layoutX="382.0" layoutY="63.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
-                    <Rectangle fx:id="left_map_nothree_of_one" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="42.0" layoutX="118.0" layoutY="115.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
-                    <Rectangle fx:id="left_map_nothree" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="42.0" layoutX="206.0" layoutY="105.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
-                    <Rectangle fx:id="upper_map_nothree" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="42.0" layoutX="294.0" layoutY="105.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
-                    <Rectangle fx:id="right_map_nothree" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="42.0" layoutX="382.0" layoutY="105.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
-                    <Rectangle fx:id="right_map_nothree_of_one" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="52.0" layoutX="470.0" layoutY="105.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="69.0" />
-                    <Rectangle fx:id="left_map_notwo_of_two" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="76.0" layoutX="62.0" layoutY="145.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="56.0" />
-                    <Rectangle fx:id="left_map_notwo_of_one" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="46.0" layoutX="118.0" layoutY="157.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
-                    <Rectangle fx:id="left_map_notwo" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="60.0" layoutX="206.0" layoutY="146.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
-                    <Rectangle fx:id="upper_map_notwo" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="60.0" layoutX="294.0" layoutY="146.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
-                    <Rectangle fx:id="right_map_notwo" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="60.0" layoutX="382.0" layoutY="147.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
-                    <Rectangle fx:id="right_map_notwo_of_one" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="52.0" layoutX="470.0" layoutY="157.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="69.0" />
-                    <Rectangle fx:id="left_map_noone_of_one" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="55.0" layoutX="118.0" layoutY="203.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
-                    <Rectangle fx:id="left_map_noone" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="52.0" layoutX="206.0" layoutY="205.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
-                    <Rectangle fx:id="upper_map" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="51.0" layoutX="294.0" layoutY="205.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
-                    <Rectangle fx:id="right_map_noone" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="50.0" layoutX="382.0" layoutY="206.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
-                    <Rectangle fx:id="right_map_noone_of_one" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="52.0" layoutX="470.0" layoutY="205.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="69.0" />
-                    <Rectangle fx:id="left_map" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="60.0" layoutX="206.0" layoutY="255.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
-                    <Rectangle fx:id="home_map" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="60.0" layoutX="294.0" layoutY="255.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
-                    <Rectangle fx:id="right_map" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="60.0" layoutX="382.0" layoutY="256.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
-                     <Rectangle fx:id="home_interior" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="13.0" layoutX="314.0" layoutY="258.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="18.0" />
-</children>
-            </Group></children>
+               </Group></children>
       </Group>
          <StackPane fx:id="sleepStackPane" disable="true" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: black;" visible="false">
             <children>
@@ -1076,7 +1081,7 @@
                                  <Label fx:id="invlbl" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="invbtn" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="invbtn" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                               </children>
                            </Pane>
                            <Pane layoutX="46.0" prefHeight="32.0" prefWidth="34.0">
@@ -1084,7 +1089,7 @@
                                  <Label fx:id="invlbl1" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg1" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="invbtn1" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="invbtn1" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                               </children>
                            </Pane>
                            <Pane layoutX="91.0" prefHeight="32.0" prefWidth="34.0">
@@ -1092,7 +1097,7 @@
                                  <Label fx:id="invlbl2" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg2" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="invbtn2" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="invbtn2" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                               </children>
                            </Pane>
                            <Pane layoutX="137.0" prefHeight="32.0" prefWidth="34.0">
@@ -1100,7 +1105,7 @@
                                  <Label fx:id="invlbl3" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg3" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="invbtn3" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="invbtn3" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                               </children>
                            </Pane>
                            <Pane layoutX="183.0" prefHeight="32.0" prefWidth="34.0">
@@ -1108,7 +1113,7 @@
                                  <Label fx:id="invlbl4" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg4" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="invbtn4" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="invbtn4" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                               </children>
                            </Pane>
                            <Pane layoutX="229.0" prefHeight="32.0" prefWidth="34.0">
@@ -1116,7 +1121,7 @@
                                  <Label fx:id="invlbl5" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg5" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="invbtn5" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="invbtn5" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                               </children>
                            </Pane>
                            <Pane layoutX="1.0" layoutY="42.0" prefHeight="32.0" prefWidth="34.0">
@@ -1124,7 +1129,7 @@
                                  <Label fx:id="invlbl6" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg6" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="invbtn6" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="invbtn6" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                               </children>
                            </Pane>
                            <Pane layoutX="46.0" layoutY="42.0" prefHeight="32.0" prefWidth="34.0">
@@ -1132,7 +1137,7 @@
                                  <Label fx:id="invlbl7" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg7" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="invbtn7" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="invbtn7" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                               </children>
                            </Pane>
                            <Pane layoutX="91.0" layoutY="42.0" prefHeight="32.0" prefWidth="34.0">
@@ -1140,7 +1145,7 @@
                                  <Label fx:id="invlbl8" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg8" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="invbtn8" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="invbtn8" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                               </children>
                            </Pane>
                            <Pane layoutX="137.0" layoutY="42.0" prefHeight="32.0" prefWidth="34.0">
@@ -1148,7 +1153,7 @@
                                  <Label fx:id="invlbl9" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg9" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="invbtn9" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="invbtn9" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                               </children>
                            </Pane>
                            <Pane layoutX="183.0" layoutY="42.0" prefHeight="32.0" prefWidth="34.0">
@@ -1156,7 +1161,7 @@
                                  <Label fx:id="invlbl10" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg10" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="invbtn10" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="invbtn10" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                               </children>
                            </Pane>
                            <Pane layoutX="229.0" layoutY="42.0" prefHeight="32.0" prefWidth="34.0">
@@ -1164,7 +1169,7 @@
                                  <Label fx:id="invlbl11" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg11" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="invbtn11" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="invbtn11" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                               </children>
                            </Pane>
                            <Pane layoutX="1.0" layoutY="84.0" prefHeight="32.0" prefWidth="34.0">
@@ -1172,7 +1177,7 @@
                                  <Label fx:id="invlbl12" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg12" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="invbtn12" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="invbtn12" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                               </children>
                            </Pane>
                            <Pane layoutX="46.0" layoutY="84.0" prefHeight="32.0" prefWidth="34.0">
@@ -1180,7 +1185,7 @@
                                  <Label fx:id="invlbl13" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg13" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="invbtn13" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="invbtn13" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                               </children>
                            </Pane>
                            <Pane layoutX="91.0" layoutY="84.0" prefHeight="32.0" prefWidth="34.0">
@@ -1188,7 +1193,7 @@
                                  <Label fx:id="invlbl14" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg14" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="invbtn14" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="invbtn14" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                               </children>
                            </Pane>
                            <Pane layoutX="137.0" layoutY="84.0" prefHeight="32.0" prefWidth="34.0">
@@ -1196,7 +1201,7 @@
                                  <Label fx:id="invlbl15" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg15" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="invbtn15" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="invbtn15" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                               </children>
                            </Pane>
                            <Pane layoutX="183.0" layoutY="84.0" prefHeight="32.0" prefWidth="34.0">
@@ -1204,7 +1209,7 @@
                                  <Label fx:id="invlbl16" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg16" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="invbtn16" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="invbtn16" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                               </children>
                            </Pane>
                            <Pane layoutX="229.0" layoutY="84.0" prefHeight="32.0" prefWidth="34.0">
@@ -1212,7 +1217,7 @@
                                  <Label fx:id="invlbl17" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg17" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="invbtn17" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="invbtn17" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                               </children>
                            </Pane>
                            <Pane layoutX="1.0" layoutY="127.0" prefHeight="32.0" prefWidth="34.0">
@@ -1220,7 +1225,7 @@
                                  <Label fx:id="invlbl18" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg18" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="invbtn18" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="invbtn18" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                               </children>
                            </Pane>
                            <Pane layoutX="46.0" layoutY="127.0" prefHeight="32.0" prefWidth="34.0">
@@ -1228,7 +1233,7 @@
                                  <Label fx:id="invlbl19" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg19" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="invbtn19" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="invbtn19" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                               </children>
                            </Pane>
                            <Pane layoutX="91.0" layoutY="127.0" prefHeight="32.0" prefWidth="34.0">
@@ -1236,7 +1241,7 @@
                                  <Label fx:id="invlbl20" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg20" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="invbtn20" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="invbtn20" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                               </children>
                            </Pane>
                            <Pane layoutX="137.0" layoutY="127.0" prefHeight="32.0" prefWidth="34.0">
@@ -1244,7 +1249,7 @@
                                  <Label fx:id="invlbl21" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg21" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="invbtn21" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="invbtn21" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                               </children>
                            </Pane>
                            <Pane layoutX="183.0" layoutY="127.0" prefHeight="32.0" prefWidth="34.0">
@@ -1252,7 +1257,7 @@
                                  <Label fx:id="invlbl22" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg22" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="invbtn22" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="invbtn22" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                               </children>
                            </Pane>
                            <Pane layoutX="229.0" layoutY="127.0" prefHeight="32.0" prefWidth="34.0">
@@ -1260,7 +1265,7 @@
                                  <Label fx:id="invlbl23" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg23" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="invbtn23" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="invbtn23" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                               </children>
                            </Pane>
                            <Pane layoutX="1.0" layoutY="168.0" prefHeight="32.0" prefWidth="34.0">
@@ -1268,7 +1273,7 @@
                                  <Label fx:id="invlbl24" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg24" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="invbtn24" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="invbtn24" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                               </children>
                            </Pane>
                            <Pane layoutX="46.0" layoutY="168.0" prefHeight="32.0" prefWidth="34.0">
@@ -1276,7 +1281,7 @@
                                  <Label fx:id="invlbl25" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg25" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="invbtn25" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="invbtn25" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                               </children>
                            </Pane>
                            <Pane layoutX="91.0" layoutY="168.0" prefHeight="32.0" prefWidth="34.0">
@@ -1284,7 +1289,7 @@
                                  <Label fx:id="invlbl26" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg26" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="invbtn26" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="invbtn26" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                               </children>
                            </Pane>
                            <Pane layoutX="137.0" layoutY="168.0" prefHeight="32.0" prefWidth="34.0">
@@ -1292,7 +1297,7 @@
                                  <Label fx:id="invlbl27" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg27" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="invbtn27" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="invbtn27" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                               </children>
                            </Pane>
                            <Pane layoutX="183.0" layoutY="168.0" prefHeight="32.0" prefWidth="34.0">
@@ -1300,7 +1305,7 @@
                                  <Label fx:id="invlbl28" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg28" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="invbtn28" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="invbtn28" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                               </children>
                            </Pane>
                            <Pane layoutX="229.0" layoutY="168.0" prefHeight="32.0" prefWidth="34.0">
@@ -1308,7 +1313,7 @@
                                  <Label fx:id="invlbl29" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg29" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="invbtn29" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="invbtn29" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                               </children>
                            </Pane>
                            <Pane layoutX="1.0" layoutY="210.0" prefHeight="32.0" prefWidth="34.0">
@@ -1316,7 +1321,7 @@
                                  <Label fx:id="invlbl30" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg30" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="invbtn30" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="invbtn30" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                               </children>
                            </Pane>
                            <Pane layoutX="46.0" layoutY="210.0" prefHeight="32.0" prefWidth="34.0">
@@ -1324,7 +1329,7 @@
                                  <Label fx:id="invlbl31" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg31" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="invbtn31" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="invbtn31" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                               </children>
                            </Pane>
                            <Pane layoutX="91.0" layoutY="210.0" prefHeight="32.0" prefWidth="34.0">
@@ -1332,7 +1337,7 @@
                                  <Label fx:id="invlbl32" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg32" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="invbtn32" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="invbtn32" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                               </children>
                            </Pane>
                            <Pane layoutX="137.0" layoutY="210.0" prefHeight="32.0" prefWidth="34.0">
@@ -1340,7 +1345,7 @@
                                  <Label fx:id="invlbl33" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg33" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="invbtn33" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="invbtn33" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                               </children>
                            </Pane>
                            <Pane layoutX="183.0" layoutY="210.0" prefHeight="32.0" prefWidth="34.0">
@@ -1348,7 +1353,7 @@
                                  <Label fx:id="invlbl34" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg34" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="invbtn34" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="invbtn34" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                               </children>
                            </Pane>
                            <Pane layoutX="229.0" layoutY="210.0" prefHeight="32.0" prefWidth="34.0">
@@ -1356,7 +1361,7 @@
                                  <Label fx:id="invlbl35" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg35" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="invbtn35" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="invbtn35" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                               </children>
                            </Pane>
                            <Pane layoutX="1.0" layoutY="251.0" prefHeight="32.0" prefWidth="34.0">
@@ -1364,7 +1369,7 @@
                                  <Label fx:id="invlbl36" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg36" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="invbtn36" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="invbtn36" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                               </children>
                            </Pane>
                            <Pane layoutX="46.0" layoutY="251.0" prefHeight="32.0" prefWidth="34.0">
@@ -1372,7 +1377,7 @@
                                  <Label fx:id="invlbl37" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg37" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="invbtn37" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="invbtn37" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                               </children>
                            </Pane>
                            <Pane layoutX="91.0" layoutY="251.0" prefHeight="32.0" prefWidth="34.0">
@@ -1380,7 +1385,7 @@
                                  <Label fx:id="invlbl38" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg38" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="invbtn38" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="invbtn38" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                               </children>
                            </Pane>
                            <Pane layoutX="137.0" layoutY="251.0" prefHeight="32.0" prefWidth="34.0">
@@ -1388,7 +1393,7 @@
                                  <Label fx:id="invlbl39" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg39" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="invbtn39" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="invbtn39" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                               </children>
                            </Pane>
                            <Pane layoutX="183.0" layoutY="251.0" prefHeight="32.0" prefWidth="34.0">
@@ -1396,7 +1401,7 @@
                                  <Label fx:id="invlbl40" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg40" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="invbtn40" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="invbtn40" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                               </children>
                            </Pane>
                            <Pane layoutX="229.0" layoutY="251.0" prefHeight="32.0" prefWidth="34.0">
@@ -1404,7 +1409,7 @@
                                  <Label fx:id="invlbl41" layoutX="19.0" layoutY="22.0" prefHeight="17.0" prefWidth="20.0" text="x0" textFill="WHITE" />
                                  <ImageView fx:id="inyimg41" fitHeight="55.0" fitWidth="34.0" layoutX="-1.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="invbtn41" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="invbtn41" mnemonicParsing="false" opacity="0.0" prefHeight="35.0" prefWidth="34.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                               </children>
                            </Pane>
                         </children>
@@ -1415,7 +1420,7 @@
                               <children>
                                  <ImageView fx:id="Playerinvimg" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="Playerinvbtn" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="Playerinvbtn" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                  <Label fx:id="Playerinvlbl" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                     <font>
                                        <Font name="System Bold" size="12.0" />
@@ -1427,7 +1432,7 @@
                               <children>
                                  <ImageView fx:id="Playerinvimg1" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="Playerinvbtn1" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="Playerinvbtn1" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                  <Label fx:id="Playerinvlbl1" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                     <font>
                                        <Font name="System Bold" size="12.0" />
@@ -1439,7 +1444,7 @@
                               <children>
                                  <ImageView fx:id="Playerinvimg2" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="Playerinvbtn2" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="Playerinvbtn2" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                  <Label fx:id="Playerinvlbl2" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                     <font>
                                        <Font name="System Bold" size="12.0" />
@@ -1451,7 +1456,7 @@
                               <children>
                                  <ImageView fx:id="Playerinvimg3" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="Playerinvbtn3" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="Playerinvbtn3" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                  <Label fx:id="Playerinvlbl3" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                     <font>
                                        <Font name="System Bold" size="12.0" />
@@ -1463,7 +1468,7 @@
                               <children>
                                  <ImageView fx:id="Playerinvimg4" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="Playerinvbtn4" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="Playerinvbtn4" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                  <Label fx:id="Playerinvlbl4" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                     <font>
                                        <Font name="System Bold" size="12.0" />
@@ -1475,7 +1480,7 @@
                               <children>
                                  <ImageView fx:id="Playerinvimg5" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="Playerinvbtn5" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="Playerinvbtn5" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                  <Label fx:id="Playerinvlbl5" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                     <font>
                                        <Font name="System Bold" size="12.0" />
@@ -1487,7 +1492,7 @@
                               <children>
                                  <ImageView fx:id="Playerinvimg6" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="Playerinvbtn6" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="Playerinvbtn6" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                  <Label fx:id="Playerinvlbl6" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                     <font>
                                        <Font name="System Bold" size="12.0" />
@@ -1499,7 +1504,7 @@
                               <children>
                                  <ImageView fx:id="Playerinvimg7" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="Playerinvbtn7" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="Playerinvbtn7" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                  <Label fx:id="Playerinvlbl7" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                     <font>
                                        <Font name="System Bold" size="12.0" />
@@ -1511,7 +1516,7 @@
                               <children>
                                  <ImageView fx:id="Playerinvimg8" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="Playerinvbtn8" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="Playerinvbtn8" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                  <Label fx:id="Playerinvlbl8" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                     <font>
                                        <Font name="System Bold" size="12.0" />
@@ -1523,7 +1528,7 @@
                               <children>
                                  <ImageView fx:id="Playerinvimg9" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="Playerinvbtn9" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="Playerinvbtn9" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                  <Label fx:id="Playerinvlbl9" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                     <font>
                                        <Font name="System Bold" size="12.0" />
@@ -1535,7 +1540,7 @@
                               <children>
                                  <ImageView fx:id="Playerinvimg10" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="Playerinvbtn10" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="Playerinvbtn10" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                  <Label fx:id="Playerinvlbl10" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                     <font>
                                        <Font name="System Bold" size="12.0" />
@@ -1547,7 +1552,7 @@
                               <children>
                                  <ImageView fx:id="Playerinvimg11" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="Playerinvbtn11" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="Playerinvbtn11" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                  <Label fx:id="Playerinvlbl11" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                     <font>
                                        <Font name="System Bold" size="12.0" />
@@ -1559,7 +1564,7 @@
                               <children>
                                  <ImageView fx:id="Playerinvimg12" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="Playerinvbtn12" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="Playerinvbtn12" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                  <Label fx:id="Playerinvlbl12" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                     <font>
                                        <Font name="System Bold" size="12.0" />
@@ -1571,7 +1576,7 @@
                               <children>
                                  <ImageView fx:id="Playerinvimg13" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="Playerinvbtn13" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="Playerinvbtn13" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                  <Label fx:id="Playerinvlbl13" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                     <font>
                                        <Font name="System Bold" size="12.0" />
@@ -1583,7 +1588,7 @@
                               <children>
                                  <ImageView fx:id="Playerinvimg14" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="Playerinvbtn14" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="Playerinvbtn14" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                  <Label fx:id="Playerinvlbl14" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                     <font>
                                        <Font name="System Bold" size="12.0" />
@@ -1595,7 +1600,7 @@
                               <children>
                                  <ImageView fx:id="Playerinvimg15" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="Playerinvbtn15" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="Playerinvbtn15" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                  <Label fx:id="Playerinvlbl15" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                     <font>
                                        <Font name="System Bold" size="12.0" />
@@ -1607,7 +1612,7 @@
                               <children>
                                  <ImageView fx:id="Playerinvimg16" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="Playerinvbtn16" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="Playerinvbtn16" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                  <Label fx:id="Playerinvlbl16" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                     <font>
                                        <Font name="System Bold" size="12.0" />
@@ -1619,7 +1624,7 @@
                               <children>
                                  <ImageView fx:id="Playerinvimg17" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="Playerinvbtn17" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="Playerinvbtn17" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                  <Label fx:id="Playerinvlbl17" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                     <font>
                                        <Font name="System Bold" size="12.0" />
@@ -1631,7 +1636,7 @@
                               <children>
                                  <ImageView fx:id="Playerinvimg18" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="Playerinvbtn18" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="Playerinvbtn18" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                  <Label fx:id="Playerinvlbl18" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                     <font>
                                        <Font name="System Bold" size="12.0" />
@@ -1643,7 +1648,7 @@
                               <children>
                                  <ImageView fx:id="Playerinvimg19" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                 <Button fx:id="Playerinvbtn19" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                 <Button fx:id="Playerinvbtn19" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                  <Label fx:id="Playerinvlbl19" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                     <font>
                                        <Font name="System Bold" size="12.0" />
@@ -1668,15 +1673,15 @@
                            <Image url="@../image/Back.png" />
                         </image>
                      </ImageView>
+                     <Button fx:id="btntuto" layoutX="532.0" layoutY="59.0" mnemonicParsing="false" onAction="#handlebtntutoaction" prefHeight="28.0" prefWidth="28.0" style="-fx-background-radius: 100%; -fx-background-color: transparent; -fx-border-color: yellow; -fx-border-radius: 100%; -fx-border-width: 1; -fx-padding: 0;" styleClass="invisible-button" stylesheets="@../css/style.css" textFill="#e6ff00">
+                        <graphic>
+                           <FontAwesomeIcon fill="#f6ff00" glyphName="QUESTION" selectionFill="YELLOW" size="1.5em" text="" />
+                        </graphic>
+                     </Button>
                   </children>
                </Pane>
             </children>
          </StackPane>
-         <Button prefWidth="28.0" prefHeight="28.0" fx:id="btntuto" layoutX="522.0" layoutY="29.0" mnemonicParsing="false" onAction="#handlebtntutoaction" style="-fx-background-radius: 100%; -fx-background-color: transparent; -fx-border-color: yellow; -fx-border-radius: 100%; -fx-border-width: 1; -fx-padding: 0;" textFill="#e6ff00" styleClass="invisible-button" stylesheets="@../css/style.css">
-            <graphic>
-               <FontAwesomeIcon fill="#f6ff00" glyphName="QUESTION" selectionFill="YELLOW" size="1.5em" />
-            </graphic>
-         </Button>
       </Group>
       <StackPane fx:id="tutorialOverlay" managed="false" onMouseClicked="#handleTutorialOverlayClick" pickOnBounds="true" visible="false">
          <children>
