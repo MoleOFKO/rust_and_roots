@@ -260,6 +260,8 @@ public class D_undermap_rightController extends BaseMapController {
     private Rectangle lava_slime_hitbox_right;
     @FXML
     private Rectangle lava_slime_detect;
+    @FXML
+    private Rectangle wall8;
 
     @Override
     protected String dayBackgroundPath() {

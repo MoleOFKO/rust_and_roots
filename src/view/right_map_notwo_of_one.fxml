@@ -28,7 +28,7 @@
                   <Image url="@../image/maps/rightmap_no.2(1).png" />
                </image>
             </ImageView>
-            <Group fx:id="tree" layoutX="230.0" layoutY="-176.0">
+            <Group fx:id="tree">
                <children>
                   <ImageView fx:id="tree_img" fitHeight="126.0" fitWidth="107.0" layoutX="262.0" layoutY="176.0" pickOnBounds="true" preserveRatio="false" smooth="false">
                      <image>
@@ -39,7 +39,7 @@
                   <ImageView fx:id="drops_img_tree" fitHeight="28.0" fitWidth="28.0" layoutX="303.0" layoutY="267.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
                </children>
             </Group>
-            <Group fx:id="tree1">
+            <Group fx:id="tree1" layoutX="74.0" layoutY="-161.0">
                <children>
                   <ImageView fx:id="tree_img1" fitHeight="126.0" fitWidth="107.0" layoutX="262.0" layoutY="176.0" pickOnBounds="true" preserveRatio="false" smooth="false">
                      <image>
@@ -50,7 +50,7 @@
                   <ImageView fx:id="drops_img_tree1" fitHeight="28.0" fitWidth="28.0" layoutX="303.0" layoutY="267.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
                </children>
             </Group>
-            <Group fx:id="tree2" layoutX="74.0" layoutY="-161.0">
+            <Group fx:id="tree2" layoutX="192.0" layoutY="66.0">
                <children>
                   <ImageView fx:id="tree_img2" fitHeight="126.0" fitWidth="107.0" layoutX="262.0" layoutY="176.0" pickOnBounds="true" preserveRatio="false" smooth="false">
                      <image>
@@ -61,7 +61,7 @@
                   <ImageView fx:id="drops_img_tree2" fitHeight="28.0" fitWidth="28.0" layoutX="303.0" layoutY="267.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
                </children>
             </Group>
-            <Group fx:id="tree3" layoutX="192.0" layoutY="66.0">
+            <Group fx:id="tree3" layoutX="-82.0" layoutY="-156.0">
                <children>
                   <ImageView fx:id="tree_img3" fitHeight="126.0" fitWidth="107.0" layoutX="262.0" layoutY="176.0" pickOnBounds="true" preserveRatio="false" smooth="false">
                      <image>
@@ -72,7 +72,7 @@
                   <ImageView fx:id="drops_img_tree3" fitHeight="28.0" fitWidth="28.0" layoutX="303.0" layoutY="267.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
                </children>
             </Group>
-            <Group fx:id="tree4" layoutX="-82.0" layoutY="-156.0">
+            <Group fx:id="tree4" layoutX="-262.0" layoutY="97.0">
                <children>
                   <ImageView fx:id="tree_img4" fitHeight="126.0" fitWidth="107.0" layoutX="262.0" layoutY="176.0" pickOnBounds="true" preserveRatio="false" smooth="false">
                      <image>
@@ -83,7 +83,7 @@
                   <ImageView fx:id="drops_img_tree4" fitHeight="28.0" fitWidth="28.0" layoutX="303.0" layoutY="267.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
                </children>
             </Group>
-            <Group fx:id="tree5" layoutX="-262.0" layoutY="97.0">
+            <Group fx:id="tree5" layoutX="-131.0" layoutY="-21.0">
                <children>
                   <ImageView fx:id="tree_img5" fitHeight="126.0" fitWidth="107.0" layoutX="262.0" layoutY="176.0" pickOnBounds="true" preserveRatio="false" smooth="false">
                      <image>
@@ -94,17 +94,6 @@
                   <ImageView fx:id="drops_img_tree5" fitHeight="28.0" fitWidth="28.0" layoutX="303.0" layoutY="267.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
                </children>
             </Group>
-            <Group fx:id="tree6" layoutX="-131.0" layoutY="-21.0">
-               <children>
-                  <ImageView fx:id="tree_img6" fitHeight="126.0" fitWidth="107.0" layoutX="262.0" layoutY="176.0" pickOnBounds="true" preserveRatio="false" smooth="false">
-                     <image>
-                        <Image url="@../image/items/yellow_tree1.png" />
-                     </image>
-                  </ImageView>
-                  <Rectangle fx:id="tree_hitbox6" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="22.0" layoutX="278.0" layoutY="246.0" stroke="RED" strokeType="INSIDE" translateX="24" translateY="28" width="26.0" />
-                  <ImageView fx:id="drops_img_tree6" fitHeight="28.0" fitWidth="28.0" layoutX="303.0" layoutY="267.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
-               </children>
-            </Group>
             <Group fx:id="human">
                <children>
                   <ImageView fx:id="human_img" fitHeight="64" fitWidth="64" layoutX="284.0" layoutY="78.0" />
@@ -112,39 +101,68 @@
                   <Rectangle fx:id="human_hitbox" arcHeight="6" arcWidth="6" fill="TRANSPARENT" height="24" layoutX="299.0" layoutY="96.0" width="28" />
                </children>
             </Group>
-            <Group fx:id="treelayorgp6" layoutX="131.0" layoutY="155.0">
+            <Group fx:id="orc" layoutX="165.0" layoutY="26.0">
                <children>
-                  <ImageView fx:id="treelayorimg6" fitHeight="126.0" fitWidth="107.0" pickOnBounds="true" preserveRatio="true" />
+                  <Rectangle fx:id="orc_hitbox" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="262.0" layoutY="171.0" stroke="RED" strokeType="INSIDE" translateX="24" translateY="28" width="14.0" />
+                  <ImageView fx:id="orc_img" fitHeight="64" fitWidth="64" layoutX="262.0" layoutY="176.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
+                  <ImageView fx:id="orc_drops_img" fitHeight="64" fitWidth="64" layoutX="262.0" layoutY="176.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
+                  <Rectangle fx:id="orc_hitbox_left" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="272.0" layoutY="200.0" stroke="RED" strokeType="INSIDE" width="14.0" />
+                  <Rectangle fx:id="orc_hitbox_up" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="286.0" layoutY="181.0" stroke="RED" strokeType="INSIDE" width="14.0" />
+                  <Rectangle fx:id="orc_hitbox_down" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="286.0" layoutY="218.0" stroke="RED" strokeType="INSIDE" width="14.0" />
+                  <Rectangle fx:id="orc_hitbox_right" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="299.0" layoutY="199.0" stroke="RED" strokeType="INSIDE" width="14.0" />
+                  <Rectangle fx:id="orc_detect" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="137.0" layoutX="225.0" layoutY="141.0" stroke="RED" strokeType="INSIDE" width="137.0" />
                </children>
             </Group>
-            <Group fx:id="treelayorgp5" layoutY="273.0">
+            <Group fx:id="orc1" layoutX="176.0" layoutY="-141.0">
+               <children>
+                  <Rectangle fx:id="orc1_hitbox" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="262.0" layoutY="171.0" stroke="RED" strokeType="INSIDE" translateX="24" translateY="28" width="14.0" />
+                  <ImageView fx:id="orc1_img" fitHeight="64" fitWidth="64" layoutX="262.0" layoutY="176.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
+                  <ImageView fx:id="orc1_drops_img" fitHeight="64" fitWidth="64" layoutX="262.0" layoutY="176.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
+                  <Rectangle fx:id="orc1_hitbox_left" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="272.0" layoutY="200.0" stroke="RED" strokeType="INSIDE" width="14.0" />
+                  <Rectangle fx:id="orc1_hitbox_up" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="286.0" layoutY="181.0" stroke="RED" strokeType="INSIDE" width="14.0" />
+                  <Rectangle fx:id="orc1_hitbox_down" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="286.0" layoutY="218.0" stroke="RED" strokeType="INSIDE" width="14.0" />
+                  <Rectangle fx:id="orc1_hitbox_right" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="299.0" layoutY="199.0" stroke="RED" strokeType="INSIDE" width="14.0" />
+                  <Rectangle fx:id="orc1_detect" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="137.0" layoutX="225.0" layoutY="141.0" stroke="RED" strokeType="INSIDE" width="137.0" />
+               </children>
+            </Group>
+            <Group fx:id="treelayorgp5" layoutX="131.0" layoutY="155.0">
                <children>
                   <ImageView fx:id="treelayorimg5" fitHeight="126.0" fitWidth="107.0" pickOnBounds="true" preserveRatio="true" />
                </children>
             </Group>
-            <Group fx:id="treelayorgp4" layoutX="180.0" layoutY="20.0">
+            <Group fx:id="treelayorgp4" layoutY="273.0">
                <children>
                   <ImageView fx:id="treelayorimg4" fitHeight="126.0" fitWidth="107.0" pickOnBounds="true" preserveRatio="true" />
                </children>
             </Group>
-            <Group fx:id="treelayorgp3" layoutX="454.0" layoutY="242.0">
+            <Group fx:id="treelayorgp3" layoutX="180.0" layoutY="20.0">
                <children>
                   <ImageView fx:id="treelayorimg3" fitHeight="126.0" fitWidth="107.0" pickOnBounds="true" preserveRatio="true" />
                </children>
             </Group>
-            <Group fx:id="treelayorgp2" layoutX="336.0" layoutY="15.0">
+            <Group fx:id="treelayorgp2" layoutX="454.0" layoutY="242.0">
                <children>
                   <ImageView fx:id="treelayorimg2" fitHeight="126.0" fitWidth="107.0" pickOnBounds="true" preserveRatio="true" />
                </children>
             </Group>
-            <Group fx:id="treelayorgp1" layoutX="262.0" layoutY="176.0">
+            <Group fx:id="treelayorgp1" layoutX="336.0" layoutY="15.0">
                <children>
                   <ImageView fx:id="treelayorimg1" fitHeight="126.0" fitWidth="107.0" pickOnBounds="true" preserveRatio="true" />
                </children>
             </Group>
-            <Group fx:id="treelayorgp" layoutX="492.0">
+            <Group fx:id="treelayorgp" layoutX="262.0" layoutY="176.0">
                <children>
                   <ImageView fx:id="treelayorimg" fitHeight="126.0" fitWidth="107.0" pickOnBounds="true" preserveRatio="true" />
+               </children>
+            </Group>
+            <Group fx:id="fallen_tree" layoutX="271.0" layoutY="-108.0">
+               <children>
+                  <ImageView fx:id="fallen_tree_img" fitHeight="140.0" fitWidth="43.0" layoutX="286.0" layoutY="176.0" pickOnBounds="true" preserveRatio="false" smooth="false">
+                     <image>
+                        <Image url="@../image/maps/Fallen_Tree.png" />
+                     </image>
+                  </ImageView>
+                  <Rectangle fx:id="fallen_tree_wall" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="127.0" layoutX="269.0" layoutY="152.0" stroke="RED" strokeType="INSIDE" translateX="24" translateY="28" width="35.0" />
                </children>
             </Group>
             <Group>
@@ -266,11 +284,57 @@
                   <ImageView fx:id="drops_img_stone2" fitHeight="28.0" fitWidth="28.0" layoutX="303.0" layoutY="267.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
                </children>
             </Group>
-            <Button prefWidth="28.0" prefHeight="28.0" fx:id="btntuto" layoutX="572.0" mnemonicParsing="false" onAction="#handlebtntutoaction" style="-fx-background-radius: 100%; -fx-background-color: transparent; -fx-border-color: yellow; -fx-border-radius: 100%; -fx-border-width: 1; -fx-padding: 0;" textFill="#e6ff00" styleClass="invisible-button" stylesheets="@../css/style.css">
+            <Button fx:id="btntuto" layoutX="572.0" mnemonicParsing="false" onAction="#handlebtntutoaction" style="-fx-background-radius: 100%; -fx-background-color: transparent; -fx-border-color: yellow; -fx-border-radius: 100%;" styleClass="invisible-button" stylesheets="@../css/style.css" textFill="#e6ff00">
                <graphic>
                   <FontAwesomeIcon fill="#f6ff00" glyphName="QUESTION" size="1.5em" />
                </graphic>
             </Button>
+            <Group fx:id="minimapicongroup" layoutX="540.0" layoutY="-10.0">
+               <children>
+                  <ImageView fx:id="miniMapIcon" fitHeight="37.0" fitWidth="34.0" layoutX="-14.0" layoutY="9.0" onMouseClicked="#handleMiniMapIconaction" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../image/tools/minimapicon.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </Group>
+            <Group fx:id="minimapgroup" visible="false">
+               <children>
+                  <Pane opacity="0.54" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: black;" />
+                  <ImageView fx:id="minimap" fitHeight="311.0" fitWidth="514.0" layoutX="45.0" layoutY="35.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../image/maps/map%20(2).png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="closeminimapbtn" fitHeight="33.0" fitWidth="29.0" layoutX="565.0" layoutY="5.0" onMouseClicked="#handleCloseMiniMapAction" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../image/tools/x.png" />
+                     </image>
+                  </ImageView>
+                                   <Rectangle fx:id="left_map_nofour" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="42.0" layoutX="206.0" layoutY="63.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
+                    <Rectangle fx:id="upper_map_nofour" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="42.0" layoutX="294.0" layoutY="63.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
+                    <Rectangle fx:id="right_map_nofour" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="42.0" layoutX="382.0" layoutY="63.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
+                    <Rectangle fx:id="left_map_nothree_of_one" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="42.0" layoutX="118.0" layoutY="115.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
+                    <Rectangle fx:id="left_map_nothree" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="42.0" layoutX="206.0" layoutY="105.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
+                    <Rectangle fx:id="upper_map_nothree" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="42.0" layoutX="294.0" layoutY="105.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
+                    <Rectangle fx:id="right_map_nothree" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="42.0" layoutX="382.0" layoutY="105.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
+                    <Rectangle fx:id="right_map_nothree_of_one" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="52.0" layoutX="470.0" layoutY="105.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="69.0" />
+                    <Rectangle fx:id="left_map_notwo_of_two" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="76.0" layoutX="62.0" layoutY="145.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="56.0" />
+                    <Rectangle fx:id="left_map_notwo_of_one" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="46.0" layoutX="118.0" layoutY="157.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
+                    <Rectangle fx:id="left_map_notwo" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="60.0" layoutX="206.0" layoutY="146.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
+                    <Rectangle fx:id="upper_map_notwo" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="60.0" layoutX="294.0" layoutY="146.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
+                    <Rectangle fx:id="right_map_notwo" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="60.0" layoutX="382.0" layoutY="147.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
+                    <Rectangle fx:id="right_map_notwo_of_one" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="52.0" layoutX="470.0" layoutY="157.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="69.0" />
+                    <Rectangle fx:id="left_map_noone_of_one" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="55.0" layoutX="118.0" layoutY="203.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
+                    <Rectangle fx:id="left_map_noone" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="52.0" layoutX="206.0" layoutY="205.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
+                    <Rectangle fx:id="upper_map" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="51.0" layoutX="294.0" layoutY="205.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
+                    <Rectangle fx:id="right_map_noone" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="50.0" layoutX="382.0" layoutY="206.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
+                    <Rectangle fx:id="right_map_noone_of_one" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="52.0" layoutX="470.0" layoutY="205.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="69.0" />
+                    <Rectangle fx:id="left_map" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="60.0" layoutX="206.0" layoutY="255.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
+                    <Rectangle fx:id="home_map" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="60.0" layoutX="294.0" layoutY="255.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
+                    <Rectangle fx:id="right_map" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="60.0" layoutX="382.0" layoutY="256.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
+</children>
+            </Group>
             <Group layoutX="10.0" layoutY="2.0">
                <children>
                   <HBox fx:id="hotbar" alignment="CENTER" layoutX="148.0" layoutY="349.0" opacity="0.81" prefHeight="47.0" prefWidth="294.0" styleClass="hbox" stylesheets="@../css/style.css">
@@ -403,7 +467,7 @@
                                        <children>
                                           <ImageView fx:id="Playerinvimg" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                          <Button fx:id="Playerinvbtn" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                          <Button fx:id="Playerinvbtn" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                           <Label fx:id="Playerinvlbl" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                              <font>
                                                 <Font name="System Bold" size="12.0" />
@@ -415,7 +479,7 @@
                                        <children>
                                           <ImageView fx:id="Playerinvimg1" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                          <Button fx:id="Playerinvbtn1" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                          <Button fx:id="Playerinvbtn1" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                           <Label fx:id="Playerinvlbl1" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                              <font>
                                                 <Font name="System Bold" size="12.0" />
@@ -427,7 +491,7 @@
                                        <children>
                                           <ImageView fx:id="Playerinvimg2" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                          <Button fx:id="Playerinvbtn2" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                          <Button fx:id="Playerinvbtn2" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                           <Label fx:id="Playerinvlbl2" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                              <font>
                                                 <Font name="System Bold" size="12.0" />
@@ -439,7 +503,7 @@
                                        <children>
                                           <ImageView fx:id="Playerinvimg3" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                          <Button fx:id="Playerinvbtn3" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                          <Button fx:id="Playerinvbtn3" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                           <Label fx:id="Playerinvlbl3" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                              <font>
                                                 <Font name="System Bold" size="12.0" />
@@ -451,7 +515,7 @@
                                        <children>
                                           <ImageView fx:id="Playerinvimg4" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                          <Button fx:id="Playerinvbtn4" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                          <Button fx:id="Playerinvbtn4" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                           <Label fx:id="Playerinvlbl4" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                              <font>
                                                 <Font name="System Bold" size="12.0" />
@@ -463,7 +527,7 @@
                                        <children>
                                           <ImageView fx:id="Playerinvimg5" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                          <Button fx:id="Playerinvbtn5" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                          <Button fx:id="Playerinvbtn5" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                           <Label fx:id="Playerinvlbl5" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                              <font>
                                                 <Font name="System Bold" size="12.0" />
@@ -475,7 +539,7 @@
                                        <children>
                                           <ImageView fx:id="Playerinvimg6" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                          <Button fx:id="Playerinvbtn6" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                          <Button fx:id="Playerinvbtn6" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                           <Label fx:id="Playerinvlbl6" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                              <font>
                                                 <Font name="System Bold" size="12.0" />
@@ -487,7 +551,7 @@
                                        <children>
                                           <ImageView fx:id="Playerinvimg7" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                          <Button fx:id="Playerinvbtn7" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                          <Button fx:id="Playerinvbtn7" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                           <Label fx:id="Playerinvlbl7" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                              <font>
                                                 <Font name="System Bold" size="12.0" />
@@ -499,7 +563,7 @@
                                        <children>
                                           <ImageView fx:id="Playerinvimg8" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                          <Button fx:id="Playerinvbtn8" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                          <Button fx:id="Playerinvbtn8" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                           <Label fx:id="Playerinvlbl8" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                              <font>
                                                 <Font name="System Bold" size="12.0" />
@@ -511,7 +575,7 @@
                                        <children>
                                           <ImageView fx:id="Playerinvimg9" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                          <Button fx:id="Playerinvbtn9" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                          <Button fx:id="Playerinvbtn9" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                           <Label fx:id="Playerinvlbl9" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                              <font>
                                                 <Font name="System Bold" size="12.0" />
@@ -523,7 +587,7 @@
                                        <children>
                                           <ImageView fx:id="Playerinvimg10" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                          <Button fx:id="Playerinvbtn10" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                          <Button fx:id="Playerinvbtn10" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                           <Label fx:id="Playerinvlbl10" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                              <font>
                                                 <Font name="System Bold" size="12.0" />
@@ -535,7 +599,7 @@
                                        <children>
                                           <ImageView fx:id="Playerinvimg11" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                          <Button fx:id="Playerinvbtn11" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                          <Button fx:id="Playerinvbtn11" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                           <Label fx:id="Playerinvlbl11" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                              <font>
                                                 <Font name="System Bold" size="12.0" />
@@ -547,7 +611,7 @@
                                        <children>
                                           <ImageView fx:id="Playerinvimg12" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                          <Button fx:id="Playerinvbtn12" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                          <Button fx:id="Playerinvbtn12" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                           <Label fx:id="Playerinvlbl12" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                              <font>
                                                 <Font name="System Bold" size="12.0" />
@@ -559,7 +623,7 @@
                                        <children>
                                           <ImageView fx:id="Playerinvimg13" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                          <Button fx:id="Playerinvbtn13" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                          <Button fx:id="Playerinvbtn13" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                           <Label fx:id="Playerinvlbl13" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                              <font>
                                                 <Font name="System Bold" size="12.0" />
@@ -571,7 +635,7 @@
                                        <children>
                                           <ImageView fx:id="Playerinvimg14" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                          <Button fx:id="Playerinvbtn14" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                          <Button fx:id="Playerinvbtn14" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                           <Label fx:id="Playerinvlbl14" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                              <font>
                                                 <Font name="System Bold" size="12.0" />
@@ -583,7 +647,7 @@
                                        <children>
                                           <ImageView fx:id="Playerinvimg15" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                          <Button fx:id="Playerinvbtn15" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                          <Button fx:id="Playerinvbtn15" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                           <Label fx:id="Playerinvlbl15" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                              <font>
                                                 <Font name="System Bold" size="12.0" />
@@ -595,7 +659,7 @@
                                        <children>
                                           <ImageView fx:id="Playerinvimg16" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                          <Button fx:id="Playerinvbtn16" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                          <Button fx:id="Playerinvbtn16" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                           <Label fx:id="Playerinvlbl16" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                              <font>
                                                 <Font name="System Bold" size="12.0" />
@@ -607,7 +671,7 @@
                                        <children>
                                           <ImageView fx:id="Playerinvimg17" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                          <Button fx:id="Playerinvbtn17" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                          <Button fx:id="Playerinvbtn17" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                           <Label fx:id="Playerinvlbl17" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                              <font>
                                                 <Font name="System Bold" size="12.0" />
@@ -619,7 +683,7 @@
                                        <children>
                                           <ImageView fx:id="Playerinvimg18" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                          <Button fx:id="Playerinvbtn18" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                          <Button fx:id="Playerinvbtn18" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                           <Label fx:id="Playerinvlbl18" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                              <font>
                                                 <Font name="System Bold" size="12.0" />
@@ -631,7 +695,7 @@
                                        <children>
                                           <ImageView fx:id="Playerinvimg19" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                                          <Button fx:id="Playerinvbtn19" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                                          <Button fx:id="Playerinvbtn19" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                                           <Label fx:id="Playerinvlbl19" layoutX="38.0" layoutY="38.0" text="x0" textFill="WHITE">
                                              <font>
                                                 <Font name="System Bold" size="12.0" />
@@ -998,9 +1062,9 @@
                                  </font>
                               </Label>
                               <Slider fx:id="sfxVolumeSlider" layoutX="108.0" layoutY="147.0" max="1.0" min="0.0" prefHeight="25.0" prefWidth="371.0" value="1.0" />
-                              <Button fx:id="btnsave" layoutX="368.0" layoutY="226.0" mnemonicParsing="false" onAction="#handlesave" text="Save" styleClass="invisible-button" stylesheets="@../css/style.css" />
-                              <Button fx:id="btnload" layoutX="413.0" layoutY="226.0" mnemonicParsing="false" onAction="#handleload" text="Load" styleClass="invisible-button" stylesheets="@../css/style.css" />
-                        <Button fx:id="btnsaveandexit" layoutX="367.0" layoutY="263.0" mnemonicParsing="false" onAction="#handlesaveexitaction" text="Save &amp; Exit" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                              <Button fx:id="btnsave" layoutX="368.0" layoutY="226.0" mnemonicParsing="false" onAction="#handlesave" styleClass="invisible-button" stylesheets="@../css/style.css" text="Save" />
+                              <Button fx:id="btnload" layoutX="413.0" layoutY="226.0" mnemonicParsing="false" onAction="#handleload" styleClass="invisible-button" stylesheets="@../css/style.css" text="Load" />
+                        <Button fx:id="btnsaveandexit" layoutX="367.0" layoutY="263.0" mnemonicParsing="false" onAction="#handlesaveexitaction" styleClass="invisible-button" stylesheets="@../css/style.css" text="Save &amp; Exit" />
                            </children>
                         </Group>
                         <Button fx:id="openInventory" layoutX="118.0" layoutY="32.0" mnemonicParsing="false" onAction="#handleopenInventoryaction" opacity="0.0" prefHeight="25.0" prefWidth="89.0" styleClass="invisible-button" stylesheets="@../css/style.css" />
@@ -1014,52 +1078,6 @@
                      </children>
                   </Pane>
                </children>
-            </Group>
-            <Group fx:id="minimapicongroup" layoutX="540.0" layoutY="-10.0">
-               <children>
-                  <ImageView fx:id="miniMapIcon" fitHeight="37.0" fitWidth="34.0" layoutX="-14.0" layoutY="9.0" onMouseClicked="#handleMiniMapIconaction" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../image/tools/minimapicon.png" />
-                     </image>
-                  </ImageView>
-               </children>
-            </Group>
-            <Group fx:id="minimapgroup" visible="false">
-               <children>
-                  <Pane opacity="0.54" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: black;" />
-                  <ImageView fx:id="minimap" fitHeight="311.0" fitWidth="514.0" layoutX="45.0" layoutY="35.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../image/maps/map%20(2).png" />
-                     </image>
-                  </ImageView>
-                  <ImageView fx:id="closeminimapbtn" fitHeight="33.0" fitWidth="29.0" layoutX="565.0" layoutY="5.0" onMouseClicked="#handleCloseMiniMapAction" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../image/tools/x.png" />
-                     </image>
-                  </ImageView>
-                                   <Rectangle fx:id="left_map_nofour" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="42.0" layoutX="206.0" layoutY="63.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
-                    <Rectangle fx:id="upper_map_nofour" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="42.0" layoutX="294.0" layoutY="63.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
-                    <Rectangle fx:id="right_map_nofour" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="42.0" layoutX="382.0" layoutY="63.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
-                    <Rectangle fx:id="left_map_nothree_of_one" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="42.0" layoutX="118.0" layoutY="115.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
-                    <Rectangle fx:id="left_map_nothree" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="42.0" layoutX="206.0" layoutY="105.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
-                    <Rectangle fx:id="upper_map_nothree" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="42.0" layoutX="294.0" layoutY="105.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
-                    <Rectangle fx:id="right_map_nothree" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="42.0" layoutX="382.0" layoutY="105.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
-                    <Rectangle fx:id="right_map_nothree_of_one" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="52.0" layoutX="470.0" layoutY="105.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="69.0" />
-                    <Rectangle fx:id="left_map_notwo_of_two" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="76.0" layoutX="62.0" layoutY="145.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="56.0" />
-                    <Rectangle fx:id="left_map_notwo_of_one" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="46.0" layoutX="118.0" layoutY="157.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
-                    <Rectangle fx:id="left_map_notwo" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="60.0" layoutX="206.0" layoutY="146.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
-                    <Rectangle fx:id="upper_map_notwo" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="60.0" layoutX="294.0" layoutY="146.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
-                    <Rectangle fx:id="right_map_notwo" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="60.0" layoutX="382.0" layoutY="147.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
-                    <Rectangle fx:id="right_map_notwo_of_one" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="52.0" layoutX="470.0" layoutY="157.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="69.0" />
-                    <Rectangle fx:id="left_map_noone_of_one" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="55.0" layoutX="118.0" layoutY="203.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
-                    <Rectangle fx:id="left_map_noone" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="52.0" layoutX="206.0" layoutY="205.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
-                    <Rectangle fx:id="upper_map" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="51.0" layoutX="294.0" layoutY="205.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
-                    <Rectangle fx:id="right_map_noone" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="50.0" layoutX="382.0" layoutY="206.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
-                    <Rectangle fx:id="right_map_noone_of_one" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="52.0" layoutX="470.0" layoutY="205.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="69.0" />
-                    <Rectangle fx:id="left_map" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="60.0" layoutX="206.0" layoutY="255.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
-                    <Rectangle fx:id="home_map" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="60.0" layoutX="294.0" layoutY="255.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
-                    <Rectangle fx:id="right_map" arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="60.0" layoutX="382.0" layoutY="256.0" managed="false" mouseTransparent="true" opacity="0.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="88.0" />
-</children>
             </Group></children>
       </Group>
    </children>
