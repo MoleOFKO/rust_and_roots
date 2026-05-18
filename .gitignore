@@ -40,3 +40,9 @@ nbproject/project.xml
 # =========================
 tmp_ant.xml
 tmp_delete_test.txt
+nbproject/build-impl.xml
+nbproject/private/private.properties
+nbproject/private/private.xml
+nbproject/project.xml
+src/db/dbcon.java
+nbproject/genfiles.properties
