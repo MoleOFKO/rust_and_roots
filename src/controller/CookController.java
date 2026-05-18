@@ -133,7 +133,7 @@ public class CookController implements Initializable, SceneController {
     @FXML private Label cookwaitingtimelbl;
     @FXML private Label cookname;
     @FXML private Label cookeffectlbl;
-    @FXML private Button closeimgbtn;
+    @FXML private ImageView closeimgbtn;
     @FXML
     private Label cooksuccessrate;
     @FXML

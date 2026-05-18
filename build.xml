@@ -12,12 +12,8 @@
         </copy>
     </target>
 
-    <!-- Keep resources in sync for full builds too (safe to re-copy). -->
-    <target name="-post-compile">
-        <copy todir="${build.classes.dir}" overwrite="true">
-            <fileset dir="${src.dir}" excludes="**/*.java"/>
-        </copy>
-    </target>
+    <!-- Full builds already copy non-Java resources in nbproject/build-impl.xml's -do-compile target. -->
+    <target name="-post-compile"/>
     <!--
 
     There exist several targets which are by default empty and which can be 

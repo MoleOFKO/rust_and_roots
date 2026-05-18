@@ -218,7 +218,7 @@
                   </DropShadow>
                </effect>
             </Label>
-            <Button fx:id="btntuto" layoutX="570.0" layoutY="1.0" mnemonicParsing="false" onAction="#handlebtntutoaction" style="-fx-background-radius: 100%; -fx-background-color: transparent; -fx-border-color: yellow; -fx-border-radius: 100%;" textFill="#e6ff00" styleClass="invisible-button" stylesheets="@../css/style.css">
+            <Button prefWidth="28.0" prefHeight="28.0" fx:id="btntuto" layoutX="570.0" layoutY="1.0" mnemonicParsing="false" onAction="#handlebtntutoaction" style="-fx-background-radius: 100%; -fx-background-color: transparent; -fx-border-color: yellow; -fx-border-radius: 100%; -fx-border-width: 1; -fx-padding: 0;" textFill="#e6ff00" styleClass="invisible-button" stylesheets="@../css/style.css">
                <graphic>
                   <FontAwesomeIcon fill="#f6ff00" glyphName="QUESTION" selectionFill="YELLOW" size="1.5em" />
                </graphic>
