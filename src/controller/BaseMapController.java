@@ -58,6 +58,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
@@ -2056,13 +2057,9 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     }
 
     @FXML
-    protected void handlecloseaction(MouseEvent event) {
+    protected void handlecloseaction(Event event) {
         closeMenuScreen();
-    }
-
-    @FXML
-    protected void handlecloseaction(ActionEvent event) {
-        closeMenuScreen();
+        if (event != null) event.consume();
     }
 
     @FXML
