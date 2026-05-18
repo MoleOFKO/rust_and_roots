@@ -33,6 +33,7 @@ import game.GameTimeManager;
 import game.InteractionManager;
 import game.SceneController;
 import java.util.Objects;
+import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -133,6 +134,9 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     });
 
     private static final ConcurrentHashMap<String, AtomicLong> MAP_EVICTION_VERSION_BY_KEY = new ConcurrentHashMap<>();
+    private static final String DAY_TO_NIGHT_SWAP_IMAGE = "/image/tools/DayNightSwap.png";
+    private static final String NIGHT_TO_DAY_SWAP_IMAGE = "/image/tools/dayswap.png";
+    private static final Duration DAY_NIGHT_SWAP_DISPLAY_DURATION = Duration.seconds(1);
 
     private boolean permadeathHandled = false;
 
@@ -293,6 +297,10 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
     protected Image dayBg;
     protected Image nightBg;
+    private Image dayToNightSwapImage;
+    private Image nightToDaySwapImage;
+    private ImageView dayNightSwapOverlay;
+    private PauseTransition dayNightSwapHide;
     protected ChangeListener<Boolean> nightListener;
     protected ChangeListener<Number> farmTimeListener;
 
@@ -1042,12 +1050,15 @@ public abstract class BaseMapController implements Initializable, SceneControlle
             }
             nightListener = null;
         }
+        clearDayNightSwapOverlay();
 
         unbindSharedUiFromSingletons();
         clearCachedUiReferences();
 
         dayBg = null;
         nightBg = null;
+        dayToNightSwapImage = null;
+        nightToDaySwapImage = null;
     }
 
     private void releaseSettingsTabTimePause() {
@@ -3049,25 +3060,87 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         dayBg = loadImageOrNull(dayPath);
         nightBg = loadImageOrNull(nightPath);
         if (dayBg == null) return;
+        dayToNightSwapImage = loadImageOrNull(DAY_TO_NIGHT_SWAP_IMAGE);
+        nightToDaySwapImage = loadImageOrNull(NIGHT_TO_DAY_SWAP_IMAGE);
 
         GameTimeManager time = GameTimeManager.get();
         nightListener = (obs, wasNight, isNight) -> {
-            if (isNight) {
-                background.setImage(nightBg != null ? nightBg : dayBg);
-                return;
+            applyDayNightBackground(background, isNight);
+            if (wasNight != null && !wasNight.equals(isNight)) {
+                showDayNightSwapImage(isNight);
             }
-            background.setImage(dayBg);
         };
 
         time.nightProperty().addListener(nightListener);
-        nightListener.changed(time.nightProperty(), !time.isNight(), time.isNight());
+        applyDayNightBackground(background, time.isNight());
 
         background.sceneProperty().addListener((o, oldScene, newScene) -> {
             if (newScene == null && nightListener != null) {
                 time.nightProperty().removeListener(nightListener);
                 nightListener = null;
             }
+            if (newScene == null) {
+                clearDayNightSwapOverlay();
+            }
         });
+    }
+
+    private void applyDayNightBackground(ImageView background, boolean isNight) {
+        if (background == null) return;
+        background.setImage(isNight ? (nightBg != null ? nightBg : dayBg) : dayBg);
+    }
+
+    private void showDayNightSwapImage(boolean nowNight) {
+        StackPane root = view != null ? view : controllerField("view", StackPane.class);
+        if (root == null) {
+            return;
+        }
+
+        Image swapImage = nowNight ? dayToNightSwapImage : nightToDaySwapImage;
+        if (swapImage == null) {
+            return;
+        }
+
+        if (dayNightSwapHide != null) {
+            dayNightSwapHide.stop();
+        }
+
+        ImageView overlay = dayNightSwapOverlay;
+        if (overlay == null) {
+            overlay = new ImageView();
+            overlay.setMouseTransparent(true);
+            overlay.setPickOnBounds(false);
+            overlay.setPreserveRatio(false);
+            overlay.fitWidthProperty().bind(root.widthProperty());
+            overlay.fitHeightProperty().bind(root.heightProperty());
+            dayNightSwapOverlay = overlay;
+        }
+
+        overlay.setImage(swapImage);
+        overlay.setVisible(true);
+        overlay.setManaged(false);
+        if (!root.getChildren().contains(overlay)) {
+            root.getChildren().add(overlay);
+        }
+        overlay.toFront();
+
+        dayNightSwapHide = new PauseTransition(DAY_NIGHT_SWAP_DISPLAY_DURATION);
+        dayNightSwapHide.setOnFinished(event -> clearDayNightSwapOverlay());
+        dayNightSwapHide.play();
+    }
+
+    private void clearDayNightSwapOverlay() {
+        if (dayNightSwapHide != null) {
+            dayNightSwapHide.stop();
+            dayNightSwapHide = null;
+        }
+        if (dayNightSwapOverlay != null) {
+            if (dayNightSwapOverlay.getParent() instanceof Pane pane) {
+                pane.getChildren().remove(dayNightSwapOverlay);
+            }
+            dayNightSwapOverlay.setImage(null);
+            dayNightSwapOverlay = null;
+        }
     }
 
     private void setupFarmTimeRefreshIfPresent() {
