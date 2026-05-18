@@ -20,6 +20,8 @@ import javafx.scene.text.Font;
 
 public final class TutorialOverlayHelper {
 
+    private static final double TUTORIAL_BUTTON_SIZE = 28.0;
+
     public static final List<String> GLOBAL_BUTTON_TUTORIAL_IMAGES = List.of(
         "/image/Toturial/Move.png",
         "/image/Toturial/Run.png",
@@ -152,13 +154,19 @@ public final class TutorialOverlayHelper {
         closeButton.setManaged(false);
         closeButton.setFocusTraversable(false);
         closeButton.setPickOnBounds(true);
+        closeButton.setMinSize(TUTORIAL_BUTTON_SIZE, TUTORIAL_BUTTON_SIZE);
+        closeButton.setPrefSize(TUTORIAL_BUTTON_SIZE, TUTORIAL_BUTTON_SIZE);
+        closeButton.setMaxSize(TUTORIAL_BUTTON_SIZE, TUTORIAL_BUTTON_SIZE);
         closeButton.setStyle("""
             -fx-background-radius: 100%;
             -fx-background-color: rgba(0, 0, 0, 0.55);
             -fx-border-color: yellow;
             -fx-border-radius: 100%;
+            -fx-border-width: 1;
+            -fx-padding: 0;
             -fx-text-fill: yellow;
             -fx-font-weight: bold;
+            -fx-font-size: 12px;
             """);
         closeButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
             event.consume();
@@ -190,20 +198,22 @@ public final class TutorialOverlayHelper {
         if (tutorialButton != null && tutorialButton.getScene() != null) {
             Bounds buttonBounds = tutorialButton.localToScene(tutorialButton.getBoundsInLocal());
             Bounds rootBounds = root.sceneToLocal(buttonBounds);
+            double x = rootBounds.getMinX() + ((rootBounds.getWidth() - TUTORIAL_BUTTON_SIZE) / 2.0);
+            double y = rootBounds.getMinY() + ((rootBounds.getHeight() - TUTORIAL_BUTTON_SIZE) / 2.0);
             closeButton.resizeRelocate(
-                rootBounds.getMinX(),
-                rootBounds.getMinY(),
-                Math.max(28.0, rootBounds.getWidth()),
-                Math.max(28.0, rootBounds.getHeight())
+                x,
+                y,
+                TUTORIAL_BUTTON_SIZE,
+                TUTORIAL_BUTTON_SIZE
             );
             return;
         }
 
         closeButton.resizeRelocate(
-            Math.max(0.0, root.getWidth() - 32.0),
+            Math.max(0.0, root.getWidth() - TUTORIAL_BUTTON_SIZE),
             0.0,
-            32.0,
-            32.0
+            TUTORIAL_BUTTON_SIZE,
+            TUTORIAL_BUTTON_SIZE
         );
     }
 

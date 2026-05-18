@@ -179,6 +179,12 @@ public class D_undermapController extends BaseMapController {
     private Rectangle silver_hitbox2;
     @FXML
     private ImageView drops_img_silve21;
+    @FXML
+    private Rectangle wall16;
+    @FXML
+    private Slider bgmVolumeSlider;
+    @FXML
+    private Slider sfxVolumeSlider;
 
     @Override
     protected String dayBackgroundPath() {
@@ -521,21 +527,7 @@ public class D_undermapController extends BaseMapController {
     @FXML
     private Group settingsTab;
     @FXML
-    private Slider timescaleslider;
-    @FXML
-    private Button btnsetday;
-    @FXML
-    private Button btnsetnight;
-    @FXML
-    private Button btnplus1h;
-    @FXML
     private Button btnsaveandexit;
-    @FXML
-    private Label sliderscale;
-    @FXML
-    private Label lbldays;
-    @FXML
-    private Label lbltime;
     @FXML
     private Button btnsave;
     @FXML
@@ -698,4 +690,6 @@ public class D_undermapController extends BaseMapController {
         registerExit(exit_down, "/view/d_undermap_noone.fxml", SpawnTag.FROM_UP);
         registerExit(exit_up, "/view/d_homemap.fxml", SpawnTag.FROM_DOWN);
     }
+
+ 
 }

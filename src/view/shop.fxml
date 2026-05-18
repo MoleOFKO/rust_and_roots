@@ -419,7 +419,7 @@
             </Pane>
             <Button fx:id="colbuy" layoutX="307.0" layoutY="35.0" mnemonicParsing="false" onAction="#handlecolbuyaction" opacity="0.0" prefHeight="25.0" prefWidth="34.0" styleClass="invisible-button" stylesheets="@../css/style.css" />
             <Button fx:id="colsell" alignment="TOP_LEFT" layoutX="346.0" layoutY="35.0" mnemonicParsing="false" onAction="#handlecolsellaction" opacity="0.0" prefHeight="25.0" prefWidth="34.0" styleClass="invisible-button" stylesheets="@../css/style.css" />
-            <Button fx:id="btntuto" layoutX="572.0" mnemonicParsing="false" onAction="#handlebtntutoaction" style="-fx-background-radius: 100%; -fx-background-color: transparent; -fx-border-color: yellow; -fx-border-radius: 100%;" styleClass="invisible-button" stylesheets="@../css/style.css" textFill="#e6ff00">
+            <Button prefWidth="28.0" prefHeight="28.0" fx:id="btntuto" layoutX="572.0" mnemonicParsing="false" onAction="#handlebtntutoaction" style="-fx-background-radius: 100%; -fx-background-color: transparent; -fx-border-color: yellow; -fx-border-radius: 100%; -fx-border-width: 1; -fx-padding: 0;" styleClass="invisible-button" stylesheets="@../css/style.css" textFill="#e6ff00">
                <graphic>
                   <FontAwesomeIcon fill="#f6ff00" glyphName="QUESTION" selectionFill="YELLOW" size="1.5em" />
                </graphic>

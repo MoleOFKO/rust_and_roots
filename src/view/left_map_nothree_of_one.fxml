@@ -275,7 +275,7 @@
                   <Rectangle fx:id="slime1_detect" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="113.0" layoutX="237.0" layoutY="152.0" stroke="RED" strokeType="INSIDE" width="113.0" />
                </children>
             </Group>
-            <Button fx:id="btntuto" layoutX="573.0" mnemonicParsing="false" onAction="#handlebtntutoaction" style="-fx-background-radius: 100%; -fx-background-color: transparent; -fx-border-color: yellow; -fx-border-radius: 100%;" textFill="#e6ff00" styleClass="invisible-button" stylesheets="@../css/style.css">
+            <Button prefWidth="28.0" prefHeight="28.0" fx:id="btntuto" layoutX="573.0" mnemonicParsing="false" onAction="#handlebtntutoaction" style="-fx-background-radius: 100%; -fx-background-color: transparent; -fx-border-color: yellow; -fx-border-radius: 100%; -fx-border-width: 1; -fx-padding: 0;" textFill="#e6ff00" styleClass="invisible-button" stylesheets="@../css/style.css">
                <graphic>
                   <FontAwesomeIcon fill="#f6ff00" glyphName="QUESTION" size="1.5em" />
                </graphic>

@@ -576,4 +576,6 @@ public class D_undermap_leftController extends BaseMapController {
     protected void configureExits() {
         registerExit(exit_right, "/view/d_undermap.fxml", SpawnTag.FROM_LEFT);
     }
+
+
 }
