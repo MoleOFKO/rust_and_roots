@@ -29,11 +29,12 @@ public final class ItemDatabase {
     private static final Map<Integer, Integer> maxGrowthPhasesBySeedId = new HashMap<>();
 
     // Items that should never be offered for purchase in the shop.
-    // These are "mineable node"/legacy ore items; gameplay uses the corresponding *_drop_item instead.
+    // These are unavailable gameplay items or legacy ore nodes that use *_drop_item drops instead.
     private static final Set<String> SHOP_EXCLUDED_LOOKUP_KEYS = Set.of(
         "adamantite ore",
         "copper ore",
         "gold ore",
+        "fishing rod",
         "hihiogane ore",
         "iron ore",
         "mithril ore",
@@ -230,6 +231,10 @@ public final class ItemDatabase {
         return lookup.contains("axe")
             || lookup.contains("pickaxe")
             || lookup.contains("pick axe")
+            || lookup.contains("dagger")
+            || lookup.contains("shovel")
+            || lookup.contains("spear")
+            || lookup.contains("sword")
             || lookup.contains("sickle")
             || lookup.contains("fishing rod")
             || lookup.contains("watering can");
@@ -622,6 +627,10 @@ public final class ItemDatabase {
         if (normalizedName.contains("axe")
                 || normalizedName.contains("pickaxe")
                 || normalizedName.contains("pick axe")
+                || normalizedName.contains("dagger")
+                || normalizedName.contains("shovel")
+                || normalizedName.contains("spear")
+                || normalizedName.contains("sword")
                 || normalizedName.contains("sickle")
                 || normalizedName.contains("fishing rod")
                 || normalizedName.contains("watering can")) {

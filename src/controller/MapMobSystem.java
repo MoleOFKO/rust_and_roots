@@ -287,7 +287,6 @@ final class MapMobSystem {
         long nowNanos = System.nanoTime();
         double nowSeconds = GameTimeManager.get().totalSecondsProperty().get();
 
-        int damage = calculatePlayerMobDamage();
         boolean hitAny = false;
 
         for (MobHandle handle : mobs) {
@@ -301,6 +300,7 @@ final class MapMobSystem {
             }
 
             hitAny = true;
+            int damage = calculatePlayerMobDamage(handle);
 
             if (damage > 0) {
                 boolean killed = handle.entity.applyPlayerDamage(damage, nowNanos);
@@ -717,25 +717,43 @@ final class MapMobSystem {
         return (int) Math.max(1L, raw);
     }
 
-    private int calculatePlayerMobDamage() {
+    private int calculatePlayerMobDamage(MobHandle target) {
         if (playerState == null || player == null) return 0;
 
         int playerStr = Math.max(0, playerState.getStr());
-        int bonus = 0;
-        int equippedId = player.getEquippedItemId();
-        if (equippedId > 0) {
-            String name = ItemDatabase.getItemName(equippedId);
-            if (name != null && !name.isBlank()) {
-                String normalized = name.trim().toLowerCase(Locale.ROOT);
-                if (normalized.contains("sword")) {
-                    bonus += 2;
-                }
-            }
-        }
-
+        int bonus = targetBonusForEquippedWeapon(target);
         int rolled = CombatRules.rollAttackDamage(playerStr, bonus);
         int combatBonus = SkillModifiers.combatBonusDamage(getCombatLevel());
         return Math.max(0, rolled + combatBonus);
+    }
+
+    private int targetBonusForEquippedWeapon(MobHandle target) {
+        int equippedId = player.getEquippedItemId();
+        if (equippedId <= 0 || target == null) return 0;
+
+        String name = ItemDatabase.getItemName(equippedId);
+        if (name == null || name.isBlank()) return 0;
+
+        String weapon = name.trim().toLowerCase(Locale.ROOT);
+        String mobType = target.mobType == null ? "" : target.mobType.trim().toLowerCase(Locale.ROOT);
+
+        if (weapon.contains("dagger") && mobType.equals("orc")) {
+            return 1;
+        }
+        if (weapon.contains("shovel") && isSlimeType(mobType)) {
+            return 1;
+        }
+        if (weapon.contains("spear") && isSlimeType(mobType)) {
+            return 2;
+        }
+        if (weapon.contains("sword") && mobType.equals("orcb")) {
+            return 1;
+        }
+        return 0;
+    }
+
+    private boolean isSlimeType(String mobType) {
+        return mobType != null && mobType.contains("slime");
     }
 
     private int getCombatLevel() {

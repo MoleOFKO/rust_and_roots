@@ -800,7 +800,6 @@ public final class GameState {
 
         fixedShopItemIds.clear();
 
-        addPreferredFixedShopItem(fixedShopItemIds, "Fishing Rod");
         addPreferredFixedShopItem(fixedShopItemIds, "Pickaxe");
         addPreferredFixedShopItem(fixedShopItemIds, "Axe");
 
