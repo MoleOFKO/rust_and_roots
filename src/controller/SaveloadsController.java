@@ -32,6 +32,8 @@ import util.AppDialogs;
 import util.WorldScaler;
 
 public class SaveloadsController implements Initializable {
+    private static final String CHARACTER_PREVIEW_IMAGE = "/image/character_to_show.png";
+    private static final String DEAD_PREVIEW_IMAGE = "/image/dead.png";
     
     @FXML
     private ImageView btnLoad;
@@ -280,7 +282,7 @@ public class SaveloadsController implements Initializable {
         }
 
         if (cimg != null) {
-            cimg.setImage(loadCharacterPreviewImage());
+            cimg.setImage(loadPreviewImage(preview.dead ? DEAD_PREVIEW_IMAGE : CHARACTER_PREVIEW_IMAGE));
         }
     }
 
@@ -498,18 +500,13 @@ public class SaveloadsController implements Initializable {
         return null;
     }
 
-    private Image loadCharacterPreviewImage() {
-        String[] candidates = new String[] {
-            "/image/character_to_show.png"
-        };
-        for (String path : candidates) {
-            try (InputStream is = getClass().getResourceAsStream(path)) {
-                if (is != null) {
-                    return new Image(is);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
+    private Image loadPreviewImage(String path) {
+        try (InputStream is = getClass().getResourceAsStream(path)) {
+            if (is != null) {
+                return new Image(is);
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         return null;

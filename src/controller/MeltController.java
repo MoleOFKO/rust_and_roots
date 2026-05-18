@@ -401,13 +401,6 @@ public class MeltController implements Initializable, SceneController {
             return;
         }
 
-        int staminaCost = getAdjustedStaminaCost(selectedRule) * outputQty;
-        if (gameState.getPlayerState().getStamina() < staminaCost) {
-            refreshDynamicUi();
-            return;
-        }
-        gameState.getPlayerState().consumeStamina(staminaCost);
-
         if (leftovers > 0) {
             inventory.addItem(selectedOreItemId, leftovers);
         }
@@ -552,8 +545,7 @@ public class MeltController implements Initializable, SceneController {
         int outputQty = computeOutputQty(selectedRule, selectedOreQuantity);
         if (outputQty <= 0) return true;
         int totalCost = getSelectedTotalCost();
-        return !gameState.canAffordSmeltPoints(totalCost, now)
-            || gameState.getPlayerState().getStamina() < getSelectedTotalStaminaCost();
+        return !gameState.canAffordSmeltPoints(totalCost, now);
     }
 
     private int getSelectedTotalCost() {
@@ -561,12 +553,6 @@ public class MeltController implements Initializable, SceneController {
         int usedInputQty = computeUsedInputQty(selectedRule, selectedOreQuantity);
         if (usedInputQty <= 0) return 0;
         return getAdjustedCostPerOre(selectedRule) * usedInputQty;
-    }
-
-    private int getSelectedTotalStaminaCost() {
-        if (selectedRule == null || selectedOreQuantity <= 0) return 0;
-        int outputQty = computeOutputQty(selectedRule, selectedOreQuantity);
-        return outputQty <= 0 ? 0 : getAdjustedStaminaCost(selectedRule) * outputQty;
     }
 
     private int getAdjustedCostPerOre(SmeltRule rule) {
@@ -587,11 +573,6 @@ public class MeltController implements Initializable, SceneController {
     private String itemNameSafe(int itemId) {
         item itm = ItemDatabase.getItemById(itemId);
         return itm == null ? ("Item " + itemId) : itm.getItem_name();
-    }
-
-    private int getAdjustedStaminaCost(SmeltRule rule) {
-        if (rule == null || gameState == null) return 0;
-        return ProcessingRules.computeAdjustedStaminaCost(rule.staminaCost, rule.dexScaling, gameState.getPlayerState().getDex());
     }
 
     private double getAdjustedSecondsPerOre(SmeltRule rule) {

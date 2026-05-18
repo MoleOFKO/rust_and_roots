@@ -733,6 +733,13 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         ImageView miniMapImage = minimap != null ? minimap : controllerField("minimap", ImageView.class);
         if (miniMapGroup == null || miniMapImage == null || human == null || isMiniMapExcludedMap(mapKey())) return;
 
+        if (isMiniMapPlayerMarkerHiddenMap(mapKey())) {
+            if (minimapPlayerMarker != null) {
+                minimapPlayerMarker.setVisible(false);
+            }
+            return;
+        }
+
         if (minimapPlayerMarker == null) {
             minimapPlayerMarker = new Polygon(0.0, -7.0, 6.0, 7.0, 0.0, 4.0, -6.0, 7.0);
             minimapPlayerMarker.setFill(Color.DODGERBLUE);
@@ -742,6 +749,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
             miniMapGroup.getChildren().add(minimapPlayerMarker);
         }
 
+        minimapPlayerMarker.setVisible(true);
         MiniMapPoint point = miniMapPointForPlayer(mapKey(), human.getLayoutX(), human.getLayoutY(), miniMapGroup, miniMapImage);
         if (point == null) return;
 
@@ -749,6 +757,11 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         minimapPlayerMarker.setLayoutY(point.y());
         minimapPlayerMarker.setRotate(miniMapMarkerRotation());
         minimapPlayerMarker.toFront();
+    }
+
+    private boolean isMiniMapPlayerMarkerHiddenMap(String rawMapKey) {
+        String key = rawMapKey == null ? "" : rawMapKey.toLowerCase(Locale.ROOT);
+        return "right_map_notwo_of_two".equals(key);
     }
 
     private MiniMapImageBounds renderedMiniMapImageBounds(ImageView miniMapImage) {
