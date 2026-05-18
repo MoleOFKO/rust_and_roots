@@ -1,11 +1,11 @@
 package controller;
 
-import static controller.BaseMapController.MAP_EXIT_DELAY_GAME_SECONDS;
+import game.GameTimeManager;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
+import javafx.geometry.Bounds;
 import javafx.scene.Group;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -14,13 +14,11 @@ import javafx.scene.control.Slider;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
-import javax.swing.JOptionPane;
-import model.InteractionZone;
+import util.AppDialogs;
 import util.SpawnTag;
 
 /**
@@ -32,6 +30,11 @@ public class Right_map_notwo_of_oneController extends BaseMapController {
 
     private static final String DAY_BG_PATH = "/image/maps/rightmap_no.2(1).png";
     private static final String NIGHT_BG_PATH = "/image/NightMap/rightmap_no.2(1)night.png";
+    private static final int FALLEN_TREE_UNLOCK_DAY = 100;
+
+    private boolean fallenTreeCollisionRegistered = false;
+    private boolean fallenTreeDialogArmed = true;
+
     @FXML
     private ImageView bg;
     @FXML
@@ -590,15 +593,55 @@ public class Right_map_notwo_of_oneController extends BaseMapController {
        registerExit(exit_left, "/view/right_map_notwo.fxml", SpawnTag.FROM_RIGHT);
        registerExit(exit_right, "/view/right_map_notwo_of_two.fxml", SpawnTag.FROM_LEFT);
        registerExit(exit_down, "/view/right_map_noone_of_one.fxml", SpawnTag.FROM_UP);
-//       if (exit_right != null) {
-//            interactionManager.addZone(new InteractionZone(
-//                exit_right,
-//                null,
-//                () -> JOptionPane.showMessageDialog(null, "Map unavailable"),
-//                MAP_EXIT_DELAY_GAME_SECONDS
-//            ));
-//        }
+       updateFallenTreeGate(null);
     }
+
+    @Override
+    protected void onGameLoopUpdate(Bounds playerBounds) {
+        updateFallenTreeGate(playerBounds);
+    }
+
+    private void updateFallenTreeGate(Bounds playerBounds) {
+        if (fallen_tree_wall == null) {
+            return;
+        }
+
+        if (!fallenTreeCollisionRegistered) {
+            fallen_tree_wall.setMouseTransparent(true);
+            fallen_tree_wall.setVisible(false);
+            registerPlayerCollisionRectangle(fallen_tree_wall);
+            rebuildPlayerCollisionWalls();
+            fallenTreeCollisionRegistered = true;
+        }
+
+        int currentDay = GameTimeManager.get().dayNumberProperty().get();
+        boolean unlocked = currentDay >= FALLEN_TREE_UNLOCK_DAY;
+
+        fallen_tree_wall.setDisable(unlocked);
+        if (fallen_tree_img != null) {
+            fallen_tree_img.setVisible(!unlocked);
+            fallen_tree_img.setManaged(!unlocked);
+        }
+
+        if (unlocked || playerBounds == null) {
+            fallenTreeDialogArmed = true;
+            return;
+        }
+
+        Bounds wallBounds = fallen_tree_wall.localToScene(fallen_tree_wall.getBoundsInLocal());
+        boolean touchingWall = playerBounds.intersects(wallBounds);
+        if (!touchingWall) {
+            fallenTreeDialogArmed = true;
+            return;
+        }
+
+        if (fallenTreeDialogArmed) {
+            fallenTreeDialogArmed = false;
+            int remainingDays = Math.max(0, FALLEN_TREE_UNLOCK_DAY - currentDay);
+            AppDialogs.showMessageDialog(null, "Come again after " + remainingDays + " days....");
+        }
+    }
+
     @FXML
     private void handlebtntutoaction(ActionEvent event) {
         showOverworldTutorialOverlay();

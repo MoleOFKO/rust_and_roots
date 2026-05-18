@@ -40,6 +40,7 @@ public class Farm_tableController implements Initializable, SceneController {
     private static final String TOOL_SLOT_STYLE = "-fx-effect: dropshadow(gaussian, rgba(255,215,0,0.85), 14, 0.55, 0, 0);";
 
     private static final double FARM_TABLE_TIME_SCALE = 0.25;
+    private static final double FARM_PLOT_IMAGE_SIZE = 57.0;
     private static final int DEFAULT_PLANT_STAMINA_COST = 2;
     private static final String FARM_TUTORIAL_KEY = "farm_table_inside";
     private static final List<String> FARM_TUTORIAL_IMAGES = List.of(
@@ -586,10 +587,12 @@ public class Farm_tableController implements Initializable, SceneController {
             if (id != null && id.startsWith("farm_img")) {
                 int n = NodeCollectors.extractNumber(id, "farm_img");
                 if (n >= 0) {
+                    normalizeFarmPlotImage(img);
                     String plotId = "Plot " + n;
                     plotViews.put(plotId, img);
                     Region target = (img.getParent() instanceof Region region) ? region : null;
                     if (target != null) {
+                        alignPlotTargetToImage(target, img);
                         registerPlotTarget(plotId, target, img);
                     }
                 }
@@ -605,6 +608,34 @@ public class Farm_tableController implements Initializable, SceneController {
                 collectPlotNodesRecursive(child);
             }
         }
+    }
+
+    private void normalizeFarmPlotImage(ImageView img) {
+        if (img == null) {
+            return;
+        }
+        img.setFitWidth(FARM_PLOT_IMAGE_SIZE);
+        img.setFitHeight(FARM_PLOT_IMAGE_SIZE);
+        img.setPreserveRatio(false);
+    }
+
+    private void alignPlotTargetToImage(Region target, ImageView plotImageView) {
+        if (target == null || plotImageView == null) {
+            return;
+        }
+
+        double imageOffsetX = cleanLayoutValue(plotImageView.getLayoutX());
+        double imageOffsetY = cleanLayoutValue(plotImageView.getLayoutY());
+        if (imageOffsetX != 0.0 || imageOffsetY != 0.0) {
+            target.setLayoutX(cleanLayoutValue(target.getLayoutX()) + imageOffsetX);
+            target.setLayoutY(cleanLayoutValue(target.getLayoutY()) + imageOffsetY);
+            plotImageView.setLayoutX(0.0);
+            plotImageView.setLayoutY(0.0);
+        }
+    }
+
+    private double cleanLayoutValue(double value) {
+        return Double.isNaN(value) ? 0.0 : value;
     }
 
     private void registerPlotTarget(String plotId, Region target, ImageView plotImageView) {
@@ -628,39 +659,10 @@ public class Farm_tableController implements Initializable, SceneController {
             return;
         }
 
-        double width = Math.max(0.0, target.getPrefWidth());
-        double height = Math.max(0.0, target.getPrefHeight());
-
-        double fitWidth = Math.max(0.0, plotImageView.getFitWidth());
-        double fitHeight = Math.max(0.0, plotImageView.getFitHeight());
-
-        if (fitWidth <= 0.0 && plotImageView.getImage() != null) {
-            fitWidth = Math.max(0.0, plotImageView.getImage().getWidth());
-        }
-        if (fitHeight <= 0.0 && plotImageView.getImage() != null) {
-            fitHeight = Math.max(0.0, plotImageView.getImage().getHeight());
-        }
-
-        double layoutX = plotImageView.getLayoutX();
-        double layoutY = plotImageView.getLayoutY();
-        if (Double.isNaN(layoutX)) layoutX = 0.0;
-        if (Double.isNaN(layoutY)) layoutY = 0.0;
-
-        if (fitWidth > 0.0) {
-            width = Math.max(width, Math.max(fitWidth, layoutX + fitWidth));
-        }
-
-        if (fitHeight > 0.0) {
-            height = Math.max(height, Math.max(fitHeight, layoutY + fitHeight));
-        }
-
-        width = Math.max(1.0, width);
-        height = Math.max(1.0, height);
-
-        target.setMinSize(width, height);
-        target.setPrefSize(width, height);
-        target.setMaxSize(width, height);
-        target.resize(width, height);
+        target.setMinSize(FARM_PLOT_IMAGE_SIZE, FARM_PLOT_IMAGE_SIZE);
+        target.setPrefSize(FARM_PLOT_IMAGE_SIZE, FARM_PLOT_IMAGE_SIZE);
+        target.setMaxSize(FARM_PLOT_IMAGE_SIZE, FARM_PLOT_IMAGE_SIZE);
+        target.resize(FARM_PLOT_IMAGE_SIZE, FARM_PLOT_IMAGE_SIZE);
     }
 
     private void collectSeedSlots() {

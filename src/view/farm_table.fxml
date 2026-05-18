@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.text.Font?>
 
-<StackPane fx:id="view" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: black;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Farm_tableController">
+<StackPane fx:id="view" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: black;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Farm_tableController">
    <children>
       <Group fx:id="world">
          <children>
@@ -32,248 +32,248 @@
                <children>
                   <Group fx:id="farm" layoutX="7.0" layoutY="26.0">
                      <children>
-                        <Pane layoutX="271.0" layoutY="29.0" prefHeight="52.0" prefWidth="48.0">
+                        <Pane layoutX="265.0" layoutY="30.0" prefHeight="57.0" prefWidth="57.0">
                            <children>
-                              <ImageView fx:id="farm_img4" fitHeight="66.0" fitWidth="48.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fx:id="farm_img4" fitHeight="57.0" fitWidth="57.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="false">
                                  <image>
                                     <Image url="@../image/crops/wheat_plant3.png" />
                                  </image>
                               </ImageView>
                            </children>
                         </Pane>
-                        <Pane layoutX="208.0" layoutY="28.0" prefHeight="52.0" prefWidth="48.0">
+                        <Pane layoutX="202.0" layoutY="30.0" prefHeight="57.0" prefWidth="57.0">
                            <children>
-                              <ImageView fx:id="farm_img3" fitHeight="66.0" fitWidth="48.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fx:id="farm_img3" fitHeight="57.0" fitWidth="57.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="false">
                                  <image>
                                     <Image url="@../image/crops/wheat_plant3.png" />
                                  </image>
                               </ImageView>
                            </children>
                         </Pane>
-                        <Pane layoutX="333.0" layoutY="29.0" prefHeight="52.0" prefWidth="48.0">
+                        <Pane layoutX="328.0" layoutY="31.0" prefHeight="57.0" prefWidth="57.0">
                            <children>
-                              <ImageView fx:id="farm_img5" fitHeight="66.0" fitWidth="48.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fx:id="farm_img5" fitHeight="57.0" fitWidth="57.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="false">
                                  <image>
                                     <Image url="@../image/crops/wheat_plant3.png" />
                                  </image>
                               </ImageView>
                            </children>
                         </Pane>
-                        <Pane layoutX="396.0" layoutY="30.0" prefHeight="52.0" prefWidth="48.0">
+                        <Pane layoutX="390.0" layoutY="29.0" prefHeight="57.0" prefWidth="57.0">
                            <children>
-                              <ImageView fx:id="farm_img6" fitHeight="66.0" fitWidth="48.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fx:id="farm_img6" fitHeight="57.0" fitWidth="57.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="false">
                                  <image>
                                     <Image url="@../image/crops/wheat_plant3.png" />
                                  </image>
                               </ImageView>
                            </children>
                         </Pane>
-                        <Pane layoutX="457.0" layoutY="31.0" maxWidth="52.0" prefHeight="48.0">
+                        <Pane layoutX="453.0" layoutY="30.0" prefHeight="57.0" prefWidth="57.0">
                            <children>
-                              <ImageView fx:id="farm_img7" fitHeight="66.0" fitWidth="48.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fx:id="farm_img7" fitHeight="57.0" fitWidth="57.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="false">
                                  <image>
                                     <Image url="@../image/crops/wheat_plant3.png" />
                                  </image>
                               </ImageView>
                            </children>
                         </Pane>
-                        <Pane layoutX="79.0" layoutY="75.0" prefHeight="52.0" prefWidth="48.0">
+                        <Pane layoutX="71.0" layoutY="76.0" prefHeight="57.0" prefWidth="57.0">
                            <children>
-                              <ImageView fx:id="farm_img8" fitHeight="66.0" fitWidth="48.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fx:id="farm_img8" fitHeight="57.0" fitWidth="57.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="false">
                                  <image>
                                     <Image url="@../image/crops/wheat_plant3.png" />
                                  </image>
                               </ImageView>
                            </children>
                         </Pane>
-                        <Pane layoutX="143.0" layoutY="75.0" prefHeight="52.0" prefWidth="48.0">
+                        <Pane layoutX="137.0" layoutY="77.0" prefHeight="57.0" prefWidth="57.0">
                            <children>
-                              <ImageView fx:id="farm_img9" fitHeight="66.0" fitWidth="48.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fx:id="farm_img9" fitHeight="57.0" fitWidth="57.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="false">
                                  <image>
                                     <Image url="@../image/crops/wheat_plant3.png" />
                                  </image>
                               </ImageView>
                            </children>
                         </Pane>
-                        <Pane layoutX="206.0" layoutY="75.0" prefHeight="52.0" prefWidth="48.0">
+                        <Pane layoutX="201.0" layoutY="77.0" prefHeight="57.0" prefWidth="57.0">
                            <children>
-                              <ImageView fx:id="farm_img10" fitHeight="66.0" fitWidth="48.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fx:id="farm_img10" fitHeight="57.0" fitWidth="57.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="false">
                                  <image>
                                     <Image url="@../image/crops/wheat_plant3.png" />
                                  </image>
                               </ImageView>
                            </children>
                         </Pane>
-                        <Pane layoutX="271.0" layoutY="75.0" prefHeight="52.0" prefWidth="48.0">
+                        <Pane layoutX="265.0" layoutY="76.0" prefHeight="57.0" prefWidth="57.0">
                            <children>
-                              <ImageView fx:id="farm_img11" fitHeight="66.0" fitWidth="48.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fx:id="farm_img11" fitHeight="57.0" fitWidth="57.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="false">
                                  <image>
                                     <Image url="@../image/crops/wheat_plant3.png" />
                                  </image>
                               </ImageView>
                            </children>
                         </Pane>
-                        <Pane layoutX="336.0" layoutY="75.0" prefHeight="52.0" prefWidth="48.0">
+                        <Pane layoutX="328.0" layoutY="77.0" prefHeight="57.0" prefWidth="57.0">
                            <children>
-                              <ImageView fx:id="farm_img12" fitHeight="66.0" fitWidth="48.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fx:id="farm_img12" fitHeight="57.0" fitWidth="57.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="false">
                                  <image>
                                     <Image url="@../image/crops/wheat_plant3.png" />
                                  </image>
                               </ImageView>
                            </children>
                         </Pane>
-                        <Pane layoutX="394.0" layoutY="75.0" prefHeight="52.0" prefWidth="48.0">
+                        <Pane layoutX="393.0" layoutY="77.0" prefHeight="57.0" prefWidth="57.0">
                            <children>
-                              <ImageView fx:id="farm_img13" fitHeight="66.0" fitWidth="48.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fx:id="farm_img13" fitHeight="57.0" fitWidth="57.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="false">
                                  <image>
                                     <Image url="@../image/crops/wheat_plant3.png" />
                                  </image>
                               </ImageView>
                            </children>
                         </Pane>
-                        <Pane layoutX="463.0" layoutY="75.0" prefHeight="52.0" prefWidth="48.0">
+                        <Pane layoutX="460.0" layoutY="77.0" prefHeight="57.0" prefWidth="57.0">
                            <children>
-                              <ImageView fx:id="farm_img14" fitHeight="66.0" fitWidth="48.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fx:id="farm_img14" fitHeight="57.0" fitWidth="57.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="false">
                                  <image>
                                     <Image url="@../image/crops/wheat_plant3.png" />
                                  </image>
                               </ImageView>
                            </children>
                         </Pane>
-                        <Pane layoutX="71.0" layoutY="125.0" prefHeight="52.0" prefWidth="48.0">
+                        <Pane layoutX="64.0" layoutY="127.0" prefHeight="57.0" prefWidth="57.0">
                            <children>
-                              <ImageView fx:id="farm_img15" fitHeight="66.0" fitWidth="48.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fx:id="farm_img15" fitHeight="57.0" fitWidth="57.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="false">
                                  <image>
                                     <Image url="@../image/crops/wheat_plant3.png" />
                                  </image>
                               </ImageView>
                            </children>
                         </Pane>
-                        <Pane layoutX="138.0" layoutY="125.0" prefHeight="52.0" prefWidth="48.0">
+                        <Pane layoutX="132.0" layoutY="128.0" prefHeight="57.0" prefWidth="57.0">
                            <children>
-                              <ImageView fx:id="farm_img16" fitHeight="66.0" fitWidth="48.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fx:id="farm_img16" fitHeight="57.0" fitWidth="57.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="false">
                                  <image>
                                     <Image url="@../image/crops/wheat_plant3.png" />
                                  </image>
                               </ImageView>
                            </children>
                         </Pane>
-                        <Pane layoutX="205.0" layoutY="125.0" prefHeight="52.0" prefWidth="48.0">
+                        <Pane layoutX="198.0" layoutY="127.0" prefHeight="57.0" prefWidth="57.0">
                            <children>
-                              <ImageView fx:id="farm_img17" fitHeight="66.0" fitWidth="48.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fx:id="farm_img17" fitHeight="57.0" fitWidth="57.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="false">
                                  <image>
                                     <Image url="@../image/crops/wheat_plant3.png" />
                                  </image>
                               </ImageView>
                            </children>
                         </Pane>
-                        <Pane layoutX="271.0" layoutY="125.0" prefHeight="52.0" prefWidth="48.0">
+                        <Pane layoutX="264.0" layoutY="127.0" prefHeight="57.0" prefWidth="57.0">
                            <children>
-                              <ImageView fx:id="farm_img18" fitHeight="66.0" fitWidth="48.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fx:id="farm_img18" fitHeight="57.0" fitWidth="57.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="false">
                                  <image>
                                     <Image url="@../image/crops/wheat_plant3.png" />
                                  </image>
                               </ImageView>
                            </children>
                         </Pane>
-                        <Pane layoutX="338.0" layoutY="125.0" prefHeight="52.0" prefWidth="48.0">
+                        <Pane layoutX="331.0" layoutY="125.0" prefHeight="57.0" prefWidth="57.0">
                            <children>
-                              <ImageView fx:id="farm_img19" fitHeight="66.0" fitWidth="48.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fx:id="farm_img19" fitHeight="57.0" fitWidth="57.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="false">
                                  <image>
                                     <Image url="@../image/crops/wheat_plant3.png" />
                                  </image>
                               </ImageView>
                            </children>
                         </Pane>
-                        <Pane layoutX="405.0" layoutY="125.0" prefHeight="52.0" prefWidth="48.0">
+                        <Pane layoutX="399.0" layoutY="128.0" prefHeight="57.0" prefWidth="57.0">
                            <children>
-                              <ImageView fx:id="farm_img20" fitHeight="66.0" fitWidth="48.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fx:id="farm_img20" fitHeight="57.0" fitWidth="57.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="false">
                                  <image>
                                     <Image url="@../image/crops/wheat_plant3.png" />
                                  </image>
                               </ImageView>
                            </children>
                         </Pane>
-                        <Pane layoutX="471.0" layoutY="125.0" prefHeight="52.0" prefWidth="48.0">
+                        <Pane layoutX="465.0" layoutY="127.0" prefHeight="57.0" prefWidth="57.0">
                            <children>
-                              <ImageView fx:id="farm_img21" fitHeight="66.0" fitWidth="48.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fx:id="farm_img21" fitHeight="57.0" fitWidth="57.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="false">
                                  <image>
                                     <Image url="@../image/crops/wheat_plant3.png" />
                                  </image>
                               </ImageView>
                            </children>
                         </Pane>
-                        <Pane layoutX="65.0" layoutY="177.0" prefHeight="58.0" prefWidth="48.0">
+                        <Pane layoutX="58.0" layoutY="181.0" prefHeight="57.0" prefWidth="57.0">
                            <children>
-                              <ImageView fx:id="farm_img22" fitHeight="66.0" fitWidth="48.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fx:id="farm_img22" fitHeight="57.0" fitWidth="57.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="false">
                                  <image>
                                     <Image url="@../image/crops/wheat_plant3.png" />
                                  </image>
                               </ImageView>
                            </children>
                         </Pane>
-                        <Pane layoutX="133.0" layoutY="177.0" prefHeight="52.0" prefWidth="48.0">
+                        <Pane layoutX="127.0" layoutY="181.0" prefHeight="57.0" prefWidth="57.0">
                            <children>
-                              <ImageView fx:id="farm_img23" fitHeight="66.0" fitWidth="48.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fx:id="farm_img23" fitHeight="57.0" fitWidth="57.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="false">
                                  <image>
                                     <Image url="@../image/crops/wheat_plant3.png" />
                                  </image>
                               </ImageView>
                            </children>
                         </Pane>
-                        <Pane layoutX="203.0" layoutY="177.0" prefHeight="52.0" prefWidth="48.0">
+                        <Pane layoutX="196.0" layoutY="181.0" prefHeight="57.0" prefWidth="57.0">
                            <children>
-                              <ImageView fx:id="farm_img24" fitHeight="66.0" fitWidth="48.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fx:id="farm_img24" fitHeight="57.0" fitWidth="57.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="false">
                                  <image>
                                     <Image url="@../image/crops/wheat_plant3.png" />
                                  </image>
                               </ImageView>
                            </children>
                         </Pane>
-                        <Pane layoutX="269.0" layoutY="177.0" prefHeight="52.0" prefWidth="48.0">
+                        <Pane layoutX="265.0" layoutY="181.0" prefHeight="57.0" prefWidth="57.0">
                            <children>
-                              <ImageView fx:id="farm_img25" fitHeight="66.0" fitWidth="48.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fx:id="farm_img25" fitHeight="57.0" fitWidth="57.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="false">
                                  <image>
                                     <Image url="@../image/crops/wheat_plant3.png" />
                                  </image>
                               </ImageView>
                            </children>
                         </Pane>
-                        <Pane layoutX="339.0" layoutY="177.0" prefHeight="52.0" prefWidth="48.0">
+                        <Pane layoutX="337.0" layoutY="181.0" prefHeight="57.0" prefWidth="57.0">
                            <children>
-                              <ImageView fx:id="farm_img26" fitHeight="66.0" fitWidth="48.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fx:id="farm_img26" fitHeight="57.0" fitWidth="57.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="false">
                                  <image>
                                     <Image url="@../image/crops/wheat_plant3.png" />
                                  </image>
                               </ImageView>
                            </children>
                         </Pane>
-                        <Pane layoutX="409.0" layoutY="177.0" prefHeight="52.0" prefWidth="48.0">
+                        <Pane layoutX="404.0" layoutY="181.0" prefHeight="57.0" prefWidth="57.0">
                            <children>
-                              <ImageView fx:id="farm_img27" fitHeight="66.0" fitWidth="48.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fx:id="farm_img27" fitHeight="57.0" fitWidth="57.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="false">
                                  <image>
                                     <Image url="@../image/crops/wheat_plant3.png" />
                                  </image>
                               </ImageView>
                            </children>
                         </Pane>
-                        <Pane layoutX="477.0" layoutY="177.0" prefHeight="52.0" prefWidth="48.0">
+                        <Pane layoutX="473.0" layoutY="181.0" prefHeight="57.0" prefWidth="57.0">
                            <children>
-                              <ImageView fx:id="farm_img28" fitHeight="66.0" fitWidth="48.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fx:id="farm_img28" fitHeight="57.0" fitWidth="57.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="false">
                                  <image>
                                     <Image url="@../image/crops/wheat_plant3.png" />
                                  </image>
                               </ImageView>
                            </children>
                         </Pane>
-                        <Pane layoutX="83.0" layoutY="28.0" prefHeight="52.0" prefWidth="48.0">
+                        <Pane layoutX="76.0" layoutY="29.0" prefHeight="57.0" prefWidth="57.0">
                            <children>
-                              <ImageView fx:id="farm_img1" fitHeight="66.0" fitWidth="48.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true" />
+                              <ImageView fx:id="farm_img1" fitHeight="57.0" fitWidth="57.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="false" />
                            </children>
                         </Pane>
-                        <Pane layoutX="147.0" layoutY="28.0" prefHeight="52.0" prefWidth="48.0">
+                        <Pane layoutX="141.0" layoutY="30.0" prefHeight="57.0" prefWidth="57.0">
                            <children>
-                              <ImageView fx:id="farm_img2" fitHeight="66.0" fitWidth="48.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fx:id="farm_img2" fitHeight="57.0" fitWidth="57.0" onMouseClicked="#handleFarmPlot" pickOnBounds="true" preserveRatio="false">
                                  <image>
                                     <Image url="@../image/crops/wheat_plant3.png" />
                                  </image>
@@ -516,9 +516,9 @@
                   </Pane>
                </children>
             </Pane>
-            <Button fx:id="btntuto" layoutX="572.0" layoutY="3.0" mnemonicParsing="false" onAction="#handlebtntutoaction" style="-fx-background-radius: 100%; -fx-background-color: transparent; -fx-border-color: yellow; -fx-border-radius: 100%;" styleClass="invisible-button" stylesheets="@../css/style.css" textFill="#e6ff00">
+            <Button fx:id="btntuto" layoutX="572.0" layoutY="3.0" mnemonicParsing="false" onAction="#handlebtntutoaction" prefHeight="28.0" prefWidth="28.0" style="-fx-background-radius: 100%; -fx-background-color: transparent; -fx-border-color: yellow; -fx-border-radius: 100%; -fx-border-width: 1; -fx-padding: 0;" styleClass="invisible-button" stylesheets="@../css/style.css" textFill="#e6ff00">
                <graphic>
-                  <FontAwesomeIcon fill="#f6ff00" glyphName="QUESTION" size="1.5em" />
+                  <FontAwesomeIcon fill="#f6ff00" glyphName="QUESTION" selectionFill="YELLOW" size="1.5em" />
                </graphic>
             </Button>
          </children>
