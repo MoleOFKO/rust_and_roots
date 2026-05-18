@@ -83,18 +83,6 @@ public class Right_map_notwo_of_oneController extends BaseMapController {
     @FXML
     private ImageView drops_img_tree5;
     @FXML
-    private Group tree6;
-    @FXML
-    private ImageView tree_img6;
-    @FXML
-    private Rectangle tree_hitbox6;
-    @FXML
-    private ImageView drops_img_tree6;
-    @FXML
-    private Group treelayorgp6;
-    @FXML
-    private ImageView treelayorimg6;
-    @FXML
     private Group treelayorgp5;
     @FXML
     private ImageView treelayorimg5;
@@ -161,27 +149,105 @@ public class Right_map_notwo_of_oneController extends BaseMapController {
     @FXML
     private ImageView drops_img_stone2;
     @FXML
-    private Group orcb;
-    @FXML
-    private Rectangle orcb_hitbox;
-    @FXML
-    private ImageView orcb_img;
-    @FXML
-    private ImageView orcb_drops_img;
-    @FXML
-    private Rectangle orcb_hitbox_left;
-    @FXML
-    private Rectangle orcb_hitbox_up;
-    @FXML
-    private Rectangle orcb_hitbox_down;
-    @FXML
-    private Rectangle orcb_hitbox_right;
-    @FXML
-    private Rectangle orcb_detect;
-    @FXML
     private Slider bgmVolumeSlider;
     @FXML
     private Slider sfxVolumeSlider;
+    @FXML
+    private Group orc;
+    @FXML
+    private Rectangle orc_hitbox;
+    @FXML
+    private ImageView orc_img;
+    @FXML
+    private ImageView orc_drops_img;
+    @FXML
+    private Rectangle orc_hitbox_left;
+    @FXML
+    private Rectangle orc_hitbox_up;
+    @FXML
+    private Rectangle orc_hitbox_down;
+    @FXML
+    private Rectangle orc_hitbox_right;
+    @FXML
+    private Rectangle orc_detect;
+    @FXML
+    private Group orc1;
+    @FXML
+    private Rectangle orc1_hitbox;
+    @FXML
+    private ImageView orc1_img;
+    @FXML
+    private ImageView orc1_drops_img;
+    @FXML
+    private Rectangle orc1_hitbox_left;
+    @FXML
+    private Rectangle orc1_hitbox_up;
+    @FXML
+    private Rectangle orc1_hitbox_down;
+    @FXML
+    private Rectangle orc1_hitbox_right;
+    @FXML
+    private Rectangle orc1_detect;
+    @FXML
+    private Group fallen_tree;
+    @FXML
+    private ImageView fallen_tree_img;
+    @FXML
+    private Rectangle fallen_tree_wall;
+    @FXML
+    private Group minimapicongroup;
+    @FXML
+    private ImageView miniMapIcon;
+    @FXML
+    private Group minimapgroup;
+    @FXML
+    private ImageView minimap;
+    @FXML
+    private ImageView closeminimapbtn;
+    @FXML
+    private Rectangle left_map_nofour;
+    @FXML
+    private Rectangle upper_map_nofour;
+    @FXML
+    private Rectangle right_map_nofour;
+    @FXML
+    private Rectangle left_map_nothree_of_one;
+    @FXML
+    private Rectangle left_map_nothree;
+    @FXML
+    private Rectangle upper_map_nothree;
+    @FXML
+    private Rectangle right_map_nothree;
+    @FXML
+    private Rectangle right_map_nothree_of_one;
+    @FXML
+    private Rectangle left_map_notwo_of_two;
+    @FXML
+    private Rectangle left_map_notwo_of_one;
+    @FXML
+    private Rectangle left_map_notwo;
+    @FXML
+    private Rectangle upper_map_notwo;
+    @FXML
+    private Rectangle right_map_notwo;
+    @FXML
+    private Rectangle right_map_notwo_of_one;
+    @FXML
+    private Rectangle left_map_noone_of_one;
+    @FXML
+    private Rectangle left_map_noone;
+    @FXML
+    private Rectangle upper_map;
+    @FXML
+    private Rectangle right_map_noone;
+    @FXML
+    private Rectangle right_map_noone_of_one;
+    @FXML
+    private Rectangle left_map;
+    @FXML
+    private Rectangle home_map;
+    @FXML
+    private Rectangle right_map;
     
     @Override
     protected String dayBackgroundPath() {
