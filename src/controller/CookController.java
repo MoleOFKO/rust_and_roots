@@ -466,7 +466,7 @@ public class CookController implements Initializable, SceneController {
 
         if (selectedRecipe != null) {
             if (cookwaitingtimelbl != null) {
-                cookwaitingtimelbl.setText("waiting time: " + getAdjustedWaitSeconds(selectedRecipe) + "s  SP:-" + getAdjustedStaminaCost(selectedRecipe) + "  SR:" + computeSuccessRate(selectedRecipe) + "%");
+                cookwaitingtimelbl.setText("waiting time: " + getAdjustedWaitSeconds(selectedRecipe) + "s  SR:" + computeSuccessRate(selectedRecipe) + "%");
             }
             if (selectedcook != null) {
                 // Spec: only show the cooked result once the process is done.
@@ -485,7 +485,7 @@ public class CookController implements Initializable, SceneController {
                 return false;
             }
         }
-        return gameState.getPlayerState().getStamina() >= getAdjustedStaminaCost(recipe);
+        return true;
     }
 
     private int computeSuccessRate(Recipe recipe) {
@@ -503,11 +503,6 @@ public class CookController implements Initializable, SceneController {
         return ProcessingRules.computeAdjustedWaitSeconds(recipe.waitSeconds, recipe.dexScaling, gameState.getPlayerState().getDex());
     }
 
-    private int getAdjustedStaminaCost(Recipe recipe) {
-        if (recipe == null || gameState == null) return 0;
-        return ProcessingRules.computeAdjustedStaminaCost(recipe.staminaCost, recipe.dexScaling, gameState.getPlayerState().getDex());
-    }
-
     @FXML
     private void handlestartcookingaction(ActionEvent event) {
         if (selectedRecipe == null) return;
@@ -520,8 +515,6 @@ public class CookController implements Initializable, SceneController {
             }
         }
 
-        int adjustedStaminaCost = getAdjustedStaminaCost(selectedRecipe);
-        gameState.getPlayerState().consumeStamina(adjustedStaminaCost);
         int successRate = computeSuccessRate(selectedRecipe);
         boolean success = ProcessingRules.rollSuccess(successRate);
         int outputQty = success ? ProcessingRules.computeOutputAmount(selectedRecipe.baseOutputAmount, successRate) : 0;

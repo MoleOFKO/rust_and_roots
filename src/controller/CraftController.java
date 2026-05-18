@@ -254,7 +254,7 @@ public class CraftController implements Initializable, SceneController {
             return;
         }
         if (lblname != null) lblname.setText("Name : " + selectedRecipe.name + " x" + selectedRecipe.baseOutputAmount);
-        if (lblwt != null) lblwt.setText("Waiting time : " + getAdjustedWaitSeconds(selectedRecipe) + "s  SP:-" + getAdjustedStaminaCost(selectedRecipe));
+        if (lblwt != null) lblwt.setText("Waiting time : " + getAdjustedWaitSeconds(selectedRecipe) + "s");
         if (lblsr != null) lblsr.setText("Success rate : " + computeSuccessRate(selectedRecipe) + "%");
         if (lbleffect != null) lbleffect.setText("Effect : " + buildEffectText(selectedRecipe));
         updateIngredientViews();
@@ -372,7 +372,7 @@ public class CraftController implements Initializable, SceneController {
             return;
         }
         if (selectedRecipe != null) {
-            if (lblwt != null) lblwt.setText("Waiting time : " + getAdjustedWaitSeconds(selectedRecipe) + "s  SP:-" + getAdjustedStaminaCost(selectedRecipe));
+            if (lblwt != null) lblwt.setText("Waiting time : " + getAdjustedWaitSeconds(selectedRecipe) + "s");
             if (resultitem != null) {
                 // Spec: only show the crafted result once the process is done.
                 resultitem.setImage(null);
@@ -386,7 +386,6 @@ public class CraftController implements Initializable, SceneController {
 
     private boolean canCraft(Recipe recipe) {
         if (recipe == null) return false;
-        if (gameState.getPlayerState().getStamina() < getAdjustedStaminaCost(recipe)) return false;
         for (IngredientRequirement req : recipe.ingredients) {
             if (inventory.getCount(req.itemId) < req.requiredAmount) return false;
         }
@@ -406,11 +405,6 @@ public class CraftController implements Initializable, SceneController {
     private int getAdjustedWaitSeconds(Recipe recipe) {
         if (recipe == null || gameState == null) return 0;
         return ProcessingRules.computeAdjustedWaitSeconds(recipe.waitSeconds, recipe.dexScaling, gameState.getPlayerState().getDex());
-    }
-
-    private int getAdjustedStaminaCost(Recipe recipe) {
-        if (recipe == null || gameState == null) return 0;
-        return ProcessingRules.computeAdjustedStaminaCost(recipe.staminaCost, recipe.dexScaling, gameState.getPlayerState().getDex());
     }
 
     @FXML
@@ -472,8 +466,6 @@ public class CraftController implements Initializable, SceneController {
         for (IngredientRequirement req : selectedRecipe.ingredients) {
             if (!inventory.removeItem(req.itemId, req.requiredAmount)) return;
         }
-        int adjustedStaminaCost = getAdjustedStaminaCost(selectedRecipe);
-        gameState.getPlayerState().consumeStamina(adjustedStaminaCost);
         int successRate = computeSuccessRate(selectedRecipe);
         boolean success = ProcessingRules.rollSuccess(successRate);
         int outputQty = success ? ProcessingRules.computeOutputAmount(selectedRecipe.baseOutputAmount, successRate) : 0;

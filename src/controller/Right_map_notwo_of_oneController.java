@@ -30,7 +30,8 @@ public class Right_map_notwo_of_oneController extends BaseMapController {
 
     private static final String DAY_BG_PATH = "/image/maps/rightmap_no.2(1).png";
     private static final String NIGHT_BG_PATH = "/image/NightMap/rightmap_no.2(1)night.png";
-    private static final int FALLEN_TREE_UNLOCK_DAY = 100;
+    private static final int FALLEN_TREE_REQUIRED_SURVIVED_DAYS = 100;
+    private static final double FALLEN_TREE_CONTACT_MARGIN = 6.0;
 
     private boolean fallenTreeCollisionRegistered = false;
     private boolean fallenTreeDialogArmed = true;
@@ -614,10 +615,14 @@ public class Right_map_notwo_of_oneController extends BaseMapController {
             fallenTreeCollisionRegistered = true;
         }
 
-        int currentDay = GameTimeManager.get().dayNumberProperty().get();
-        boolean unlocked = currentDay >= FALLEN_TREE_UNLOCK_DAY;
+        int survivedDays = Math.max(0, GameTimeManager.get().dayNumberProperty().get() - 1);
+        boolean unlocked = survivedDays >= FALLEN_TREE_REQUIRED_SURVIVED_DAYS;
 
         fallen_tree_wall.setDisable(unlocked);
+        if (fallen_tree != null) {
+            fallen_tree.setVisible(!unlocked);
+            fallen_tree.setManaged(!unlocked);
+        }
         if (fallen_tree_img != null) {
             fallen_tree_img.setVisible(!unlocked);
             fallen_tree_img.setManaged(!unlocked);
@@ -629,7 +634,12 @@ public class Right_map_notwo_of_oneController extends BaseMapController {
         }
 
         Bounds wallBounds = fallen_tree_wall.localToScene(fallen_tree_wall.getBoundsInLocal());
-        boolean touchingWall = playerBounds.intersects(wallBounds);
+        boolean touchingWall = playerBounds.intersects(
+            wallBounds.getMinX() - FALLEN_TREE_CONTACT_MARGIN,
+            wallBounds.getMinY() - FALLEN_TREE_CONTACT_MARGIN,
+            wallBounds.getWidth() + (FALLEN_TREE_CONTACT_MARGIN * 2.0),
+            wallBounds.getHeight() + (FALLEN_TREE_CONTACT_MARGIN * 2.0)
+        );
         if (!touchingWall) {
             fallenTreeDialogArmed = true;
             return;
@@ -637,7 +647,7 @@ public class Right_map_notwo_of_oneController extends BaseMapController {
 
         if (fallenTreeDialogArmed) {
             fallenTreeDialogArmed = false;
-            int remainingDays = Math.max(0, FALLEN_TREE_UNLOCK_DAY - currentDay);
+            int remainingDays = Math.max(0, FALLEN_TREE_REQUIRED_SURVIVED_DAYS - survivedDays);
             AppDialogs.showMessageDialog(null, "Come again after " + remainingDays + " days....");
         }
     }
