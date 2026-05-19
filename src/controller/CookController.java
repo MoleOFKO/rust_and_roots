@@ -664,7 +664,7 @@ public class CookController implements Initializable, SceneController {
 
     @FXML
     private void handlebtntutoaction(ActionEvent event) {
-        TutorialOverlayHelper.show(view, List.of("/image/Toturial/Cooking Tutorial.png"));
+        TutorialOverlayHelper.show(view, event, List.of("/image/Toturial/Cooking Tutorial.png"));
         if (event != null) event.consume();
     }
 

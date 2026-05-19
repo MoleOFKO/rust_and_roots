@@ -1044,7 +1044,7 @@
                               </children>
                            </Group>
                            <Button fx:id="openInventory" layoutX="117.0" layoutY="32.0" mnemonicParsing="false" onAction="#handleopenInventoryaction" opacity="0.0" prefHeight="25.0" prefWidth="89.0" styleClass="invisible-button" stylesheets="@../css/style.css" />
-                           <ImageView fx:id="btnclose" fitHeight="25.0" fitWidth="20.0" layoutX="472.0" layoutY="29.0" onMouseClicked="#handlecloseaction" pickOnBounds="true" preserveRatio="true">
+                           <ImageView fx:id="btnclose" fitHeight="28.0" fitWidth="28.0" layoutX="472.0" layoutY="29.0" onMouseClicked="#handlecloseaction" pickOnBounds="true" preserveRatio="true">
                               <image>
                                  <Image url="@../image/tools/x.png" />
                               </image>

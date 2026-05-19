@@ -668,7 +668,7 @@ public class MeltController implements Initializable, SceneController {
 
     @FXML
     private void handlebtntutoaction(ActionEvent event) {
-        TutorialOverlayHelper.show(view, MELT_TUTORIAL_IMAGES);
+        TutorialOverlayHelper.show(view, event, MELT_TUTORIAL_IMAGES);
         if (event != null) event.consume();
     }
 

@@ -35,6 +35,7 @@ import util.SceneManager;
 import util.SkillModifiers;
 import util.SpawnTag;
 import util.TutorialOverlayHelper;
+import util.WorldScaler;
 
 public class Farm_tableController implements Initializable, SceneController {
     private static final String TOOL_SLOT_STYLE = "-fx-effect: dropshadow(gaussian, rgba(255,215,0,0.85), 14, 0.55, 0, 0);";
@@ -95,7 +96,7 @@ public class Farm_tableController implements Initializable, SceneController {
 
     @FXML
     private void handlebtntutoaction(ActionEvent event) {
-        TutorialOverlayHelper.show(view, TutorialOverlayHelper.GLOBAL_BUTTON_TUTORIAL_IMAGES);
+        TutorialOverlayHelper.show(view, event, TutorialOverlayHelper.GLOBAL_BUTTON_TUTORIAL_IMAGES);
         if (event != null) {
             event.consume();
         }
@@ -143,6 +144,7 @@ public class Farm_tableController implements Initializable, SceneController {
     public void initialize(URL url, ResourceBundle rb) {
         if (gameState == null) gameState = GameState.get();
         ItemDatabase.loadItems();
+        new WorldScaler(view, world);
 
         defaultSeedsIcon = SeedsImg == null ? null : SeedsImg.getImage();
         defaultWaterCanIcon = WaterCanImg == null ? null : WaterCanImg.getImage();

@@ -566,7 +566,7 @@ public class CraftController implements Initializable, SceneController {
 
     @FXML
     private void handlebtntutoaction(ActionEvent event) {
-        TutorialOverlayHelper.show(view, List.of("/image/Toturial/Craft Tutorial.png"));
+        TutorialOverlayHelper.show(view, event, List.of("/image/Toturial/Craft Tutorial.png"));
         if (event != null) event.consume();
     }
 
