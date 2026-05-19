@@ -414,7 +414,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 	    }
 
 	    private void dispatchPlayerAttackStarted() {
-	        if (player != null && player.isSwordEquipped()) {
+	        if (player != null && player.usesBladeAttackSfx()) {
 	            SoundManager.playSfx(SoundManager.Sfx.SWORD_CUT);
 	        }
 

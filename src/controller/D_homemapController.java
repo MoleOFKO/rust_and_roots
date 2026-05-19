@@ -849,7 +849,10 @@ public class D_homemapController extends BaseMapController {
             return;
         }
 
-        Bounds attackBounds = attackHitbox.localToScene(attackHitbox.getBoundsInLocal());
+        Bounds attackBounds = PlayerAttackBounds.build(player, human_hitbox, attackHitbox);
+        if (attackBounds == null) {
+            return;
+        }
         int currentDay = game.GameTimeManager.get().dayNumberProperty().get();
         double nowSeconds = game.GameTimeManager.get().totalSecondsProperty().get();
 

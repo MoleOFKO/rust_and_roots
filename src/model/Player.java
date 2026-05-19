@@ -273,6 +273,18 @@ public class Player {
         return equippedKind == EquipmentKind.SWORD;
     }
 
+    public boolean isDaggerEquipped() {
+        return equippedKind == EquipmentKind.DAGGER;
+    }
+
+    public boolean isSpearEquipped() {
+        return equippedKind == EquipmentKind.SPEAR;
+    }
+
+    public boolean usesBladeAttackSfx() {
+        return isSwordEquipped() || isDaggerEquipped() || isSpearEquipped();
+    }
+
     public enum FacingDirection {
         DOWN,
         LEFT,

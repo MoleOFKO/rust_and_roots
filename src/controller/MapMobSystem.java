@@ -825,59 +825,14 @@ final class MapMobSystem {
     }
 
     private Bounds buildPlayerAttackBounds() {
-        if (player == null) return null;
-
-        Rectangle directional = resolveActiveDirectionalAttackHitbox();
-        if (directional != null) {
-            return directional.localToScene(directional.getBoundsInLocal());
-        }
-
-        if (playerBodyHitbox == null) return null;
-        Bounds body = playerBodyHitbox.localToScene(playerBodyHitbox.getBoundsInLocal());
-
-        double attackWidth = 14.0;
-        double attackHeight = 20.0;
-
-        return switch (player.getFacingDirection()) {
-            case LEFT -> new BoundingBox(
-                body.getMinX() - attackWidth,
-                body.getMinY() + (body.getHeight() - attackHeight) * 0.5,
-                attackWidth,
-                attackHeight
-            );
-            case RIGHT -> new BoundingBox(
-                body.getMaxX(),
-                body.getMinY() + (body.getHeight() - attackHeight) * 0.5,
-                attackWidth,
-                attackHeight
-            );
-            case UP -> new BoundingBox(
-                body.getMinX() + (body.getWidth() - attackWidth) * 0.5,
-                body.getMinY() - attackHeight,
-                attackWidth,
-                attackHeight
-            );
-            case DOWN -> new BoundingBox(
-                body.getMinX() + (body.getWidth() - attackWidth) * 0.5,
-                body.getMaxY(),
-                attackWidth,
-                attackHeight
-            );
-        };
-    }
-
-    private Rectangle resolveActiveDirectionalAttackHitbox() {
-        if (player == null) return null;
-        if (playerAttackLeft == null && playerAttackRight == null && playerAttackUp == null && playerAttackDown == null) {
-            return null;
-        }
-
-        return switch (player.getFacingDirection()) {
-            case LEFT -> playerAttackLeft;
-            case RIGHT -> playerAttackRight;
-            case UP -> playerAttackUp;
-            case DOWN -> playerAttackDown;
-        };
+        return PlayerAttackBounds.build(
+            player,
+            playerBodyHitbox,
+            playerAttackLeft,
+            playerAttackRight,
+            playerAttackUp,
+            playerAttackDown
+        );
     }
 
     private void syncDirectionalHitboxes() {

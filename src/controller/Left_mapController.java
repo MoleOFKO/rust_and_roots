@@ -921,7 +921,8 @@ public class Left_mapController extends BaseMapController {
         Rectangle attackHitbox = resolveActiveAttackHitbox();
         if (attackHitbox == null) return;
 
-        Bounds attackBounds = attackHitbox.localToScene(attackHitbox.getBoundsInLocal());
+        Bounds attackBounds = PlayerAttackBounds.build(player, human_hitbox, attackHitbox);
+        if (attackBounds == null) return;
         GameTimeManager time = GameTimeManager.get();
         int currentDay = time.dayNumberProperty().get();
         double nowSeconds = time.totalSecondsProperty().get();

@@ -1027,7 +1027,8 @@ public class Upper_mapController extends BaseMapController {
         Rectangle attackHitbox = resolveActiveAttackHitbox();
         if (attackHitbox == null) return;
 
-        Bounds attackBounds = attackHitbox.localToScene(attackHitbox.getBoundsInLocal());
+        Bounds attackBounds = PlayerAttackBounds.build(player, human_hitbox, attackHitbox);
+        if (attackBounds == null) return;
         long nowNanos = System.nanoTime();
 
         GameTimeManager time = GameTimeManager.get();
