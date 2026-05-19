@@ -434,6 +434,8 @@ public class FinalbossController extends BaseMapController {
     private Rectangle orcb_hitbox_right;
     @FXML
     private Rectangle orcb_detect;
+    @FXML
+    private Button tutoclose;
 
 //    /**
 //     * Initializes the controller class.

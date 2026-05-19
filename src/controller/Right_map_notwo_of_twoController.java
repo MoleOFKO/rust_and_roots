@@ -490,6 +490,18 @@ public class Right_map_notwo_of_twoController extends BaseMapController {
     private Rectangle orc_hitbox_right1;
     @FXML
     private Rectangle orc_detect1;
+    @FXML
+    private Button tutoclose;
+    @FXML
+    private Group minimapicongroup;
+    @FXML
+    private ImageView miniMapIcon;
+    @FXML
+    private Group minimapgroup;
+    @FXML
+    private ImageView minimap;
+    @FXML
+    private ImageView closeminimapbtn;
 
     @Override
     protected String mapKey() {
@@ -515,5 +527,4 @@ public class Right_map_notwo_of_twoController extends BaseMapController {
         private void handlebtntutoaction(ActionEvent event) {
             showOverworldTutorialOverlay();
         }
-
 }

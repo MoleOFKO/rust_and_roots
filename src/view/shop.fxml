@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.text.Font?>
 
-<StackPane fx:id="view" style="-fx-background-color: black;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ShopController">
+<StackPane fx:id="view" style="-fx-background-color: black;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ShopController">
    <children>
       <Group fx:id="world">
          <children>
@@ -304,7 +304,7 @@
                      <children>
                         <ImageView fx:id="imgsell1" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                        <Button fx:id="btnsell1" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                        <Button fx:id="btnsell1" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                         <Label fx:id="lblsell1" layoutX="38.0" layoutY="38.0" text="x0" />
                      </children>
                   </Group>
@@ -312,7 +312,7 @@
                      <children>
                         <ImageView fx:id="imgsell2" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                        <Button fx:id="btnsell2" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                        <Button fx:id="btnsell2" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                         <Label fx:id="lblsell2" layoutX="38.0" layoutY="38.0" text="x0" />
                      </children>
                   </Group>
@@ -320,7 +320,7 @@
                      <children>
                         <ImageView fx:id="imgsell3" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                        <Button fx:id="btnsell3" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                        <Button fx:id="btnsell3" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                         <Label fx:id="lblsell3" layoutX="38.0" layoutY="38.0" text="x0" />
                      </children>
                   </Group>
@@ -328,7 +328,7 @@
                      <children>
                         <ImageView fx:id="imgsell4" fitHeight="55.0" fitWidth="55.0" layoutY="1.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                        <Button fx:id="btnsell4" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                        <Button fx:id="btnsell4" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                         <Label fx:id="lblsell4" layoutX="38.0" layoutY="39.0" text="x0" />
                      </children>
                   </Group>
@@ -336,7 +336,7 @@
                      <children>
                         <ImageView fx:id="imgsell5" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                        <Button fx:id="btnsell5" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                        <Button fx:id="btnsell5" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                         <Label fx:id="lblsell5" layoutX="38.0" layoutY="38.0" text="x0" />
                      </children>
                   </Group>
@@ -344,7 +344,7 @@
                      <children>
                         <ImageView fx:id="imgsell6" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                        <Button fx:id="btnsell6" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                        <Button fx:id="btnsell6" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                         <Label fx:id="lblsell6" layoutX="38.0" layoutY="38.0" text="x0" />
                      </children>
                   </Group>
@@ -352,7 +352,7 @@
                      <children>
                         <ImageView fx:id="imgsell7" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                        <Button fx:id="btnsell7" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                        <Button fx:id="btnsell7" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                         <Label fx:id="lblsell7" layoutX="38.0" layoutY="38.0" text="x0" />
                      </children>
                   </Group>
@@ -360,7 +360,7 @@
                      <children>
                         <ImageView fx:id="imgsell8" fitHeight="55.0" fitWidth="55.0" layoutY="1.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                        <Button fx:id="btnsell8" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                        <Button fx:id="btnsell8" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                         <Label fx:id="lblsell8" layoutX="38.0" layoutY="39.0" text="x0" />
                      </children>
                   </Group>
@@ -368,7 +368,7 @@
                      <children>
                         <ImageView fx:id="imgsell9" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                        <Button fx:id="btnsell9" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                        <Button fx:id="btnsell9" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                         <Label fx:id="lblsell9" layoutX="38.0" layoutY="38.0" text="x0" />
                      </children>
                   </Group>
@@ -376,7 +376,7 @@
                      <children>
                         <ImageView fx:id="imgsell10" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                        <Button fx:id="btnsell10" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                        <Button fx:id="btnsell10" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                         <Label fx:id="lblsell10" layoutX="38.0" layoutY="38.0" text="x0" />
                      </children>
                   </Group>
@@ -384,7 +384,7 @@
                      <children>
                         <ImageView fx:id="imgsell11" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                        <Button fx:id="btnsell11" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                        <Button fx:id="btnsell11" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="55.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                         <Label fx:id="lblsell11" layoutX="38.0" layoutY="38.0" text="x0" />
                      </children>
                   </Group>
@@ -392,7 +392,7 @@
                      <children>
                         <ImageView fx:id="imgsell12" fitHeight="55.0" fitWidth="55.0" layoutY="1.0" pickOnBounds="true" preserveRatio="true">
 </ImageView>
-                        <Button fx:id="btnsell12" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="56.0" text="Button" styleClass="invisible-button" stylesheets="@../css/style.css" />
+                        <Button fx:id="btnsell12" mnemonicParsing="false" opacity="0.0" prefHeight="55.0" prefWidth="56.0" styleClass="invisible-button" stylesheets="@../css/style.css" text="Button" />
                         <Label fx:id="lblsell12" layoutX="38.0" layoutY="39.0" text="x0" />
                      </children>
                   </Group>
@@ -419,9 +419,14 @@
             </Pane>
             <Button fx:id="colbuy" layoutX="307.0" layoutY="35.0" mnemonicParsing="false" onAction="#handlecolbuyaction" opacity="0.0" prefHeight="25.0" prefWidth="34.0" styleClass="invisible-button" stylesheets="@../css/style.css" />
             <Button fx:id="colsell" alignment="TOP_LEFT" layoutX="346.0" layoutY="35.0" mnemonicParsing="false" onAction="#handlecolsellaction" opacity="0.0" prefHeight="25.0" prefWidth="34.0" styleClass="invisible-button" stylesheets="@../css/style.css" />
-            <Button prefWidth="28.0" prefHeight="28.0" fx:id="btntuto" layoutX="572.0" mnemonicParsing="false" onAction="#handlebtntutoaction" style="-fx-background-radius: 100%; -fx-background-color: transparent; -fx-border-color: yellow; -fx-border-radius: 100%; -fx-border-width: 1; -fx-padding: 0;" styleClass="invisible-button" stylesheets="@../css/style.css" textFill="#e6ff00">
+            <Button fx:id="btntuto" layoutX="572.0" mnemonicParsing="false" onAction="#handlebtntutoaction" prefHeight="28.0" prefWidth="28.0" style="-fx-background-radius: 100%; -fx-background-color: transparent; -fx-border-color: yellow; -fx-border-radius: 100%; -fx-border-width: 1; -fx-padding: 0;" styleClass="invisible-button" stylesheets="@../css/style.css" textFill="#e6ff00">
                <graphic>
-                  <FontAwesomeIcon fill="#f6ff00" glyphName="QUESTION" selectionFill="YELLOW" size="1.5em" />
+                  <FontAwesomeIcon fill="#f6ff00" glyphName="QUESTION" size="1.5em" />
+               </graphic>
+            </Button>
+            <Button fx:id="tutoclose" layoutX="572.0" mnemonicParsing="false" onAction="#handlebtntutoaction" prefHeight="28.0" prefWidth="28.0" style="-fx-background-radius: 100%; -fx-background-color: transparent; -fx-border-color: yellow; -fx-border-radius: 100%; -fx-border-width: 1; -fx-padding: 0;" styleClass="invisible-button" stylesheets="@../css/style.css" textFill="#e6ff00" visible="false">
+               <graphic>
+                  <FontAwesomeIcon fill="#f6ff00" glyphName="CLOSE" size="1.5em" />
                </graphic>
             </Button>
          </children>

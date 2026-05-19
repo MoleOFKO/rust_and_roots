@@ -138,6 +138,8 @@ public class CookController implements Initializable, SceneController {
     private Label cooksuccessrate;
     @FXML
     private Button btntuto;
+    @FXML
+    private Button tutoclose;
 
     @Override
     public void init(GameState gs) {

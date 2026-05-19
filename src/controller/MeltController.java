@@ -125,6 +125,8 @@ public class MeltController implements Initializable, SceneController {
     @FXML private Label guide;
     @FXML
     private Button btntuto;
+    @FXML
+    private Button tutoclose;
 
     @Override
     public void init(GameState gs) {

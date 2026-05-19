@@ -112,6 +112,7 @@ public class Left_map_notwo_of_twoController extends BaseMapController{
     @FXML
     private Rectangle right_map;
     @FXML
+    private Button tutoclose;
     private Rectangle wall4;
     @FXML
     private Rectangle wall5;

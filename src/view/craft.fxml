@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.text.Font?>
 
-<StackPane fx:id="view" style="-fx-background-color: black;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.CraftController">
+<StackPane fx:id="view" style="-fx-background-color: black;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.CraftController">
    <children>
       <Group fx:id="world">
          <children>
@@ -129,9 +129,14 @@
                </font>
             </Label>
             <Button fx:id="btnclose" layoutX="319.0" layoutY="313.0" mnemonicParsing="false" onAction="#handlecloseaction" opacity="0.0" prefHeight="34.0" prefWidth="112.0" styleClass="invisible-button" stylesheets="@../css/style.css" />
-            <Button prefWidth="28.0" prefHeight="28.0" fx:id="btntuto" layoutX="572.0" mnemonicParsing="false" onAction="#handlebtntutoaction" style="-fx-background-radius: 100%; -fx-background-color: transparent; -fx-border-color: yellow; -fx-border-radius: 100%; -fx-border-width: 1; -fx-padding: 0;" styleClass="invisible-button" stylesheets="@../css/style.css" textFill="#e6ff00">
+            <Button fx:id="btntuto" layoutX="572.0" mnemonicParsing="false" onAction="#handlebtntutoaction" prefHeight="28.0" prefWidth="28.0" style="-fx-background-radius: 100%; -fx-background-color: transparent; -fx-border-color: yellow; -fx-border-radius: 100%; -fx-border-width: 1; -fx-padding: 0;" styleClass="invisible-button" stylesheets="@../css/style.css" textFill="#e6ff00">
                <graphic>
-                  <FontAwesomeIcon fill="#f6ff00" glyphName="QUESTION" selectionFill="YELLOW" size="1.5em" />
+                  <FontAwesomeIcon fill="#f6ff00" glyphName="QUESTION" size="1.5em" />
+               </graphic>
+            </Button>
+            <Button fx:id="tutoclose" layoutX="572.0" mnemonicParsing="false" onAction="#handlebtntutoaction" prefHeight="28.0" prefWidth="28.0" style="-fx-background-radius: 100%; -fx-background-color: transparent; -fx-border-color: yellow; -fx-border-radius: 100%; -fx-border-width: 1; -fx-padding: 0;" styleClass="invisible-button" stylesheets="@../css/style.css" textFill="#e6ff00" visible="false">
+               <graphic>
+                  <FontAwesomeIcon fill="#f6ff00" glyphName="CLOSE" size="1.5em" />
                </graphic>
             </Button>
          </children></Group>

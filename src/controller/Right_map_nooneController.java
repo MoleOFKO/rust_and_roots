@@ -239,6 +239,8 @@ public class Right_map_nooneController extends BaseMapController {
     private Slider bgmVolumeSlider;
     @FXML
     private Slider sfxVolumeSlider;
+    @FXML
+    private Button tutoclose;
 
     @Override
     protected String dayBackgroundPath() {
