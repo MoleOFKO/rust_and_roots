@@ -33,14 +33,6 @@
                   <Rectangle fx:id="exit_down" height="8.0" layoutX="-45.0" layoutY="204.0" opacity="0" width="63.0" />
                   <Rectangle fx:id="exit_up" height="7.0" layoutX="-31.0" layoutY="-183.0" opacity="0" width="51.0" />
                   <Rectangle fx:id="exit_left" height="38.0" layoutX="-290.0" layoutY="-64.0" opacity="0" width="4.0" />
-                  <Label fx:id="hotbarguide" layoutX="-58.0" layoutY="186.0" text="press 'e' to open hotbar">
-                     <font>
-                        <Font name="System Bold" size="12.0" />
-                     </font>
-                     <effect>
-                        <DropShadow color="white" height="10.5" radius="6.9925" spread="0.67" width="19.47" />
-                     </effect>
-                  </Label>
                </children>
             </Group>
             <Group fx:id="walls" layoutY="-1.0" visible="false">
@@ -165,6 +157,14 @@
                   <ImageView fx:id="equip_img" fitHeight="64" fitWidth="64" layoutX="245.0" layoutY="171.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
                </children>
             </Group>
+            <Label fx:id="hotbarguide" layoutX="230.0" layoutY="361.0" text="press 'e' to open hotbar">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+               <effect>
+                  <DropShadow color="white" height="10.5" radius="6.9925" spread="0.67" width="19.47" />
+               </effect>
+            </Label>
             <Group fx:id="treelayorgp8" layoutX="319.0" layoutY="272.0">
                <children>
                   <ImageView fx:id="treelayorimg8" fitHeight="126.0" fitWidth="107.0" pickOnBounds="true" preserveRatio="true" />

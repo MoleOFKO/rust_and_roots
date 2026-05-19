@@ -31,6 +31,9 @@ import util.SpawnTag;
  */
 public class Right_map_notwo_of_twoController extends BaseMapController {
 
+    private static final String DAY_BG_PATH = "/image/maps/rightmapno2of2.png";
+    private static final String NIGHT_BG_PATH = "/image/NightMap/right_map_no.2(2)night.png";
+    
     @FXML
     private StackPane view;
     @FXML
@@ -503,6 +506,16 @@ public class Right_map_notwo_of_twoController extends BaseMapController {
     @Override
     protected String mapKey() {
         return "right_map_notwo_of_two";
+    }
+    
+    @Override
+    protected String dayBackgroundPath() {
+        return DAY_BG_PATH;
+    }
+
+    @Override
+    protected String nightBackgroundPath() {
+        return NIGHT_BG_PATH;
     }
 
     @Override

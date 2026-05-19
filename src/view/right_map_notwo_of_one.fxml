@@ -94,6 +94,16 @@
                   <ImageView fx:id="drops_img_tree5" fitHeight="28.0" fitWidth="28.0" layoutX="303.0" layoutY="267.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
                </children>
             </Group>
+            <Group fx:id="fallen_tree" layoutX="271.0" layoutY="-108.0">
+               <children>
+                  <ImageView fx:id="fallen_tree_img" fitHeight="140.0" fitWidth="43.0" layoutX="286.0" layoutY="176.0" pickOnBounds="true" preserveRatio="false" smooth="false">
+                     <image>
+                        <Image url="@../image/maps/Fallen_Tree.png" />
+                     </image>
+                  </ImageView>
+                  <Rectangle fx:id="fallen_tree_wall" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="127.0" layoutX="270.0" layoutY="152.0" mouseTransparent="true" opacity="0" stroke="TRANSPARENT" strokeType="INSIDE" translateX="24" translateY="28" width="35.0" />
+               </children>
+            </Group>
             <Group fx:id="human">
                <children>
                   <ImageView fx:id="human_img" fitHeight="64" fitWidth="64" layoutX="284.0" layoutY="78.0" />
@@ -101,6 +111,14 @@
                   <Rectangle fx:id="human_hitbox" arcHeight="6" arcWidth="6" fill="TRANSPARENT" height="24" layoutX="299.0" layoutY="96.0" width="28" />
                </children>
             </Group>
+            <Label fx:id="hotbarguide" layoutX="233.0" layoutY="368.0" text="press 'e' to open hotbar">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+               <effect>
+                  <DropShadow color="white" height="10.5" radius="6.9925" spread="0.67" width="19.47" />
+               </effect>
+            </Label>
             <Group fx:id="orc" layoutX="165.0" layoutY="26.0">
                <children>
                   <Rectangle fx:id="orc_hitbox" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="262.0" layoutY="171.0" stroke="RED" strokeType="INSIDE" translateX="24" translateY="28" width="14.0" />
@@ -155,29 +173,11 @@
                   <ImageView fx:id="treelayorimg" fitHeight="126.0" fitWidth="107.0" pickOnBounds="true" preserveRatio="true" />
                </children>
             </Group>
-            <Group fx:id="fallen_tree" layoutX="271.0" layoutY="-108.0">
-               <children>
-                  <ImageView fx:id="fallen_tree_img" fitHeight="140.0" fitWidth="43.0" layoutX="286.0" layoutY="176.0" pickOnBounds="true" preserveRatio="false" smooth="false">
-                     <image>
-                        <Image url="@../image/maps/Fallen_Tree.png" />
-                     </image>
-                  </ImageView>
-                  <Rectangle fx:id="fallen_tree_wall" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="127.0" layoutX="269.0" layoutY="152.0" mouseTransparent="true" opacity="0" stroke="TRANSPARENT" strokeType="INSIDE" translateX="24" translateY="28" width="35.0" />
-               </children>
-            </Group>
             <Group>
                <children>
                   <Rectangle fx:id="exit_left" height="39.0" layoutX="2.0" layoutY="128.0" opacity="0" width="6.0" />
                   <Rectangle fx:id="exit_down" height="12.0" layoutX="210.0" layoutY="388.0" opacity="0" width="66.0" />
                   <Rectangle fx:id="exit_right" height="39.0" layoutX="590.0" layoutY="117.0" opacity="0" width="7.0" />
-                  <Label fx:id="hotbarguide" layoutX="232.0" layoutY="371.0" text="press 'e' to open hotbar">
-                     <font>
-                        <Font name="System Bold" size="12.0" />
-                     </font>
-                     <effect>
-                        <DropShadow color="white" height="10.5" radius="6.9925" spread="0.67" width="19.47" />
-                     </effect>
-                  </Label>
                </children>
             </Group>
             <Group>

@@ -33,14 +33,6 @@
                   <Rectangle fx:id="exit_down" height="12.0" layoutX="265.0" layoutY="331.0" opacity="0" width="70.0" />
                   <Rectangle fx:id="exit_right" height="59.0" layoutX="591.0" layoutY="80.0" opacity="0" width="12.0" />
                   <Rectangle fx:id="exit_left" height="62.0" layoutY="77.0" opacity="0" width="7.0" />
-                  <Label fx:id="hotbarguide" layoutX="229.0" layoutY="315.0" text="press 'e' to open hotbar">
-                     <font>
-                        <Font name="System Bold" size="12.0" />
-                     </font>
-                     <effect>
-                        <DropShadow color="white" height="10.5" radius="6.9925" spread="0.67" width="19.47" />
-                     </effect>
-                  </Label>
                </children>
             </Group>
             <Group autoSizeChildren="false" layoutX="33.0" layoutY="82.0">
@@ -91,6 +83,14 @@
                   <ImageView fx:id="equip_img" fitHeight="64" fitWidth="64" layoutY="42.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
                </children>
             </Group>
+            <Label fx:id="hotbarguide" layoutX="239.0" layoutY="365.0" text="press 'e' to open hotbar">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+               <effect>
+                  <DropShadow color="white" height="10.5" radius="6.9925" spread="0.67" width="19.47" />
+               </effect>
+            </Label>
             <Group fx:id="slime" layoutX="-110.0" layoutY="-121.0">
                <children>
                   <Rectangle fx:id="slime_hitbox" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="262.0" layoutY="171.0" stroke="RED" strokeType="INSIDE" translateX="24" translateY="28" width="14.0" />

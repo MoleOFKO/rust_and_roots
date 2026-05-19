@@ -162,6 +162,10 @@ public class D_homemapController extends BaseMapController {
     private Rectangle copper_hitbox1;
     @FXML
     private ImageView drops_img_copper1;
+    @FXML
+    private Slider bgmVolumeSlider;
+    @FXML
+    private Slider sfxVolumeSlider;
 
     @Override
     protected String dayBackgroundPath() {
@@ -511,21 +515,7 @@ public class D_homemapController extends BaseMapController {
     @FXML
     private Group settingsTab;
     @FXML
-    private Slider timescaleslider;
-    @FXML
-    private Button btnsetday;
-    @FXML
-    private Button btnsetnight;
-    @FXML
-    private Button btnplus1h;
-    @FXML
     private Button btnsaveandexit;
-    @FXML
-    private Label sliderscale;
-    @FXML
-    private Label lbldays;
-    @FXML
-    private Label lbltime;
     @FXML
     private Button btnsave;
     @FXML
