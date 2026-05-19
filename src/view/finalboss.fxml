@@ -23,7 +23,7 @@
    <children>
       <Group fx:id="world">
          <children>
-            <ImageView fitHeight="406.0" fitWidth="604.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="bg" fitHeight="406.0" fitWidth="604.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../image/maps/finalboss.png" />
                </image>

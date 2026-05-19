@@ -137,7 +137,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     private static final ConcurrentHashMap<String, AtomicLong> MAP_EVICTION_VERSION_BY_KEY = new ConcurrentHashMap<>();
     private static final String DAY_TO_NIGHT_SWAP_IMAGE = "/image/tools/DayNightSwap.png";
     private static final String NIGHT_TO_DAY_SWAP_IMAGE = "/image/tools/dayswap.png";
-    private static final Duration DAY_NIGHT_SWAP_DISPLAY_DURATION = Duration.seconds(1);
+    private static final Duration DAY_NIGHT_SWAP_DISPLAY_DURATION = Duration.seconds(0.2);
 
     private boolean permadeathHandled = false;
 

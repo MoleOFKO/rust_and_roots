@@ -30,6 +30,9 @@ import util.SpawnTag;
  * @author Kaung Zin
  */
 public class FinalbossController extends BaseMapController {
+    
+    private static final String DAY_BG_PATH = "/image/maps/finalboss.png";
+    private static final String NIGHT_BG_PATH = "/image/NightMap/finalboss_night.png";
 
     @FXML
     private StackPane view;
@@ -580,6 +583,16 @@ public class FinalbossController extends BaseMapController {
     @Override
     protected String mapKey() {
         return "finalboss";
+    }
+    
+    @Override
+    protected String dayBackgroundPath() {
+        return DAY_BG_PATH;
+    }
+
+    @Override
+    protected String nightBackgroundPath() {
+        return NIGHT_BG_PATH;
     }
 
     @Override
