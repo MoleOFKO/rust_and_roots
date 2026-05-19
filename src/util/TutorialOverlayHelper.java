@@ -4,6 +4,7 @@ import game.GameState;
 import java.util.List;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
@@ -50,7 +51,15 @@ public final class TutorialOverlayHelper {
         if (root == null || imagePaths == null || imagePaths.isEmpty()) {
             return;
         }
-        createAndShowOverlay(root, imagePaths);
+        createAndShowOverlay(root, null, imagePaths);
+    }
+
+    public static void show(StackPane root, ActionEvent event, List<String> imagePaths) {
+        if (root == null || imagePaths == null || imagePaths.isEmpty()) {
+            return;
+        }
+        Node anchor = event != null && event.getSource() instanceof Node node ? node : null;
+        createAndShowOverlay(root, anchor, imagePaths);
     }
 
     public static void showIfNeeded(StackPane root, GameState gameState, String tutorialKey, List<String> imagePaths) {
@@ -63,10 +72,10 @@ public final class TutorialOverlayHelper {
         }
 
         gameState.markTutorialSeen(tutorialKey);
-        createAndShowOverlay(root, imagePaths);
+        createAndShowOverlay(root, null, imagePaths);
     }
 
-    private static void createAndShowOverlay(StackPane root, List<String> imagePaths) {
+    private static void createAndShowOverlay(StackPane root, Node anchor, List<String> imagePaths) {
         StackPane overlay = new StackPane();
         overlay.setManaged(true);
         overlay.setVisible(true);
@@ -124,8 +133,8 @@ public final class TutorialOverlayHelper {
 
         content.getChildren().add(contentBox);
         overlay.getChildren().addAll(shade, content);
-        Button tutoclosebtn = createTutorialCloseButton(root);
-        overlay.getChildren().add(tutoclosebtn);
+        StackPane tutoclosebtnPane = createTutorialCloseButtonPane(root, anchor);
+        overlay.getChildren().add(tutoclosebtnPane);
 
         final int[] index = {0};
         Runnable updateStep = () -> {
@@ -148,15 +157,23 @@ public final class TutorialOverlayHelper {
         root.getChildren().add(overlay);
     }
 
-    private static Button createTutorialCloseButton(StackPane root) {
+    private static StackPane createTutorialCloseButtonPane(StackPane root, Node anchor) {
+        StackPane closePane = new StackPane();
+        closePane.setId("tutoclosebtnPane");
+        closePane.setManaged(false);
+        closePane.setPickOnBounds(true);
+        closePane.setMinSize(TUTORIAL_BUTTON_SIZE, TUTORIAL_BUTTON_SIZE);
+        closePane.setPrefSize(TUTORIAL_BUTTON_SIZE, TUTORIAL_BUTTON_SIZE);
+        closePane.setMaxSize(TUTORIAL_BUTTON_SIZE, TUTORIAL_BUTTON_SIZE);
+
         Button closeButton = new Button("X");
         closeButton.setId("tutoclosebtn");
-        closeButton.setManaged(false);
         closeButton.setFocusTraversable(false);
         closeButton.setPickOnBounds(true);
-        closeButton.setMinSize(TUTORIAL_BUTTON_SIZE, TUTORIAL_BUTTON_SIZE);
-        closeButton.setPrefSize(TUTORIAL_BUTTON_SIZE, TUTORIAL_BUTTON_SIZE);
-        closeButton.setMaxSize(TUTORIAL_BUTTON_SIZE, TUTORIAL_BUTTON_SIZE);
+        closeButton.setMinSize(0, 0);
+        closeButton.prefWidthProperty().bind(closePane.widthProperty());
+        closeButton.prefHeightProperty().bind(closePane.heightProperty());
+        closeButton.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         closeButton.setStyle("""
             -fx-background-radius: 100%;
             -fx-background-color: rgba(0, 0, 0, 0.55);
@@ -170,18 +187,19 @@ public final class TutorialOverlayHelper {
             """);
         closeButton.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
             event.consume();
-            closeTutorialOverlay(closeButton);
+            closeTutorialOverlay(closePane);
         });
         closeButton.setOnAction(event -> {
             event.consume();
-            closeTutorialOverlay(closeButton);
+            closeTutorialOverlay(closePane);
         });
 
-        positionTutorialCloseButton(root, closeButton);
-        Platform.runLater(() -> positionTutorialCloseButton(root, closeButton));
-        root.widthProperty().addListener((obs, oldValue, newValue) -> positionTutorialCloseButton(root, closeButton));
-        root.heightProperty().addListener((obs, oldValue, newValue) -> positionTutorialCloseButton(root, closeButton));
-        return closeButton;
+        closePane.getChildren().add(closeButton);
+        positionTutorialCloseButtonPane(root, anchor, closePane, closeButton);
+        Platform.runLater(() -> positionTutorialCloseButtonPane(root, anchor, closePane, closeButton));
+        root.widthProperty().addListener((obs, oldValue, newValue) -> positionTutorialCloseButtonPane(root, anchor, closePane, closeButton));
+        root.heightProperty().addListener((obs, oldValue, newValue) -> positionTutorialCloseButtonPane(root, anchor, closePane, closeButton));
+        return closePane;
     }
 
     private static void closeTutorialOverlay(Node closeButton) {
@@ -191,25 +209,33 @@ public final class TutorialOverlayHelper {
         }
     }
 
-    private static void positionTutorialCloseButton(StackPane root, Button closeButton) {
-        if (root == null || closeButton == null) return;
+    private static void positionTutorialCloseButtonPane(StackPane root, Node anchor, StackPane closePane, Button closeButton) {
+        if (root == null || closePane == null || closeButton == null) return;
 
-        Node tutorialButton = root.lookup("#btntuto");
+        Node tutorialButton = anchor != null ? anchor : root.lookup("#btntuto");
         if (tutorialButton != null && tutorialButton.getScene() != null) {
             Bounds buttonBounds = tutorialButton.localToScene(tutorialButton.getBoundsInLocal());
             Bounds rootBounds = root.sceneToLocal(buttonBounds);
-            double x = rootBounds.getMinX() + ((rootBounds.getWidth() - TUTORIAL_BUTTON_SIZE) / 2.0);
-            double y = rootBounds.getMinY() + ((rootBounds.getHeight() - TUTORIAL_BUTTON_SIZE) / 2.0);
-            closeButton.resizeRelocate(
-                x,
-                y,
-                TUTORIAL_BUTTON_SIZE,
-                TUTORIAL_BUTTON_SIZE
+            double width = rootBounds.getWidth() > 0.0 ? rootBounds.getWidth() : TUTORIAL_BUTTON_SIZE;
+            double height = rootBounds.getHeight() > 0.0 ? rootBounds.getHeight() : TUTORIAL_BUTTON_SIZE;
+            closePane.setMinSize(width, height);
+            closePane.setPrefSize(width, height);
+            closePane.setMaxSize(width, height);
+            closeButton.setFont(Font.font("System Bold", Math.max(12.0, Math.min(width, height) * 0.43)));
+            closePane.resizeRelocate(
+                rootBounds.getMinX(),
+                rootBounds.getMinY(),
+                width,
+                height
             );
             return;
         }
 
-        closeButton.resizeRelocate(
+        closePane.setMinSize(TUTORIAL_BUTTON_SIZE, TUTORIAL_BUTTON_SIZE);
+        closePane.setPrefSize(TUTORIAL_BUTTON_SIZE, TUTORIAL_BUTTON_SIZE);
+        closePane.setMaxSize(TUTORIAL_BUTTON_SIZE, TUTORIAL_BUTTON_SIZE);
+        closeButton.setFont(Font.font("System Bold", 12.0));
+        closePane.resizeRelocate(
             Math.max(0.0, root.getWidth() - TUTORIAL_BUTTON_SIZE),
             0.0,
             TUTORIAL_BUTTON_SIZE,

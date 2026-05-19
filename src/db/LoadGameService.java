@@ -31,6 +31,7 @@ import util.SoundManager;
 public class LoadGameService {
     private static final String FARM_SLOT_WATERING_CAN = "__farm_slot_watering_can__";
     private static final String FARM_SLOT_SICKLE = "__farm_slot_sickle__";
+    private static final double SECONDS_PER_DAY = 24.0 * 60.0 * 60.0;
 
     /**
      * Loads only the requested map-specific state (farm / trees / mobs) for the currently active save.
@@ -523,10 +524,47 @@ public class LoadGameService {
             try (ResultSet rs = ps.executeQuery()) {
                 if (!rs.next()) return;
 
+                int savedDay = Math.max(1, rs.getInt("day_number"));
+                double savedTotalSeconds = rs.getDouble("total_seconds");
+                double normalizedTotalSeconds = normalizeSavedTotalSeconds(savedDay, savedTotalSeconds);
+
                 GameTimeManager time = GameTimeManager.get();
-                time.setDay(rs.getInt("day_number"));
-                time.totalSecondsProperty().set(rs.getDouble("total_seconds"));
+                time.totalSecondsProperty().set(normalizedTotalSeconds);
+
+                if (Double.compare(savedTotalSeconds, normalizedTotalSeconds) != 0) {
+                    updateSavedTime(con, saveId, savedDay, normalizedTotalSeconds);
+                }
             }
+        }
+    }
+
+    private double normalizeSavedTotalSeconds(int savedDay, double savedTotalSeconds) {
+        savedDay = Math.max(1, savedDay);
+        double safeTotalSeconds = Double.isFinite(savedTotalSeconds) && savedTotalSeconds >= 0.0
+                ? savedTotalSeconds
+                : 0.0;
+        double timeOfDaySeconds = safeTotalSeconds % SECONDS_PER_DAY;
+        if (timeOfDaySeconds < 0.0) {
+            timeOfDaySeconds += SECONDS_PER_DAY;
+        }
+        double dayStartSeconds = (savedDay - 1) * SECONDS_PER_DAY;
+        return dayStartSeconds + timeOfDaySeconds;
+    }
+
+    private void updateSavedTime(Connection con, int saveId, int dayNumber, double totalSeconds) throws SQLException {
+        String sql = """
+            INSERT INTO saved_time (saved_id, day_number, total_seconds)
+            VALUES (?, ?, ?)
+            ON DUPLICATE KEY UPDATE
+                day_number = VALUES(day_number),
+                total_seconds = VALUES(total_seconds)
+            """;
+
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, saveId);
+            ps.setInt(2, Math.max(1, dayNumber));
+            ps.setDouble(3, Math.max(0.0, totalSeconds));
+            ps.executeUpdate();
         }
     }
 

@@ -2214,10 +2214,10 @@ public class Home_interiorController extends BaseMapController {
         // Check if the chest interface is currently open/visible
         if (chestStackPane != null && chestStackPane.isVisible()) {
             // Show only the specific chest tutorial image
-            TutorialOverlayHelper.show(view, List.of("/image/Toturial/Chest Tutorial.png"));
+            TutorialOverlayHelper.show(view, event, List.of("/image/Toturial/Chest Tutorial.png"));
         } else {
             // Otherwise, show the default global tutorial sequence
-            TutorialOverlayHelper.show(view, TutorialOverlayHelper.GLOBAL_BUTTON_TUTORIAL_IMAGES);
+            TutorialOverlayHelper.show(view, event, TutorialOverlayHelper.GLOBAL_BUTTON_TUTORIAL_IMAGES);
         }
 
         if (event != null) {
