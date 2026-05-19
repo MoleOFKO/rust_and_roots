@@ -147,7 +147,7 @@ public final class TutorialOverlayHelper {
         }
 
         final Runnable[] closeOverlay = new Runnable[1];
-        ReparentedCloseButton fxmlCloseButton = prepareFxmlCloseButton(root, overlay, tutorialButton, closeOverlay);
+        FxmlCloseButtonState fxmlCloseButton = prepareFxmlCloseButton(root, overlay, tutorialButton, closeOverlay);
         if (fxmlCloseButton == null) {
             StackPane tutoclosebtnPane = createTutorialCloseButtonPane(root, tutorialButton, () -> closeOverlay[0].run());
             overlay.getChildren().add(tutoclosebtnPane);
@@ -264,7 +264,7 @@ public final class TutorialOverlayHelper {
         );
     }
 
-    private static ReparentedCloseButton prepareFxmlCloseButton(
+    private static FxmlCloseButtonState prepareFxmlCloseButton(
             StackPane root,
             StackPane overlay,
             Node tutorialButton,
@@ -275,17 +275,12 @@ public final class TutorialOverlayHelper {
             return null;
         }
 
-        ReparentedCloseButton state = ReparentedCloseButton.detach(closeButton);
-        if (state == null) {
-            return null;
-        }
+        FxmlCloseButtonState state = new FxmlCloseButtonState(closeButton);
 
-        closeButton.setManaged(false);
         closeButton.setVisible(true);
         closeButton.setDisable(false);
         closeButton.setFocusTraversable(false);
         closeButton.setPickOnBounds(true);
-        overlay.getChildren().add(closeButton);
 
         EventHandler<MouseEvent> mouseFilter = event -> {
             event.consume();
@@ -298,11 +293,43 @@ public final class TutorialOverlayHelper {
             closeOverlay[0].run();
         });
 
-        positionTutorialCloseButton(root, tutorialButton, closeButton);
-        Platform.runLater(() -> positionTutorialCloseButton(root, tutorialButton, closeButton));
-        root.widthProperty().addListener((obs, oldValue, newValue) -> positionTutorialCloseButton(root, tutorialButton, closeButton));
-        root.heightProperty().addListener((obs, oldValue, newValue) -> positionTutorialCloseButton(root, tutorialButton, closeButton));
+        Button closeHitbox = createFxmlCloseHitbox(root, closeButton, closeOverlay);
+        overlay.getChildren().add(closeHitbox);
+        state.setOverlayHitbox(closeHitbox);
+        positionFxmlCloseHitbox(root, closeButton, closeHitbox);
+        Platform.runLater(() -> positionFxmlCloseHitbox(root, closeButton, closeHitbox));
+        root.widthProperty().addListener((obs, oldValue, newValue) -> positionFxmlCloseHitbox(root, closeButton, closeHitbox));
+        root.heightProperty().addListener((obs, oldValue, newValue) -> positionFxmlCloseHitbox(root, closeButton, closeHitbox));
+
         return state;
+    }
+
+    private static Button createFxmlCloseHitbox(StackPane root, Button closeButton, Runnable[] closeOverlay) {
+        Button hitbox = new Button();
+        hitbox.setManaged(false);
+        hitbox.setOpacity(0.0);
+        hitbox.setFocusTraversable(false);
+        hitbox.setPickOnBounds(true);
+        hitbox.setStyle("-fx-background-color: transparent; -fx-padding: 0;");
+        hitbox.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
+            event.consume();
+            closeOverlay[0].run();
+        });
+        hitbox.setOnAction(event -> {
+            event.consume();
+            closeOverlay[0].run();
+        });
+        return hitbox;
+    }
+
+    private static void positionFxmlCloseHitbox(StackPane root, Button closeButton, Button hitbox) {
+        if (root == null || closeButton == null || hitbox == null || closeButton.getScene() == null) {
+            return;
+        }
+        Bounds rootBounds = root.sceneToLocal(closeButton.localToScene(closeButton.getBoundsInLocal()));
+        double width = rootBounds.getWidth() > 0.0 ? rootBounds.getWidth() : TUTORIAL_BUTTON_SIZE;
+        double height = rootBounds.getHeight() > 0.0 ? rootBounds.getHeight() : TUTORIAL_BUTTON_SIZE;
+        hitbox.resizeRelocate(rootBounds.getMinX(), rootBounds.getMinY(), width, height);
     }
 
     private static Node findFxmlCloseButton(StackPane root, Node tutorialButton) {
@@ -311,92 +338,48 @@ public final class TutorialOverlayHelper {
             if (closeButton instanceof Button) {
                 return closeButton;
             }
+            closeButton = tutorialButton.getParent().lookup("#tutoclose");
+            if (closeButton instanceof Button) {
+                return closeButton;
+            }
         }
-        return root.lookup("#tutoclosebtn");
+        Node closeButton = root.lookup("#tutoclosebtn");
+        if (closeButton instanceof Button) {
+            return closeButton;
+        }
+        return root.lookup("#tutoclose");
     }
 
-    private static void positionTutorialCloseButton(StackPane root, Node anchor, Button closeButton) {
-        if (root == null || closeButton == null) return;
-
-        Node tutorialButton = anchor != null ? anchor : root.lookup("#btntuto");
-        if (tutorialButton != null && tutorialButton.getScene() != null) {
-            Bounds buttonBounds = tutorialButton.localToScene(tutorialButton.getBoundsInLocal());
-            Bounds rootBounds = root.sceneToLocal(buttonBounds);
-            double width = rootBounds.getWidth() > 0.0 ? rootBounds.getWidth() : TUTORIAL_BUTTON_SIZE;
-            double height = rootBounds.getHeight() > 0.0 ? rootBounds.getHeight() : TUTORIAL_BUTTON_SIZE;
-            closeButton.setMinSize(width, height);
-            closeButton.setPrefSize(width, height);
-            closeButton.setMaxSize(width, height);
-            closeButton.setFont(Font.font("System Bold", Math.max(12.0, Math.min(width, height) * 0.43)));
-            closeButton.resizeRelocate(rootBounds.getMinX(), rootBounds.getMinY(), width, height);
-            return;
-        }
-
-        closeButton.setMinSize(TUTORIAL_BUTTON_SIZE, TUTORIAL_BUTTON_SIZE);
-        closeButton.setPrefSize(TUTORIAL_BUTTON_SIZE, TUTORIAL_BUTTON_SIZE);
-        closeButton.setMaxSize(TUTORIAL_BUTTON_SIZE, TUTORIAL_BUTTON_SIZE);
-        closeButton.setFont(Font.font("System Bold", 12.0));
-        closeButton.resizeRelocate(
-            Math.max(0.0, root.getWidth() - TUTORIAL_BUTTON_SIZE),
-            0.0,
-            TUTORIAL_BUTTON_SIZE,
-            TUTORIAL_BUTTON_SIZE
-        );
-    }
-
-    private static final class ReparentedCloseButton {
+    private static final class FxmlCloseButtonState {
         private final Button button;
-        private final Parent parent;
-        private final int index;
         private final boolean visible;
-        private final boolean managed;
         private final boolean disabled;
         private final EventHandler<ActionEvent> actionHandler;
         private EventHandler<MouseEvent> mouseFilter;
+        private Button overlayHitbox;
         private boolean restored;
 
-        private ReparentedCloseButton(Button button, Parent parent, int index) {
+        private FxmlCloseButtonState(Button button) {
             this.button = button;
-            this.parent = parent;
-            this.index = index;
             this.visible = button.isVisible();
-            this.managed = button.isManaged();
             this.disabled = button.isDisable();
             this.actionHandler = button.getOnAction();
-        }
-
-        private static ReparentedCloseButton detach(Button button) {
-            Parent parent = button.getParent();
-            if (parent instanceof Pane pane) {
-                int index = pane.getChildren().indexOf(button);
-                if (index < 0) return null;
-                ReparentedCloseButton state = new ReparentedCloseButton(button, parent, index);
-                pane.getChildren().remove(button);
-                return state;
-            }
-            if (parent instanceof Group group) {
-                int index = group.getChildren().indexOf(button);
-                if (index < 0) return null;
-                ReparentedCloseButton state = new ReparentedCloseButton(button, parent, index);
-                group.getChildren().remove(button);
-                return state;
-            }
-            return null;
         }
 
         private void setMouseFilter(EventHandler<MouseEvent> mouseFilter) {
             this.mouseFilter = mouseFilter;
         }
 
+        private void setOverlayHitbox(Button overlayHitbox) {
+            this.overlayHitbox = overlayHitbox;
+        }
+
         private void restore() {
             if (restored) return;
             restored = true;
 
-            Parent currentParent = button.getParent();
-            if (currentParent instanceof Pane pane) {
-                pane.getChildren().remove(button);
-            } else if (currentParent instanceof Group group) {
-                group.getChildren().remove(button);
+            if (overlayHitbox != null && overlayHitbox.getParent() instanceof Pane pane) {
+                pane.getChildren().remove(overlayHitbox);
             }
 
             if (mouseFilter != null) {
@@ -404,14 +387,7 @@ public final class TutorialOverlayHelper {
             }
             button.setOnAction(actionHandler);
             button.setVisible(visible);
-            button.setManaged(managed);
             button.setDisable(disabled);
-
-            if (parent instanceof Pane pane && !pane.getChildren().contains(button)) {
-                pane.getChildren().add(Math.min(index, pane.getChildren().size()), button);
-            } else if (parent instanceof Group group && !group.getChildren().contains(button)) {
-                group.getChildren().add(Math.min(index, group.getChildren().size()), button);
-            }
         }
     }
 
