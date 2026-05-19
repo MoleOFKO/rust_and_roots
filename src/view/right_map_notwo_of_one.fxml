@@ -284,9 +284,14 @@
                   <ImageView fx:id="drops_img_stone2" fitHeight="28.0" fitWidth="28.0" layoutX="303.0" layoutY="267.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
                </children>
             </Group>
-            <Button prefHeight="28.0" prefWidth="28.0" fx:id="btntuto" layoutX="572.0" mnemonicParsing="false" onAction="#handlebtntutoaction" style="-fx-background-radius: 100%; -fx-background-color: transparent; -fx-border-color: yellow; -fx-border-radius: 100%; -fx-border-width: 1; -fx-padding: 0;" styleClass="invisible-button" stylesheets="@../css/style.css" textFill="#e6ff00">
+            <Button fx:id="btntuto" layoutX="572.0" mnemonicParsing="false" onAction="#handlebtntutoaction" prefHeight="28.0" prefWidth="28.0" style="-fx-background-radius: 100%; -fx-background-color: transparent; -fx-border-color: yellow; -fx-border-radius: 100%; -fx-border-width: 1; -fx-padding: 0;" styleClass="invisible-button" stylesheets="@../css/style.css" textFill="#e6ff00">
                <graphic>
                   <FontAwesomeIcon fill="#f6ff00" glyphName="QUESTION" size="1.5em" />
+               </graphic>
+            </Button>
+            <Button fx:id="tutoclose" layoutX="573.0" mnemonicParsing="false" onAction="#handlebtntutoaction" prefHeight="28.0" prefWidth="28.0" style="-fx-background-radius: 100%; -fx-background-color: transparent; -fx-border-color: yellow; -fx-border-radius: 100%; -fx-border-width: 1; -fx-padding: 0;" styleClass="invisible-button" stylesheets="@../css/style.css" textFill="#e6ff00" visible="false">
+               <graphic>
+                  <FontAwesomeIcon fill="#f6ff00" glyphName="CLOSE" size="1.5em" />
                </graphic>
             </Button>
             <Group fx:id="minimapicongroup" layoutX="540.0" layoutY="-10.0">

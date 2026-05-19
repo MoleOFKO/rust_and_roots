@@ -93,6 +93,8 @@ public class Farm_tableController implements Initializable, SceneController {
     private final List<SeedListEntry> displayedSeedListEntries = new ArrayList<>();
     @FXML
     private Button btntuto;
+    @FXML
+    private Button tutoclose;
 
     @FXML
     private void handlebtntutoaction(ActionEvent event) {

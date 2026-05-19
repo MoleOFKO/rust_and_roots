@@ -253,6 +253,8 @@ public class Left_map_notwo_of_oneController extends BaseMapController {
     private Rectangle home_map;
     @FXML
     private Rectangle right_map;
+    @FXML
+    private Button tutoclose;
 
     @Override
     protected String dayBackgroundPath() {

@@ -53,6 +53,8 @@ public class ShopController implements Initializable, SceneController {
     private Inventory inv;
     @FXML
     private Button btntuto;
+    @FXML
+    private Button tutoclose;
 
     @Override
     public void init(GameState gs) {

@@ -14,6 +14,7 @@ import javafx.scene.control.Slider;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
@@ -252,6 +253,8 @@ public class Right_map_notwo_of_oneController extends BaseMapController {
     private Rectangle home_map;
     @FXML
     private Rectangle right_map;
+    @FXML
+    private Button tutoclose;
     
     @Override
     protected String dayBackgroundPath() {

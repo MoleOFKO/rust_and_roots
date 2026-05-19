@@ -524,6 +524,8 @@ public class home_mapController extends BaseMapController {
     private Rectangle home_map;
     @FXML
     private Rectangle right_map;
+    @FXML
+    private Button tutoclose;
     
 
     @Override
@@ -696,4 +698,5 @@ public class home_mapController extends BaseMapController {
     protected void handleCloseMiniMapAction(MouseEvent event) {
         super.handleCloseMiniMapAction(event);
     }
+
 }

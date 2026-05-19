@@ -98,6 +98,8 @@ public class CraftController implements Initializable, SceneController {
     @FXML private Button btnclose;
     @FXML
     private Button btntuto;
+    @FXML
+    private Button tutoclose;
 
     @Override
     public void init(GameState gs) {

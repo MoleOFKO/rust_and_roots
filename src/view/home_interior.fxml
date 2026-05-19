@@ -21,7 +21,7 @@
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
 
-<StackPane fx:id="view" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: black;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Home_interiorController">
+<StackPane fx:id="view" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: black;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Home_interiorController">
    <children>
       <Group fx:id="world">
       <Group>
@@ -88,7 +88,7 @@
                            <Image url="@../image/tools/dialog.png" />
                         </image>
                         <effect>
-                           <DropShadow spread="0.45" color="WHITE" />
+                           <DropShadow color="WHITE" spread="0.45" />
                         </effect>
                      </ImageView>
                      <ImageView fx:id="craftingdialogimg" fitHeight="21.0" fitWidth="50.0" layoutX="499.0" layoutY="83.0" mouseTransparent="true" pickOnBounds="true" preserveRatio="true">
@@ -96,7 +96,7 @@
                            <Image url="@../image/tools/craftdialog.png" />
                         </image>
                         <effect>
-                           <DropShadow spread="0.45" color="WHITE" />
+                           <DropShadow color="WHITE" spread="0.45" />
                         </effect>
                      </ImageView>
                      <ImageView fx:id="invdialogimg" fitHeight="21.0" fitWidth="50.0" layoutX="449.0" layoutY="224.0" mouseTransparent="true" pickOnBounds="true" preserveRatio="true">
@@ -104,7 +104,7 @@
                            <Image url="@../image/tools/invdialog.png" />
                         </image>
                         <effect>
-                           <DropShadow spread="0.45" color="WHITE" />
+                           <DropShadow color="WHITE" spread="0.45" />
                         </effect>
                      </ImageView>
                      <ImageView fx:id="meltdialogimg" fitHeight="21.0" fitWidth="50.0" layoutX="113.0" layoutY="70.0" mouseTransparent="true" pickOnBounds="true" preserveRatio="true">
@@ -112,7 +112,7 @@
                            <Image url="@../image/tools/meltdialog.png" />
                         </image>
                         <effect>
-                           <DropShadow spread="0.45" color="WHITE" />
+                           <DropShadow color="WHITE" spread="0.45" />
                         </effect>
                      </ImageView>
                      <ImageView fx:id="sleepingdialogimg" fitHeight="21.0" fitWidth="50.0" layoutX="355.0" layoutY="83.0" mouseTransparent="true" pickOnBounds="true" preserveRatio="true">
@@ -120,7 +120,7 @@
                            <Image url="@../image/tools/sleepdialog.png" />
                         </image>
                         <effect>
-                           <DropShadow spread="0.45" color="WHITE" />
+                           <DropShadow color="WHITE" spread="0.45" />
                         </effect>
                      </ImageView>
                   </children>
@@ -242,6 +242,11 @@
                <Button fx:id="btntuto" layoutX="523.0" layoutY="28.0" mnemonicParsing="false" onAction="#handlebtntutoaction" prefHeight="28.0" prefWidth="28.0" style="-fx-background-radius: 100%; -fx-background-color: transparent; -fx-border-color: yellow; -fx-border-radius: 100%; -fx-border-width: 1; -fx-padding: 0;" styleClass="invisible-button" stylesheets="@../css/style.css" textFill="#e6ff00">
                   <graphic>
                      <FontAwesomeIcon fill="#f6ff00" glyphName="QUESTION" size="1.5em" text="" />
+                  </graphic>
+               </Button>
+               <Button fx:id="tutoclose" layoutX="523.0" layoutY="28.0" mnemonicParsing="false" onAction="#handlebtntutoaction" prefHeight="28.0" prefWidth="28.0" style="-fx-background-radius: 100%; -fx-background-color: transparent; -fx-border-color: yellow; -fx-border-radius: 100%; -fx-border-width: 1; -fx-padding: 0;" styleClass="invisible-button" stylesheets="@../css/style.css" textFill="#e6ff00" visible="false">
+                  <graphic>
+                     <FontAwesomeIcon fill="#f6ff00" glyphName="CLOSE" size="1.5em" />
                   </graphic>
                </Button>
             <Group fx:id="minimapicongroup" layoutX="490.0" layoutY="17.0">
