@@ -134,42 +134,6 @@ public class Left_map_notwoController extends BaseMapController {
     @FXML
     private Slider sfxVolumeSlider;
     @FXML
-    private Group slime;
-    @FXML
-    private Rectangle slime_hitbox;
-    @FXML
-    private ImageView slime_img;
-    @FXML
-    private ImageView slime_drops_img;
-    @FXML
-    private Rectangle slime_hitbox_left;
-    @FXML
-    private Rectangle slime_hitbox_up;
-    @FXML
-    private Rectangle slime_hitbox_down;
-    @FXML
-    private Rectangle slime_hitbox_right;
-    @FXML
-    private Rectangle slime_detect;
-    @FXML
-    private Group slime1;
-    @FXML
-    private Rectangle slime1_hitbox;
-    @FXML
-    private ImageView slime1_img;
-    @FXML
-    private ImageView slime1_drops_img;
-    @FXML
-    private Rectangle slime1_hitbox_left;
-    @FXML
-    private Rectangle slime1_hitbox_up;
-    @FXML
-    private Rectangle slime1_hitbox_down;
-    @FXML
-    private Rectangle slime1_hitbox_right;
-    @FXML
-    private Rectangle slime1_detect;
-    @FXML
     private Group minimapicongroup;
     @FXML
     private ImageView miniMapIcon;

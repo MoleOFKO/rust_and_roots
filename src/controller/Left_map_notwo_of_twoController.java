@@ -111,6 +111,20 @@ public class Left_map_notwo_of_twoController extends BaseMapController{
     private Rectangle home_map;
     @FXML
     private Rectangle right_map;
+    @FXML
+    private Rectangle wall4;
+    @FXML
+    private Rectangle wall5;
+    @FXML
+    private Rectangle wall6;
+    @FXML
+    private Rectangle wall7;
+    @FXML
+    private Rectangle wall8;
+    @FXML
+    private Rectangle wall9;
+    @FXML
+    private Rectangle wall10;
 
     @Override
     protected String dayBackgroundPath() {

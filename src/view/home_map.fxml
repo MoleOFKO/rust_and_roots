@@ -220,7 +220,7 @@
             </Label>
             <Button fx:id="btntuto" layoutX="562.0" layoutY="7.0" mnemonicParsing="false" onAction="#handlebtntutoaction" prefHeight="28.0" prefWidth="28.0" style="-fx-background-radius: 100%; -fx-background-color: transparent; -fx-border-color: yellow; -fx-border-radius: 100%; -fx-border-width: 1; -fx-padding: 0;" styleClass="invisible-button" stylesheets="@../css/style.css" textFill="#e6ff00">
                <graphic>
-                  <FontAwesomeIcon fill="#f6ff00" glyphName="QUESTION" selectionFill="YELLOW" size="1.5em" />
+                  <FontAwesomeIcon fill="#f6ff00" glyphName="QUESTION" size="1.5em" />
                </graphic>
             </Button>
             <Group fx:id="minimapicongroup" layoutX="528.0" layoutY="-6.0">

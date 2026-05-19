@@ -40,14 +40,6 @@
             <Group>
                <children>
                   <Rectangle fx:id="exit_right" height="255.0" layoutX="585.0" layoutY="73.0" opacity="0" width="10.0" />
-                  <Label fx:id="hotbarguide" layoutX="202.0" layoutY="356.0" text="press 'e' to open hotbar">
-                     <font>
-                        <Font name="System Bold" size="12.0" />
-                     </font>
-                     <effect>
-                        <DropShadow color="white" height="10.5" radius="6.9925" spread="0.67" width="19.47" />
-                     </effect>
-                  </Label>
                </children>
             </Group>
             <Group autoSizeChildren="false">
@@ -67,6 +59,14 @@
                   <Rectangle fx:id="human_hitbox_right" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="299.0" layoutY="199.0" stroke="RED" strokeType="INSIDE" width="14.0" />
                </children>
             </Group>
+            <Label fx:id="hotbarguide" layoutX="223.0" layoutY="366.0" text="press 'e' to open hotbar">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+               <effect>
+                  <DropShadow color="white" height="10.5" radius="6.9925" spread="0.67" width="19.47" />
+               </effect>
+            </Label>
             <Group fx:id="poison_slime" layoutX="24.0" layoutY="-99.0">
                <children>
                   <Rectangle fx:id="poison_slime_hitbox" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="262.0" layoutY="171.0" stroke="RED" strokeType="INSIDE" translateX="24" translateY="28" width="14.0" />

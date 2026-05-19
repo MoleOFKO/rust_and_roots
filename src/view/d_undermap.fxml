@@ -55,14 +55,6 @@
                   <Rectangle fx:id="exit_up" height="8.0" layoutX="271.0" layoutY="1.0" opacity="0" width="47.0" />
                   <Rectangle fx:id="exit_left" height="209.0" layoutX="-4.0" layoutY="62.0" opacity="0" width="10.0" />
                   <Rectangle fx:id="exit_down" height="6.0" layoutX="235.0" layoutY="390.0" opacity="0" width="78.0" />
-                  <Label fx:id="hotbarguide" layoutX="202.0" layoutY="356.0" text="press 'e' to open hotbar">
-                     <font>
-                        <Font name="System Bold" size="12.0" />
-                     </font>
-                     <effect>
-                        <DropShadow color="white" height="10.5" radius="6.9925" spread="0.67" width="19.47" />
-                     </effect>
-                  </Label>
                </children>
             </Group>
             <Group autoSizeChildren="false" layoutX="-101.0" layoutY="243.0">
@@ -85,6 +77,14 @@
                   <Rectangle fx:id="human_hitbox_right" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="299.0" layoutY="199.0" stroke="RED" strokeType="INSIDE" width="14.0" />
                </children>
             </Group>
+            <Label fx:id="hotbarguide" layoutX="223.0" layoutY="367.0" text="press 'e' to open hotbar">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+               <effect>
+                  <DropShadow color="white" height="10.5" radius="6.9925" spread="0.67" width="19.47" />
+               </effect>
+            </Label>
             <Group fx:id="daynightnavgroup">
                <children>
                   <ImageView fitHeight="60.0" fitWidth="210.0" pickOnBounds="true" preserveRatio="true">
