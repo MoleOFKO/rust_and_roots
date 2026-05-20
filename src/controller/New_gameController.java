@@ -361,7 +361,7 @@ public class New_gameController implements Initializable, SceneController {
     }
 
     private int getCurrentCoreStatCap() {
-        return 3;
+        return 10;
     }
 
     private int getCurrentStatValueWithPending(String statKey) {
@@ -389,7 +389,7 @@ public class New_gameController implements Initializable, SceneController {
     }
 
     private int getHpSpPointCap() {
-        return getAverageCoreStatWithPending() + getCurrentCoreStatCap();
+        return getAverageCoreStatWithPending();
     }
 
     private int getHpSpInvestedPointsWithPending(String statKey) {

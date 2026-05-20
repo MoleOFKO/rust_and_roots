@@ -233,7 +233,7 @@ CREATE TABLE `mobs` (
   `image` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`mobs_id`),
   UNIQUE KEY `uq_mobs_mobs_type` (`mobs_type`)
-) ENGINE=InnoDB AUTO_INCREMENT=146 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=221 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -347,7 +347,7 @@ CREATE TABLE `save_game` (
 
 LOCK TABLES `save_game` WRITE;
 /*!40000 ALTER TABLE `save_game` DISABLE KEYS */;
-INSERT INTO `save_game` VALUES (16,1,'Save 1','2026-05-19 13:06:25',2,123,2000,79.85478632785512,104.4105669701408,500,0,1,'Larry',45,50,0,1,'overworld_combat_hotbar_unlock,cook_inside,1,melt_tutorial,home_map_overview,craft_inside,home_interior_chest_inside,home_interior_overview',0.5,1,5990),(17,2,'Save 1','2026-05-19 12:35:00',1,124,2000,160,135,500,0,1,'Yann',45,50,0,0,'overworld_combat_hotbar_unlock,cook_inside,1,melt_tutorial,home_map_overview,craft_inside,home_interior_chest_inside,home_interior_overview',0.5,1,200),(18,3,'Save 1','2026-05-19 12:35:00',1,125,10000,160,135,1000,0,1,'ShaneKo',45,50,0,0,'overworld_combat_hotbar_unlock,cook_inside,1,melt_tutorial,home_map_overview,craft_inside,home_interior_chest_inside,home_interior_overview',0.5,1,600),(19,4,'Save 1','2026-05-19 12:35:00',1,126,10000,160,135,1000,0,1,'KaungKaung',45,50,0,0,'overworld_combat_hotbar_unlock,cook_inside,1,melt_tutorial,home_map_overview,craft_inside,home_interior_chest_inside,home_interior_overview',0.5,1,600);
+INSERT INTO `save_game` VALUES (16,1,'Save 1','2026-05-19 13:06:25',2,123,2000,79.85478632785512,104.4105669701408,500,0,1,'Larry',45,50,0,1,'overworld_combat_hotbar_unlock,cook_inside,1,melt_tutorial,home_map_overview,craft_inside,home_interior_chest_inside,home_interior_overview',0.5,1,5990),(17,2,'Save 1','2026-05-19 12:35:00',1,124,2000,160,135,500,0,1,'Yann',45,50,0,0,'overworld_combat_hotbar_unlock,cook_inside,1,melt_tutorial,home_map_overview,craft_inside,home_interior_chest_inside,home_interior_overview',0.5,1,200),(18,3,'Save 1','2026-05-20 07:49:56',1,125,10000,160,135,1000,0,1,'ShaneKo',45,50,0,1,'overworld_combat_hotbar_unlock,cook_inside,1,melt_tutorial,home_map_overview,craft_inside,home_interior_chest_inside,home_interior_overview',0.5,1,11090),(19,4,'Save 1','2026-05-19 12:35:00',1,126,10000,160,135,1000,0,1,'KaungKaung',45,50,0,0,'overworld_combat_hotbar_unlock,cook_inside,1,melt_tutorial,home_map_overview,craft_inside,home_interior_chest_inside,home_interior_overview',0.5,1,600);
 /*!40000 ALTER TABLE `save_game` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -375,7 +375,7 @@ CREATE TABLE `saved_chest_item` (
 
 LOCK TABLES `saved_chest_item` WRITE;
 /*!40000 ALTER TABLE `saved_chest_item` DISABLE KEYS */;
-INSERT INTO `saved_chest_item` VALUES (16,5,20),(16,6,20),(16,7,20),(16,8,20),(16,9,20),(17,5,20),(17,6,20),(17,7,20),(17,8,20),(17,9,20),(18,5,30),(18,6,30),(18,7,30),(18,8,30),(18,9,30),(19,5,30),(19,6,30),(19,7,30),(19,8,30),(19,9,30);
+INSERT INTO `saved_chest_item` VALUES (16,5,20),(16,6,20),(16,7,20),(16,8,20),(16,9,20),(17,5,20),(17,6,20),(17,7,20),(17,8,20),(17,9,20),(18,5,30),(18,6,30),(18,7,30),(18,8,30),(18,9,30),(18,264,20),(19,5,30),(19,6,30),(19,7,30),(19,8,30),(19,9,30);
 /*!40000 ALTER TABLE `saved_chest_item` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -410,7 +410,7 @@ CREATE TABLE `saved_farm_plot` (
 
 LOCK TABLES `saved_farm_plot` WRITE;
 /*!40000 ALTER TABLE `saved_farm_plot` DISABLE KEYS */;
-INSERT INTO `saved_farm_plot` VALUES (16,'home_map','__farm_slot_sickle__',NULL,-1,-1,0,0,0,0),(16,'home_map','__farm_slot_watering_can__',NULL,-1,-1,0,0,0,0),(16,'home_map','Plot 1',NULL,-1,-1,0,1800,600,300),(16,'home_map','Plot 10',NULL,-1,-1,0,1800,600,300),(16,'home_map','Plot 11',NULL,-1,-1,0,1800,600,300),(16,'home_map','Plot 12',NULL,-1,-1,0,1800,600,300),(16,'home_map','Plot 13',NULL,-1,-1,0,1800,600,300),(16,'home_map','Plot 14',NULL,-1,-1,0,1800,600,300),(16,'home_map','Plot 15',NULL,-1,-1,0,1800,600,300),(16,'home_map','Plot 16',NULL,-1,-1,0,1800,600,300),(16,'home_map','Plot 17',NULL,-1,-1,0,1800,600,300),(16,'home_map','Plot 18',NULL,-1,-1,0,1800,600,300),(16,'home_map','Plot 19',NULL,-1,-1,0,1800,600,300),(16,'home_map','Plot 2',NULL,-1,-1,0,1800,600,300),(16,'home_map','Plot 20',NULL,-1,-1,0,1800,600,300),(16,'home_map','Plot 21',NULL,-1,-1,0,1800,600,300),(16,'home_map','Plot 22',NULL,-1,-1,0,1800,600,300),(16,'home_map','Plot 23',NULL,-1,-1,0,1800,600,300),(16,'home_map','Plot 24',NULL,-1,-1,0,1800,600,300),(16,'home_map','Plot 25',NULL,-1,-1,0,1800,600,300),(16,'home_map','Plot 26',NULL,-1,-1,0,1800,600,300),(16,'home_map','Plot 27',NULL,-1,-1,0,1800,600,300),(16,'home_map','Plot 28',NULL,-1,-1,0,1800,600,300),(16,'home_map','Plot 3',NULL,-1,-1,0,1800,600,300),(16,'home_map','Plot 4',NULL,-1,-1,0,1800,600,300),(16,'home_map','Plot 5',NULL,-1,-1,0,1800,600,300),(16,'home_map','Plot 6',NULL,-1,-1,0,1800,600,300),(16,'home_map','Plot 7',NULL,-1,-1,0,1800,600,300),(16,'home_map','Plot 8',NULL,-1,-1,0,1800,600,300),(16,'home_map','Plot 9',NULL,-1,-1,0,1800,600,300);
+INSERT INTO `saved_farm_plot` VALUES (16,'home_map','__farm_slot_sickle__',NULL,-1,-1,0,0,0,0),(16,'home_map','__farm_slot_watering_can__',NULL,-1,-1,0,0,0,0),(16,'home_map','Plot 1',NULL,-1,-1,0,1800,600,300),(16,'home_map','Plot 10',NULL,-1,-1,0,1800,600,300),(16,'home_map','Plot 11',NULL,-1,-1,0,1800,600,300),(16,'home_map','Plot 12',NULL,-1,-1,0,1800,600,300),(16,'home_map','Plot 13',NULL,-1,-1,0,1800,600,300),(16,'home_map','Plot 14',NULL,-1,-1,0,1800,600,300),(16,'home_map','Plot 15',NULL,-1,-1,0,1800,600,300),(16,'home_map','Plot 16',NULL,-1,-1,0,1800,600,300),(16,'home_map','Plot 17',NULL,-1,-1,0,1800,600,300),(16,'home_map','Plot 18',NULL,-1,-1,0,1800,600,300),(16,'home_map','Plot 19',NULL,-1,-1,0,1800,600,300),(16,'home_map','Plot 2',NULL,-1,-1,0,1800,600,300),(16,'home_map','Plot 20',NULL,-1,-1,0,1800,600,300),(16,'home_map','Plot 21',NULL,-1,-1,0,1800,600,300),(16,'home_map','Plot 22',NULL,-1,-1,0,1800,600,300),(16,'home_map','Plot 23',NULL,-1,-1,0,1800,600,300),(16,'home_map','Plot 24',NULL,-1,-1,0,1800,600,300),(16,'home_map','Plot 25',NULL,-1,-1,0,1800,600,300),(16,'home_map','Plot 26',NULL,-1,-1,0,1800,600,300),(16,'home_map','Plot 27',NULL,-1,-1,0,1800,600,300),(16,'home_map','Plot 28',NULL,-1,-1,0,1800,600,300),(16,'home_map','Plot 3',NULL,-1,-1,0,1800,600,300),(16,'home_map','Plot 4',NULL,-1,-1,0,1800,600,300),(16,'home_map','Plot 5',NULL,-1,-1,0,1800,600,300),(16,'home_map','Plot 6',NULL,-1,-1,0,1800,600,300),(16,'home_map','Plot 7',NULL,-1,-1,0,1800,600,300),(16,'home_map','Plot 8',NULL,-1,-1,0,1800,600,300),(16,'home_map','Plot 9',NULL,-1,-1,0,1800,600,300),(18,'home_map','__farm_slot_sickle__',NULL,-1,-1,0,0,0,0),(18,'home_map','__farm_slot_watering_can__',NULL,-1,-1,0,0,0,0),(18,'home_map','Plot 1',NULL,-1,-1,0,1800,600,300),(18,'home_map','Plot 10',NULL,-1,-1,0,1800,600,300),(18,'home_map','Plot 11',NULL,-1,-1,0,1800,600,300),(18,'home_map','Plot 12',NULL,-1,-1,0,1800,600,300),(18,'home_map','Plot 13',NULL,-1,-1,0,1800,600,300),(18,'home_map','Plot 14',NULL,-1,-1,0,1800,600,300),(18,'home_map','Plot 15',NULL,-1,-1,0,1800,600,300),(18,'home_map','Plot 16',NULL,-1,-1,0,1800,600,300),(18,'home_map','Plot 17',NULL,-1,-1,0,1800,600,300),(18,'home_map','Plot 18',NULL,-1,-1,0,1800,600,300),(18,'home_map','Plot 19',NULL,-1,-1,0,1800,600,300),(18,'home_map','Plot 2',NULL,-1,-1,0,1800,600,300),(18,'home_map','Plot 20',NULL,-1,-1,0,1800,600,300),(18,'home_map','Plot 21',NULL,-1,-1,0,1800,600,300),(18,'home_map','Plot 22',NULL,-1,-1,0,1800,600,300),(18,'home_map','Plot 23',NULL,-1,-1,0,1800,600,300),(18,'home_map','Plot 24',NULL,-1,-1,0,1800,600,300),(18,'home_map','Plot 25',NULL,-1,-1,0,1800,600,300),(18,'home_map','Plot 26',NULL,-1,-1,0,1800,600,300),(18,'home_map','Plot 27',NULL,-1,-1,0,1800,600,300),(18,'home_map','Plot 28',NULL,-1,-1,0,1800,600,300),(18,'home_map','Plot 3',NULL,-1,-1,0,1800,600,300),(18,'home_map','Plot 4',NULL,-1,-1,0,1800,600,300),(18,'home_map','Plot 5',NULL,-1,-1,0,1800,600,300),(18,'home_map','Plot 6',NULL,-1,-1,0,1800,600,300),(18,'home_map','Plot 7',NULL,-1,-1,0,1800,600,300),(18,'home_map','Plot 8',NULL,-1,-1,0,1800,600,300),(18,'home_map','Plot 9',NULL,-1,-1,0,1800,600,300);
 /*!40000 ALTER TABLE `saved_farm_plot` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -467,7 +467,7 @@ CREATE TABLE `saved_item` (
 
 LOCK TABLES `saved_item` WRITE;
 /*!40000 ALTER TABLE `saved_item` DISABLE KEYS */;
-INSERT INTO `saved_item` VALUES (16,1,1),(16,2,1),(16,3,1),(16,4,1),(16,99,10),(16,110,10),(16,127,1),(16,199,10),(16,203,10),(16,250,1),(16,251,1),(16,252,1),(16,253,1),(16,261,10),(16,262,10),(17,1,1),(17,2,1),(17,3,1),(17,4,1),(17,99,10),(17,110,10),(17,127,1),(17,199,10),(17,203,10),(17,250,1),(17,251,1),(17,252,1),(17,253,1),(17,261,10),(17,262,10),(18,1,1),(18,2,1),(18,3,1),(18,4,1),(18,18,10),(18,41,10),(18,99,10),(18,110,10),(18,127,1),(18,199,20),(18,203,10),(18,244,20),(18,250,1),(18,251,1),(18,252,1),(18,253,1),(18,260,20),(18,261,20),(18,262,20),(18,263,20),(18,264,20),(19,1,1),(19,2,1),(19,3,1),(19,4,1),(19,18,10),(19,41,10),(19,99,10),(19,110,10),(19,127,1),(19,199,20),(19,203,10),(19,244,20),(19,250,1),(19,251,1),(19,252,1),(19,253,1),(19,260,20),(19,261,20),(19,262,20),(19,263,20),(19,264,20);
+INSERT INTO `saved_item` VALUES (16,1,1),(16,2,1),(16,3,1),(16,4,1),(16,99,10),(16,110,10),(16,127,1),(16,199,10),(16,203,10),(16,250,1),(16,251,1),(16,252,1),(16,253,1),(16,261,10),(16,262,10),(17,1,1),(17,2,1),(17,3,1),(17,4,1),(17,99,10),(17,110,10),(17,127,1),(17,199,10),(17,203,10),(17,250,1),(17,251,1),(17,252,1),(17,253,1),(17,261,10),(17,262,10),(18,1,1),(18,2,1),(18,3,1),(18,4,1),(18,18,10),(18,41,10),(18,99,10),(18,110,10),(18,127,1),(18,199,20),(18,203,10),(18,244,20),(18,250,1),(18,251,1),(18,252,1),(18,253,1),(18,260,20),(18,261,20),(18,262,20),(18,263,20),(19,1,1),(19,2,1),(19,3,1),(19,4,1),(19,18,10),(19,41,10),(19,99,10),(19,110,10),(19,127,1),(19,199,20),(19,203,10),(19,244,20),(19,250,1),(19,251,1),(19,252,1),(19,253,1),(19,260,20),(19,261,20),(19,262,20),(19,263,20),(19,264,20);
 /*!40000 ALTER TABLE `saved_item` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -510,6 +510,7 @@ CREATE TABLE `saved_mob` (
 
 LOCK TABLES `saved_mob` WRITE;
 /*!40000 ALTER TABLE `saved_mob` DISABLE KEYS */;
+INSERT INTO `saved_mob` VALUES (16,'left_map_notwo_of_one','slime','slime',0,18,18,46,46,5,10,21,1,0,-1,-1,-169,74,4269171.592782135,50),(16,'left_map_notwo_of_one','slime1','slime',0,14,14,40,40,8,12,26,1,0,-1,-1,64,-107,4269171.592782135,50);
 /*!40000 ALTER TABLE `saved_mob` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -592,7 +593,7 @@ CREATE TABLE `saved_shop_state` (
 
 LOCK TABLES `saved_shop_state` WRITE;
 /*!40000 ALTER TABLE `saved_shop_state` DISABLE KEYS */;
-INSERT INTO `saved_shop_state` VALUES (16,-1,-1);
+INSERT INTO `saved_shop_state` VALUES (16,-1,-1),(18,-1,-1);
 /*!40000 ALTER TABLE `saved_shop_state` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -674,7 +675,7 @@ CREATE TABLE `saved_smelt_state` (
 
 LOCK TABLES `saved_smelt_state` WRITE;
 /*!40000 ALTER TABLE `saved_smelt_state` DISABLE KEYS */;
-INSERT INTO `saved_smelt_state` VALUES (16,50,50,4264500.26165518,0,0),(17,50,50,4262400,0,0),(18,150,150,4262400,0,0),(19,150,150,4262400,0,0);
+INSERT INTO `saved_smelt_state` VALUES (16,50,50,4264500.26165518,0,0),(17,50,50,4262400,0,0),(18,150,150,8697746.687452812,0,0),(19,150,150,4262400,0,0);
 /*!40000 ALTER TABLE `saved_smelt_state` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -700,7 +701,7 @@ CREATE TABLE `saved_time` (
 
 LOCK TABLES `saved_time` WRITE;
 /*!40000 ALTER TABLE `saved_time` DISABLE KEYS */;
-INSERT INTO `saved_time` VALUES (16,50,4267849.376481558),(17,50,4262400),(18,50,4262400),(19,50,4262400);
+INSERT INTO `saved_time` VALUES (16,50,4267849.376481558),(17,50,4262400),(18,101,8697746.687452812),(19,101,8524800);
 /*!40000 ALTER TABLE `saved_time` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -771,7 +772,7 @@ CREATE TABLE `saved_tree_resource` (
 
 LOCK TABLES `saved_tree_resource` WRITE;
 /*!40000 ALTER TABLE `saved_tree_resource` DISABLE KEYS */;
-INSERT INTO `saved_tree_resource` VALUES (16,'upper_map','stone','stone',3,49,10,10,50,-1,50,0,0,0,4267620.93257996,0),(16,'upper_map','stone1','stone',3,49,10,10,50,-1,50,0,0,0,4267620.93257996,0),(16,'upper_map','stone2','stone',3,49,10,10,50,-1,50,0,0,0,4267620.93257996,0),(16,'upper_map','stone3','stone',3,49,10,10,50,-1,50,0,0,0,4267620.93257996,0),(16,'upper_map','stone4','stone',3,49,10,10,50,-1,50,0,0,0,4267620.93257996,0),(16,'upper_map','stone5','stone',3,49,10,10,50,-1,50,0,0,0,4267620.93257996,0),(16,'upper_map','stone6','stone',3,49,10,10,50,-1,50,0,0,0,4267620.93257996,0),(16,'upper_map','tree','blue',3,49,10,10,50,-1,50,0,0,0,4267620.93257996,0),(16,'upper_map','tree1','yellow',3,49,10,10,50,-1,50,0,0,0,4267620.93257996,0),(16,'upper_map','tree2','red',3,49,10,10,50,-1,50,0,0,0,4267620.93257996,0),(16,'upper_map','tree3','yellow',3,49,10,10,50,-1,50,0,0,0,4267620.93257996,0);
+INSERT INTO `saved_tree_resource` VALUES (16,'d_homemap','copper','copper',2,0,15,15,2,-1,1,0,0,0,-1,0),(16,'d_homemap','copper1','copper',2,0,15,15,2,-1,1,0,0,0,-1,0),(16,'d_homemap','iron','iron',2,0,15,15,2,-1,1,0,0,0,-1,0),(16,'d_homemap','iron1','iron',2,0,15,15,2,-1,1,0,0,0,-1,0),(16,'d_homemap','iron2','iron',2,0,15,15,2,-1,1,0,0,0,-1,0),(16,'d_homemap','iron3','iron',2,0,15,15,2,-1,1,0,0,0,-1,0),(16,'d_homemap','iron4','iron',2,0,15,15,2,-1,1,0,0,0,-1,0),(16,'d_homemap','iron5','iron',2,0,15,15,2,-1,1,0,0,0,-1,0),(16,'d_homemap','iron6','iron',2,0,15,15,2,-1,1,0,0,0,-1,0),(16,'d_homemap','iron7','iron',2,0,15,15,2,-1,1,0,0,0,-1,0),(16,'d_homemap','stone_dungeon','stone_dungeon',2,0,10,10,1,-1,1,0,0,0,-1,0),(16,'d_homemap','stone_dungeon1','stone_dungeon',2,0,10,10,1,-1,1,0,0,0,-1,0),(16,'d_homemap','stone_dungeon2','stone_dungeon',2,0,10,10,1,-1,1,0,0,0,-1,0),(16,'d_homemap','stone_dungeon3','stone_dungeon',2,0,10,10,1,-1,1,0,0,0,-1,0),(16,'d_homemap','stone_dungeon4','stone_dungeon',2,0,10,10,1,-1,1,0,0,0,-1,0),(16,'left_map','stone','stone',3,49,10,10,50,-1,50,0,0,0,4268723.281353585,0),(16,'left_map','stone1','stone',3,49,10,10,50,-1,50,0,0,0,4268723.281353585,0),(16,'left_map','stone2','stone',3,49,10,10,50,-1,50,0,0,0,4268723.281353585,0),(16,'left_map','stone3','stone',3,49,10,10,50,-1,50,0,0,0,4268723.281353585,0),(16,'left_map','tree','blue',3,49,10,10,50,-1,50,0,0,0,4268723.281353585,0),(16,'left_map','tree1','yellow',3,49,10,10,50,-1,50,0,0,0,4268723.281353585,0),(16,'left_map','tree2','yellow',3,49,10,10,50,-1,50,0,0,0,4268723.281353585,0),(16,'left_map','tree3','red',3,49,10,10,50,-1,50,0,0,0,4268723.281353585,0),(16,'left_map_noone','stone','stone',3,49,10,10,50,-1,50,0,0,0,4268876.869571985,0),(16,'left_map_noone','stone1','stone',3,49,10,10,50,-1,50,0,0,0,4268876.869571985,0),(16,'left_map_noone','stone2','stone',3,49,10,10,50,-1,50,0,0,0,4268876.869571985,0),(16,'left_map_noone','tree','blue',3,49,10,10,50,-1,50,0,0,0,4268876.869571985,0),(16,'left_map_noone','tree1','yellow',3,49,10,10,50,-1,50,0,0,0,4268876.869571985,0),(16,'left_map_noone','tree2','red',3,49,10,10,50,-1,50,0,0,0,4268876.869571985,0),(16,'left_map_noone','tree3','yellow',3,49,10,10,50,-1,50,0,0,0,4268876.869571985,0),(16,'left_map_noone','tree4','blue',3,49,10,10,50,-1,50,0,0,0,4268876.869571985,0),(16,'left_map_noone','tree5','blue',3,49,10,10,50,-1,50,0,0,0,4268876.869571985,0),(16,'left_map_noone','tree6','yellow',3,49,10,10,50,-1,50,0,0,0,4268876.869571985,0),(16,'left_map_noone','tree7','red',3,49,10,10,50,-1,50,0,0,0,4268876.869571985,0),(16,'left_map_noone','tree8','red',3,49,10,10,50,-1,50,0,0,0,4268876.869571985,0),(16,'left_map_noone_of_one','stone','stone',3,49,10,10,50,-1,50,0,0,0,4268944.470264815,0),(16,'left_map_noone_of_one','stone1','stone',3,49,10,10,50,-1,50,0,0,0,4268944.470264815,0),(16,'left_map_noone_of_one','stone2','stone',3,49,10,10,50,-1,50,0,0,0,4268944.470264815,0),(16,'left_map_noone_of_one','tree','yellow',3,49,10,10,50,-1,50,0,0,0,4268944.470264815,0),(16,'left_map_noone_of_one','tree1','yellow',3,49,10,10,50,-1,50,0,0,0,4268944.470264815,0),(16,'left_map_noone_of_one','tree2','blue',3,49,10,10,50,-1,50,0,0,0,4268944.470264815,0),(16,'left_map_noone_of_one','tree3','blue',3,49,10,10,50,-1,50,0,0,0,4268944.470264815,0),(16,'left_map_noone_of_one','tree4','yellow',3,49,10,10,50,-1,50,0,0,0,4268944.470264815,0),(16,'left_map_noone_of_one','tree5','blue',3,49,10,10,50,-1,50,0,0,0,4268944.470264815,0),(16,'left_map_notwo_of_one','stone','stone',3,49,10,10,50,-1,50,0,0,0,4269038.517906136,0),(16,'left_map_notwo_of_one','stone1','stone',3,49,10,10,50,-1,50,0,0,0,4269038.517906136,0),(16,'left_map_notwo_of_one','stone2','stone',3,49,10,10,50,-1,50,0,0,0,4269038.517906136,0),(16,'left_map_notwo_of_one','stone3','stone',3,49,10,10,50,-1,50,0,0,0,4269038.517906136,0),(16,'left_map_notwo_of_one','stone4','stone',3,49,10,10,50,-1,50,0,0,0,4269038.517906136,0),(16,'left_map_notwo_of_one','stone5','stone',3,49,10,10,50,-1,50,0,0,0,4269038.517906136,0),(16,'left_map_notwo_of_one','tree','blue',3,49,10,10,50,-1,50,0,0,0,4269038.517906136,0),(16,'left_map_notwo_of_one','tree1','yellow',3,49,10,10,50,-1,50,0,0,0,4269038.517906136,0),(16,'left_map_notwo_of_one','tree2','blue',3,49,10,10,50,-1,50,0,0,0,4269038.517906136,0),(16,'left_map_notwo_of_one','tree3','red',3,49,10,10,50,-1,50,0,0,0,4269038.517906136,0),(16,'left_map_notwo_of_one','tree4','blue',3,49,10,10,50,-1,50,0,0,0,4269038.517906136,0),(16,'upper_map','stone','stone',3,49,10,10,50,-1,50,0,0,0,4267620.93257996,0),(16,'upper_map','stone1','stone',3,49,10,10,50,-1,50,0,0,0,4267620.93257996,0),(16,'upper_map','stone2','stone',3,49,10,10,50,-1,50,0,0,0,4267620.93257996,0),(16,'upper_map','stone3','stone',3,49,10,10,50,-1,50,0,0,0,4267620.93257996,0),(16,'upper_map','stone4','stone',3,49,10,10,50,-1,50,0,0,0,4267620.93257996,0),(16,'upper_map','stone5','stone',3,49,10,10,50,-1,50,0,0,0,4267620.93257996,0),(16,'upper_map','stone6','stone',3,49,10,10,50,-1,50,0,0,0,4267620.93257996,0),(16,'upper_map','tree','blue',3,49,10,10,50,-1,50,0,0,0,4267620.93257996,0),(16,'upper_map','tree1','yellow',3,49,10,10,50,-1,50,0,0,0,4267620.93257996,0),(16,'upper_map','tree2','red',3,49,10,10,50,-1,50,0,0,0,4267620.93257996,0),(16,'upper_map','tree3','yellow',3,49,10,10,50,-1,50,0,0,0,4267620.93257996,0);
 /*!40000 ALTER TABLE `saved_tree_resource` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -796,7 +797,7 @@ CREATE TABLE `saved_unlocked_recipe` (
 
 LOCK TABLES `saved_unlocked_recipe` WRITE;
 /*!40000 ALTER TABLE `saved_unlocked_recipe` DISABLE KEYS */;
-INSERT INTO `saved_unlocked_recipe` VALUES (16,'baked_potato'),(16,'rope'),(16,'stick'),(16,'tomato_slices'),(16,'water_bottle'),(17,'baked_potato'),(17,'rope'),(17,'stick'),(17,'tomato_slices'),(18,'baked_potato'),(18,'beef_potato_stew'),(18,'fresh_salad'),(18,'polished_stone'),(18,'rope'),(18,'salad_leaves'),(18,'stick'),(18,'stone_block'),(18,'tomato_slices'),(18,'wooden_board'),(19,'baked_potato'),(19,'beef_potato_stew'),(19,'fresh_salad'),(19,'polished_stone'),(19,'rope'),(19,'salad_leaves'),(19,'stick'),(19,'stone_block'),(19,'tomato_slices'),(19,'wooden_board');
+INSERT INTO `saved_unlocked_recipe` VALUES (16,'baked_potato'),(16,'rope'),(16,'stick'),(16,'tomato_slices'),(16,'water_bottle'),(17,'baked_potato'),(17,'rope'),(17,'stick'),(17,'tomato_slices'),(18,'baked_potato'),(18,'beef_potato_stew'),(18,'fresh_salad'),(18,'polished_stone'),(18,'rope'),(18,'salad_leaves'),(18,'stick'),(18,'stone_block'),(18,'tomato_slices'),(18,'water_bottle'),(18,'wooden_board'),(19,'baked_potato'),(19,'beef_potato_stew'),(19,'fresh_salad'),(19,'polished_stone'),(19,'rope'),(19,'salad_leaves'),(19,'stick'),(19,'stone_block'),(19,'tomato_slices'),(19,'wooden_board');
 /*!40000 ALTER TABLE `saved_unlocked_recipe` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -871,7 +872,7 @@ CREATE TABLE `user_roles` (
 
 LOCK TABLES `user_roles` WRITE;
 /*!40000 ALTER TABLE `user_roles` DISABLE KEYS */;
-INSERT INTO `user_roles` VALUES (1,'admin'),(2,'owner'),(3,'user');
+INSERT INTO `user_roles` VALUES (1,'admin'),(3,'user');
 /*!40000 ALTER TABLE `user_roles` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -884,4 +885,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-05-19 19:45:01
+-- Dump completed on 2026-05-20 14:24:26

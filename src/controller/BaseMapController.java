@@ -1647,16 +1647,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
 
     protected int getCurrentCoreStatCap() {
         int dayNumber = GameTimeManager.get().dayNumberProperty().get();
-        if (dayNumber <= 0) {
-            return 10;
-        }
-        if (dayNumber <= 5) {
-            return 10;
-        }
-        if (dayNumber <= 10) {
-            return 20;
-        }
-        return 30;
+        return Math.max(10, dayNumber);
     }
 
     protected int getCurrentStatValueWithPending(String statKey) {
@@ -1686,7 +1677,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     }
 
     protected int getHpSpPointCap() {
-        return getAverageCoreStatWithPending() + getCurrentCoreStatCap();
+        return getAverageCoreStatWithPending();
     }
 
     protected int getHpSpInvestedPointsWithPending(String statKey) {
