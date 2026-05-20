@@ -12,7 +12,9 @@ import java.net.URL;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.ResourceBundle;
 import javax.naming.NamingException;
@@ -93,7 +95,10 @@ public class LoginController implements Initializable {
     private static final int OTP_LENGTH = 6;
     private static final int OTP_EXPIRY_MINUTES = 10;
     private static final int OTP_RESEND_COOLDOWN_SECONDS = 180;
+    private static final int MAX_PASSWORD_RETRY_COUNT = 3;
+    private static final long INITIAL_PASSWORD_LOCKOUT_SECONDS = 180;
     private static final String PASSWORD_REGEX = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{8,}$";
+    private final Map<String, LoginRetryState> loginRetryStates = new HashMap<>();
     private String pendingOtpCode;
     private LocalDateTime pendingOtpExpiresAt;
     private String pendingOtpEmail;
@@ -101,6 +106,8 @@ public class LoginController implements Initializable {
     private String pendingOtpPassword;
     private LocalDateTime otpResendAvailableAt;
     private Timeline otpResendCooldownTimeline;
+    private LoginRetryState activeLoginLockoutState;
+    private Timeline loginLockoutCountdownTimeline;
     @FXML
     private TextField otpcode;
     @FXML
@@ -151,6 +158,14 @@ public class LoginController implements Initializable {
             return;
         }
 
+        String retryKey = normalizeLoginRetryKey(loginInput);
+        LoginRetryState retryState = loginRetryStates.computeIfAbsent(retryKey, key -> new LoginRetryState());
+        if (retryState.isLocked()) {
+            startLoginPasswordLockoutCountdown(retryState);
+            AppDialogs.showMessageDialog(null, "Please try again later.");
+            return;
+        }
+
         UiSqlService.AuthRow auth;
         try {
             auth = UiSqlService.fetchAuthRow(loginInput);
@@ -165,9 +180,16 @@ public class LoginController implements Initializable {
 
         String dbPassword = auth.password();
         if (dbPassword == null || !dbPassword.equals(password)) {
-            AppDialogs.showMessageDialog(null, "Incorrect password.");
+            retryState.recordFailedPassword();
+            if (retryState.isLocked()) {
+                startLoginPasswordLockoutCountdown(retryState);
+            }
+            AppDialogs.showMessageDialog(null, "Password is incorrect.");
             return;
         }
+
+        loginRetryStates.remove(retryKey);
+        stopLoginPasswordLockoutCountdown();
 
         txtname = auth.accountName();
         int accountId = auth.accountId();
@@ -375,6 +397,49 @@ public class LoginController implements Initializable {
             && pendingOtpPassword.equals(password);
     }
 
+    private String normalizeLoginRetryKey(String loginInput) {
+        return loginInput == null ? "" : loginInput.trim().toLowerCase();
+    }
+
+    private static final class LoginRetryState {
+        private int failedPasswordAttempts = 0;
+        private long nextLockoutSeconds = INITIAL_PASSWORD_LOCKOUT_SECONDS;
+        private LocalDateTime lockedUntil;
+
+        boolean isLocked() {
+            if (lockedUntil == null) {
+                return false;
+            }
+            if (LocalDateTime.now().isBefore(lockedUntil)) {
+                return true;
+            }
+            lockedUntil = null;
+            failedPasswordAttempts = 0;
+            return false;
+        }
+
+        void recordFailedPassword() {
+            if (isLocked()) {
+                return;
+            }
+
+            failedPasswordAttempts++;
+            if (failedPasswordAttempts >= MAX_PASSWORD_RETRY_COUNT) {
+                lockedUntil = LocalDateTime.now().plusSeconds(nextLockoutSeconds);
+                nextLockoutSeconds = Math.max(nextLockoutSeconds, nextLockoutSeconds * 2);
+                failedPasswordAttempts = 0;
+            }
+        }
+
+        long getLockoutSecondsRemaining() {
+            if (lockedUntil == null) {
+                return 0;
+            }
+            long remainingSeconds = ChronoUnit.SECONDS.between(LocalDateTime.now(), lockedUntil);
+            return Math.max(0, remainingSeconds);
+        }
+    }
+
     private void clearPendingOtpState() {
         pendingOtpCode = null;
         pendingOtpExpiresAt = null;
@@ -535,21 +600,86 @@ public class LoginController implements Initializable {
 
     @FXML
     private void handleopenpasswordaction(MouseEvent event) {
+        if (isLoginPasswordLockoutActive()) return;
         applyLoginPasswordMask(false);
     }
 
     @FXML
     private void handlecolsedpasswordaction(MouseEvent event) {
+        if (isLoginPasswordLockoutActive()) return;
         applyLoginPasswordMask(true);
     }
 
     private void applyLoginPasswordMask(boolean masked) {
+        if (isLoginPasswordLockoutActive()) {
+            masked = false;
+        }
         txtlpassword.setVisible(masked);
         txtlpassword.setManaged(masked);
         txtlpasswordvisible.setVisible(!masked);
         txtlpasswordvisible.setManaged(!masked);
         openlpassword.setVisible(masked);
         closedlpassword.setVisible(!masked);
+    }
+
+    private void startLoginPasswordLockoutCountdown(LoginRetryState retryState) {
+        activeLoginLockoutState = retryState;
+        ensureLoginLockoutCountdownTimeline();
+        updateLoginPasswordLockoutDisplay();
+        if (loginLockoutCountdownTimeline != null) {
+            loginLockoutCountdownTimeline.playFromStart();
+        }
+    }
+
+    private void ensureLoginLockoutCountdownTimeline() {
+        if (loginLockoutCountdownTimeline != null) {
+            return;
+        }
+        loginLockoutCountdownTimeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> updateLoginPasswordLockoutDisplay()));
+        loginLockoutCountdownTimeline.setCycleCount(Timeline.INDEFINITE);
+    }
+
+    private void updateLoginPasswordLockoutDisplay() {
+        if (activeLoginLockoutState == null || !activeLoginLockoutState.isLocked()) {
+            stopLoginPasswordLockoutCountdown();
+            return;
+        }
+
+        long remainingSeconds = activeLoginLockoutState.getLockoutSecondsRemaining();
+        String cooldownText = "Try again in " + formatCooldown(remainingSeconds);
+        applyLoginPasswordMask(false);
+        if (txtlpassword != null) {
+            txtlpassword.setText(cooldownText);
+            txtlpassword.setDisable(true);
+        }
+        if (txtlpasswordvisible != null) {
+            txtlpasswordvisible.setText(cooldownText);
+            txtlpasswordvisible.setDisable(true);
+        }
+        if (openlpassword != null) openlpassword.setDisable(true);
+        if (closedlpassword != null) closedlpassword.setDisable(true);
+    }
+
+    private void stopLoginPasswordLockoutCountdown() {
+        if (loginLockoutCountdownTimeline != null) {
+            loginLockoutCountdownTimeline.stop();
+        }
+        activeLoginLockoutState = null;
+        if (txtlpassword != null) {
+            txtlpassword.setDisable(false);
+            txtlpassword.setText("");
+        }
+        if (txtlpasswordvisible != null) {
+            txtlpasswordvisible.setDisable(false);
+            txtlpasswordvisible.setText("");
+        }
+        if (openlpassword != null) openlpassword.setDisable(false);
+        if (closedlpassword != null) closedlpassword.setDisable(false);
+        applyLoginPasswordMask(true);
+    }
+
+    private boolean isLoginPasswordLockoutActive() {
+        return activeLoginLockoutState != null && activeLoginLockoutState.isLocked();
     }
 
     private void startSignupOtpCooldown() {

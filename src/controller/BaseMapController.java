@@ -1646,8 +1646,7 @@ public abstract class BaseMapController implements Initializable, SceneControlle
     }
 
     protected int getCurrentCoreStatCap() {
-        int dayNumber = GameTimeManager.get().dayNumberProperty().get();
-        return Math.max(10, dayNumber);
+        return PlayerState.MAX_CORE_STAT;
     }
 
     protected int getCurrentStatValueWithPending(String statKey) {
@@ -1748,10 +1747,10 @@ public abstract class BaseMapController implements Initializable, SceneControlle
         if (pendingSpPoints > 0) {
             playerState.setMaxStamina(playerState.getMaxStamina() + pendingSpPoints);
         }
-        if (pendingStrPoints > 0) playerState.setBaseStr(playerState.getBaseStr() + pendingStrPoints);
-        if (pendingVitPoints > 0) playerState.setBaseVit(playerState.getBaseVit() + pendingVitPoints);
-        if (pendingDexPoints > 0) playerState.setBaseDex(playerState.getBaseDex() + pendingDexPoints);
-        if (pendingAgiPoints > 0) playerState.setBaseAgi(playerState.getBaseAgi() + pendingAgiPoints);
+        if (pendingStrPoints > 0) playerState.setBaseStr(Math.min(PlayerState.MAX_CORE_STAT, playerState.getBaseStr() + pendingStrPoints));
+        if (pendingVitPoints > 0) playerState.setBaseVit(Math.min(PlayerState.MAX_CORE_STAT, playerState.getBaseVit() + pendingVitPoints));
+        if (pendingDexPoints > 0) playerState.setBaseDex(Math.min(PlayerState.MAX_CORE_STAT, playerState.getBaseDex() + pendingDexPoints));
+        if (pendingAgiPoints > 0) playerState.setBaseAgi(Math.min(PlayerState.MAX_CORE_STAT, playerState.getBaseAgi() + pendingAgiPoints));
 
         statusAllocationMode = false;
         resetPendingStatusChanges();

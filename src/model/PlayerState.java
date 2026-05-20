@@ -21,6 +21,7 @@ public final class PlayerState {
     private static final int DEFAULT_DEX = 3;
     private static final int DEFAULT_STR = 3;
     private static final int DEFAULT_VIT = 3;
+    public static final int MAX_CORE_STAT = 100;
     private static final String DEFAULT_NAME = "Player";
 
     private final Inventory inventory;
@@ -360,7 +361,7 @@ public final class PlayerState {
     }
 
     public void setAgi(int value) {
-        agi.set(Math.max(0, value - equipmentAgiBonus));
+        agi.set(clamp(value - equipmentAgiBonus, 0, MAX_CORE_STAT));
     }
 
     public int getBaseAgi() {
@@ -368,7 +369,7 @@ public final class PlayerState {
     }
 
     public void setBaseAgi(int value) {
-        agi.set(Math.max(0, value));
+        agi.set(clamp(value, 0, MAX_CORE_STAT));
     }
 
     public IntegerProperty dexProperty() {
@@ -380,7 +381,7 @@ public final class PlayerState {
     }
 
     public void setDex(int value) {
-        dex.set(Math.max(0, value - equipmentDexBonus));
+        dex.set(clamp(value - equipmentDexBonus, 0, MAX_CORE_STAT));
     }
 
     public int getBaseDex() {
@@ -388,7 +389,7 @@ public final class PlayerState {
     }
 
     public void setBaseDex(int value) {
-        dex.set(Math.max(0, value));
+        dex.set(clamp(value, 0, MAX_CORE_STAT));
     }
 
     public int getMaxHp() {
@@ -423,7 +424,7 @@ public final class PlayerState {
     }
 
     public void setStr(int value) {
-        str.set(Math.max(0, value - equipmentStrBonus));
+        str.set(clamp(value - equipmentStrBonus, 0, MAX_CORE_STAT));
     }
 
     public int getBaseStr() {
@@ -431,7 +432,7 @@ public final class PlayerState {
     }
 
     public void setBaseStr(int value) {
-        str.set(Math.max(0, value));
+        str.set(clamp(value, 0, MAX_CORE_STAT));
     }
 
     public IntegerProperty vitProperty() {
@@ -443,7 +444,7 @@ public final class PlayerState {
     }
 
     public void setVit(int value) {
-        vit.set(Math.max(0, value - equipmentVitBonus));
+        vit.set(clamp(value - equipmentVitBonus, 0, MAX_CORE_STAT));
     }
 
     public int getBaseVit() {
@@ -451,7 +452,7 @@ public final class PlayerState {
     }
 
     public void setBaseVit(int value) {
-        vit.set(Math.max(0, value));
+        vit.set(clamp(value, 0, MAX_CORE_STAT));
     }
 
     public void setEquipmentStatBonuses(int strBonus, int agiBonus, int dexBonus, int vitBonus) {

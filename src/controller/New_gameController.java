@@ -361,7 +361,7 @@ public class New_gameController implements Initializable, SceneController {
     }
 
     private int getCurrentCoreStatCap() {
-        return 10;
+        return PlayerState.MAX_CORE_STAT;
     }
 
     private int getCurrentStatValueWithPending(String statKey) {
@@ -453,10 +453,10 @@ public class New_gameController implements Initializable, SceneController {
         if (pendingSpPoints > 0) {
             playerState.setMaxStamina(playerState.getMaxStamina() + pendingSpPoints);
         }
-        if (pendingStrPoints > 0) playerState.setStr(playerState.getStr() + pendingStrPoints);
-        if (pendingVitPoints > 0) playerState.setVit(playerState.getVit() + pendingVitPoints);
-        if (pendingDexPoints > 0) playerState.setDex(playerState.getDex() + pendingDexPoints);
-        if (pendingAgiPoints > 0) playerState.setAgi(playerState.getAgi() + pendingAgiPoints);
+        if (pendingStrPoints > 0) playerState.setStr(Math.min(PlayerState.MAX_CORE_STAT, playerState.getStr() + pendingStrPoints));
+        if (pendingVitPoints > 0) playerState.setVit(Math.min(PlayerState.MAX_CORE_STAT, playerState.getVit() + pendingVitPoints));
+        if (pendingDexPoints > 0) playerState.setDex(Math.min(PlayerState.MAX_CORE_STAT, playerState.getDex() + pendingDexPoints));
+        if (pendingAgiPoints > 0) playerState.setAgi(Math.min(PlayerState.MAX_CORE_STAT, playerState.getAgi() + pendingAgiPoints));
 
         resetPendingStatusChanges();
         refreshStatusView();
