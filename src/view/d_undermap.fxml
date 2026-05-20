@@ -46,14 +46,14 @@
                   <Rectangle fx:id="wall13" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="198.0" layoutX="570.0" layoutY="-340.0" stroke="TRANSPARENT" strokeType="INSIDE" width="20.0" />
                   <Rectangle fx:id="wall14" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="396.0" layoutX="-6.0" layoutY="-348.0" stroke="TRANSPARENT" strokeType="INSIDE" width="3.0" />
                   <Rectangle fx:id="wall15" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="390.0" layoutX="587.0" layoutY="-344.0" stroke="TRANSPARENT" strokeType="INSIDE" width="4.0" />
-                  <Rectangle fx:id="wall16" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="215.0" layoutX="-5.0" layoutY="-349.0" stroke="TRANSPARENT" strokeType="INSIDE" width="13.0" />
+                  <Rectangle fx:id="wall16" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="215.0" layoutX="-5.0" layoutY="-349.0" stroke="TRANSPARENT" strokeType="INSIDE" width="15.0" />
                </children>
             </Group>
             <Group layoutX="10.0">
                <children>
-                  <Rectangle fx:id="exit_right" height="221.0" layoutX="575.0" layoutY="64.0" opacity="0" width="11.0" />
+                  <Rectangle fx:id="exit_right" height="74.0" layoutX="581.0" layoutY="181.0" opacity="0" width="5.0" />
                   <Rectangle fx:id="exit_up" height="8.0" layoutX="271.0" layoutY="1.0" opacity="0" width="47.0" />
-                  <Rectangle fx:id="exit_left" height="209.0" layoutX="-4.0" layoutY="62.0" opacity="0" width="10.0" />
+                  <Rectangle fx:id="exit_left" height="57.0" layoutX="-9.0" layoutY="199.0" opacity="0" width="7.0" />
                   <Rectangle fx:id="exit_down" height="6.0" layoutX="235.0" layoutY="390.0" opacity="0" width="78.0" />
                </children>
             </Group>
