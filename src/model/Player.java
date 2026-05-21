@@ -180,6 +180,7 @@ public class Player {
     private boolean deathFinished = false;
     private long attackEndsAtNanos = 0L;
     private long nextAttackAvailableAtNanos = 0L;
+    private boolean attackSignalSent = false;
     private boolean hurtActive = false;
     private long hurtEndsAtNanos = 0L;
     private final Effect hurtFlashEffect = createHurtFlashEffect();
@@ -520,6 +521,7 @@ public class Player {
         moving = false;
         attackEndsAtNanos = 0L;
         nextAttackAvailableAtNanos = 0L;
+        attackSignalSent = false;
         hurtActive = false;
         hurtEndsAtNanos = 0L;
         clearHurtFlashEffect();
@@ -580,10 +582,13 @@ public class Player {
             }
 
             setAnimState(AnimState.ATTACK, false);
+            trySendAttackSignal(now);
             return;
         }
 
         if (animState == AnimState.ATTACK) {
+            trySendAttackSignal(now);
+            attackSignalSent = false;
             setAnimState(AnimState.IDLE, true);
         }
 
@@ -1151,15 +1156,36 @@ public class Player {
         long attackDuration = getAttackDurationNanos(animationSet);
         attackEndsAtNanos = now + attackDuration;
         nextAttackAvailableAtNanos = attackEndsAtNanos;
+        attackSignalSent = false;
         setAnimState(AnimState.ATTACK, true);
-        if (onAttackStarted != null) {
-            onAttackStarted.run();
-        }
     }
 
     private long getAttackDurationNanos(EquipmentAnimationSet animationSet) {
         int columns = getHumanAttackColumns(animationSet);
         return (long) columns * getAttackFrameDelayNanos();
+    }
+
+    private void trySendAttackSignal(long now) {
+        if (attackSignalSent || onAttackStarted == null || attackEndsAtNanos <= 0L) {
+            return;
+        }
+
+        EquipmentAnimationSet animationSet = equipmentAnimations.get(equippedKind);
+        long attackDuration = getAttackDurationNanos(animationSet);
+        long attackStartedAt = attackEndsAtNanos - attackDuration;
+        long signalOffset = getAttackSignalOffsetNanos(animationSet);
+        if (now - attackStartedAt < signalOffset) {
+            return;
+        }
+
+        attackSignalSent = true;
+        onAttackStarted.run();
+    }
+
+    private long getAttackSignalOffsetNanos(EquipmentAnimationSet animationSet) {
+        int columns = getHumanAttackColumns(animationSet);
+        int signalFrame = Math.max(1, columns / 2);
+        return signalFrame * getAttackFrameDelayNanos();
     }
 
     private boolean isAttackActive(long now) {

@@ -1407,7 +1407,7 @@ public class Home_interiorController extends BaseMapController {
         ));
 
         tutorialImageView.layoutXProperty().bind(view.widthProperty().subtract(tutorialImageView.fitWidthProperty()).divide(2.0));
-        tutorialImageView.layoutYProperty().bind(view.heightProperty().multiply(0.155));
+        tutorialImageView.layoutYProperty().bind(view.heightProperty().subtract(tutorialImageView.fitHeightProperty()).divide(2.0));
 
         tutorialPromptLabel.fontProperty().bind(Bindings.createObjectBinding(
             () -> javafx.scene.text.Font.font("System Bold", clampTutorialSize(view.getWidth() * 0.028, 14, 26)),

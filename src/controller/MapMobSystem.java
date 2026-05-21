@@ -351,7 +351,7 @@ final class MapMobSystem {
         double nowSeconds = time.totalSecondsProperty().get();
 
         MobMapState mapMobs = gameState.getMobState(mapKey);
-        List<Rectangle> staticWalls = (walls != null) ? CollisionRegistry.collectWalls(walls) : List.of();
+        List<Rectangle> staticWalls = CollisionRegistry.collectMobBlockingObstacles(world, walls);
 
         List<Group> mobGroups = new ArrayList<>();
         for (Node node : nodesById.values()) {

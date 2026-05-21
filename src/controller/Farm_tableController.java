@@ -45,19 +45,17 @@ public class Farm_tableController implements Initializable, SceneController {
     private static final int DEFAULT_PLANT_STAMINA_COST = 2;
     private static final String FARM_TUTORIAL_KEY = "farm_table_inside";
     private static final List<String> FARM_TUTORIAL_IMAGES = List.of(
-        "/image/Toturial/Farm1.png",
-        "/image/Toturial/Farm2.png",
-        "/image/Toturial/Farm3.png",
-        "/image/Toturial/Farm4.png",
-        "/image/Toturial/Farm5.png",
-        "/image/Toturial/Farm6.png",
-        "/image/Toturial/Farm7.png",
-        "/image/Toturial/Farm8.png",
-        "/image/Toturial/Farm9.png",
-        "/image/Toturial/Farm10.png",
-        "/image/Toturial/Farm11.png",
-        "/image/Toturial/Farm12.png",
-        "/image/Toturial/Farm13.png"
+        "/image/Toturial/To Select Seed.png",
+        "/image/Toturial/Choose Seed.png",
+        "/image/Toturial/Select Field.png",
+        "/image/Toturial/Plant Appear.png",
+        "/image/Toturial/Befor Select Water_Can.png",
+        "/image/Toturial/Select Water Can.png",
+        "/image/Toturial/Water Plant.png",
+        "/image/Toturial/Harvest.png",
+        "/image/Toturial/Before Select Sickle.png",
+        "/image/Toturial/Select Sickle.png",
+        "/image/Toturial/Hervested.png"
     );
 
     private static final String PLOT_IDLE_STYLE = "-fx-background-color: transparent; -fx-background-radius: 6; -fx-border-color: transparent; -fx-border-radius: 6;";

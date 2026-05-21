@@ -48,6 +48,11 @@ public class New_gameController implements Initializable, SceneController {
     private static final int NEW_GAME_BASE_DEX = 1;
     private static final int NEW_GAME_BASE_AGI = 1;
     private static final int NEW_GAME_STARTING_EXP = 6;
+    private static final int NEW_GAME_CREATION_STAT_CAP = 3;
+    private static final List<String> NEW_GAME_TUTORIAL_IMAGES = List.of(
+        "/image/Toturial/New Game.png",
+        "/image/Toturial/Stats Detail.png"
+    );
 
     @FXML
     private TextField txtchaname;
@@ -361,7 +366,7 @@ public class New_gameController implements Initializable, SceneController {
     }
 
     private int getCurrentCoreStatCap() {
-        return PlayerState.MAX_CORE_STAT;
+        return NEW_GAME_CREATION_STAT_CAP;
     }
 
     private int getCurrentStatValueWithPending(String statKey) {
@@ -533,7 +538,7 @@ public class New_gameController implements Initializable, SceneController {
 
     @FXML
     private void handlebtntutoaction(ActionEvent event) {
-        TutorialOverlayHelper.show(view, event, TutorialOverlayHelper.GLOBAL_BUTTON_TUTORIAL_IMAGES);
+        TutorialOverlayHelper.show(view, event, NEW_GAME_TUTORIAL_IMAGES);
         if (event != null) {
             event.consume();
         }

@@ -42,11 +42,10 @@ public class ShopController implements Initializable, SceneController {
     private static final int RESTOCK_PER_DAY = 10;
     private static final String HOTBAR_SELL_ENTRY_STYLE = "-fx-text-fill: #8fdcff; -fx-font-weight: bold;";
     private static final List<String> SHOP_TUTORIAL_IMAGES = List.of(
-        "/image/Toturial/Shop.png",
-        "/image/Toturial/Buy1.png",
-        "/image/Toturial/Buy2.png",
-        "/image/Toturial/Sell1.png",
-        "/image/Toturial/Sell2.png"
+        "/image/Toturial/Buy.png",
+        "/image/Toturial/Buy Item.png",
+        "/image/Toturial/Sell.png",
+        "/image/Toturial/Sell Item.png"
     );
 
     private GameState gameState;

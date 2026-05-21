@@ -177,6 +177,7 @@ public final class MobEntity {
     private boolean hurtActive = false;
     private long hurtEndsAtNanos = 0L;
     private final Effect hurtFlashEffect = createHurtFlashEffect();
+    private long attackStartedAtNanos = 0L;
     private long attackEndsAtNanos = 0L;
     private long nextAttackAvailableAtNanos = 0L;
     private boolean attackDamageApplied = false;
@@ -337,7 +338,9 @@ public final class MobEntity {
 
         // Attack finished.
         if (animState == AnimState.ATTACK) {
+            tryApplyAttackDamage(playerBoundsScene, playerState);
             attackDamageApplied = false;
+            attackStartedAtNanos = 0L;
             setAnimState(AnimState.IDLE, true);
         }
 
@@ -368,7 +371,6 @@ public final class MobEntity {
 
             if (shouldStartAttack(simNowNanos, playerBoundsScene, playerState)) {
                 startAttack(simNowNanos);
-                tryApplyAttackDamage(playerBoundsScene, playerState);
                 runAttackActive = false;
             }
         } else {
@@ -661,6 +663,7 @@ public final class MobEntity {
         hurtActive = false;
         hurtEndsAtNanos = 0L;
         clearHurtFlashEffect();
+        attackStartedAtNanos = 0L;
         attackEndsAtNanos = 0L;
         nextAttackAvailableAtNanos = 0L;
         attackDamageApplied = false;
@@ -930,6 +933,7 @@ public final class MobEntity {
 
     private void startAttack(long nowNanos) {
         long duration = (long) attackColumns * getAttackFrameDelayNanos();
+        attackStartedAtNanos = nowNanos;
         attackEndsAtNanos = nowNanos + duration;
         nextAttackAvailableAtNanos = attackEndsAtNanos;
         attackDamageApplied = false;
@@ -945,6 +949,7 @@ public final class MobEntity {
     private void tryApplyAttackDamage(Bounds playerBoundsScene, PlayerState playerState) {
         if (playerBoundsScene == null || playerState == null) return;
         if (attackDamageApplied) return;
+        if (!hasReachedAttackDamageFrame(simNowNanos)) return;
         Rectangle active = resolveActiveAttackHitbox();
         if (active == null || active.isDisable()) return;
 
@@ -1005,6 +1010,15 @@ public final class MobEntity {
 
     private boolean isAttackActive(long nowNanos) {
         return attackEndsAtNanos > 0L && nowNanos < attackEndsAtNanos;
+    }
+
+    private boolean hasReachedAttackDamageFrame(long nowNanos) {
+        if (attackStartedAtNanos <= 0L) {
+            return false;
+        }
+        int damageFrame = Math.max(1, attackColumns / 2);
+        long offset = damageFrame * getAttackFrameDelayNanos();
+        return nowNanos - attackStartedAtNanos >= offset;
     }
 
     private long getAttackFrameDelayNanos() {
