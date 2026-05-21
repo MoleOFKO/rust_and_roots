@@ -30,6 +30,7 @@ public final class TutorialOverlayHelper {
     public static final List<String> GLOBAL_BUTTON_TUTORIAL_IMAGES = List.of(
         "/image/Toturial/Move.png",
         "/image/Toturial/Run.png",
+        "/image/Toturial/Consume.png",
         "/image/Toturial/before_goes_to_hotbar.png",
         "/image/Toturial/goes_to_hotbar.png",
         "/image/Toturial/Wp_hold.png",

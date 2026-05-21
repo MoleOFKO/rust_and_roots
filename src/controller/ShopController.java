@@ -28,6 +28,7 @@ import model.RecipeCatalog;
 import model.item;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
+import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.scene.Group;
 import util.AppDialogs;
@@ -40,6 +41,7 @@ public class ShopController implements Initializable, SceneController {
     private static final int RANDOM_BUY_SLOT_COUNT = 4;
     private static final int MAX_STOCK_PER_ITEM = 10;
     private static final int RESTOCK_PER_DAY = 10;
+    private static final String SHOP_TUTORIAL_KEY = "shop_tutorial";
     private static final String HOTBAR_SELL_ENTRY_STYLE = "-fx-text-fill: #8fdcff; -fx-font-weight: bold;";
     private static final List<String> SHOP_TUTORIAL_IMAGES = List.of(
         "/image/Toturial/Buy.png",
@@ -63,7 +65,7 @@ public class ShopController implements Initializable, SceneController {
 
     @FXML
     private void handlebtntutoaction(ActionEvent event) {
-        TutorialOverlayHelper.show(view, event, TutorialOverlayHelper.GLOBAL_BUTTON_TUTORIAL_IMAGES);
+        TutorialOverlayHelper.show(view, event, SHOP_TUTORIAL_IMAGES);
         if (event != null) {
             event.consume();
         }
@@ -410,6 +412,9 @@ public class ShopController implements Initializable, SceneController {
         bindCoins();
         setMode(Mode.BUY);
         refreshAllPanels();
+        Platform.runLater(() ->
+            TutorialOverlayHelper.showIfNeeded(view, gameState, SHOP_TUTORIAL_KEY, SHOP_TUTORIAL_IMAGES)
+        );
     }
 
     private void buildUiCollections() {
