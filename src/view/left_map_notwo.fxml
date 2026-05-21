@@ -80,6 +80,30 @@
                   <ImageView fx:id="equip_img" fitHeight="64" fitWidth="64" layoutX="-8.0" layoutY="42.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
                </children>
             </Group>
+            <Group fx:id="slime" layoutX="-170.0" layoutY="35.0">
+               <children>
+                  <Rectangle fx:id="slime_hitbox" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="262.0" layoutY="171.0" stroke="RED" strokeType="INSIDE" translateX="24" translateY="28" width="14.0" />
+                  <ImageView fx:id="slime_img" fitHeight="64" fitWidth="64" layoutX="262.0" layoutY="176.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
+                  <ImageView fx:id="slime_drops_img" fitHeight="64" fitWidth="64" layoutX="262.0" layoutY="176.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
+                  <Rectangle fx:id="slime_hitbox_left" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="272.0" layoutY="200.0" stroke="RED" strokeType="INSIDE" width="14.0" />
+                  <Rectangle fx:id="slime_hitbox_up" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="286.0" layoutY="181.0" stroke="RED" strokeType="INSIDE" width="14.0" />
+                  <Rectangle fx:id="slime_hitbox_down" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="286.0" layoutY="218.0" stroke="RED" strokeType="INSIDE" width="14.0" />
+                  <Rectangle fx:id="slime_hitbox_right" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="299.0" layoutY="199.0" stroke="RED" strokeType="INSIDE" width="14.0" />
+                  <Rectangle fx:id="slime_detect" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="113.0" layoutX="237.0" layoutY="152.0" stroke="RED" strokeType="INSIDE" width="113.0" />
+               </children>
+            </Group>
+            <Group fx:id="slime1" layoutX="106.0" layoutY="-119.0">
+               <children>
+                  <Rectangle fx:id="slime1_hitbox" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="262.0" layoutY="171.0" stroke="RED" strokeType="INSIDE" translateX="24" translateY="28" width="14.0" />
+                  <ImageView fx:id="slime1_img" fitHeight="64" fitWidth="64" layoutX="262.0" layoutY="176.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
+                  <ImageView fx:id="slime1_drops_img" fitHeight="64" fitWidth="64" layoutX="262.0" layoutY="176.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
+                  <Rectangle fx:id="slime1_hitbox_left" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="272.0" layoutY="200.0" stroke="RED" strokeType="INSIDE" width="14.0" />
+                  <Rectangle fx:id="slime1_hitbox_up" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="286.0" layoutY="181.0" stroke="RED" strokeType="INSIDE" width="14.0" />
+                  <Rectangle fx:id="slime1_hitbox_down" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="286.0" layoutY="218.0" stroke="RED" strokeType="INSIDE" width="14.0" />
+                  <Rectangle fx:id="slime1_hitbox_right" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="299.0" layoutY="199.0" stroke="RED" strokeType="INSIDE" width="14.0" />
+                  <Rectangle fx:id="slime1_detect" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="113.0" layoutX="237.0" layoutY="152.0" stroke="RED" strokeType="INSIDE" width="113.0" />
+               </children>
+            </Group>
             <Label fx:id="hotbarguide" layoutX="232.0" layoutY="368.0" text="press 'e' to open hotbar">
                <font>
                   <Font name="System Bold" size="12.0" />
@@ -100,7 +124,7 @@
             </Group>
             <Group fx:id="daynightnavgroup">
                <children>
-                  <ImageView fitHeight="60.0" fitWidth="210.0" pickOnBounds="true" preserveRatio="true">
+                  <ImageView fitHeight="60.0" fitWidth="186.0" pickOnBounds="true" preserveRatio="true">
                      <image>
                         <Image url="@../image/maps/infobar.png" />
                      </image>
@@ -121,7 +145,7 @@
                         <Font name="System Bold" size="9.0" />
                      </font>
                   </Label>
-                  <Label fx:id="name" layoutX="103.0" layoutY="1.0" prefHeight="17.0" prefWidth="76.0" text="Name:">
+                  <Label fx:id="name" layoutX="103.0" prefHeight="14.0" prefWidth="76.0" text="Name:">
                      <font>
                         <Font name="System Bold" size="9.0" />
                      </font>
