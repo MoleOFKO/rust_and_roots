@@ -28,7 +28,7 @@
                   <Image url="@../image/maps/left_map_no.2(2).png" />
                </image>
             </ImageView>
-            <Group fx:id="walls" layoutX="2.0" layoutY="1.0">
+            <Group fx:id="walls" layoutX="2.0" layoutY="1.0" visible="false">
                <children>
                   <Rectangle fx:id="wall" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="399.0" layoutX="-1.0" layoutY="1.0" stroke="BLACK" strokeType="INSIDE" width="5.0" />
                   <Rectangle fx:id="wall1" arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT" height="399.0" layoutX="600.0" layoutY="1.0" stroke="BLACK" strokeType="INSIDE" width="3.0" />
@@ -63,7 +63,7 @@
                   <ImageView fx:id="equip_img" fitHeight="64" fitWidth="64" layoutX="23.0" layoutY="-1.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
                </children>
             </Group>
-            <Label fx:id="hotbarguide" text="press 'e' to open hotbar">
+            <Label fx:id="hotbarguide" layoutX="223.0" layoutY="363.0" text="press 'e' to open hotbar">
                <font>
                   <Font name="System Bold" size="12.0" />
                </font>
@@ -71,9 +71,9 @@
                   <DropShadow color="white" height="10.5" radius="6.9925" spread="0.67" width="19.47" />
                </effect>
             </Label>
-            <Group fx:id="daynightnavgroup">
+            <Group fx:id="daynightnavgroup" layoutX="2.0">
                <children>
-                  <ImageView fitHeight="60.0" fitWidth="210.0" pickOnBounds="true" preserveRatio="true">
+                  <ImageView fitHeight="60.0" fitWidth="186.0" pickOnBounds="true" preserveRatio="true">
                      <image>
                         <Image url="@../image/maps/infobar.png" />
                      </image>
@@ -94,7 +94,7 @@
                         <Font name="System Bold" size="9.0" />
                      </font>
                   </Label>
-                  <Label fx:id="name" layoutX="103.0" layoutY="1.0" prefHeight="17.0" prefWidth="76.0" text="Name:">
+                  <Label fx:id="name" layoutX="103.0" prefHeight="14.0" prefWidth="76.0" text="Name:">
                      <font>
                         <Font name="System Bold" size="9.0" />
                      </font>
