@@ -91,7 +91,7 @@
             </Group>
             <Group fx:id="daynightnavgroup">
                <children>
-                  <ImageView fitHeight="60.0" fitWidth="210.0" pickOnBounds="true" preserveRatio="true">
+                  <ImageView fitHeight="60.0" fitWidth="186.0" pickOnBounds="true" preserveRatio="true">
                      <image>
                         <Image url="@../image/maps/infobar.png" />
                      </image>
@@ -112,7 +112,7 @@
                         <Font name="System Bold" size="9.0" />
                      </font>
                   </Label>
-                  <Label fx:id="name" layoutX="103.0" layoutY="1.0" prefHeight="17.0" prefWidth="76.0" text="Name:">
+                  <Label fx:id="name" layoutX="103.0" prefHeight="14.0" prefWidth="76.0" text="Name:">
                      <font>
                         <Font name="System Bold" size="9.0" />
                      </font>

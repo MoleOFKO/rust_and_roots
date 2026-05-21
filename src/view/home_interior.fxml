@@ -175,9 +175,21 @@
                      <Button fx:id="btncook" layoutX="106.0" layoutY="201.0" mnemonicParsing="false" onAction="#handlecookaction" opacity="0.0" prefHeight="48.0" prefWidth="70.0" styleClass="invisible-button" stylesheets="@../css/style.css" />
                   </children>
                </Group>
-               <Group fx:id="daynightnavgroup" layoutX="40.0" layoutY="25.0">
+               <Label fx:id="hotbarguide" layoutX="229.0" layoutY="358.0" text="press 'e' to open hotbar">
+                  <font>
+                     <Font name="System Bold" size="12.0" />
+                  </font>
+                  <effect>
+                     <DropShadow height="10.5" radius="6.9925" spread="0.67" width="19.47">
+                        <color>
+                           <Color fx:value="#ffffff" />
+                        </color>
+                     </DropShadow>
+                  </effect>
+               </Label>
+               <Group fx:id="daynightnavgroup" layoutX="42.0" layoutY="26.0">
                   <children>
-                     <ImageView fitHeight="60.0" fitWidth="210.0" pickOnBounds="true" preserveRatio="true">
+                     <ImageView fitHeight="60.0" fitWidth="186.0" pickOnBounds="true" preserveRatio="true">
                         <image>
                            <Image url="@../image/maps/infobar.png" />
                         </image>
@@ -198,7 +210,7 @@
                            <Font name="System Bold" size="9.0" />
                         </font>
                      </Label>
-                     <Label fx:id="name" layoutX="103.0" layoutY="1.0" prefHeight="17.0" prefWidth="76.0" text="Name:">
+                     <Label fx:id="name" layoutX="103.0" prefHeight="14.0" prefWidth="76.0" text="Name:">
                         <font>
                            <Font name="System Bold" size="9.0" />
                         </font>
@@ -227,18 +239,6 @@
                      </ImageView>
                   </children>
                </Group>
-               <Label fx:id="hotbarguide" layoutX="229.0" layoutY="358.0" text="press 'e' to open hotbar">
-                  <font>
-                     <Font name="System Bold" size="12.0" />
-                  </font>
-                  <effect>
-                     <DropShadow height="10.5" radius="6.9925" spread="0.67" width="19.47">
-                        <color>
-                           <Color fx:value="#ffffff" />
-                        </color>
-                     </DropShadow>
-                  </effect>
-               </Label>
                <Button fx:id="btntuto" layoutX="523.0" layoutY="28.0" mnemonicParsing="false" onAction="#handlebtntutoaction" prefHeight="28.0" prefWidth="28.0" style="-fx-background-radius: 100%; -fx-background-color: transparent; -fx-border-color: yellow; -fx-border-radius: 100%; -fx-border-width: 1; -fx-padding: 0;" styleClass="invisible-button" stylesheets="@../css/style.css" textFill="#e6ff00">
                   <graphic>
                      <FontAwesomeIcon fill="#f6ff00" glyphName="QUESTION" size="1.5em" text="" />

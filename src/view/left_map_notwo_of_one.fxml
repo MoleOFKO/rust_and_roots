@@ -118,14 +118,6 @@
                   <ImageView fx:id="equip_img" fitHeight="64" fitWidth="64" layoutX="23.0" layoutY="-1.0" pickOnBounds="true" preserveRatio="false" smooth="false" />
                </children>
             </Group>
-            <Label fx:id="hotbarguide" layoutX="224.0" layoutY="372.0" text="press 'e' to open hotbar">
-               <font>
-                  <Font name="System Bold" size="12.0" />
-               </font>
-               <effect>
-                  <DropShadow color="white" height="10.5" radius="6.9925" spread="0.67" width="19.47" />
-               </effect>
-            </Label>
             <Group fx:id="slime" layoutX="-169.0" layoutY="74.0">
                <children>
                   <Rectangle fx:id="slime_hitbox" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="20.0" layoutX="262.0" layoutY="171.0" stroke="RED" strokeType="INSIDE" translateX="24" translateY="28" width="14.0" />
@@ -150,6 +142,14 @@
                   <Rectangle fx:id="slime1_detect" arcHeight="5.0" arcWidth="5.0" fill="transparent" height="113.0" layoutX="237.0" layoutY="152.0" stroke="RED" strokeType="INSIDE" width="113.0" />
                </children>
             </Group>
+            <Label fx:id="hotbarguide" layoutX="224.0" layoutY="372.0" text="press 'e' to open hotbar">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+               <effect>
+                  <DropShadow color="white" height="10.5" radius="6.9925" spread="0.67" width="19.47" />
+               </effect>
+            </Label>
             <Group fx:id="treelayorgp4" layoutX="456.0" layoutY="188.0">
                <children>
                   <ImageView fx:id="treelayorimg4" fitHeight="126.0" fitWidth="107.0" pickOnBounds="true" preserveRatio="true" />
@@ -175,9 +175,9 @@
                   <ImageView fx:id="treelayorimg" fitHeight="126.0" fitWidth="107.0" pickOnBounds="true" preserveRatio="true" />
                </children>
             </Group>
-            <Group fx:id="daynightnavgroup">
+            <Group fx:id="daynightnavgroup" layoutX="1.0">
                <children>
-                  <ImageView fitHeight="60.0" fitWidth="210.0" pickOnBounds="true" preserveRatio="true">
+                  <ImageView fitHeight="60.0" fitWidth="186.0" pickOnBounds="true" preserveRatio="true">
                      <image>
                         <Image url="@../image/maps/infobar.png" />
                      </image>
@@ -198,7 +198,7 @@
                         <Font name="System Bold" size="9.0" />
                      </font>
                   </Label>
-                  <Label fx:id="name" layoutX="103.0" layoutY="1.0" prefHeight="17.0" prefWidth="76.0" text="Name:">
+                  <Label fx:id="name" layoutX="103.0" prefHeight="14.0" prefWidth="76.0" text="Name:">
                      <font>
                         <Font name="System Bold" size="9.0" />
                      </font>
