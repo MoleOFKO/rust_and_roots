@@ -96,7 +96,7 @@ public class Farm_tableController implements Initializable, SceneController {
 
     @FXML
     private void handlebtntutoaction(ActionEvent event) {
-        TutorialOverlayHelper.show(view, event, TutorialOverlayHelper.GLOBAL_BUTTON_TUTORIAL_IMAGES);
+        TutorialOverlayHelper.show(view, event, FARM_TUTORIAL_IMAGES);
         if (event != null) {
             event.consume();
         }
