@@ -30,7 +30,7 @@ public class dbcon {
     // ---- Connection config ----
     private static final String URL = "jdbc:mysql://localhost:3306/rust_and_root";
     private static final String USERNAME = "root";
-    private static final String PASSWORD = "Er05@vE1!fE5";
+    private static final String PASSWORD = "123123";
 
     // ---- Driver + schema bootstrap ----
     private static final Object INIT_LOCK = new Object();
